@@ -15,6 +15,10 @@
 	gap: 1.2rem;
 }
 
+.logo {
+	text-decoration: none;
+}
+
 .logo h1 {
 	font-size: 2.1rem;
 	font-weight: 700;
@@ -88,4 +92,74 @@
 
 .notification-dot {
 	display: none;
+}
+
+/* Tab Navigation Styles */
+/* 탭 네비게이션 컨테이너 - 가로 스크롤 가능한 탭 리스트를 감싸는 요소 */
+.tab-navigation {
+	width: 100%;
+	background-color: #fff;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+/* 탭 리스트 - 가로로 나열된 탭들을 감싸는 ul 요소 */
+.tab-list {
+	display: flex;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	overflow-x: auto;
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE and Edge */
+}
+
+/* 탭 리스트의 스크롤바 숨기기 */
+.tab-list::-webkit-scrollbar {
+	display: none; /* Chrome, Safari, Opera */
+}
+
+/* 개별 탭 아이템 - 각 탭 버튼을 감싸는 li 요소 */
+.tab-item {
+	flex-shrink: 0;
+}
+
+/* 탭 버튼 - 클릭 가능한 탭 요소 */
+.tab-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.2rem 1rem;
+	border: none;
+	background: none;
+	cursor: pointer;
+	font-size: 1.4rem;
+	color: #666;
+	font-weight: 400;
+	position: relative;
+	white-space: nowrap;
+	transition: all 0.2s ease;
+}
+
+/* 탭 버튼 호버 효과 */
+.tab-button:hover {
+	color: #222;
+}
+
+/* 활성화된 탭 버튼 스타일 */
+.tab-button.active {
+	color: #222;
+	font-weight: 600;
+}
+
+/* 활성화된 탭 아래의 강조선 */
+.tab-button.active::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 3rem;
+	height: 0.2rem;
+	background-color: #222;
+	border-radius: 0.1rem;
 }

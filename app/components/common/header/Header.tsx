@@ -1,27 +1,32 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { useState } from 'react';
 import styles from './header.module.scss';
+import { HEADER_TABS, DEFAULT_ACTIVE_TAB } from '@/constraint/header';
+import { shouldHideHeader } from '@/utils/header';
+import { HeaderTab } from '@/types/header';
 
 export default function Header() {
   const pathname = usePathname();
-  
-  // 헤더를 숨길 페이지들
-  const hideHeaderPaths = ['/login', '/signup', '/auth'];
-  
+  const [activeTab, setActiveTab] = useState<HeaderTab>(DEFAULT_ACTIVE_TAB);
+
   // 현재 경로가 헤더를 숨겨야 하는 경로인지 확인
-  const shouldHideHeader = hideHeaderPaths.some(path => pathname.startsWith(path));
-  
-  if (shouldHideHeader) {
+  if (shouldHideHeader(pathname)) {
     return null;
   }
+
+  const handleTabClick = (tab: HeaderTab) => {
+    setActiveTab(tab);
+  };
 
   return (
     <header className={styles.header}>
       <div className={styles['header-container']}>
-        <div className={styles.logo}>
+        <Link href="/" className={styles.logo}>
           <h1>KNACK</h1>
-        </div>
+        </Link>
         
         <div className={styles['search-container']}>
           <svg className={styles['search-icon']} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -52,6 +57,22 @@ export default function Header() {
           </button>
         </div>
       </div>
+      
+      {/* 탭 네비게이션 */}
+      <nav className={styles['tab-navigation']} aria-label="카테고리 탭">
+        <ul className={styles['tab-list']}>
+          {HEADER_TABS.map((tab) => (
+            <li key={tab} className={styles['tab-item']}>
+              <button
+                className={`${styles['tab-button']} ${activeTab === tab ? styles.active : ''}`}
+                onClick={() => handleTabClick(tab)}
+              >
+                {tab}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </header>
   );
 } 
