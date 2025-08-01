@@ -1,0 +1,80 @@
+/* Footer Styles */
+.footer {
+	position: fixed;
+	bottom: 0;
+	left: 50%;
+	right: 0;
+	background-color: #fff;
+	border-top: 1px solid #f0f0f0;
+	z-index: 1000;
+	transform: translateX(-50%);
+	max-width: 440px;
+	width: 100%;
+}
+
+.footer-nav {
+	width: 100%;
+}
+
+.nav-list {
+	display: flex;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.nav-item {
+	flex: 1;
+}
+
+.nav-button {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	padding: 0.8rem 0.5rem;
+	border: none;
+	background: none;
+	cursor: pointer;
+	gap: 0.3rem;
+	/* iOS Safari 기본 버튼 스타일 제거 */
+	-webkit-appearance: none;
+	appearance: none;
+	/* 추가 iOS 스타일 리셋 */
+	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.icon-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.4rem;
+	height: 2.4rem;
+}
+
+.icon-container svg {
+	width: 2.4rem;
+	height: 2.4rem;
+	color: #666; /* 기본 색상 명시적 설정 */
+}
+
+.nav-label {
+	font-size: 1rem;
+	font-weight: 400;
+	color: #666;
+	text-align: center;
+}
+
+/* 활성화된 탭 스타일 */
+.nav-button.active .nav-label {
+	color: #222;
+	font-weight: 500;
+}
+
+.nav-button.active .icon-container svg {
+	color: #222;
+} 
