@@ -1,17 +1,17 @@
-// /backend/application/use-cases/CreateOrderUseCase.ts
+// backend/application/use-cases/CreateOrderUseCase.ts
 import { OrderRepository } from '@/backend/domain/repositories/OrderRepository'
-import { Order } from '@/backend/domain/entities/Order'
+import { CreateOrderItemDto } from '@/backend/application/orders/dtos/CreateOrderItemDto'
 
 export class CreateOrderUseCase {
     constructor(private repo: OrderRepository) { }
 
     async execute(input: {
         userId: string
-        items: { productId: string; count: number; price: number; salePrice?: number }[]
+        items: CreateOrderItemDto[]
     }): Promise<string[]> {
         const now = new Date()
 
-        const orders: Omit<Order, 'id'>[] = input.items.map((item) => ({
+        const orders = input.items.map((item) => ({
             userId: input.userId,
             productId: item.productId,
             count: item.count,

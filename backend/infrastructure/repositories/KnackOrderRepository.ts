@@ -1,12 +1,12 @@
-import { OrderRepository } from '@/backend/domain/repositories/OrderRepository';
-import { Order } from '@/backend/domain/entities/Order';
+import { OrderRepository } from '@/backend/domain/repositories/OrderRepository'
+import { CreateOrderEntityDto } from '@/backend/application/orders/dtos/CreateOrderEntityDto'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
 export class KnackOrderRepository implements OrderRepository {
 
-    async saveMany(orders: Order[]): Promise<string[]> {
+    async saveMany(orders: CreateOrderEntityDto[]): Promise<string[]> {
         const created = await prisma.$transaction(
             orders.map((o) =>
                 prisma.order.create({
@@ -22,7 +22,7 @@ export class KnackOrderRepository implements OrderRepository {
                 })
             )
         )
-        return created.map((o: { id: string }) => o.id)
+        return created.map((o) => o.id)
     }
 
     async updatePaymentId(orderIds: string[], paymentId: string): Promise<void> {
@@ -31,4 +31,4 @@ export class KnackOrderRepository implements OrderRepository {
             data: { paymentId },
         })
     }
-}   
+}

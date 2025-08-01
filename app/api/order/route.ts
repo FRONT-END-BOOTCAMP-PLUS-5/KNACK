@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { CreateOrderUseCase } from '@/backend/application/usecases/CreateOrderUseCase'
+import { CreateOrderUseCase } from '@/backend/application/orders/usecases/CreateOrderUseCase'
 import { KnackOrderRepository } from '@/backend/infrastructure/repositories/KnackOrderRepository'
 
 export async function POST(req: NextRequest) {

@@ -1,6 +1,6 @@
-import { Order } from "../entities/Order";
+import { CreateOrderEntityDto } from '@/backend/application/orders/dtos/CreateOrderEntityDto'
 
 export interface OrderRepository {
-    saveMany(orders: Omit<Order, 'id'>[]): string[] | PromiseLike<string[]>;
-    updatePaymentId(orderIds: string[], paymentId: string): Promise<void>;
+    saveMany(orders: CreateOrderEntityDto[]): Promise<string[]>
+    updatePaymentId(orderIds: string[], paymentId: string): Promise<void>
 }
