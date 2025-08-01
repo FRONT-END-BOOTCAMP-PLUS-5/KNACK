@@ -1,20 +1,34 @@
 import { OrderRepository } from '@/backend/domain/repositories/OrderRepository';
 import { Order } from '@/backend/domain/entities/Order';
-import { serverRequester } from '@/backend/utils/serverRequester';
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export class KnackOrderRepository implements OrderRepository {
-    ; async save(order: Order) {
-        const res = await serverRequester.post('/orders', order);
-        return res.data;
+
+    async saveMany(orders: Order[]): Promise<string[]> {
+        const created = await prisma.$transaction(
+            orders.map((o) =>
+                prisma.order.create({
+                    data: {
+                        userId: o.userId,
+                        productId: o.productId,
+                        count: o.count,
+                        price: o.price,
+                        salePrice: o.salePrice,
+                        deliveryStatus: o.deliveryStatus,
+                        createdAt: o.createdAt,
+                    },
+                })
+            )
+        )
+        return created.map((o: { id: string }) => o.id)
     }
 
-    async saveMany(orders: Omit<Order, 'id'>[]): Promise<string[]> {
-        const res = await serverRequester.post('/orders/batch', { orders });
-        return res.data;
-    }
-
-    async findByPaymentId(paymentId: string) {
-        const res = await serverRequester.get(`/orders?paymentId=${paymentId}`);
-        return res.data;
+    async updatePaymentId(orderIds: string[], paymentId: string): Promise<void> {
+        await prisma.order.updateMany({
+            where: { id: { in: orderIds } },
+            data: { paymentId },
+        })
     }
 }   
