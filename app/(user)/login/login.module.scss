@@ -1,0 +1,51 @@
+.loginContainer {
+	min-height: 100vh;
+	background-color: #fff;
+	padding: 2rem 1.6rem;
+	position: relative;
+}
+
+.logoSection {
+  text-align: center;
+  margin: 5rem 0 5rem;
+}
+
+.logo {
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 1rem;
+  letter-spacing: -0.02em;
+  font-style: italic;
+}
+
+.slogan {
+  font-size: 1.4rem;
+  color: #000;
+  margin: 0;
+  line-height: 1.4;
+	font-weight: 600;
+}
+
+.additionalOptions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.6rem;
+  margin-bottom: 4rem;
+  
+  a {
+    font-size: 1.4rem;
+    color: #666;
+    text-decoration: none;
+    
+    &:hover {
+      color: #222;
+    }
+  }
+  
+  .divider {
+    color: #e0e0e0;
+    font-size: 1.2rem;
+  }
+}
