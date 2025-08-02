@@ -1,24 +1,27 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import styles from './header.module.scss';
-import { HEADER_TABS, DEFAULT_ACTIVE_TAB } from '@/constraint/header';
-import { shouldHideHeader } from '@/utils/header';
-import { HeaderTab } from '@/types/header';
+import { HEADER_TABS, DEFAULT_ACTIVE_TAB, HeaderTab } from '@/constraint/header';
 
 export default function Header() {
-  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<HeaderTab>(DEFAULT_ACTIVE_TAB);
-
-  // 현재 경로가 헤더를 숨겨야 하는 경로인지 확인
-  if (shouldHideHeader(pathname)) {
-    return null;
-  }
+  const { data: session } = useSession();
 
   const handleTabClick = (tab: HeaderTab) => {
     setActiveTab(tab);
+  };
+
+  const handleCartClick = () => {
+    if (!session) {
+      // 로그인하지 않은 경우 로그인 페이지로 이동
+      window.location.href = '/login';
+    } else {
+      // 로그인한 경우 장바구니 페이지로 이동
+      window.location.href = '/cart';
+    }
   };
 
   return (
@@ -48,7 +51,7 @@ export default function Header() {
             </svg>
             <span className={styles['notification-dot']}></span>
           </button>
-          <button className={styles['icon-button']}>
+          <button className={styles['icon-button']} onClick={handleCartClick}>
             <svg className={styles['bag-icon']} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
               <line x1="3" y1="6" x2="21" y2="6"/>

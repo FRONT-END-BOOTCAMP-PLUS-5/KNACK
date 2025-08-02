@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "@/app/styles/global.scss";
-import Header from "@/app/components/common/header/Header";
-import Footer from "@/app/components/common/footer/Footer";
+import LayoutWrapper from "@/app/(user)/LayoutWrapper";
 
 export const metadata: Metadata = {
   title: "KNACK",
@@ -16,9 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Header />
-        {children}
-        <Footer />
+        <LayoutWrapper>
+          {children}
+        </LayoutWrapper>
       </body>
     </html>
   );
