@@ -1,0 +1,17 @@
+.chip_button_style {
+  display: flex;
+  align-items: center;
+
+  & .chip_button {
+    margin-left: 6px;
+    border-radius: 100px;
+    border: 1px solid #ebebeb;
+    background: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
