@@ -18,3 +18,10 @@
   -webkit-line-clamp: $line;
   -webkit-box-orient: vertical;
 }
+
+@mixin max-width($width: 440px) {
+  max-width: 440px;
+  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
