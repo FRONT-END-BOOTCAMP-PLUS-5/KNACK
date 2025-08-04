@@ -5,6 +5,7 @@ import { KnackPaymentRepository } from '@/backend/infrastructure/repositories/Kn
 import { KnackCardRepository } from '@/backend/infrastructure/repositories/KnackCardRepository'
 import { CreatePaymentDto } from '@/backend/application/payments/dtos/CreatePaymentDto'
 import { CreateCardDto } from '@/backend/application/payments/dtos/CreateCardDto'
+import { AxiosError } from 'axios'
 
 export async function POST(req: NextRequest) {
     try {
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(data)
     } catch (error) {
         const errRes = error && typeof error === 'object' && 'response' in error
-            ? (error as any).response?.data
+            ? (error as AxiosError).response?.data
             : { message: '결제 승인 실패' }
         return NextResponse.json(errRes, { status: 400 })
     }
