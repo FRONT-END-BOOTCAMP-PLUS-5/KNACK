@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         // ✅ AxiosError 타입 가드
         const errRes =
             error && typeof error === 'object' && 'isAxiosError' in error
-                ? (error as AxiosError).response?.data ?? { message: '결제 승인 실패' }
+                ? (error as AxiosError).response?.data
                 : { message: (error as Error).message ?? '결제 승인 실패' }
 
         return NextResponse.json(errRes, { status: 400 })

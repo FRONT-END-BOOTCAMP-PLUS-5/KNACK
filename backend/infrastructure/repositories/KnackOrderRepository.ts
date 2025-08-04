@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 export class KnackOrderRepository implements OrderRepository {
 
-    async saveMany(orders: CreateOrderEntityDto[]): Promise<string[]> {
+    async saveMany(orders: CreateOrderEntityDto[]): Promise<number[]> {
         const created = await prisma.$transaction(
             orders.map((o) =>
                 prisma.order.create({
@@ -18,6 +18,7 @@ export class KnackOrderRepository implements OrderRepository {
                         salePrice: o.salePrice,
                         deliveryStatus: o.deliveryStatus,
                         createdAt: o.createdAt,
+                        paymentId: 0, // Temporary, will be updated later
                     },
                 })
             )
@@ -25,7 +26,7 @@ export class KnackOrderRepository implements OrderRepository {
         return created.map((o) => o.id)
     }
 
-    async updatePaymentId(orderIds: string[], paymentId: string): Promise<void> {
+    async updatePaymentId(orderIds: number[], paymentId: number): Promise<void> {
         await prisma.order.updateMany({
             where: { id: { in: orderIds } },
             data: { paymentId },

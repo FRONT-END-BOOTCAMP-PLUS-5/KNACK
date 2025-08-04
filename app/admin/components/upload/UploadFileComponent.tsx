@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useRef, useState } from 'react'
+import Image from 'next/image'
 import styles from './UploadFileComponent.module.scss'
 import { post, filePut } from '@/utils/requester'
 
@@ -44,7 +45,13 @@ export default function UploadFileComponent({ uploadUrl, storagePath }: Props) {
                 onChange={handleFileChange}
             />
             {previewUrl ? (
-                <img src={previewUrl} alt="preview" className={styles.preview} />
+                <Image
+                    src={previewUrl}
+                    alt="preview"
+                    width={200}
+                    height={150}
+                    className={styles.preview}
+                />
             ) : (
                 <>
                     <div className={styles.icon} />

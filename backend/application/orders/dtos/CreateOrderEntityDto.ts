@@ -1,10 +1,10 @@
 // backend/application/dto/CreateOrderEntityDto.ts
 export interface CreateOrderEntityDto {
     userId: string
-    productId: string
+    productId: number
     count: number
     price: number
     salePrice: number
-    deliveryStatus: string
+    deliveryStatus: number
     createdAt: Date
 }

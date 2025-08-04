@@ -8,7 +8,7 @@ export class CreateOrderUseCase {
     async execute(input: {
         userId: string
         items: CreateOrderItemDto[]
-    }): Promise<string[]> {
+    }): Promise<number[]> {
         const now = new Date()
 
         const orders = input.items.map((item) => ({
@@ -17,7 +17,7 @@ export class CreateOrderUseCase {
             count: item.count,
             price: item.price,
             salePrice: item.salePrice ?? item.price,
-            deliveryStatus: 'READY',
+            deliveryStatus: 1, // Convert string to number based on schema
             createdAt: now,
         }))
 
