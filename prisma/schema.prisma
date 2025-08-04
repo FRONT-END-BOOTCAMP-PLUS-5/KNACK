@@ -96,7 +96,8 @@ model RelatedProduct {
 // 상품 테이블 (products)
 model Product {
   id                  Int         @id @default(autoincrement())
-  productName         String      @map("product_name") @db.VarChar
+  productKorName         String      @map("product_kor_name") @db.VarChar
+  productEngName         String      @map("product_eng_name") @db.VarChar
   descriptionText     String?     @map("description_text") @db.VarChar
   thumbnailImage      String      @map("thumbnail_image") @db.VarChar
   subImages           String?     @map("sub_images") @db.VarChar
