@@ -1,32 +1,44 @@
 import prisma from '@/backend/utils/prisma';
 import { CartRepository } from '../domains/repositires/CartRepository';
+import { Cart } from '../domains/entities/Cart';
 
 interface IProps {
   userId: string;
   productId: number;
-  option_mapping_id: number;
+  optionMappingId: number;
   count: number;
 }
 
 export class PrCartRepository implements CartRepository {
   private cartData;
 
-  constructor(cartData: IProps) {
+  constructor(cartData?: IProps) {
     this.cartData = cartData;
   }
 
   async insertCart(): Promise<number> {
-    const { count, option_mapping_id, productId, userId } = this.cartData;
+    const { count, optionMappingId, productId, userId } = this.cartData ?? {};
 
     const result = await prisma.cart.create({
       data: {
-        productId: productId,
-        count: count,
-        optionMappingId: option_mapping_id,
-        userId: userId,
+        productId: productId ?? 0,
+        count: count ?? 0,
+        optionMappingId: optionMappingId ?? 0,
+        userId: userId ?? '',
       },
     });
 
     return result.id;
+  }
+
+  async getCart(): Promise<Cart[]> {
+    const result = await prisma.cart.findMany({
+      where: { userId: '7571e92b-f38b-4878-959c-f76ab9290ed8' },
+      include: { productOptionMapping: { include: { optionValue: { include: { optionType: true } } } } },
+    });
+
+    console.log('result ', result);
+
+    return result;
   }
 }
