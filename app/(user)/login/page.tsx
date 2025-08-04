@@ -1,3 +1,6 @@
+'use client';
+
+import React from 'react';
 import styles from './login.module.scss';
 import LoginForm from '@/components/common/LoginForm';
 import SocialLogin from '@/components/auth/SocialLogin';
@@ -5,10 +8,10 @@ import SocialLogin from '@/components/auth/SocialLogin';
 export default function LoginPage() {
 
   return (
-    <main className={styles.loginContainer}>
+    <main className={styles.login_container}>
 
       {/* 로고 및 슬로건 */}
-      <div className={styles.logoSection}>
+      <div className={styles.logo_section}>
         <h1 className={styles.logo}>KNACK</h1>
         <p className={styles.slogan}>Knowhow Nifty Art Chic</p>
       </div>
@@ -17,7 +20,7 @@ export default function LoginPage() {
       <LoginForm />
 
       {/* 추가 옵션 */}
-      <div className={styles.additionalOptions}>
+      <div className={styles.additional_options}>
         <a href="/signup">이메일 가입</a>
         <span className={styles.divider}>|</span>
         <a href="/find-email">이메일 찾기</a>
