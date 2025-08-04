@@ -253,7 +253,8 @@ model Brand {
 // 카테고리 테이블 (categories)
 model Category {
   id              Int         @id @default(autoincrement())
-  name            String      @db.VarChar
+  korName         String      @db.VarChar
+  endName         String      @db.VarChar
   createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
   isPrivate       Boolean     @default(true) @map("is_private")
 
