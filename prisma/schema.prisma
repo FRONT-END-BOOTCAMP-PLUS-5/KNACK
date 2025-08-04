@@ -319,6 +319,7 @@ model Payment {
   approvedAt      DateTime?   @map("approved_at") @db.Timestamptz()
   method       String         @db.VarChar
   status       String         @db.VarChar
+  tossPaymentKey String       @map("toss_payment_key") @db.VarChar 
 
   user            User        @relation(fields: [userId], references: [id])
   address         Address     @relation(fields: [addressId], references: [id])
