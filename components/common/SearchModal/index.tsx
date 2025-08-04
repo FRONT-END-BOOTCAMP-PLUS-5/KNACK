@@ -1,3 +1,5 @@
+'use client';
+
 import styles from './searchModal.module.scss';
 import SearchHeader from './SearchHeader';
 import RecentKeywords from './RecentKeywords';
