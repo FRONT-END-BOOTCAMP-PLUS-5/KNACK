@@ -1,15 +1,23 @@
-import { FileUploadRepository } from '@/backend/domain/repositories/FileUploadRepository';
-import { s3 } from '@/backend/infrastructure/database/s3Client';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
-export class S3FileUploadRepository implements FileUploadRepository {
-    async generatePresignedUrl(fileName: string, fileType: string, keyUrl: string) {
+const s3 = new S3Client({
+    region: process.env.AWS_REGION, // ✅ 지역을 명시적으로 지정
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    },
+})
+
+export class S3FileUploadRepository {
+    async generatePresignedUrl(fileName: string, fileType: string, storage: string): Promise<string> {
         const command = new PutObjectCommand({
             Bucket: process.env.S3_BUCKET_NAME!,
-            Key: `${keyUrl}/${fileName}`,
+            Key: `${storage}/${fileName}`,
             ContentType: fileType,
-        });
-        return await getSignedUrl(s3, command, { expiresIn: 60 });
+            ACL: 'private',
+        })
+
+        return await getSignedUrl(s3, command, { expiresIn: 60 })
     }
 }

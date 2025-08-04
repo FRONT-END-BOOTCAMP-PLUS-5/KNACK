@@ -1,0 +1,40 @@
+.uploadBox {
+    width: 200px;
+    height: 150px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        background-color: #f0f0f0;
+        border-color: #ccc;
+    }
+
+    input[type='file'] {
+        display: none;
+    }
+
+    .icon {
+        font-size: 24px;
+        margin-bottom: 8px;
+        color: #999;
+    }
+
+    .label {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .preview {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+}
