@@ -254,7 +254,7 @@ model Brand {
 model Category {
   id              Int         @id @default(autoincrement())
   korName         String      @db.VarChar
-  endName         String      @db.VarChar
+  engName         String      @db.VarChar
   createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
   isPrivate       Boolean     @default(true) @map("is_private")
 
