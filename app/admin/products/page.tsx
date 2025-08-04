@@ -1,51 +1,58 @@
-// ProductImageUploadPage.tsx
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import UploadFileComponent from '@/app/(admin)/components/upload/UploadFileComponent'
-import { post } from '@/utils/requester'
-import styles from './ProductImageUploadPage.module.scss'
-import { STORAGE_PATHS } from '@/backend/utils/constants'
+import Flex from '@/components/common/Flex';
+import axios from 'axios';
+import styles from './productsPage.module.scss';
+import { useState } from 'react';
 
-export default function ProductImageUploadPage() {
-    const [uploadedUrl, setUploadedUrl] = useState<string>('')
-    const [fileName, setFileName] = useState<string>('')
-    const [message, setMessage] = useState<string>('')
+const ProductsPage = () => {
+  const [korName, setKorName] = useState('');
+  const [engName, setEngName] = useState('');
+  const [price, setPrice] = useState('');
+  const [gender, setGender] = useState('');
+  const [categoryId, setCategoryId] = useState(0);
+  const [brandId, setBrandId] = useState(0);
+  const [thumbnailImage, setThumbnailImage] = useState('');
+  const [subImages, setSubImages] = useState('');
 
-    const handleUploadSuccess = (url: string, name: string) => {
-        setUploadedUrl(url)
-        setFileName(name)
-        setMessage('')
-    }
+  const createProduct = () => {
+    const data = {
+      korName: korName,
+      engName: engName,
+      price: price,
+      gender: gender,
+      categoryId: categoryId,
+      brandId: brandId,
+      thumbnailImage: thumbnailImage,
+      subImages: subImages,
+    };
 
-    const handleRegister = async () => {
-        if (!uploadedUrl) {
-            setMessage('이미지를 업로드해주세요.')
-            return
-        }
+    axios
+      .post('/api/admin/products', data)
+      .then((res) => {
+        console.log('res', res.data);
+      })
+      .catch((error) => {
+        console.log('error', error);
+      });
+  };
 
-        try {
-            await post('/api/products/image', {
-                imageUrl: uploadedUrl,
-                fileName,
-            })
-            setMessage('✅ 이미지가 성공적으로 등록되었습니다.')
-        } catch (err) {
-            setMessage('❌ 이미지 등록 중 오류가 발생했습니다.')
-        }
-    }
+  return (
+    <div className={styles.container}>
+      <Flex direction="column" gap={12}>
+        <input type="text" placeholder="한글 상품명" onChange={(e) => setKorName(e.target.value)} />
+        <input type="text" placeholder="영어 상품명" onChange={(e) => setEngName(e.target.value)} />
+        <input type="number" placeholder="가격" onChange={(e) => setPrice(e.target.value)} />
+        <input type="text" placeholder="성별" onChange={(e) => setGender(e.target.value)} />
+        <input type="text" placeholder="썸네일 이미지" onChange={(e) => setThumbnailImage(e.target.value)} />
+        <input type="text" placeholder="슬라이드 이미지" onChange={(e) => setSubImages(e.target.value)} />
+        <input type="number" placeholder="카테고리 아이디" onChange={(e) => setCategoryId(Number(e.target.value))} />
+        <input type="number" placeholder="브랜드 아이디" onChange={(e) => setBrandId(Number(e.target.value))} />
+      </Flex>
 
-    return (
-        <div className={styles.container}>
-            <h2>상품 이미지 업로드</h2>
-            <UploadFileComponent
-                uploadUrl="/api/upload"
-                storagePath={STORAGE_PATHS.PRODUCT.THUMBNAIL}
-            />
-            <button className={styles.registerButton} onClick={handleRegister}>
-                등록
-            </button>
-            {message && <p className={styles.message}>{message}</p>}
-        </div>
-    )
-}
+      <button onClick={createProduct}>상품 추가하기</button>
+    </div>
+  );
+};
+
+export default ProductsPage;
