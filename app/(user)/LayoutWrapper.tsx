@@ -2,8 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 import { SessionProvider } from 'next-auth/react';
-import Header from '../components/common/header/Header';
-import Footer from '../components/common/footer/Footer';
+import Header from '@/components/common/header/Header';
+import Footer from '@/components/common/footer/Footer';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import styles from './authInput.module.scss';
 
-interface AuthInputProps {
+interface IProps {
   id: string;
   type: 'email' | 'password';
   value: string;
@@ -21,7 +21,7 @@ export default function AuthInput({
   placeholder,
   error,
   onClear,
-}: AuthInputProps) {
+}: IProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   const inputType = type === 'password' && showPassword ? 'text' : type;

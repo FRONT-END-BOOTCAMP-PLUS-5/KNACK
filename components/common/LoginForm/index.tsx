@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import AuthInput from '../AuthInput';
+import AuthInput from '@/components/common/AuthInput';
 import { useLoginValidation } from '@/hooks/useLoginValidation';
 import styles from './loginForm.module.scss';
 
@@ -47,7 +47,7 @@ export default function LoginForm() {
   const isLoginButtonActive = email && password && !errors.email && !errors.password;
 
   return (
-    <form className={styles.loginForm} onSubmit={handleSubmit}>
+    <form className={styles.login_form} onSubmit={handleSubmit}>
       <AuthInput
         id="email"
         type="email"
@@ -67,11 +67,11 @@ export default function LoginForm() {
         error={errors.password}
       />
 
-      {errors.login && <span className={styles.loginError}>{errors.login}</span>}
+      {errors.login && <span className={styles.login_error}>{errors.login}</span>}
 
       <button 
         type="submit" 
-        className={`${styles.loginButton} ${isLoginButtonActive ? styles.active : ''}`}
+        className={`${styles.login_button} ${isLoginButtonActive ? styles.active : ''}`}
         disabled={!isLoginButtonActive}
       >
         로그인

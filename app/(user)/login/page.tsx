@@ -30,7 +30,3 @@ export default function LoginPage() {
     </main>
   );
 }
-
-/* KNACK: Knowhow Nifty Art Chic
-
-패션에 필요한 ‘요령’, 스타일리시함을 강조. */
