@@ -1,0 +1,42 @@
+.button_style {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  flex: 1 1 0;
+
+  &.border {
+    background: #fff;
+    color: #222;
+    border: 1px solid #ebebeb;
+    font-size: 1.4rem;
+  }
+
+  &.black {
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: #222;
+    color: #fff;
+  }
+
+  &.orange {
+    background: #ef6253;
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  &.medium {
+    min-height: 36px;
+    max-width: 100%;
+  }
+
+  &.large {
+    min-height: 52px;
+    min-width: 140px;
+    max-width: 100%;
+    width: 100%;
+  }
+}

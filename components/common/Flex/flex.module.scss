@@ -1,0 +1,37 @@
+.flex_style {
+  display: flex;
+
+  &.align_ {
+    &center {
+      align-items: center;
+    }
+
+    &start {
+      align-items: start;
+    }
+  }
+
+  &.justify_ {
+    &center {
+      justify-content: center;
+    }
+
+    &between {
+      justify-content: space-between;
+    }
+
+    &start {
+      justify-content: start;
+    }
+  }
+
+  &.width_ {
+    &full {
+      width: 100%;
+    }
+
+    &self {
+      width: auto;
+    }
+  }
+}
