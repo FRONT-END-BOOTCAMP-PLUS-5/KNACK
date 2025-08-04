@@ -36,7 +36,7 @@
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 14px;
+  font-size: 1.4rem;
   color: $black;
   outline: none;
   padding: 0 30px 0 10px;
@@ -59,7 +59,7 @@
   background: none;
   border: none;
   color: $black;
-  font-size: 15px;
+  font-size: 1.5rem;
   cursor: pointer;
   height: 44px;
   margin-left: auto;
@@ -85,18 +85,18 @@
 }
 
 .title {
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 700;
   color: $black;
 }
 
 .title_sub_text {
-  color: #222222cc;
-  font-size: 13px;
+  color: $gray02;
+  font-size: 1.3rem;
 
   > button {
     text-decoration: underline;
-    font-size: 13px;
+    font-size: 1.3rem;
     background: none;
     border: none;
     cursor: pointer;
@@ -120,7 +120,7 @@
   .search_item {
     text-decoration: none;
     color: $black;
-    font-size: 14px;
+    font-size: 1.4rem;
 
     align-items: center;
     border: 1px solid #ebebeb;
@@ -152,7 +152,7 @@
   border: 1px solid #ebebeb;
   text-decoration: none;
   color: $black;
-  font-size: 14px;
+  font-size: 1.4rem;
 
   &:hover {
     background-color: darken($light-gray02, 5%);
@@ -161,7 +161,7 @@
 
 .search_card_ranking {
   column-count: 2;
-  font-size: 14px;
+  font-size: 1.4rem;
   line-height: 17px;
   list-style: none;
 }
@@ -179,7 +179,7 @@
 
 .ranking_title {
   flex: 1;
-  font-size: 14px;
+  font-size: 1.4rem;
   color: $black;
   text-decoration: none;
   @include mixins.text-ellipsis;
@@ -229,7 +229,7 @@
   }
 
   .recent_product_name {
-    font-size: 11px;
+    font-size: 1.1rem;
     color: $black;
     line-height: 1.4;
     @include mixins.text-ellipsis-multi(2);
