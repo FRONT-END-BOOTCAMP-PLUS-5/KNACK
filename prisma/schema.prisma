@@ -34,7 +34,7 @@ model User {
 
 model UserAuth {
   id           Int    @id @default(autoincrement())
-  provider     String @unique @db.VarChar
+  provider     String @db.VarChar
   providerId   String @unique @map("provider_id") @db.VarChar
   passwordHash String @map("password_hash") @db.VarChar
   userId       String @map("user_id") @db.Uuid
@@ -96,8 +96,8 @@ model Product {
   createdAt                        DateTime?              @default(now()) @map("created_at") @db.Timestamptz(6)
   gender                           String?                @default("all") @db.VarChar
   hit                              Int?                   @default(0)
-  productEngName                   String                 @map("product_eng_name") @db.VarChar
-  productKorName                   String                 @map("product_kor_name") @db.VarChar
+  engName                          String                 @map("eng_name") @db.VarChar
+  korName                          String                 @map("kor_name") @db.VarChar
   coupons                          Coupon[]
   inquires                         Inquiry[]
   likes                            Like[]
@@ -280,7 +280,7 @@ model Payment {
   approvedAt     DateTime? @map("approved_at") @db.Timestamptz(6)
   method         String    @db.VarChar
   status         String    @db.VarChar
-  tossPaymentKey String    @map("toss_payment_key") @db.VarChar
+  tossPaymentKey String    @unique @map("toss_payment_key") @db.VarChar
   orders         Order[]
   address        Address   @relation(fields: [addressId], references: [id])
   user           User      @relation(fields: [userId], references: [id])
