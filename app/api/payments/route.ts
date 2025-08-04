@@ -51,8 +51,10 @@ export async function POST(req: NextRequest) {
         }
 
         return NextResponse.json(data)
-    } catch (error: any) {
-        const errRes = error.response?.data ?? { message: '결제 승인 실패' }
+    } catch (error) {
+        const errRes = error && typeof error === 'object' && 'response' in error
+            ? (error as any).response?.data
+            : { message: '결제 승인 실패' }
         return NextResponse.json(errRes, { status: 400 })
     }
 }

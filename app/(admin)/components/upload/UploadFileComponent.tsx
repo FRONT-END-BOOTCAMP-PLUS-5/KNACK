@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react'
 import styles from './UploadFileComponent.module.scss'
-import { filePost, filePut } from '@/utils/requester'
+import { post, filePut } from '@/utils/requester'
 
 interface Props {
     uploadUrl: string
@@ -19,11 +19,11 @@ export default function UploadFileComponent({ uploadUrl, storagePath }: Props) {
         if (!file) return
 
         try {
-            const metaRes = await filePost<{ url: string }>(uploadUrl, {
+            const metaRes = await post<{ url: string }>(uploadUrl, {
                 fileName: file.name,
                 fileType: file.type,
                 storage: storagePath,
-            } as any)
+            })
 
             await filePut(metaRes.url, file)
 
