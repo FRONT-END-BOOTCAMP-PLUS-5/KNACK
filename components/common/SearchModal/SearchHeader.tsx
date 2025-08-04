@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import styles from './searchModal.module.scss';
+import closeIcon from '@/public/icons/circle_close.svg';
 
 export default function SearchHeader() {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
@@ -28,16 +30,7 @@ export default function SearchHeader() {
           />
           {searchKeyword && (
             <button className={styles.btn_search_delete} onClick={handleDeleteClick}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="24" height="24">
-                <circle cx="12" cy="12" r="10" fill="#222" fillOpacity=".2" />
-                <path
-                  fill="#fff"
-                  fillOpacity=".8"
-                  fillRule="evenodd"
-                  d="m10.94 12-3.47 3.47 1.06 1.06L12 13.06l3.47 3.47 1.06-1.06L13.06 12l3.47-3.47-1.06-1.06L12 10.94 8.53 7.47 7.47 8.53 10.94 12z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Image src={closeIcon} alt="close" width={24} height={24} style={{ opacity: 0.2 }} />
             </button>
           )}
         </div>
