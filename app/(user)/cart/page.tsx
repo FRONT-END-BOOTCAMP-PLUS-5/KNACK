@@ -1,3 +1,5 @@
+'use client';
+
 import Divider from '@/components/common/Divider';
 import styles from './cartPage.module.scss';
 import ChipButton from '@/components/common/ChipButton';
@@ -6,6 +8,8 @@ import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
 import CartProduct from '@/components/Cart/CartProduct';
 import PaymentButton from '@/components/Cart/PaymentButton';
+import { cartService } from '@/services/cart';
+import { useEffect } from 'react';
 
 const DELIVERY_DESCRIPTION_TEXT = [
   '배송 방법 및 쿠폰/포인트 적용 여부는 결제 시 선택할 수 있습니다.',
@@ -15,6 +19,14 @@ const DELIVERY_DESCRIPTION_TEXT = [
 ];
 
 const CartPage = () => {
+  const { getCart } = cartService;
+
+  useEffect(() => {
+    getCart().then((res) => {
+      console.log('res', res.result);
+    });
+  }, []);
+
   return (
     <article className={styles.cart_wrap}>
       <section className={styles.all_select_bar}>

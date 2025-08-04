@@ -1,4 +1,5 @@
 import { CreateCartUseCase } from '@/backend/cart/applications/usecases/CreateCartUseCase';
+import { GetCartUseCase } from '@/backend/cart/applications/usecases/GetCartUseCase';
 import { PrCartRepository } from '@/backend/cart/repositories/PrCartRepository';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -8,6 +9,19 @@ export async function POST(request: NextRequest) {
 
     const cartRepository = new PrCartRepository(body);
     const cart = new CreateCartUseCase(cartRepository).create();
+
+    return NextResponse.json({ result: cart, status: 200 });
+  } catch (err) {
+    if (err instanceof Error) {
+      return NextResponse.json({ message: err.message, status: 503 });
+    }
+  }
+}
+
+export async function GET() {
+  try {
+    const cartRepository = new PrCartRepository();
+    const cart = await new GetCartUseCase(cartRepository).execute();
 
     return NextResponse.json({ result: cart, status: 200 });
   } catch (err) {
