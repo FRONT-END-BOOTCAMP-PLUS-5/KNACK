@@ -27,21 +27,21 @@ export default function AuthInput({
   const inputType = type === 'password' && showPassword ? 'text' : type;
 
   return (
-    <div className={styles.inputGroup}>
+    <div className={styles.input_group}>
       <label htmlFor={id}>
         {type === 'email' ? '이메일 주소' : '비밀번호'}
       </label>
-      <div className={styles.inputWrapper}>
+      <div className={styles.input_wrapper}>
         <input
           id={id}
           type={inputType}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={error ? styles.inputError : ''}
+          className={error ? styles.input_error : ''}
         />
         {type === 'email' && value && onClear && (
-          <button type="button" onClick={onClear} className={styles.clearButton}>
+          <button type="button" onClick={onClear} className={styles.clear_button}>
             ×
           </button>
         )}
@@ -49,7 +49,7 @@ export default function AuthInput({
           <button 
             type="button" 
             onClick={() => setShowPassword(!showPassword)} 
-            className={styles.passwordToggle}
+            className={styles.password_toggle}
           >
             {showPassword ? (
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -65,7 +65,7 @@ export default function AuthInput({
           </button>
         )}
       </div>
-      {error && <span className={styles.errorMessage}>{error}</span>}
+      {error && <span className={styles.error_message}>{error}</span>}
     </div>
   );
 } 

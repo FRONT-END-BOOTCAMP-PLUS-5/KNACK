@@ -1,21 +1,21 @@
-.inputGroup {
+.input_group {
   margin-bottom: 2.4rem;
 }
 
-.inputGroup label {
+.input_group label {
   display: block;
   font-size: 1.4rem;
   font-weight: 500;
   color: #222;
 }
 
-.inputWrapper {
+.input_wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.inputWrapper input {
+.input_wrapper input {
   width: 100%;
   height: 4rem;
   padding: 0 4.8rem 0 0rem;
@@ -36,7 +36,7 @@
     border-bottom: 2px solid #222;
   }
   
-  &.inputError {
+  &.input_error {
     border-bottom-color: #ff4757;
   }
   
@@ -50,7 +50,7 @@
   }
 }
 
-.clearButton {
+.clear_button {
   position: absolute;
   right: 1.2rem;
   background: none;
@@ -70,7 +70,7 @@
   }
 }
 
-.passwordToggle {
+.password_toggle {
   position: absolute;
   right: 1.2rem;
   background: none;
@@ -94,7 +94,7 @@
   }
 }
 
-.errorMessage {
+.error_message {
   display: block;
   font-size: 1.3rem;
   color: #ff4757;

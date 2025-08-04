@@ -1,10 +1,10 @@
-.socialLogin {
+.social_login {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
 }
 
-.socialButton {
+.social_button {
   width: 100%;
   height: 5rem;
   border: 1px solid #e0e0e0;
@@ -17,7 +17,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
   
-  .socialIcon {
+  .social_icon {
     position: absolute;
     left: 1.6rem;
     width: 2.4rem;

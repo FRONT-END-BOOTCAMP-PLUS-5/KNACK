@@ -10,14 +10,14 @@ export default function SocialLogin() {
   };
 
   return (
-    <div className={styles.socialLogin}>
+    <div className={styles.social_login}>
       {SOCIAL_LOGIN_PROVIDERS.map((provider) => (
         <button
           key={provider.name}
-          className={`${styles.socialButton} ${styles[`${provider.name}Button`]}`}
+          className={`${styles.social_button} ${styles[`${provider.name}Button`]}`}
           onClick={() => handleSocialLogin(provider.name)}
         >
-          <img src={provider.icon} alt={`${provider.name} 로고`} className={styles.socialIcon} />
+          <img src={provider.icon} alt={`${provider.name} 로고`} className={styles.social_icon} />
           <span>{provider.label}</span>
         </button>
       ))}
