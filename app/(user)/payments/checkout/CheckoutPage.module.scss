@@ -1,63 +1,53 @@
-.checkoutWrapper {
-    padding: 2rem;
+.checkoutContainer {
     max-width: 480px;
     margin: 0 auto;
-}
+    padding: 2rem;
+    font-family: 'Pretendard', sans-serif;
 
-.title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1.25rem;
-}
-
-.methodList {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    list-style: none;
-    padding: 0;
-}
-
-.methodItem {
-    flex: 1 1 40%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    text-align: center;
-    cursor: pointer;
-    font-size: 1rem;
-
-    &:hover {
-        background-color: #f5f5f5;
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
     }
-}
 
-.active {
-    background-color: #222;
-    color: #fff;
-    border-color: #222;
-}
+    .productList {
+        list-style: none;
+        padding: 0;
 
-.paymentInfo {
-    margin-bottom: 2rem;
+        li {
+            margin-bottom: 0.75rem;
 
-    p {
-        margin: 0.25rem 0;
+            label {
+                cursor: pointer;
+
+                input {
+                    margin-right: 0.5rem;
+                }
+            }
+        }
     }
-}
 
-.payButton {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1.125rem;
-    background-color: #0070f3;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    .summary {
+        margin-top: 2rem;
+        font-size: 1.1rem;
 
-    &:hover {
-        background-color: #0059c9;
+        p {
+            margin-bottom: 1rem;
+        }
+
+        button {
+            background: #0064ff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+
+            &:hover {
+                background: #004fcc;
+            }
+        }
     }
 }

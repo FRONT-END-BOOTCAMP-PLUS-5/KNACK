@@ -1,4 +1,3 @@
-// 📁 app/(payment)/checkout/page.tsx
 'use client'
 
 import { useState } from 'react'
@@ -7,55 +6,70 @@ import styles from './CheckoutPage.module.scss'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
 
-const PAYMENT_METHODS = [
-    { label: '카드', value: '카드' },
-    { label: '계좌이체', value: '계좌이체' },
-    { label: '토스페이', value: '토스페이' },
-    { label: '카카오페이', value: '카카오페이' },
-    { label: '네이버페이', value: '네이버페이' },
+const products = [
+    { id: 'prod1', name: '보드게임 A', price: 15000 },
+    { id: 'prod2', name: '보드게임 B', price: 22000 },
+    { id: 'prod3', name: '보드게임 C', price: 30000 },
 ]
 
 export default function CheckoutPage() {
-    const [method, setMethod] = useState<string>('카드')
+    const [selectedIds, setSelectedIds] = useState<string[]>([])
+
+    const toggleProduct = (id: string) => {
+        setSelectedIds((prev) =>
+            prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+        )
+    }
+
+    const totalAmount = products
+        .filter((p) => selectedIds.includes(p.id))
+        .reduce((sum, p) => sum + p.price, 0)
 
     const handlePayment = async () => {
+        if (totalAmount === 0) {
+            alert('상품을 선택해주세요.')
+            return
+        }
+
         try {
             const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY)
-            await tossPayments.requestPayment(method, {
-                amount: 10000,
+
+            await tossPayments.requestPayment('카드', {
+                amount: totalAmount,
                 orderId: `order_${Date.now()}`,
-                orderName: '보드게임 결제',
+                orderName: '보드게임 묶음결제',
                 customerName: '홍길동',
                 successUrl: `${window.location.origin}/payments/success`,
                 failUrl: `${window.location.origin}/payments/fail`,
             })
         } catch (e) {
-            alert('결제 오류가 발생했습니다.')
             console.error(e)
+            alert('결제 실패')
         }
     }
 
     return (
-        <div className={styles.checkoutWrapper}>
-            <h1 className={styles.title}>결제 방법</h1>
-            <ul className={styles.methodList}>
-                {PAYMENT_METHODS.map((m) => (
-                    <li
-                        key={m.value}
-                        className={`${styles.methodItem} ${method === m.value ? styles.active : ''}`}
-                        onClick={() => setMethod(m.value)}
-                    >
-                        {m.label}
+        <main className={styles.checkoutContainer}>
+            <h1>보드게임 결제</h1>
+            <ul className={styles.productList}>
+                {products.map((product) => (
+                    <li key={product.id}>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={selectedIds.includes(product.id)}
+                                onChange={() => toggleProduct(product.id)}
+                            />
+                            {product.name} - {product.price.toLocaleString()}원
+                        </label>
                     </li>
                 ))}
             </ul>
 
-            <div className={styles.paymentInfo}>
-                <p>상품명: 보드게임 결제</p>
-                <p>결제금액: 10,000원</p>
+            <div className={styles.summary}>
+                <p>총 결제 금액: <strong>{totalAmount.toLocaleString()}원</strong></p>
+                <button onClick={handlePayment}>결제하기</button>
             </div>
-
-            <button onClick={handlePayment} className={styles.payButton}>결제하기</button>
-        </div>
+        </main>
     )
 }
