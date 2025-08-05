@@ -8,17 +8,20 @@ const prisma = new PrismaClient()
 export class KnackPaymentRepository implements PaymentRepository {
 
     async save(payment: CreatePaymentDto): Promise<void> {
-        await prisma.payment.create({
+        const created = await prisma.payment.create({
             data: {
                 userId: payment.userId,
                 addressId: payment.addressId,
                 price: payment.price,
                 createdAt: payment.createdAt ?? new Date(),
                 paymentNumber: payment.paymentNumber,
-                tossPaymentKey: payment.tossPaymentKey, // 💡 누락되어 있던 필드
+                tossPaymentKey: payment.tossPaymentKey,
                 approvedAt: payment.approvedAt ?? new Date(),
                 method: payment.method,
                 status: payment.status,
+                orders: {
+                    connect: payment.orderIds.map((id) => ({ id })), // ✅ 결제에 주문 연결
+                },
             },
         })
     }
