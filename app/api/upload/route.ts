@@ -3,10 +3,27 @@ import { S3FileUploadRepository } from '@/backend/uploads/infrastructures/reposi
 import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { NextRequest, NextResponse } from 'next/server'
 
+const fileUploadRepository = new S3FileUploadRepository()
+
+export async function GET(req: NextRequest) {
+    const { searchParams } = new URL(req.url)
+    const key = searchParams.get('key')
+
+    if (!key) {
+        return NextResponse.json({ error: 'Missing key' }, { status: 400 })
+    }
+
+    try {
+        const url = await fileUploadRepository.generatePresignedGetUrl(key)
+        return NextResponse.json({ url })
+    } catch (e) {
+        return NextResponse.json({ error: 'URL 생성 실패' }, { status: 500 })
+    }
+}
+
 export async function POST(req: NextRequest) {
     const { fileName, fileType, storage } = await req.json()
 
-    const fileUploadRepository = new S3FileUploadRepository()
     const url = await fileUploadRepository.generatePresignedUrl(fileName, fileType, storage)
     return NextResponse.json({ url })
 }
