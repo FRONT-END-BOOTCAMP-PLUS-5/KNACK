@@ -1,5 +1,6 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { FileUploadRepository } from '../../domains/repositories/FileUploadRepository'
 
 const s3 = new S3Client({
     region: process.env.AWS_REGION, // ✅ 지역을 명시적으로 지정
@@ -9,7 +10,7 @@ const s3 = new S3Client({
     },
 })
 
-export class S3FileUploadRepository {
+export class S3FileUploadRepository implements FileUploadRepository {
     async generatePresignedUrl(fileName: string, fileType: string, storage: string): Promise<string> {
         const command = new PutObjectCommand({
             Bucket: process.env.S3_BUCKET_NAME!,

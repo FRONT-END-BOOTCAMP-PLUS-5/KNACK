@@ -1,5 +1,5 @@
-import { OrderRepository } from '@/backend/domain/repositories/OrderRepository'
-import { CreateOrderEntityDto } from '@/backend/application/orders/dtos/CreateOrderEntityDto'
+import { OrderRepository } from '@/backend/orders/domains/repositories/OrderRepository'
+import { CreateOrderEntityDto } from '@/backend/orders/applications/dtos/CreateOrderEntityDto'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()

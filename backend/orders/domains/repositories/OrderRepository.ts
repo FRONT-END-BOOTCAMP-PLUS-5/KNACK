@@ -1,4 +1,4 @@
-import { CreateOrderEntityDto } from '@/backend/application/orders/dtos/CreateOrderEntityDto'
+import { CreateOrderEntityDto } from '@/backend/orders/applications/dtos/CreateOrderEntityDto'
 
 export interface OrderRepository {
     saveMany(orders: CreateOrderEntityDto[]): Promise<number[]>

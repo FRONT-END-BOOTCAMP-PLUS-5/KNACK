@@ -49,9 +49,9 @@ export default function CheckoutPage() {
     }
 
     return (
-        <main className={styles.checkoutContainer}>
+        <main className={styles.checkout_container}>
             <h1>보드게임 결제</h1>
-            <ul className={styles.productList}>
+            <ul className={styles.product_list}>
                 {products.map((product) => (
                     <li key={product.id}>
                         <label>

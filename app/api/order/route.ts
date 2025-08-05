@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { CreateOrderUseCase } from '@/backend/application/orders/usecases/CreateOrderUseCase'
-import { KnackOrderRepository } from '@/backend/infrastructure/repositories/KnackOrderRepository'
+import { CreateOrderUseCase } from '@/backend/orders/applications/usecases/CreateOrderUseCase'
+import { KnackOrderRepository } from '@/backend/orders/repositories/KnackOrderRepository'
 
 export async function POST(req: NextRequest) {
     const { userId, items } = await req.json()

@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react'
 import Image from 'next/image'
-import styles from './UploadFileComponent.module.scss'
+import styles from './UploadFile.module.scss'
 import { post, filePut } from '@/utils/requester'
 
 interface Props {
@@ -30,6 +30,12 @@ export default function UploadFileComponent({ uploadUrl, storagePath }: Props) {
 
             setPreviewUrl(URL.createObjectURL(file))
             setFileName(file.name)
+
+            // 업로드 완료 후 input 초기화
+            if (fileInputRef.current) {
+                fileInputRef.current.value = ''
+            }
+
         } catch (err) {
             console.error('파일 업로드 실패:', err)
             alert('파일 업로드 중 오류가 발생했습니다.')
@@ -37,7 +43,7 @@ export default function UploadFileComponent({ uploadUrl, storagePath }: Props) {
     }
 
     return (
-        <div className={styles.uploadBox} onClick={() => fileInputRef.current?.click()}>
+        <div className={styles.upload_box} onClick={() => fileInputRef.current?.click()}>
             <input
                 type="file"
                 ref={fileInputRef}

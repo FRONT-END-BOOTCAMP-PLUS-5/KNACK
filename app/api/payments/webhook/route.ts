@@ -1,6 +1,6 @@
 // 📁 app/api/payments/webhook/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { KnackPaymentRepository } from '@/backend/infrastructure/repositories/KnackPaymentRepository'
+import { KnackPaymentRepository } from '@/backend/payments/repositories/KnackPaymentRepository'
 
 export async function POST(req: NextRequest) {
     const body = await req.json()
