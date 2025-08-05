@@ -9,7 +9,7 @@ import Text from '@/components/common/Text';
 import CartProduct from '@/components/Cart/CartProduct';
 import PaymentButton from '@/components/Cart/PaymentButton';
 import { cartService } from '@/services/cart';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ICart } from '@/types/cart';
 
 const DELIVERY_DESCRIPTION_TEXT = [
@@ -23,6 +23,8 @@ const CartPage = () => {
   const { getCart, removeCart } = cartService;
 
   const [carts, setCarts] = useState<ICart[]>([]);
+  const [selectCarts, setSelectCarts] = useState<ICart[]>([]);
+  const [allChecked, setAllChecked] = useState(false);
 
   const handleRemoveCart = (id: number) => {
     removeCart(id)
@@ -36,21 +38,48 @@ const CartPage = () => {
       });
   };
 
-  const initCart = () => {
+  const addSelectCart = (selectData: ICart, checked: boolean) => {
+    if (checked) {
+      setSelectCarts((prev) => [...prev, selectData]);
+    } else {
+      setSelectCarts(selectCarts.filter((item) => item?.id !== selectData.id));
+    }
+  };
+
+  const handleAllCheckbox = (status: boolean) => {
+    setAllChecked(status);
+    if (status) setSelectCarts(carts);
+    else setSelectCarts([]);
+  };
+
+  const initCart = useCallback(() => {
     getCart().then((res) => {
       setCarts(res.result);
     });
-  };
+  }, [getCart]);
+
+  useEffect(() => {
+    console.log('selectCarts', selectCarts);
+    if (carts?.length !== 0 && selectCarts.length === carts.length) {
+      setAllChecked(true);
+    } else setAllChecked(false);
+  }, [selectCarts, carts]);
+
+  useEffect(() => {
+    if (allChecked) {
+      setSelectCarts(carts);
+    }
+  }, [allChecked]);
 
   useEffect(() => {
     initCart();
-  }, []);
+  }, [initCart]);
 
   return (
     <article className={styles.cart_wrap}>
       <section className={styles.all_select_bar}>
         <div className={styles.select_input_box}>
-          <Checkbox id="allSelect" />
+          <Checkbox id="allSelect" checked={allChecked} onChangeCheckbox={(status) => handleAllCheckbox(status)} />
           <label htmlFor="allSelect">전체 선택</label>
         </div>
         <ChipButton text="선택 삭제" />
@@ -59,7 +88,13 @@ const CartPage = () => {
       <section>
         {carts?.map((item, index) => (
           <React.Fragment key={item?.id + '_' + index}>
-            <CartProduct cartData={item} onClickDelete={() => handleRemoveCart(item?.id)} />
+            <CartProduct
+              cartData={item}
+              allChecked={allChecked}
+              selectCarts={selectCarts}
+              addSelectCart={addSelectCart}
+              onClickDelete={() => handleRemoveCart(item?.id)}
+            />
             <Divider />
           </React.Fragment>
         ))}
@@ -73,7 +108,7 @@ const CartPage = () => {
                 총 상품금액
               </Text>
               <Text size={1.4} color="black1">
-                397,2000원
+                {selectCarts?.reduce((acc, cur) => acc + cur?.product?.price, 0).toLocaleString()}원
               </Text>
             </Flex>
             <Flex justify="between" paddingVertical={3}>
@@ -91,7 +126,7 @@ const CartPage = () => {
               총 예상 결제금액
             </Text>
             <Text size={1.6} color="black1" weight={700}>
-              416,200원
+              {selectCarts?.reduce((acc, cur) => acc + cur?.product?.price, 0).toLocaleString()}
             </Text>
           </Flex>
         </section>

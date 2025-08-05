@@ -11,16 +11,24 @@ import { STORAGE_PATHS } from '@/constraint/auth';
 
 interface IProps {
   cartData: ICart;
+  allChecked: boolean;
+  selectCarts: ICart[];
   onClickDelete: () => void;
+  addSelectCart: (selectData: ICart, checked: boolean) => void;
 }
 
-const CartProduct = ({ cartData, onClickDelete }: IProps) => {
+const CartProduct = ({ cartData, allChecked, selectCarts, addSelectCart, onClickDelete }: IProps) => {
   const { korName, engName, thumbnailImage, price } = cartData.product;
 
   return (
     <div>
       <section className={styles.item_select_bar}>
-        <Checkbox />
+        <Checkbox
+          checked={
+            allChecked === true || selectCarts.filter((item) => item.id === cartData.id).length > 0 ? true : null
+          }
+          onChangeCheckbox={(status) => addSelectCart(cartData, status)}
+        />
         <ChipButton text="삭제" onClick={onClickDelete} />
       </section>
       <Link href={'/'} className={styles.item_info_wrap}>
