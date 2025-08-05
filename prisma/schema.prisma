@@ -7,352 +7,312 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
-// 사용자 테이블 (users)
 model User {
-  
-  id              String      @id @default(uuid()) @db.Uuid
-  name            String      @db.VarChar
-  email           String      @unique @db.VarChar
-  password        String      @db.VarChar
-  deletedAt       DateTime?   @map("deleted_at") @db.Timestamptz()
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-  marketing       Boolean     @default(false)
-  sns             Boolean     @default(false)
-  profileImage    String?     @map("profile_image") @db.VarChar
-  point           Int         @default(0)
-  isActive        Boolean     @default(true) @map("is_active")
-  nickname        String      @db.VarChar
-
-  userAuths       UserAuth[]
-  couponMappings  CouponMapping[]
-  reviews         Review[]
-  likes           Like[]
-  orders          Order[]
-  payments        Payment[]
-  addresses       Address[]
-  carts           Cart[]
+  id             String          @id @default(uuid()) @db.Uuid
+  name           String          @db.VarChar
+  email          String          @unique @db.VarChar
+  password       String          @db.VarChar
+  deletedAt      DateTime?       @map("deleted_at") @db.Timestamptz(6)
+  createdAt      DateTime?       @default(now()) @map("created_at") @db.Timestamptz(6)
+  marketing      Boolean         @default(false)
+  sns            Boolean         @default(false)
+  profileImage   String?         @map("profile_image") @db.VarChar
+  point          Int             @default(0)
+  isActive       Boolean         @default(true) @map("is_active")
+  nickname       String          @db.VarChar
+  addresses      Address[]
+  carts          Cart[]
+  couponMappings CouponMapping[]
+  likes          Like[]
+  orders         Order[]
+  payments       Payment[]
+  reviews        Review[]
+  userAuths      UserAuth[]
 
   @@map("users")
 }
 
-// 사용자 인증 테이블 (user_auths)
 model UserAuth {
-  id              Int         @id @default(autoincrement())
-  provider        String      @unique @db.VarChar
-  providerId      String      @unique @map("provider_id") @db.VarChar
-  passwordHash    String      @map("password_hash") @db.VarChar
-  userId          String      @map("user_id") @db.Uuid
-  user            User        @relation(fields: [userId], references: [id])
+  id           Int    @id @default(autoincrement())
+  provider     String @db.VarChar
+  providerId   String @unique @map("provider_id") @db.VarChar
+  passwordHash String @map("password_hash") @db.VarChar
+  userId       String @map("user_id") @db.Uuid
+  user         User   @relation(fields: [userId], references: [id])
 
   @@map("user_auths")
 }
 
-// 관리자 테이블 (admins)
 model Admin {
-  id              Int         @id @default(autoincrement())
-  name            String      @db.VarChar
-  password        String      @db.VarChar
-  role            String?     @default("관리자") @db.VarChar
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-
-  ads             Ad[]
-  answers         Answer[]
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar
+  password  String    @db.VarChar
+  role      String?   @default("관리자") @db.VarChar
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  ads       Ad[]
+  answers   Answer[]
 
   @@map("admins")
 }
 
-// 광고 테이블 (ads)
 model Ad {
-  id              Int         @id @default(autoincrement())
-  adminId         Int         @map("admin_id")
-  name            String      @db.VarChar
-  imgUrl          String      @map("img_url") @db.VarChar
-  redirectUrl     String?     @default("/") @map("redirect_url") @db.VarChar
-  primary         Int?        @default(0)
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-  isActive        Boolean     @default(false) @map("is_active")
-  activateTime    DateTime?   @map("activate_time") @db.Timestamptz()
-  price           Int?        @default(0)
-
-  admin           Admin       @relation(fields: [adminId], references: [id])
+  id           Int       @id @default(autoincrement())
+  adminId      Int       @map("admin_id")
+  name         String    @db.VarChar
+  imgUrl       String    @map("img_url") @db.VarChar
+  redirectUrl  String?   @default("/") @map("redirect_url") @db.VarChar
+  primary      Int?      @default(0)
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  isActive     Boolean   @default(false) @map("is_active")
+  activateTime DateTime? @map("activate_time") @db.Timestamptz(6)
+  price        Int?      @default(0)
+  admin        Admin     @relation(fields: [adminId], references: [id])
 
   @@map("ads")
 }
 
-// 관련 상품 테이블 (related_products)
 model RelatedProduct {
-  productId           Int         @map("product_id")
-  relatedProductId    Int         @map("related_product_id")
-
-  product             Product     @relation("ProductRelated", fields: [productId], references: [id])
-  relatedProduct      Product     @relation("RelatedToProduct", fields: [relatedProductId], references: [id])
+  productId        Int     @map("product_id")
+  relatedProductId Int     @map("related_product_id")
+  product          Product @relation("ProductRelated", fields: [productId], references: [id])
+  relatedProduct   Product @relation("RelatedToProduct", fields: [relatedProductId], references: [id])
 
   @@id([productId, relatedProductId])
   @@map("related_products")
 }
 
-// 상품 테이블 (products)
 model Product {
-  id                  Int         @id @default(autoincrement())
-  productName         String      @map("product_name") @db.VarChar
-  descriptionText     String?     @map("description_text") @db.VarChar
-  thumbnailImage      String      @map("thumbnail_image") @db.VarChar
-  subImages           String?     @map("sub_images") @db.VarChar
-  price               Int?        @default(0)
-  discountPercent     Int?        @default(0) @map("discount_percent")
-  detailContents      String?     @map("detail_contents") @db.VarChar
-  brandId             Int         @map("brand_id")
-  categoryId          Int         @map("category_id")
-  isRecommended       Boolean     @default(false) @map("is_recommended")
-  isPrivate           Boolean     @default(true) @map("is_private")
-  createdAt           DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-  gender              String?     @default("all") @db.VarChar
-  hit                 Int?        @default(0)
-
-  brand               Brand       @relation(fields: [brandId], references: [id])
-  category            Category    @relation(fields: [categoryId], references: [id])
-
-  relatedProducts_ProductRelated RelatedProduct[] @relation("ProductRelated")
-  relatedProducts_RelatedToProduct RelatedProduct[] @relation("RelatedToProduct")
-
-  coupons             Coupon[]
-  inquires            Inquiry[]
-  reviews             Review[]
-  productOptionMappings ProductOptionMapping[]
-  likes               Like[]
-  orders              Order[]
+  id                               Int                    @id @default(autoincrement())
+  descriptionText                  String?                @map("description_text") @db.VarChar
+  thumbnailImage                   String                 @map("thumbnail_image") @db.VarChar
+  subImages                        String?                @map("sub_images") @db.VarChar
+  price                            Int?                   @default(0)
+  discountPercent                  Int?                   @default(0) @map("discount_percent")
+  detailContents                   String?                @map("detail_contents") @db.VarChar
+  brandId                          Int                    @map("brand_id")
+  categoryId                       Int                    @map("category_id")
+  isRecommended                    Boolean                @default(false) @map("is_recommended")
+  isPrivate                        Boolean                @default(true) @map("is_private")
+  createdAt                        DateTime?              @default(now()) @map("created_at") @db.Timestamptz(6)
+  gender                           String?                @default("all") @db.VarChar
+  hit                              Int?                   @default(0)
+  engName                          String                 @map("eng_name") @db.VarChar
+  korName                          String                 @map("kor_name") @db.VarChar
+  coupons                          Coupon[]
+  inquires                         Inquiry[]
+  likes                            Like[]
+  orders                           Order[]
+  productOptionMappings            ProductOptionMapping[]
+  brand                            Brand                  @relation(fields: [brandId], references: [id])
+  category                         Category               @relation(fields: [categoryId], references: [id])
+  relatedProducts_ProductRelated   RelatedProduct[]       @relation("ProductRelated")
+  relatedProducts_RelatedToProduct RelatedProduct[]       @relation("RelatedToProduct")
+  reviews                          Review[]
 
   @@map("products")
 }
 
-// 쿠폰 테이블 (coupons)
 model Coupon {
-  id              Int         @id @default(autoincrement())
-  name            String      @db.VarChar
-  salePercent     Int?        @default(0) @map("sale_percent")
-  productId       Int         @map("product_id")
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-  expirationAt    DateTime?   @map("expriation_at") @db.Timestamptz()
-
-  product         Product     @relation(fields: [productId], references: [id])
-  couponMappings  CouponMapping[]
+  id             Int             @id @default(autoincrement())
+  name           String          @db.VarChar
+  salePercent    Int?            @default(0) @map("sale_percent")
+  productId      Int             @map("product_id")
+  createdAt      DateTime?       @default(now()) @map("created_at") @db.Timestamptz(6)
+  expirationAt   DateTime?       @map("expriation_at") @db.Timestamptz(6)
+  couponMappings CouponMapping[]
+  product        Product         @relation(fields: [productId], references: [id])
 
   @@map("coupons")
 }
 
-// 쿠폰 매핑 테이블 (coupon_mappings)
 model CouponMapping {
-  id              Int         @id @default(autoincrement())
-  userId          String      @map("user_id") @db.Uuid
-  couponId        Int         @map("coupon_id")
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-
-  user            User        @relation(fields: [userId], references: [id])
-  coupon          Coupon      @relation(fields: [couponId], references: [id])
+  id        Int       @id @default(autoincrement())
+  userId    String    @map("user_id") @db.Uuid
+  couponId  Int       @map("coupon_id")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  coupon    Coupon    @relation(fields: [couponId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 
   @@map("coupon_mappings")
 }
 
-// 답변 테이블 (answers)
 model Answer {
-  inquiryId       Int         @map("inquiry_id")
-  adminId         Int         @map("admin_id")
-  contents        String      @db.VarChar
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-
-  inquiry         Inquiry     @relation(fields: [inquiryId], references: [id])
-  admin           Admin       @relation(fields: [adminId], references: [id])
+  inquiryId Int       @map("inquiry_id")
+  adminId   Int       @map("admin_id")
+  contents  String    @db.VarChar
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  admin     Admin     @relation(fields: [adminId], references: [id])
+  inquiry   Inquiry   @relation(fields: [inquiryId], references: [id])
 
   @@id([inquiryId, adminId])
   @@map("answers")
 }
 
-// 문의 테이블 (inquires)
 model Inquiry {
-  id              Int         @id @default(autoincrement())
-  productId       Int         @map("product_id")
-  contents        String      @db.VarChar
-  isPrivate       Boolean     @default(false) @map("is_private")
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-
-  product         Product     @relation(fields: [productId], references: [id])
-  answers         Answer[]
+  id        Int       @id @default(autoincrement())
+  productId Int       @map("product_id")
+  contents  String    @db.VarChar
+  isPrivate Boolean   @default(false) @map("is_private")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  answers   Answer[]
+  product   Product   @relation(fields: [productId], references: [id])
 
   @@map("inquires")
 }
 
-// 리뷰 테이블 (reviews)
 model Review {
-  userId          String      @map("user_id") @db.Uuid
-  productId       Int         @map("product_id")
-  contents        String      @db.VarChar
-  rating          Int?        @default(0)
-  reviewImages    String?     @map("review_images") @db.VarChar
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-
-  user            User        @relation(fields: [userId], references: [id])
-  product         Product     @relation(fields: [productId], references: [id])
+  userId       String    @map("user_id") @db.Uuid
+  productId    Int       @map("product_id")
+  contents     String    @db.VarChar
+  rating       Int?      @default(0)
+  reviewImages String?   @map("review_images") @db.VarChar
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  product      Product   @relation(fields: [productId], references: [id])
+  user         User      @relation(fields: [userId], references: [id])
 
   @@id([userId, productId])
   @@map("reviews")
 }
 
-// 옵션 타입 테이블 (option_types)
 model OptionType {
-  id              Int         @id @default(autoincrement())
-  name            String      @db.VarChar
-  isPrivate       Boolean     @default(true) @map("is_private")
-
-  optionValues    OptionValue[]
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar
+  isPrivate    Boolean       @default(true) @map("is_private")
+  optionValues OptionValue[]
 
   @@map("option_types")
 }
 
-// 옵션 값 테이블 (option_values)
 model OptionValue {
-  id              Int         @id @default(autoincrement())
-  typeId          Int         @map("type_id")
-  isPrivate       Boolean     @default(true) @map("is_private")
-  name            String      @db.VarChar
-
-  optionType      OptionType  @relation(fields: [typeId], references: [id])
+  id                    Int                    @id @default(autoincrement())
+  typeId                Int                    @map("type_id")
+  isPrivate             Boolean                @default(true) @map("is_private")
+  name                  String                 @db.VarChar
+  optionType            OptionType             @relation(fields: [typeId], references: [id])
   productOptionMappings ProductOptionMapping[]
 
   @@map("option_values")
 }
 
-// 상품-옵션 매핑 테이블 (product_option_mappings)
 model ProductOptionMapping {
-  id              Int         @id @default(autoincrement())
-  productId       Int         @map("product_id")
-  optionValueId   Int         @map("option_value_id")
-  stock           Int?        @default(0)
-
-  product         Product     @relation(fields: [productId], references: [id])
-  optionValue     OptionValue @relation(fields: [optionValueId], references: [id])
-  carts           Cart[]
+  id            Int         @id @default(autoincrement())
+  productId     Int         @map("product_id")
+  optionValueId Int         @map("option_value_id")
+  stock         Int?        @default(0)
+  carts         Cart[]
+  optionValue   OptionValue @relation(fields: [optionValueId], references: [id])
+  product       Product     @relation(fields: [productId], references: [id])
 
   @@map("product_option_mappings")
 }
 
-// 브랜드 테이블 (brands)
 model Brand {
-  id              Int         @id @default(autoincrement())
-  brandName       String      @map("brand_name") @db.VarChar
-  logoImage       String      @map("logo_image") @db.VarChar
-  isPrivate       Boolean     @default(true) @map("is_private")
-
-  products        Product[]
+  id        Int       @id @default(autoincrement())
+  korName String    @map("kor_name") @db.VarChar
+  engName String    @map("eng_name") @db.VarChar
+  logoImage String    @map("logo_image") @db.VarChar
+  isPrivate Boolean   @default(true) @map("is_private")
+  products  Product[]
 
   @@map("brands")
 }
 
-// 카테고리 테이블 (categories)
 model Category {
-  id              Int         @id @default(autoincrement())
-  name            String      @db.VarChar
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-  isPrivate       Boolean     @default(true) @map("is_private")
-
-  products        Product[]
-  subCategories   SubCategory[]
+  id            Int           @id @default(autoincrement())
+  createdAt     DateTime?     @default(now()) @map("created_at") @db.Timestamptz(6)
+  isPrivate     Boolean       @default(true) @map("is_private")
+  engName       String        @map("eng_name") @db.VarChar
+  korName       String        @map("kor_name") @db.VarChar
+  products      Product[]
+  subCategories SubCategory[]
 
   @@map("categories")
 }
 
-// 서브 카테고리 테이블 (sub_categories)
 model SubCategory {
-  id              Int         @id @default(autoincrement())
-  name            String      @db.VarChar
-  categoryId      Int         @map("category_id")
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-  isPrivate       Boolean     @default(true) @map("is_private")
-
-  category        Category    @relation(fields: [categoryId], references: [id])
+  id         Int       @id @default(autoincrement())
+  engName    String    @map("eng_name") @db.VarChar
+  korName    String    @map("kor_name") @db.VarChar
+  categoryId Int       @map("category_id")
+  createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  isPrivate  Boolean   @default(true) @map("is_private")
+  category   Category  @relation(fields: [categoryId], references: [id])
 
   @@map("sub_categories")
 }
 
-// 좋아요 테이블 (likes)
 model Like {
-  id              Int         @id @default(autoincrement())
-  userId          String      @map("user_id") @db.Uuid
-  productId       Int         @map("product_id")
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-
-  user            User        @relation(fields: [userId], references: [id])
-  product         Product     @relation(fields: [productId], references: [id])
+  id        Int       @id @default(autoincrement())
+  userId    String    @map("user_id") @db.Uuid
+  productId Int       @map("product_id")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  product   Product   @relation(fields: [productId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 
   @@map("likes")
 }
 
-// 주문 테이블 (orders)
 model Order {
-  id              Int         @id @default(autoincrement())
-  userId          String      @map("user_id") @db.Uuid
-  productId       Int         @map("product_id")
-  price           Int?        @default(0)
-  salePrice       Int?        @default(0) @map("sale_price")
-  tracking        String?     @db.VarChar
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-  deliveryStatus  Int?        @map("delivery_status")
-  count           Int?        @default(0)
-  paymentId       Int         @map("payment_id")
-
-  user            User        @relation(fields: [userId], references: [id])
-  product         Product     @relation(fields: [productId], references: [id])
-  payment         Payment     @relation(fields: [paymentId], references: [id])
+  id             Int       @id @default(autoincrement())
+  userId         String    @map("user_id") @db.Uuid
+  productId      Int       @map("product_id")
+  price          Int?      @default(0)
+  salePrice      Int?      @default(0) @map("sale_price")
+  tracking       String?   @db.VarChar
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  deliveryStatus Int?      @map("delivery_status")
+  count          Int?      @default(0)
+  paymentId      Int       @map("payment_id")
+  payment        Payment   @relation(fields: [paymentId], references: [id])
+  product        Product   @relation(fields: [productId], references: [id])
+  user           User      @relation(fields: [userId], references: [id])
 
   @@map("orders")
 }
 
-// 결제 테이블 (payments)
 model Payment {
-  id              Int         @id @default(autoincrement())
-  userId          String      @map("user_id") @db.Uuid
-  price           Int?        @default(0)
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-  paymentNumber   Int         @map("payment_number")
-  addressId       Int         @map("address_id")
-
-  user            User        @relation(fields: [userId], references: [id])
-  address         Address     @relation(fields: [addressId], references: [id])
-  orders          Order[]
+  id             Int       @id @default(autoincrement())
+  userId         String    @map("user_id") @db.Uuid
+  price          Int?      @default(0)
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  paymentNumber  Int       @map("payment_number")
+  addressId      Int       @map("address_id")
+  approvedAt     DateTime? @map("approved_at") @db.Timestamptz(6)
+  method         String    @db.VarChar
+  status         String    @db.VarChar
+  tossPaymentKey String    @unique @map("toss_payment_key") @db.VarChar
+  orders         Order[]
+  address        Address   @relation(fields: [addressId], references: [id])
+  user           User      @relation(fields: [userId], references: [id])
 
   @@map("payments")
 }
 
-// 주소 테이블 (addresses)
 model Address {
-  id              Int         @id @default(autoincrement())
-  userId          String      @map("user_id") @db.Uuid
-  name            String      @db.VarChar
-  phone           String?     @db.VarChar
-  zipCode         String      @map("zip_code") @db.VarChar
-  detail          String?     @db.VarChar
-  main            String      @db.VarChar
-  message         String?     @db.VarChar
-  isDefault       Boolean     @default(false) @map("is_default")
-
-  user            User        @relation(fields: [userId], references: [id])
-  payments        Payment[]
+  id        Int       @id @default(autoincrement())
+  userId    String    @map("user_id") @db.Uuid
+  name      String    @db.VarChar
+  phone     String?   @db.VarChar
+  zipCode   String    @map("zip_code") @db.VarChar
+  detail    String?   @db.VarChar
+  main      String    @db.VarChar
+  message   String?   @db.VarChar
+  isDefault Boolean   @default(false) @map("is_default")
+  user      User      @relation(fields: [userId], references: [id])
+  payments  Payment[]
 
   @@map("addresses")
 }
 
-// 장바구니 테이블 (carts)
 model Cart {
-  id              Int         @id @default(autoincrement())
-  userId          String      @map("user_id") @db.Uuid
-  productId       Int         @map("product_id")
-  optionMappingId Int         @map("option_mapping_id")
-  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz()
-  count           Int?        @default(1)
-
-  user            User        @relation(fields: [userId], references: [id])
+  id                   Int                  @id @default(autoincrement())
+  userId               String               @map("user_id") @db.Uuid
+  productId            Int                  @map("product_id")
+  optionMappingId      Int                  @map("option_mapping_id")
+  createdAt            DateTime?            @default(now()) @map("created_at") @db.Timestamptz(6)
+  count                Int?                 @default(1)
   productOptionMapping ProductOptionMapping @relation(fields: [optionMappingId], references: [id])
+  user                 User                 @relation(fields: [userId], references: [id])
 
   @@map("carts")
 }

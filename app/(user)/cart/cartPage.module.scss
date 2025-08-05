@@ -1,0 +1,49 @@
+.cart_wrap {
+  position: relative;
+}
+
+.all_select_bar {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  & .select_input_box {
+    display: flex;
+    align-items: center;
+
+    & label {
+      font-size: 1.4em;
+      color: #222;
+      font-weight: 600;
+    }
+  }
+}
+
+.select_order_info_wrap {
+  & .select_order_title {
+    padding: 15px 16px;
+    font-size: 1.6rem;
+    color: #222;
+    font-weight: 700;
+  }
+
+  & .title {
+    font-size: 1.4rem;
+    color: #909090;
+  }
+
+  & .price {
+    font-size: 1.4rem;
+    color: #222;
+  }
+}
+
+.delivery_description_text {
+  background: #fafafa;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  line-height: 1.2;
+}
