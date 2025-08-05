@@ -41,4 +41,19 @@ export async function filePost<T = unknown>(url: string, formData: FormData): Pr
     return res.data
 }
 
+export async function filePut(url: string, file: File): Promise<void> {
+    const res = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': file.type,
+        },
+        body: file,
+    })
+
+    if (!res.ok) {
+        const err = await res.text()
+        throw new Error(`S3 upload failed: ${res.status} - ${err}`)
+    }
+}
+
 export default requester

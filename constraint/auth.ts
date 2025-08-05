@@ -24,4 +24,15 @@ export const SOCIAL_LOGIN_PROVIDERS = [
     icon: '/google_logo.svg',
     label: '구글 로그인',
   },
-] as const; 
+] as const;
+
+// S3 스토리지
+export const STORAGE_PATHS = {
+  PREFIX: 'https://d2ubv3uh3d6fx8.cloudfront.net',
+  USER_PROFILE: 'uploads/user/profile',
+  PRODUCT: {
+    THUMBNAIL: 'uploads/product/thumbnail',
+    SLIDER: 'uploads/product/slider',
+    DETAIL: 'uploads/product/detail',
+  },
+}
