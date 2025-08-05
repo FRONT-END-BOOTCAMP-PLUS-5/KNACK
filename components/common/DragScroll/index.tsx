@@ -10,7 +10,7 @@ interface IProps {
 }
 
 export default function DragScroll({ children, className = '', showScrollbar = false }: IProps) {
-  const scrollbarClass = showScrollbar ? styles.showScrollbar : styles.hideScrollbar;
+  const scrollbarClass = showScrollbar ? styles.show_scrollbar : styles.hide_scrollbar;
 
-  return <div className={`${styles.dragScroll} ${scrollbarClass} ${className}`}>{children}</div>;
+  return <div className={`${styles.drag_scroll} ${scrollbarClass} ${className}`}>{children}</div>;
 }

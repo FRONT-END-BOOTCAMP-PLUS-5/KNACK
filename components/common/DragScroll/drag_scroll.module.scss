@@ -1,6 +1,6 @@
 @use '@/styles/mixins';
 
-.dragScroll {
+.drag_scroll {
   display: flex;
   overflow-x: auto;
   overflow-y: hidden;
@@ -10,7 +10,7 @@
     flex-shrink: 0;
   }
 
-  &.hideScrollbar {
+  &.hide_scrollbar {
     scrollbar-width: none;
     -ms-overflow-style: none;
 
@@ -19,7 +19,7 @@
     }
   }
 
-  &.showScrollbar {
+  &.show_scrollbar {
     scrollbar-width: thin;
     -ms-overflow-style: auto;
 
