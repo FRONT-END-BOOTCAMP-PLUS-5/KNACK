@@ -34,7 +34,10 @@ export class PrCartRepository implements CartRepository {
   async getCart(): Promise<Cart[]> {
     const result = await prisma.cart.findMany({
       where: { userId: '7571e92b-f38b-4878-959c-f76ab9290ed8' },
-      include: { productOptionMapping: { include: { optionValue: { include: { optionType: true } } } } },
+      include: {
+        productOptionMapping: { include: { optionType: { include: { optionValue: true } } } },
+        product: { include: { brand: true, category: true } },
+      },
     });
 
     console.log('result ', result);
