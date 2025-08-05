@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 interface IProps {
   cartData: ICart;
   selectCarts: ICart[];
-  onClickDelete: () => void;
+  onClickDelete: (id: number) => void;
   addSelectCart: (selectData: ICart, checked: boolean) => void;
 }
 
@@ -31,7 +31,7 @@ const CartProduct = ({ cartData, selectCarts, addSelectCart, onClickDelete }: IP
     <div>
       <section className={styles.item_select_bar}>
         <Checkbox checked={checked} onChangeCheckbox={(status) => addSelectCart(cartData, status)} />
-        <ChipButton text="삭제" onClick={onClickDelete} />
+        <ChipButton text="삭제" onClick={() => onClickDelete(cartData?.id)} />
       </section>
       <Link href={'/'} className={styles.item_info_wrap}>
         <span className={styles.item_image}>
@@ -62,7 +62,7 @@ const CartProduct = ({ cartData, selectCarts, addSelectCart, onClickDelete }: IP
         <p className={styles.price}>무료</p>
       </div>
       <section className={styles.button_wrap}>
-        <Button text="옵션/배송 변경" />
+        <Button text="옵션 변경" />
         <Button text="바로 주문" style="black" />
       </section>
     </div>

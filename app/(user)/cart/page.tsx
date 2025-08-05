@@ -12,24 +12,54 @@ import { cartService } from '@/services/cart';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ICart } from '@/types/cart';
 import { DELIVERY_DESCRIPTION_TEXT } from '@/constraint/cart';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
 const CartPage = () => {
-  const { getCart, removeCart } = cartService;
+  const { getCart, removeCart, removesCart } = cartService;
 
   const [carts, setCarts] = useState<ICart[]>([]);
   const [selectCarts, setSelectCarts] = useState<ICart[]>([]);
   const [allChecked, setAllChecked] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [multiDeleteOpen, setMultiDeleteOpen] = useState(false);
+  const [selectedCartId, setSelectedCartId] = useState<number>(0);
 
-  const handleRemoveCart = (id: number) => {
-    removeCart(id)
+  const handleRemoveCart = () => {
+    removeCart(selectedCartId)
       .then((res) => {
         if (res.result) {
+          setSelectedCartId(0);
+          setDeleteOpen(false);
           initCart();
         }
       })
       .catch((error) => {
         console.log('error', error.message);
       });
+  };
+
+  const handleMultiRemoveCart = () => {
+    const ids = selectCarts?.map((item) => item.id);
+
+    removesCart(ids)
+      .then((res) => {
+        console.log('res', res);
+        setMultiDeleteOpen(false);
+        setSelectCarts([]);
+        initCart();
+      })
+      .catch((error) => {
+        console.log('error', error.message);
+      });
+  };
+
+  const onClickMultiRemoveCart = () => {
+    setMultiDeleteOpen(true);
+  };
+
+  const onClickRemoveCart = (id: number) => {
+    setDeleteOpen(true);
+    setSelectedCartId(id);
   };
 
   const addSelectCart = (selectData: ICart, checked: boolean) => {
@@ -70,7 +100,7 @@ const CartPage = () => {
           <Checkbox id="allSelect" checked={allChecked} onChangeCheckbox={(status) => handleAllCheckbox(status)} />
           <label htmlFor="allSelect">전체 선택</label>
         </div>
-        <ChipButton text="선택 삭제" />
+        <ChipButton text="선택 삭제" onClick={onClickMultiRemoveCart} />
       </section>
       <Divider />
       <section>
@@ -80,7 +110,7 @@ const CartPage = () => {
               cartData={item}
               selectCarts={selectCarts}
               addSelectCart={addSelectCart}
-              onClickDelete={() => handleRemoveCart(item?.id)}
+              onClickDelete={onClickRemoveCart}
             />
             <Divider />
           </React.Fragment>
@@ -132,7 +162,28 @@ const CartPage = () => {
         </section>
         <Divider />
       </section>
-      <PaymentButton />
+      <PaymentButton selectCarts={selectCarts} />
+      <ConfirmModal open={deleteOpen} onClose={() => setDeleteOpen(false)} onConfirm={() => handleRemoveCart()}>
+        <Flex direction="column" align="center" gap={16}>
+          <Text tag="h2" weight={700} size={1.8} color="black1">
+            상품 삭제
+          </Text>
+          <Text tag="p" size={1.4} color="gray1">
+            상품을 삭제 하시겠습니까?
+          </Text>
+        </Flex>
+      </ConfirmModal>
+
+      <ConfirmModal open={multiDeleteOpen} onClose={() => setMultiDeleteOpen(false)} onConfirm={handleMultiRemoveCart}>
+        <Flex direction="column" align="center" gap={16}>
+          <Text tag="h2" weight={700} size={1.8} color="black1">
+            선택 상품 삭제
+          </Text>
+          <Text tag="p" size={1.4} color="gray1">
+            선택하신 {selectCarts?.length ?? 0}개의 상품을 삭제 하시겠습니까?
+          </Text>
+        </Flex>
+      </ConfirmModal>
     </article>
   );
 };

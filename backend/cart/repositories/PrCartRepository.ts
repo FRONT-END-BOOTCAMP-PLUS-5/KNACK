@@ -50,4 +50,16 @@ export class PrCartRepository implements CartRepository {
 
     return result.id;
   }
+
+  async manyRemove(ids: number[]): Promise<number> {
+    const result = await prisma.cart.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    return result.count;
+  }
 }
