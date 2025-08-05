@@ -8,27 +8,29 @@ import Button from '@/components/common/Button';
 import { ICart } from '@/types/cart';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
+import { useEffect, useState } from 'react';
 
 interface IProps {
   cartData: ICart;
-  allChecked: boolean;
   selectCarts: ICart[];
   onClickDelete: () => void;
   addSelectCart: (selectData: ICart, checked: boolean) => void;
 }
 
-const CartProduct = ({ cartData, allChecked, selectCarts, addSelectCart, onClickDelete }: IProps) => {
+const CartProduct = ({ cartData, selectCarts, addSelectCart, onClickDelete }: IProps) => {
   const { korName, engName, thumbnailImage, price } = cartData.product;
+
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    const check = selectCarts.filter((item) => item.id === cartData.id).length > 0;
+    setChecked(check);
+  }, [selectCarts]);
 
   return (
     <div>
       <section className={styles.item_select_bar}>
-        <Checkbox
-          checked={
-            allChecked === true || selectCarts.filter((item) => item.id === cartData.id).length > 0 ? true : null
-          }
-          onChangeCheckbox={(status) => addSelectCart(cartData, status)}
-        />
+        <Checkbox checked={checked} onChangeCheckbox={(status) => addSelectCart(cartData, status)} />
         <ChipButton text="삭제" onClick={onClickDelete} />
       </section>
       <Link href={'/'} className={styles.item_info_wrap}>
@@ -41,7 +43,9 @@ const CartProduct = ({ cartData, allChecked, selectCarts, addSelectCart, onClick
           />
         </span>
         <div className={styles.item_info}>
-          <h3 className={styles.main_text}>{korName}</h3>
+          <h3 className={styles.main_text}>
+            {korName} {cartData?.id}
+          </h3>
           <p className={styles.sub_text}>{engName}</p>
           <p className={styles.option_text}>
             {cartData?.productOptionMapping?.optionType?.name} /{' '}

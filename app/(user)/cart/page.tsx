@@ -11,13 +11,7 @@ import PaymentButton from '@/components/Cart/PaymentButton';
 import { cartService } from '@/services/cart';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ICart } from '@/types/cart';
-
-const DELIVERY_DESCRIPTION_TEXT = [
-  '배송 방법 및 쿠폰/포인트 적용 여부는 결제 시 선택할 수 있습니다.',
-  '총 결제금액은 배송 방법 및 쿠폰/포인트 적용 여부에 따라 달라질 수 있습니다.',
-  '예상 결제금액은 기본 배송 방법 및 일반 결제로 주문했을 때의 가격입니다.',
-  '장바구니에는 KNACK 배송 상품과 브랜드 배송 상품을 각각 최대 30개까지 담을 수 있으며, 상품은 최대 365일까지 보관됩니다.',
-];
+import { DELIVERY_DESCRIPTION_TEXT } from '@/constraint/cart';
 
 const CartPage = () => {
   const { getCart, removeCart } = cartService;
@@ -43,6 +37,7 @@ const CartPage = () => {
       setSelectCarts((prev) => [...prev, selectData]);
     } else {
       setSelectCarts(selectCarts.filter((item) => item?.id !== selectData.id));
+      setAllChecked(false);
     }
   };
 
@@ -59,17 +54,10 @@ const CartPage = () => {
   }, [getCart]);
 
   useEffect(() => {
-    console.log('selectCarts', selectCarts);
-    if (carts?.length !== 0 && selectCarts.length === carts.length) {
-      setAllChecked(true);
-    } else setAllChecked(false);
-  }, [selectCarts, carts]);
-
-  useEffect(() => {
-    if (allChecked) {
-      setSelectCarts(carts);
+    if (carts?.length !== 0) {
+      setAllChecked(selectCarts.length === carts.length);
     }
-  }, [allChecked]);
+  }, [selectCarts, carts]);
 
   useEffect(() => {
     initCart();
@@ -90,7 +78,6 @@ const CartPage = () => {
           <React.Fragment key={item?.id + '_' + index}>
             <CartProduct
               cartData={item}
-              allChecked={allChecked}
               selectCarts={selectCarts}
               addSelectCart={addSelectCart}
               onClickDelete={() => handleRemoveCart(item?.id)}
