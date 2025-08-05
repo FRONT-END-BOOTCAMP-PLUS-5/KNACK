@@ -1,6 +1,6 @@
 // 📁 backend/domain/repositories/PaymentRepository.ts
 
-import { CreatePaymentDto } from '@/backend/payments/applications/payments/dtos/CreatePaymentDto'
+import { CreatePaymentDto } from "../../applications/dtos/CreatePaymentDto"
 
 export interface PaymentRepository {
     save(payment: CreatePaymentDto): Promise<void>

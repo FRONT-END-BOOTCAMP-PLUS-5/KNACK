@@ -1,4 +1,4 @@
-import { CreateCardDto } from '@/backend/payments/applications/payments/dtos/CreateCardDto'
+import { CreateCardDto } from "../../applications/dtos/CreateCardDto"
 
 export interface CardRepository {
     save(card: CreateCardDto): Promise<void>

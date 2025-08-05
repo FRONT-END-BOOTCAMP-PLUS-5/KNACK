@@ -1,4 +1,4 @@
-import { S3FileUploadRepository } from '@/backend/infrastructures/repositories/S3FileUploadRepository'
+import { S3FileUploadRepository } from '@/backend/uploads/infrastructures/repositories/S3FileUploadRepository'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {

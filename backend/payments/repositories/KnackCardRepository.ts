@@ -1,7 +1,7 @@
 // 📁 backend/infrastructure/db/PrismaCardRepository.ts
 import { PrismaClient } from '@prisma/client'
-import { CardRepository } from '@/backend/domain/repositories/CardRepository'
-import { CreateCardDto } from '@/backend/application/payments/dtos/CreateCardDto'
+import { CardRepository } from '@/backend/payments/domains/repositories/CardRepository'
+import { CreateCardDto } from '@/backend/payments/applications/dtos/CreateCardDto'
 
 const prisma = new PrismaClient()
 

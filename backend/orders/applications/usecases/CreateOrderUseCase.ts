@@ -1,6 +1,7 @@
 // backend/application/use-cases/CreateOrderUseCase.ts
-import { OrderRepository } from '@/backend/domain/repositories/OrderRepository'
-import { CreateOrderItemDto } from '@/backend/application/orders/dtos/CreateOrderItemDto'
+
+import { OrderRepository } from "../../domains/repositories/OrderRepository"
+import { CreateOrderItemDto } from "../dtos/CreateOrderItemDto"
 
 export class CreateOrderUseCase {
     constructor(private repo: OrderRepository) { }

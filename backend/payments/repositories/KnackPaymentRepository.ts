@@ -1,7 +1,7 @@
 // 📁 backend/infrastructure/db/PrismaPaymentRepository.ts
 import { PrismaClient } from '@prisma/client'
 import { PaymentRepository } from '@/backend/payments/domains/repositories/PaymentRepository'
-import { CreatePaymentDto } from '@/backend/payments/applications/payments/dtos/CreatePaymentDto'
+import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto'
 
 const prisma = new PrismaClient()
 

@@ -1,11 +1,11 @@
 // 📁 app/api/payments/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { serverPost as tossPOST } from '@/backend/utils/serverRequester'
-import { CreatePaymentDto } from '@/backend/payments/applications/payments/dtos/CreatePaymentDto'
-import { CreateCardDto } from '@/backend/payments/applications/payments/dtos/CreateCardDto'
 import type { AxiosError } from 'axios'
 import { KnackPaymentRepository } from '@/backend/payments/repositories/KnackPaymentRepository'
 import { KnackCardRepository } from '@/backend/payments/repositories/KnackCardRepository'
+import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto'
+import { CreateCardDto } from '@/backend/payments/applications/dtos/CreateCardDto'
 
 export async function POST(req: NextRequest) {
     try {
