@@ -9,8 +9,8 @@ const TestPage = () => {
   const handleAddCart = () => {
     const cartData: CartRef = {
       count: 1,
-      optionMappingId: 1,
-      productId: 1,
+      optionMappingId: 2,
+      productId: 2,
       userId: '7571e92b-f38b-4878-959c-f76ab9290ed8',
     };
 
