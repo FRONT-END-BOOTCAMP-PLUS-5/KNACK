@@ -6,6 +6,8 @@ import Checkbox from '@/components/common/Checkbox';
 import Link from 'next/link';
 import Button from '@/components/common/Button';
 import { ICart } from '@/types/cart';
+import Image from 'next/image';
+import { STORAGE_PATHS } from '@/constraint/auth';
 
 interface IProps {
   cartData: ICart;
@@ -23,12 +25,12 @@ const CartProduct = ({ cartData, onClickDelete }: IProps) => {
       </section>
       <Link href={'/'} className={styles.item_info_wrap}>
         <span className={styles.item_image}>
-          {/* <Image
-            src={`${STORAGE_PATHS.PREFIX}${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${thumbnailImage}`}
+          <Image
+            src={`${STORAGE_PATHS.PREFIX}/${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${thumbnailImage}`}
             alt="상품 썸네일"
             width={300}
             height={300}
-          /> */}
+          />
         </span>
         <div className={styles.item_info}>
           <h3 className={styles.main_text}>{korName}</h3>
