@@ -5,25 +5,43 @@ import styles from './cartProduct.module.scss';
 import Checkbox from '@/components/common/Checkbox';
 import Link from 'next/link';
 import Button from '@/components/common/Button';
+import { ICart } from '@/types/cart';
 
-const CartProduct = () => {
+interface IProps {
+  cartData: ICart;
+  onClickDelete: () => void;
+}
+
+const CartProduct = ({ cartData, onClickDelete }: IProps) => {
+  const { korName, engName, thumbnailImage, price } = cartData.product;
+
   return (
     <div>
       <section className={styles.item_select_bar}>
         <Checkbox />
-        <ChipButton text="삭제" />
+        <ChipButton text="삭제" onClick={onClickDelete} />
       </section>
       <Link href={'/'} className={styles.item_info_wrap}>
-        <span className={styles.item_image}>이미지</span>
+        <span className={styles.item_image}>
+          {/* <Image
+            src={`${STORAGE_PATHS.PREFIX}${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${thumbnailImage}`}
+            alt="상품 썸네일"
+            width={300}
+            height={300}
+          /> */}
+        </span>
         <div className={styles.item_info}>
-          <h3 className={styles.main_text}>메인 타이틀</h3>
-          <p className={styles.sub_text}>서브타이틀</p>
-          <p className={styles.option_text}>옵션</p>
+          <h3 className={styles.main_text}>{korName}</h3>
+          <p className={styles.sub_text}>{engName}</p>
+          <p className={styles.option_text}>
+            {cartData?.productOptionMapping?.optionType?.name} /{' '}
+            {cartData?.productOptionMapping?.optionType?.optionValue[0].name}
+          </p>
         </div>
       </Link>
       <div className={styles.item_price}>
         <p className={styles.price_title}>상품금액</p>
-        <p className={styles.price}>249,000원</p>
+        <p className={styles.price}>{price.toLocaleString()}원</p>
       </div>
       <div className={styles.delivery_price}>
         <p className={styles.delivery_title}>배송비</p>

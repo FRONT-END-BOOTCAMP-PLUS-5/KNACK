@@ -17,4 +17,12 @@ export const cartService = {
 
     return data;
   },
+
+  removeCart: async (id: number) => {
+    const { data, error } = await requester.delete(`/api/cart?id=${id}`).catch((error) => error);
+
+    if (error) throw new Error(error.message);
+
+    return data;
+  },
 };

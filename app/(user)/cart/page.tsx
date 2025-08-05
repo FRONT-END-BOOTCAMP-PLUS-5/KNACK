@@ -9,7 +9,8 @@ import Text from '@/components/common/Text';
 import CartProduct from '@/components/Cart/CartProduct';
 import PaymentButton from '@/components/Cart/PaymentButton';
 import { cartService } from '@/services/cart';
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { ICart } from '@/types/cart';
 
 const DELIVERY_DESCRIPTION_TEXT = [
   '배송 방법 및 쿠폰/포인트 적용 여부는 결제 시 선택할 수 있습니다.',
@@ -19,12 +20,30 @@ const DELIVERY_DESCRIPTION_TEXT = [
 ];
 
 const CartPage = () => {
-  const { getCart } = cartService;
+  const { getCart, removeCart } = cartService;
+
+  const [carts, setCarts] = useState<ICart[]>([]);
+
+  const handleRemoveCart = (id: number) => {
+    removeCart(id)
+      .then((res) => {
+        if (res.result) {
+          initCart();
+        }
+      })
+      .catch((error) => {
+        console.log('error', error.message);
+      });
+  };
+
+  const initCart = () => {
+    getCart().then((res) => {
+      setCarts(res.result);
+    });
+  };
 
   useEffect(() => {
-    getCart().then((res) => {
-      console.log('res', res.result);
-    });
+    initCart();
   }, []);
 
   return (
@@ -38,10 +57,13 @@ const CartPage = () => {
       </section>
       <Divider />
       <section>
-        <CartProduct />
-        <Divider />
-        <CartProduct />
-        <Divider />
+        {carts?.map((item, index) => (
+          <React.Fragment key={item?.id + '_' + index}>
+            <CartProduct cartData={item} onClickDelete={() => handleRemoveCart(item?.id)} />
+            <Divider />
+          </React.Fragment>
+        ))}
+
         <section className={styles.select_order_info_wrap}>
           <h2 className={styles.select_order_title}>선택 주문정보</h2>
           <Divider height={1} paddingHorizontal={16} />

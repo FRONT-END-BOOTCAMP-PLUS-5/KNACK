@@ -40,8 +40,14 @@ export class PrCartRepository implements CartRepository {
       },
     });
 
-    console.log('result ', result);
-
     return result;
+  }
+
+  async remove(id: number): Promise<number> {
+    const result = await prisma.cart.delete({
+      where: { id: id },
+    });
+
+    return result.id;
   }
 }
