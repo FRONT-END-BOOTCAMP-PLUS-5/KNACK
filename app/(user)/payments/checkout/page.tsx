@@ -40,7 +40,7 @@ export default function CheckoutPage() {
                 orderName: '보드게임 묶음결제',
                 customerName: '홍길동',
                 successUrl: `${window.location.origin}/payments/success`,
-                failUrl: `${window.location.origin}/payments/fail`,
+                failUrl: `${window.location.origin}/payments/failure`,
             })
         } catch (e) {
             console.error(e)
