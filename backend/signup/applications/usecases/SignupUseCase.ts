@@ -14,6 +14,12 @@ export class SignupUseCase {
       throw new Error('이미 존재하는 이메일입니다.');
     }
 
+    // 닉네임 중복 확인
+    const existingUserByNickname = await this.userRepository.findByNickname(nickname);
+    if (existingUserByNickname) {
+      throw new Error('이미 존재하는 닉네임입니다.');
+    }
+
     // 비밀번호 해싱
     const hashedPassword = await bcrypt.hash(password, 12);
 

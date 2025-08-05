@@ -1,4 +1,4 @@
-import { Session, User } from "next-auth";
+import { Session, User, SessionStrategy } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { LoginUseCase } from "@/backend/login/applications/usecases/LoginUseCase";
@@ -67,6 +67,6 @@ export const authOptions = {
     signIn: '/login',
   },
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt' as SessionStrategy,
   },
 };

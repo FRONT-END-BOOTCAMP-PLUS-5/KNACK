@@ -2,5 +2,6 @@ import { User, CreateUserData, UserWithoutPassword } from '@/backend/signup/doma
 
 export interface UserRepository {
   findByEmail(email: string): Promise<User | null>;
+  findByNickname(nickname: string): Promise<User | null>;
   create(userData: CreateUserData): Promise<UserWithoutPassword>;
 } 
