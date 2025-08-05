@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import styles from '@/app/components/common/footer/footer.module.scss';
+import styles from '@/components/common/footer/footer.module.scss';
 import { DEFAULT_ACTIVE_TAB } from '@/constraint/footer';
 import { getFooterTabs } from '@/utils/footer/index';
 import { TabId } from '@/types/footer';

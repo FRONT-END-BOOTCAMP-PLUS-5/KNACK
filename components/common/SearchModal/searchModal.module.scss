@@ -1,13 +1,13 @@
 @use '../../../styles/mixins';
 
 .search_container {
+  @include mixins.max-width;
   position: fixed;
   top: 0;
-  left: 0;
   width: 100%;
   height: 100vh;
   background-color: white;
-  z-index: 10000000000;
+  z-index: 1100;
   overflow-y: auto;
 }
 
@@ -33,6 +33,7 @@
 }
 
 .input_search {
+  position: relative;
   flex: 1;
   border: none;
   background: transparent;
@@ -41,6 +42,8 @@
   outline: none;
   padding: 0 30px 0 10px;
   height: 100%;
+  letter-spacing: -0.21px;
+  font-weight: 600;
 
   &::placeholder {
     color: $light-gray01;
@@ -51,8 +54,10 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
-  margin-left: 8px;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .btn_close {
@@ -153,10 +158,6 @@
   text-decoration: none;
   color: $black;
   font-size: 1.4rem;
-
-  &:hover {
-    background-color: darken($light-gray02, 5%);
-  }
 }
 
 .search_card_ranking {
