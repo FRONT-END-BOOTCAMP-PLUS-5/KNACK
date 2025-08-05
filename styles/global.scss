@@ -231,7 +231,7 @@ body {
   background-color: #fff;
   box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.15);
   overflow-x: hidden;
-  height: 100dvh;
+  min-height: 100dvh;
   font-family: 'Pretendard', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
