@@ -28,6 +28,7 @@ export const SOCIAL_LOGIN_PROVIDERS = [
 
 // S3 스토리지
 export const STORAGE_PATHS = {
+  PREFIX: 'https://d2ubv3uh3d6fx8.cloudfront.net',
   USER_PROFILE: 'uploads/user/profile',
   PRODUCT: {
     THUMBNAIL: 'uploads/product/thumbnail',
