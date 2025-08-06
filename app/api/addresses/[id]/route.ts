@@ -6,7 +6,7 @@ import { UpdateAddressUseCase } from "@/backend/address/applications/usecases/Up
 import { KnackAddressRepository } from "@/backend/address/repositories/KnackAddressRepository"
 import { DeleteAddressUseCase } from "@/backend/address/applications/usecases/DeleteAddressUseCase"
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request | NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
@@ -14,7 +14,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         }
 
         const repo = new KnackAddressRepository()
-        const id = parseInt(params.id, 10)
+        const resolvedParams = await params
+        const id = parseInt(resolvedParams.id, 10)
 
         const address = await repo.getById(id)
         if (!address || address.userId !== session.user.id) {
@@ -41,14 +42,15 @@ const AddressUpdateSchema = z.object({
     isDefault: z.boolean().optional(),
 })
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: Request | NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
             return NextResponse.json({ message: '로그인이 필요합니다.' }, { status: 401 })
         }
 
-        const id = parseInt(params.id, 10)
+        const resolvedParams = await params
+        const id = parseInt(resolvedParams.id, 10)
         const body = await req.json()
         const payload = { ...body, id }
 
@@ -78,8 +80,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 export async function DELETE(
-    req: NextRequest,
-    { params }: { params: { id: string } }
+    req: Request | NextRequest,
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions)
@@ -87,7 +89,8 @@ export async function DELETE(
             return NextResponse.json({ message: '로그인이 필요합니다.' }, { status: 401 })
         }
 
-        const id = parseInt(params.id, 10)
+        const resolvedParams = await params
+        const id = parseInt(resolvedParams.id, 10)
         if (isNaN(id)) {
             return NextResponse.json({ message: '주소 ID가 유효하지 않습니다.' }, { status: 400 })
         }
