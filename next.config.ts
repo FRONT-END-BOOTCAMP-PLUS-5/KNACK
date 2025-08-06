@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   sassOptions: {
     additionalData: `@use '@/styles/colors.scss' as *;`,
   },
+  images: {
+    domains: ['d2ubv3uh3d6fx8.cloudfront.net'],
+  },
 };
 
 export default nextConfig;

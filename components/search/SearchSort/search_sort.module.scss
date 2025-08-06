@@ -1,0 +1,41 @@
+.sort_section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  font-size: 1.3rem;
+}
+
+.sort_left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+}
+
+.sort_left_item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+
+  > p {
+    color: $gray04;
+  }
+  > span {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: $white;
+    border: 1px solid $light-gray01;
+  }
+}
+
+.sort_right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
