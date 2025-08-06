@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { GetProductsUseCase } from '@/backend/search/applications/usecases/GetProductsUseCase';
 import { PrProductsRepository } from '@/backend/search/infrastructure/repositories/PrProductsRepository';
 import { GetProductsRequestDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import { SortOption } from '@/backend/search/domains/entities/ProductFilters';
-
-const prisma = new PrismaClient();
+import prisma from '@/backend/utils/prisma';
 
 export async function GET(request: NextRequest) {
   try {

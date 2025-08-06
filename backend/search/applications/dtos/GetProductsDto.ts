@@ -57,7 +57,7 @@ export interface ProductDto {
   color?: string | null;
   size?: string | null;
 
-  brand?: {
+  brand: {
     id: number;
     korName: string;
     engName?: string;

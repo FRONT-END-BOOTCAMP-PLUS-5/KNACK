@@ -45,6 +45,11 @@ export class PrProductsRepository implements ProductSearchRepository {
           korName: { contains: filters.category, mode: 'insensitive' },
         };
       }
+      if (filters.subCategory) {
+        whereConditions.subCategory = {
+          korName: { contains: filters.subCategory, mode: 'insensitive' },
+        };
+      }
       if (filters.priceMin !== undefined || filters.priceMax !== undefined) {
         whereConditions.price = {};
         if (filters.priceMin !== undefined) {
@@ -108,6 +113,7 @@ export class PrProductsRepository implements ProductSearchRepository {
       include: {
         brand: true,
         category: true,
+        subCategory: true,
         _count: {
           select: {
             reviews: true,
@@ -144,9 +150,18 @@ export class PrProductsRepository implements ProductSearchRepository {
           product.hit || 0,
           product.engName,
           product.korName,
-          product.brand ? new Brand(product.brand.id, product.brand.korName, product.brand.engName) : undefined,
+          new Brand(product.brand.id, product.brand.korName, product.brand.engName),
           [new Category(product.category.id, product.category.korName, product.category.engName)],
-          [], //TODO: subCategories 추가되어야 함
+          product.subCategory
+            ? [
+                new SubCategory(
+                  product.subCategory.id,
+                  product.subCategory.korName,
+                  product.subCategory.engName,
+                  product.subCategory.categoryId
+                ),
+              ]
+            : [],
           product._count.reviews,
           product._count.likes
         )

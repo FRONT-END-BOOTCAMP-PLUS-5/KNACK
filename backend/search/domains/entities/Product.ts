@@ -16,7 +16,7 @@ export class Product {
     public readonly hit: number,
     public readonly engName: string,
     public readonly korName: string,
-    public readonly brand?: Brand,
+    public readonly brand: Brand,
     public readonly categories: Category[] = [],
     public readonly subCategories: SubCategory[] = [],
     public readonly reviewsCount: number = 0,
@@ -24,6 +24,7 @@ export class Product {
   ) {}
 }
 
+// TODO: 각 테이블 분리 필요
 export class Brand {
   constructor(public readonly id: number, public readonly korName: string, public readonly engName?: string) {}
 }
