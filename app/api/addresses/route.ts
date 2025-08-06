@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { KnackAddressRepository } from '@/backend/address/repositories/KnackAddressRepository'
-import { UpdateAddressUseCase } from '@/backend/address/applications/usecases/UpdateAddressUseCase'
 import { CreateAddressUseCase } from '@/backend/address/applications/usecases/CreateAddressUseCase'
 
 import { getServerSession } from 'next-auth'
