@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     const cartRepository = new PrCartRepository(body);
-    const cart = new CreateCartUseCase(cartRepository).create();
+    const cart = new CreateCartUseCase(cartRepository).create(body.id);
 
     return NextResponse.json({ result: cart, status: 200 });
   } catch (err) {

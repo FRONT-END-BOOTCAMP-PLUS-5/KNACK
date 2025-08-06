@@ -16,11 +16,18 @@ export class PrCartRepository implements CartRepository {
     this.cartData = cartData;
   }
 
-  async insertCart(): Promise<number> {
+  async upsertCart(id: number): Promise<number> {
     const { count, optionValueId, productId, userId } = this.cartData ?? {};
 
-    const result = await prisma.cart.create({
-      data: {
+    const result = await prisma.cart.upsert({
+      where: {
+        id: id,
+      },
+      update: {
+        count: count,
+        optionValueId: optionValueId,
+      },
+      create: {
         productId: productId ?? 0,
         count: count ?? 0,
         optionValueId: optionValueId ?? 0,
