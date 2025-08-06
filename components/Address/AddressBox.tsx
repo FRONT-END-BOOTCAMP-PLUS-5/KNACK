@@ -12,6 +12,7 @@ export default function AddressBox() {
     const [addresses, setAddresses] = useState<AddressDto[]>([])
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(true)
+    const [request, setRequest] = useState('')
 
     useEffect(() => {
         requester.get('/api/addresses')
@@ -31,17 +32,14 @@ export default function AddressBox() {
             .finally(() => setLoading(false))
     }, [])
 
-    const handleSelect = (id: number) => {
-        const addr = addresses.find((a) => a.id === id)
-        if (!addr) return
-        setSelectedAddress({
-            id: addr.id,
-            name: addr.name,
-            phone: addr.phone ?? '',
-            fullAddress: `${addr.main} ${addr.detail ?? ''}`.trim(),
-            request: addr.message ?? '',
-        })
-    }
+    // ✅ selectedAddress가 변경될 때 request 동기화
+    useEffect(() => {
+        if (selectedAddress?.request) {
+            setRequest(selectedAddress.request)
+        } else {
+            setRequest('')
+        }
+    }, [selectedAddress])
 
     return (
         <div className={styles.address_box}>
@@ -59,7 +57,26 @@ export default function AddressBox() {
                             <div><span className={styles.label}>받는 분</span> {selectedAddress.name}</div>
                             <div><span className={styles.label}>연락처</span> {selectedAddress.phone}</div>
                             <div><span className={styles.label}>주소</span> {selectedAddress.fullAddress}</div>
-                            <div><span className={styles.label}>요청사항</span> {selectedAddress.request || '없음'}</div>
+                            <div className={styles.select_box}><select
+                                className={styles.select}
+                                value={request}
+                                onChange={(e) => setRequest(e.target.value)}
+                            >
+                                <option value="">요청사항 선택</option>
+                                <option value="문 앞에 두고 벨 눌러주세요">문 앞에 두고 벨 눌러주세요</option>
+                                <option value="배송 전 연락 부탁드립니다">배송 전 연락 부탁드립니다</option>
+                                <option value="경비실에 맡겨주세요">경비실에 맡겨주세요</option>
+                                <option value="직접 입력">직접 입력</option>
+                            </select>
+
+                                {request === '직접 입력' && (
+                                    <input
+                                        type="text"
+                                        placeholder="요청사항을 입력해주세요"
+                                        className={styles.input}
+                                        onChange={(e) => setRequest(e.target.value)}
+                                    />
+                                )}</div>
                         </div>
                     ) : (
                         <p className={styles.no_address}>주소가 선택되지 않았습니다.</p>

@@ -5,6 +5,7 @@ import { loadTossPayments } from '@tosspayments/payment-sdk'
 import styles from './CheckoutPage.module.scss'
 import AddressBox from '@/components/Address/AddressBox'
 import { useAddressStore } from '@/store/useAddressStore' // ✅ 추가
+import requester from '@/utils/requester'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
 
@@ -24,6 +25,26 @@ export default function CheckoutPage() {
         )
     }
 
+    const handleSaveRequestMessage = async () => {
+        const { selectedAddress } = useAddressStore.getState()
+
+        if (!selectedAddress?.id) {
+            alert('주소가 선택되지 않았습니다.')
+            return
+        }
+
+        try {
+            const res = await requester.put(`/api/addresses/${selectedAddress.id}`, {
+                message: selectedAddress.request, // ✅ 요청사항만 수정
+            })
+
+            console.log('요청사항 저장 완료:', res.data)
+        } catch (error) {
+            console.error('요청사항 저장 실패:', error)
+            alert('요청사항 저장 중 오류가 발생했습니다.')
+        }
+    }
+
     const totalAmount = products
         .filter((p) => selectedIds.includes(p.id))
         .reduce((sum, p) => sum + p.price, 0)
@@ -40,8 +61,7 @@ export default function CheckoutPage() {
         }
 
         try {
-            // ✅ 주소 로컬 저장 (선택사항)
-            localStorage.setItem('selectedAddress', JSON.stringify(selectedAddress))
+            handleSaveRequestMessage()
 
             const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY)
 
@@ -61,7 +81,7 @@ export default function CheckoutPage() {
 
     return (
         <main className={styles.checkout_container}>
-            <h1>보드게임 결제</h1>
+            <h1>결제하기</h1>
 
             <section className={styles.address_section}>
                 <h3>배송지 선택</h3>
@@ -84,7 +104,9 @@ export default function CheckoutPage() {
             </ul>
 
             <div className={styles.summary}>
-                <p>총 결제 금액: <strong>{totalAmount.toLocaleString()}원</strong></p>
+                <p className={styles.total_text}>
+                    총 결제 금액: <strong className={styles.total_amount}>{totalAmount.toLocaleString()}원</strong>
+                </p>
                 <button onClick={handlePayment}>결제하기</button>
             </div>
         </main>

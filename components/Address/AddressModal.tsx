@@ -62,6 +62,7 @@ export default function AddressModal({ onClose }: Props) {
         setFullAddress(addr.main)
         setName(addr.name)
         setPhone(addr.phone)
+        setZipCode(addr.zipCode)
         setRequest(addr.detail)
         setStep('form')
     }
@@ -95,6 +96,7 @@ export default function AddressModal({ onClose }: Props) {
             let saved
             if (editingAddressId !== null) {
                 const res = await requester.put(`/api/addresses/${editingAddressId}`, payload)
+                console.log(res)
                 saved = res.data
             } else {
                 const res = await requester.post('/api/addresses', payload)

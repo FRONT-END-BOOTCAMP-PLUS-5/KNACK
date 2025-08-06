@@ -61,18 +61,21 @@ const AddressUpdateSchema = z.object({
     zipCode: z.string(),
     main: z.string(),
     detail: z.string().nullable(),
-    message: z.string().nullable(),
+    message: z.string().nullable().optional(),
     isDefault: z.boolean().optional(),
 })
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, context: { params: { id: string } }) {
     try {
+        // ✅ context에서 params 안전하게 추출
+        const { id: rawId } = await context.params
+
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
             return NextResponse.json({ message: '로그인이 필요합니다.' }, { status: 401 })
         }
 
-        const id = parseInt(params.id, 10)
+        const id = parseInt(rawId, 10)
         if (isNaN(id)) {
             return NextResponse.json({ message: '유효하지 않은 주소 ID입니다.' }, { status: 400 })
         }
@@ -94,23 +97,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
             return NextResponse.json({ message: '해당 주소를 수정할 권한이 없습니다.' }, { status: 403 })
         }
 
-        // isDefault가 true일 경우 기존 주소들을 전부 false로 초기화
-        if (data.isDefault) {
-            await prisma.address.updateMany({
-                where: { userId: session.user.id },
-                data: { isDefault: false },
-            })
-        }
-
-        await prisma.address.update({
+        const updated = await prisma.address.update({
             where: { id },
             data,
         })
 
-        return NextResponse.json({ message: '주소가 성공적으로 수정되었습니다.' })
+        return NextResponse.json(updated, { status: 200 })
     } catch (error: unknown) {
-        const message =
-            error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
+        const message = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
         console.error('주소 수정 실패:', error)
 
         return NextResponse.json(
@@ -119,6 +113,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         )
     }
 }
+
 
 export async function DELETE(
     req: NextRequest,

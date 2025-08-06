@@ -1,74 +1,71 @@
 .checkout_container {
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: 'Pretendard', sans-serif;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 32px;
+    background: transparent;
+    border-radius: 16px;
+    font-family: 'Noto Sans KR', sans-serif;
 
     h1 {
-        font-size: 1.8rem;
-        margin-bottom: 1.5rem;
-    }
+        font-size: 28px;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 32px;
+        text-align: center;
+        position: relative;
 
-    .product_list {
-        list-style: none;
-        padding: 0;
-
-        li {
-            margin-bottom: 0.75rem;
-
-            label {
-                cursor: pointer;
-
-                input {
-                    margin-right: 0.5rem;
-                }
-            }
-        }
     }
 
     .summary {
-        margin-top: 2rem;
-        font-size: 1.1rem;
+        margin-top: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end; // ✅ 우측 정렬
+        gap: 16px;
 
-        p {
-            margin-bottom: 1rem;
+        .total_text {
+            font-size: 20px;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .total_amount {
+            font-size: 24px;
+            color: #e60023; // 진한 빨강
+            font-weight: bold;
+            margin-left: 6px;
         }
 
         button {
-            background: #0064ff;
-            color: white;
+            background-color: #007aff;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 24px;
             border: none;
-            padding: 0.75rem 1.5rem;
-            font-weight: bold;
-            font-size: 1rem;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: background-color 0.2s;
             width: 100%;
 
             &:hover {
-                background: #004fcc;
+                background-color: #005ecb;
             }
         }
     }
+
 }
 
 .address_section {
-    margin-bottom: 24px;
+    border-radius: 12px;
+    margin-bottom: 32px;
 
     h3 {
-        margin-bottom: 8px;
-    }
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #333;
 
-    ul {
-        list-style: none;
-        padding: 0;
-
-        li {
-            margin-bottom: 6px;
-        }
-
-        label {
-            cursor: pointer;
-        }
+        padding-left: 12px;
     }
 }
