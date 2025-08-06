@@ -37,7 +37,7 @@
   }
   
   &.input_error {
-    border-bottom-color: #ff4757;
+    border-bottom-color: $red02;
   }
   
   // autofill 스타일 제거
@@ -97,7 +97,7 @@
 .error_message {
   display: block;
   font-size: 1.3rem;
-  color: #ff4757;
+  color: $red02;
   margin-top: 0.8rem;
   line-height: 1.4;
 } 
