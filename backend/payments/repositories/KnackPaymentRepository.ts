@@ -65,18 +65,14 @@ export class KnackPaymentRepository implements PaymentRepository {
     }
 
     async generateTodayPaymentNumber(): Promise<number> {
-        // const todayPrefix = new Date().toISOString().slice(0, 10).replace(/-/g, '') // 예: '20250806'
-        // const base = parseInt(todayPrefix) * 1e8 // 예: 2025080600000000
-
-        const todayPrefix = new Date().toISOString().slice(2, 10).replace(/-/g, '') // '250806'
-        const base = parseInt(todayPrefix) * 1000 // 예: 250806000
+        const todayPrefix = new Date().toISOString().slice(0, 10).replace(/-/g, '') // 예: '20250806'
+        const base = parseInt(todayPrefix) * 1e8 // 예: 2025080600000000
 
         const latestPayment = await prisma.payment.findFirst({
             where: {
                 paymentNumber: {
                     gte: base,
-                    // lt: base + 99999999, // 오늘 날짜 범위 내
-                    lt: base + 999, // 하루 최대 999건
+                    lt: base + 99999999, // 오늘 날짜 범위 내
                 },
             },
             orderBy: {
@@ -89,8 +85,7 @@ export class KnackPaymentRepository implements PaymentRepository {
 
         let nextSequence = 1
         if (latestPayment) {
-            // const latestSeq = latestPayment.paymentNumber % 1e8
-            const latestSeq = latestPayment.paymentNumber % 1000
+            const latestSeq = latestPayment.paymentNumber % 1e8
             nextSequence = latestSeq + 1
         }
 

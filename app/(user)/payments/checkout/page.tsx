@@ -107,7 +107,7 @@ export default function CheckoutPage() {
                 <p className={styles.total_text}>
                     총 결제 금액: <strong className={styles.total_amount}>{totalAmount.toLocaleString()}원</strong>
                 </p>
-                <button onClick={handlePayment}>결제하기</button>
+                <button onClick={handlePayment}>{totalAmount.toLocaleString()}원·결제하기</button>
             </div>
         </main>
     )
