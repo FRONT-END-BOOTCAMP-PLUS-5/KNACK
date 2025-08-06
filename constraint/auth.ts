@@ -26,13 +26,15 @@ export const SOCIAL_LOGIN_PROVIDERS = [
   },
 ] as const;
 
+const STORAGE_PREFIX = 'https://d2ubv3uh3d6fx8.cloudfront.net';
+
 // S3 스토리지
 export const STORAGE_PATHS = {
   PREFIX: 'https://d2ubv3uh3d6fx8.cloudfront.net',
-  USER_PROFILE: 'uploads/user/profile',
+  USER_PROFILE: `uploads/user/profile`,
   PRODUCT: {
-    THUMBNAIL: 'uploads/product/thumbnail',
-    SLIDER: 'uploads/product/slider',
-    DETAIL: 'uploads/product/detail',
+    THUMBNAIL: `${STORAGE_PREFIX}/uploads/product/thumbnail`,
+    SLIDER: `${STORAGE_PREFIX}/uploads/product/slider`,
+    DETAIL: `${STORAGE_PREFIX}/uploads/product/detail`,
   },
-}
+};
