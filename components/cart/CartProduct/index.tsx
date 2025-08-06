@@ -45,9 +45,7 @@ const CartProduct = ({ cartData, selectCarts, addSelectCart, optionOpen, onClick
           />
         </span>
         <div className={styles.item_info}>
-          <h3 className={styles.main_text}>
-            {korName} {cartId}
-          </h3>
+          <h3 className={styles.main_text}>{korName}</h3>
           <p className={styles.sub_text}>{engName}</p>
 
           <p className={styles.option_text}>

@@ -9,7 +9,7 @@ interface IProps {
 }
 
 const PaymentButton = ({ selectCarts }: IProps) => {
-  const totalPrice = selectCarts?.reduce((acc, cur) => acc + cur?.product?.price, 0) ?? 0;
+  const totalPrice = selectCarts?.reduce((acc, cur) => acc + (cur?.product?.price ?? 0), 0) ?? 0;
 
   return (
     <div className={styles.payment_button}>
