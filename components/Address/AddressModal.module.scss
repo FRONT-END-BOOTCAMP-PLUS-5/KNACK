@@ -1,0 +1,99 @@
+.modal_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: #fff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.h3 {
+    margin-top: 0;
+    font-size: 1.25rem;
+    font-weight: bold;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.saved_list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.saved_item {
+    background-color: #f9f9f9;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.saved_item:hover {
+    background-color: #f0f0f0;
+}
+
+.request {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.search_btn,
+.save_btn,
+.close_btn {
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.search_btn {
+    background-color: #007bff;
+    color: white;
+    width: 100%;
+}
+
+.save_btn {
+    background-color: #28a745;
+    color: white;
+    width: 100%;
+}
+
+.close_btn {
+    background-color: #ccc;
+    color: black;
+    align-self: flex-end;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.address_display {
+    font-size: 0.9rem;
+    background: #f5f5f5;
+    padding: 8px;
+    border-radius: 6px;
+}

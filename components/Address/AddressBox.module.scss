@@ -1,0 +1,83 @@
+.address_box {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    background-color: #fff;
+    font-size: 14px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .title {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .change_btn {
+        background-color: #f0f0f0;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        border: none;
+        cursor: pointer;
+    }
+}
+
+.info_box {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 16px;
+    background-color: #fafafa;
+
+    div {
+        margin-bottom: 6px;
+
+        .label {
+            display: inline-block;
+            min-width: 60px;
+            font-weight: 500;
+        }
+    }
+}
+
+.address_list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.address_item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #eaeaea;
+    border-radius: 6px;
+    background-color: #fcfcfc;
+    cursor: pointer;
+
+    input[type='radio'] {
+        margin-top: 5px;
+    }
+
+    .address_text {
+        display: flex;
+        flex-direction: column;
+
+        .sub_text {
+            font-size: 13px;
+            color: #666;
+        }
+    }
+}
+
+.loading,
+.no_address {
+    color: #999;
+    font-size: 14px;
+}
