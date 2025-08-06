@@ -11,24 +11,31 @@ import PaymentButton from '@/components/cart/PaymentButton';
 import { cartService } from '@/services/cart';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ICart } from '@/types/cart';
-import { DELIVERY_DESCRIPTION_TEXT } from '@/constraint/cart';
+import { CART_INITIAL_VALUE, DELIVERY_DESCRIPTION_TEXT } from '@/constraint/cart';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import BottomSheet from '@/components/common/BottomSheet';
+import { useBottomSheetStore } from '@/store/bottomSheetStore';
+import { STORAGE_PATHS } from '@/constraint/auth';
+import Image from 'next/image';
+import Button from '@/components/common/Button';
 
 const CartPage = () => {
-  const { getCart, removeCart, removesCart } = cartService;
+  const { getCart, removeCart, removesCart, upsertCart } = cartService;
+  const { onOpen, onClose } = useBottomSheetStore();
 
   const [carts, setCarts] = useState<ICart[]>([]);
   const [selectCarts, setSelectCarts] = useState<ICart[]>([]);
   const [allChecked, setAllChecked] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [multiDeleteOpen, setMultiDeleteOpen] = useState(false);
-  const [selectedCartId, setSelectedCartId] = useState<number>(0);
+  const [selectedCart, setSelectedCart] = useState<ICart>(CART_INITIAL_VALUE);
+  const [selectOptionId, setSelectOptionId] = useState<number>(0);
 
   const handleRemoveCart = () => {
-    removeCart(selectedCartId)
+    removeCart(selectedCart?.id)
       .then((res) => {
         if (res.result) {
-          setSelectedCartId(0);
+          setSelectedCart(CART_INITIAL_VALUE);
           setDeleteOpen(false);
           initCart();
         }
@@ -43,7 +50,6 @@ const CartPage = () => {
 
     removesCart(ids)
       .then((res) => {
-        console.log('res', res);
         setMultiDeleteOpen(false);
         setSelectCarts([]);
         initCart();
@@ -53,13 +59,44 @@ const CartPage = () => {
       });
   };
 
+  const handleOptionChange = async () => {
+    if (selectedCart?.optionValueId === selectOptionId) return onClose();
+
+    const updateData = {
+      id: selectedCart?.id,
+      count: selectedCart?.count,
+      optionValueId: selectOptionId,
+    };
+
+    await upsertCart(updateData)
+      .then((res) => {
+        if (res.result) {
+          // spinner 적용 필요
+          setTimeout(() => {
+            initCart();
+            onClose();
+          }, 300);
+        }
+      })
+      .catch((error) => {
+        onClose();
+        console.log('error', error.message);
+      });
+  };
+
   const onClickMultiRemoveCart = () => {
     setMultiDeleteOpen(true);
   };
 
-  const onClickRemoveCart = (id: number) => {
+  const onClickRemoveCart = (selectCart: ICart) => {
     setDeleteOpen(true);
-    setSelectedCartId(id);
+    setSelectedCart(selectCart);
+  };
+
+  const onClickOptionChange = (selectCart: ICart) => {
+    onOpen();
+    setSelectedCart(selectCart);
+    setSelectOptionId(selectCart?.optionValueId);
   };
 
   const addSelectCart = (selectData: ICart, checked: boolean) => {
@@ -77,14 +114,14 @@ const CartPage = () => {
     else setSelectCarts([]);
   };
 
-  const initCart = useCallback(() => {
-    getCart().then((res) => {
+  const initCart = useCallback(async () => {
+    await getCart().then((res) => {
       setCarts(res.result);
     });
   }, [getCart]);
 
   useEffect(() => {
-    if (carts?.length !== 0) {
+    if (carts?.length > 0) {
       setAllChecked(selectCarts.length === carts.length);
     }
   }, [selectCarts, carts]);
@@ -104,17 +141,19 @@ const CartPage = () => {
       </section>
       <Divider />
       <section>
-        {carts?.map((item, index) => (
-          <React.Fragment key={item?.id + '_' + index}>
-            <CartProduct
-              cartData={item}
-              selectCarts={selectCarts}
-              addSelectCart={addSelectCart}
-              onClickDelete={onClickRemoveCart}
-            />
-            <Divider />
-          </React.Fragment>
-        ))}
+        {carts?.length > 0 &&
+          carts?.map((item, index) => (
+            <React.Fragment key={item?.id + '_' + index}>
+              <CartProduct
+                cartData={item}
+                selectCarts={selectCarts}
+                optionOpen={onClickOptionChange}
+                addSelectCart={addSelectCart}
+                onClickDelete={onClickRemoveCart}
+              />
+              <Divider />
+            </React.Fragment>
+          ))}
 
         <section className={styles.select_order_info_wrap}>
           <h2 className={styles.select_order_title}>선택 주문정보</h2>
@@ -125,7 +164,7 @@ const CartPage = () => {
                 총 상품금액
               </Text>
               <Text size={1.4} color="black1">
-                {selectCarts?.reduce((acc, cur) => acc + cur?.product?.price, 0).toLocaleString()}원
+                {selectCarts?.reduce((acc, cur) => acc + (cur?.product?.price ?? 0), 0).toLocaleString()}원
               </Text>
             </Flex>
             <Flex justify="between" paddingVertical={3}>
@@ -143,7 +182,7 @@ const CartPage = () => {
               총 예상 결제금액
             </Text>
             <Text size={1.6} color="black1" weight={700}>
-              {selectCarts?.reduce((acc, cur) => acc + cur?.product?.price, 0).toLocaleString()}
+              {selectCarts?.reduce((acc, cur) => acc + (cur?.product?.price ?? 0), 0).toLocaleString()}
             </Text>
           </Flex>
         </section>
@@ -184,6 +223,47 @@ const CartPage = () => {
           </Text>
         </Flex>
       </ConfirmModal>
+
+      <BottomSheet>
+        <Flex justify="center" paddingVertical={16}>
+          <Text tag="h2" size={1.8} weight={600}>
+            옵션 변경
+          </Text>
+        </Flex>
+        <section className={styles.option_sheet_product}>
+          <span className={styles.image}>
+            <Image
+              src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${selectedCart?.product?.thumbnailImage}`}
+              width={56}
+              height={56}
+              alt="썸네일"
+            />
+          </span>
+          <Flex direction="column" width="self" gap={2}>
+            <Text size={1.4} color="black1">
+              {selectedCart?.product?.korName}
+            </Text>
+            <Text size={1.3} color="gray1">
+              {selectedCart?.product?.engName}
+            </Text>
+          </Flex>
+        </section>
+        <Divider height={1} />
+        <section className={styles.option_flex_wrap}>
+          {selectedCart?.product?.productOptionMappings[0]?.optionType?.optionValue?.map((item, index) => (
+            <button
+              key={index}
+              className={`${styles.option_button} ${selectOptionId === item?.id && styles.active}`}
+              onClick={() => setSelectOptionId(item?.id)}
+            >
+              {item?.name} / {item?.id}
+            </button>
+          ))}
+        </section>
+        <div className={styles.option_change_button_wrap}>
+          <Button size="large" style="black" text="확인" onClick={handleOptionChange} />
+        </div>
+      </BottomSheet>
     </article>
   );
 };
