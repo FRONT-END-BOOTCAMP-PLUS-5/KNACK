@@ -98,6 +98,7 @@ model Product {
   hit                              Int?                   @default(0)
   engName                          String                 @map("eng_name") @db.VarChar
   korName                          String                 @map("kor_name") @db.VarChar
+  subCategoryId                    Int                    @map("sub_category_id")
   coupons                          Coupon[]
   inquires                         Inquiry[]
   likes                            Like[]
@@ -109,6 +110,7 @@ model Product {
   relatedProducts_RelatedToProduct RelatedProduct[]       @relation("RelatedToProduct")
   reviews                          Review[]
   carts                            Cart[]
+  subCategory                      SubCategory            @relation(fields: [subCategoryId], references: [id])
 
   @@map("products")
 }
@@ -238,6 +240,7 @@ model SubCategory {
   createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   isPrivate  Boolean   @default(true) @map("is_private")
   category   Category  @relation(fields: [categoryId], references: [id])
+  products   Product[]
 
   @@map("sub_categories")
 }
@@ -276,7 +279,7 @@ model Payment {
   userId         String    @map("user_id") @db.Uuid
   price          Int?      @default(0)
   createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  paymentNumber  Int       @map("payment_number")
+  paymentNumber  BigInt       @map("payment_number")
   addressId      Int       @map("address_id")
   approvedAt     DateTime? @map("approved_at") @db.Timestamptz(6)
   method         String    @db.VarChar

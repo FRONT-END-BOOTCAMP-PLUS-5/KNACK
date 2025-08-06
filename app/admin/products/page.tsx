@@ -11,6 +11,7 @@ const ProductsPage = () => {
   const [price, setPrice] = useState(0);
   const [gender, setGender] = useState('');
   const [categoryId, setCategoryId] = useState(0);
+  const [subCategoryId, setSubCategoryId] = useState(0);
   const [brandId, setBrandId] = useState(0);
   const [thumbnailImage, setThumbnailImage] = useState('');
   const [subImages, setSubImages] = useState('');
@@ -25,6 +26,7 @@ const ProductsPage = () => {
       brandId: brandId,
       thumbnailImage: thumbnailImage,
       subImages: subImages,
+      subCategoryId: subCategoryId,
     };
 
     axios
@@ -47,6 +49,11 @@ const ProductsPage = () => {
         <input type="text" placeholder="썸네일 이미지" onChange={(e) => setThumbnailImage(e.target.value)} />
         <input type="text" placeholder="슬라이드 이미지" onChange={(e) => setSubImages(e.target.value)} />
         <input type="number" placeholder="카테고리 아이디" onChange={(e) => setCategoryId(Number(e.target.value))} />
+        <input
+          type="number"
+          placeholder="서브 카테고리 아이디"
+          onChange={(e) => setSubCategoryId(Number(e.target.value))}
+        />
         <input type="number" placeholder="브랜드 아이디" onChange={(e) => setBrandId(Number(e.target.value))} />
       </Flex>
 
