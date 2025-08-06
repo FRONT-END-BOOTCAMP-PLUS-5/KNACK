@@ -108,6 +108,7 @@ model Product {
   relatedProducts_ProductRelated   RelatedProduct[]       @relation("ProductRelated")
   relatedProducts_RelatedToProduct RelatedProduct[]       @relation("RelatedToProduct")
   reviews                          Review[]
+  carts                            Cart[]
 
   @@map("products")
 }
@@ -175,21 +176,22 @@ model Review {
 }
 
 model OptionType {
-  id           Int           @id @default(autoincrement())
-  name         String        @db.VarChar
-  isPrivate    Boolean       @default(true) @map("is_private")
-  optionValues OptionValue[]
+  id                    Int                    @id @default(autoincrement())
+  name                  String                 @db.VarChar
+  isPrivate             Boolean                @default(true) @map("is_private")
+  productOptionMappings ProductOptionMapping[]
+  optionValue           OptionValue[]         
 
   @@map("option_types")
 }
 
 model OptionValue {
-  id                    Int                    @id @default(autoincrement())
-  typeId                Int                    @map("type_id")
-  isPrivate             Boolean                @default(true) @map("is_private")
-  name                  String                 @db.VarChar
-  optionType            OptionType             @relation(fields: [typeId], references: [id])
-  productOptionMappings ProductOptionMapping[]
+  id          Int          @id @default(autoincrement())
+  isPrivate   Boolean      @default(true) @map("is_private")
+  name        String       @db.VarChar
+  typeId      Int          @map("type_id")
+  optionTypes OptionType @relation(fields: [typeId], references: [id])
+  cart        Cart[]
 
   @@map("option_values")
 }
@@ -197,10 +199,9 @@ model OptionValue {
 model ProductOptionMapping {
   id            Int         @id @default(autoincrement())
   productId     Int         @map("product_id")
-  optionValueId Int         @map("option_value_id")
+  optionTypeId  Int         @map("option_type_id")
   stock         Int?        @default(0)
-  carts         Cart[]
-  optionValue   OptionValue @relation(fields: [optionValueId], references: [id])
+  optionType    OptionType  @relation(fields: [optionTypeId], references: [id])
   product       Product     @relation(fields: [productId], references: [id])
 
   @@map("product_option_mappings")
@@ -308,11 +309,12 @@ model Cart {
   id                   Int                  @id @default(autoincrement())
   userId               String               @map("user_id") @db.Uuid
   productId            Int                  @map("product_id")
-  optionMappingId      Int                  @map("option_mapping_id")
   createdAt            DateTime?            @default(now()) @map("created_at") @db.Timestamptz(6)
   count                Int?                 @default(1)
-  productOptionMapping ProductOptionMapping @relation(fields: [optionMappingId], references: [id])
+  optionValueId        Int                  @map("option_value_id")
   user                 User                 @relation(fields: [userId], references: [id])
+  product              Product              @relation(fields: [productId], references: [id])
+  optionValue          OptionValue        @relation(fields: [optionValueId], references: [id])
 
   @@map("carts")
 }

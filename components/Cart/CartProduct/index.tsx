@@ -5,32 +5,72 @@ import styles from './cartProduct.module.scss';
 import Checkbox from '@/components/common/Checkbox';
 import Link from 'next/link';
 import Button from '@/components/common/Button';
+import { ICart } from '@/types/cart';
+import Image from 'next/image';
+import { STORAGE_PATHS } from '@/constraint/auth';
+import { useEffect, useState } from 'react';
 
-const CartProduct = () => {
+interface IProps {
+  cartData: ICart;
+  selectCarts: ICart[];
+  optionOpen: (selectedCart: ICart) => void;
+  onClickDelete: (selectedCart: ICart) => void;
+  addSelectCart: (selectData: ICart, checked: boolean) => void;
+}
+
+const CartProduct = ({ cartData, selectCarts, addSelectCart, optionOpen, onClickDelete }: IProps) => {
+  const { korName, engName, thumbnailImage, price } = cartData.product ?? {};
+  const cartId = cartData?.id;
+
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    const check = selectCarts.filter((item) => item.id === cartData.id).length > 0;
+    setChecked(check);
+  }, [selectCarts]);
+
   return (
     <div>
       <section className={styles.item_select_bar}>
-        <Checkbox />
-        <ChipButton text="삭제" />
+        <Checkbox checked={checked} onChangeCheckbox={(status) => addSelectCart(cartData, status)} />
+        <ChipButton text="삭제" onClick={() => onClickDelete(cartData)} />
       </section>
       <Link href={'/'} className={styles.item_info_wrap}>
-        <span className={styles.item_image}>이미지</span>
+        <span className={styles.item_image}>
+          <Image
+            src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${thumbnailImage}`}
+            alt="상품 썸네일"
+            width={80}
+            height={80}
+          />
+        </span>
         <div className={styles.item_info}>
-          <h3 className={styles.main_text}>메인 타이틀</h3>
-          <p className={styles.sub_text}>서브타이틀</p>
-          <p className={styles.option_text}>옵션</p>
+          <h3 className={styles.main_text}>
+            {korName} {cartId}
+          </h3>
+          <p className={styles.sub_text}>{engName}</p>
+
+          <p className={styles.option_text}>
+            {
+              cartData?.product?.productOptionMappings[0].optionType?.optionValue?.filter(
+                (fItem) => fItem?.id === cartData?.optionValueId
+              )[0].name
+            }
+
+            {cartData?.optionValueId}
+          </p>
         </div>
       </Link>
       <div className={styles.item_price}>
         <p className={styles.price_title}>상품금액</p>
-        <p className={styles.price}>249,000원</p>
+        <p className={styles.price}>{price?.toLocaleString()}원</p>
       </div>
       <div className={styles.delivery_price}>
         <p className={styles.delivery_title}>배송비</p>
         <p className={styles.price}>무료</p>
       </div>
       <section className={styles.button_wrap}>
-        <Button text="옵션/배송 변경" />
+        <Button text="옵션 변경" onClick={() => optionOpen(cartData)} />
         <Button text="바로 주문" style="black" />
       </section>
     </div>
