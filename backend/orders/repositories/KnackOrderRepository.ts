@@ -32,4 +32,18 @@ export class KnackOrderRepository implements OrderRepository {
             data: { paymentId },
         })
     }
+
+    async findManyByIdsAndUserId(orderIds: number[], userId: string): Promise<number[]> {
+        const orders = await prisma.order.findMany({
+            where: {
+                id: { in: orderIds },
+                userId,
+            },
+            select: {
+                id: true,
+            },
+        })
+
+        return orders.map(order => order.id)
+    }
 }

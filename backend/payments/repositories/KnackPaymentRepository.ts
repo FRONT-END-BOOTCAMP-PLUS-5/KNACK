@@ -63,4 +63,38 @@ export class KnackPaymentRepository implements PaymentRepository {
             orderIds: data.orders.map(order => order.id),
         }
     }
+
+    async generateTodayPaymentNumber(): Promise<number> {
+        // const todayPrefix = new Date().toISOString().slice(0, 10).replace(/-/g, '') // 예: '20250806'
+        // const base = parseInt(todayPrefix) * 1e8 // 예: 2025080600000000
+
+        const todayPrefix = new Date().toISOString().slice(2, 10).replace(/-/g, '') // '250806'
+        const base = parseInt(todayPrefix) * 1000 // 예: 250806000
+
+        const latestPayment = await prisma.payment.findFirst({
+            where: {
+                paymentNumber: {
+                    gte: base,
+                    // lt: base + 99999999, // 오늘 날짜 범위 내
+                    lt: base + 999, // 하루 최대 999건
+                },
+            },
+            orderBy: {
+                paymentNumber: 'desc',
+            },
+            select: {
+                paymentNumber: true,
+            },
+        })
+
+        let nextSequence = 1
+        if (latestPayment) {
+            // const latestSeq = latestPayment.paymentNumber % 1e8
+            const latestSeq = latestPayment.paymentNumber % 1000
+            nextSequence = latestSeq + 1
+        }
+
+        const paymentNumber = base + nextSequence
+        return paymentNumber
+    }
 }

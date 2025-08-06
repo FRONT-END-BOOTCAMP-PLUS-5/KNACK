@@ -1,29 +1,45 @@
-// 📁 app/api/payments/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { serverPost as tossPOST } from '@/backend/utils/serverRequester'
 import type { AxiosError } from 'axios'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { KnackPaymentRepository } from '@/backend/payments/repositories/KnackPaymentRepository'
 import { KnackCardRepository } from '@/backend/payments/repositories/KnackCardRepository'
 import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto'
 import { CreateCardDto } from '@/backend/payments/applications/dtos/CreateCardDto'
 
 export async function POST(req: NextRequest) {
+    const repo = new KnackPaymentRepository();
     try {
-        const { paymentKey, orderId, amount } = await req.json()
+        const session = await getServerSession(authOptions)
+        console.log(session);
+        if (!session?.user) {
+            return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 })
+        }
+
+        console.log('🔐 유저 세션 정보:', session.user)
+
+        const { paymentKey, orderId, amount, addressId, orderIds } = await req.json()
+
+        console.log({
+            paymentKey,
+            orderId,
+            amount,
+        })
 
         const data = await tossPOST('/payments/confirm', { paymentKey, orderId, amount }, 'toss')
 
         const paymentDto: CreatePaymentDto = {
             tossPaymentKey: data.paymentKey,
-            userId: data.user?.id ?? 'unknown',
-            addressId: data.addressId,
-            paymentNumber: data.paymentNumber ?? 0,
-            price: data.totalAmount,
+            userId: session.user.id, // ✅ 세션 기반 userId 사용
+            addressId,
+            paymentNumber: await repo.generateTodayPaymentNumber(),
+            price: data.price,
             approvedAt: new Date(data.approvedAt),
             createdAt: new Date(data.requestedAt),
             method: data.method,
             status: data.status,
-            orderIds: data.orderIds,
+            orderIds, // 프론트에서 전달하거나 서버에서 조회할 수도 있음
         }
 
         const paymentRepo = new KnackPaymentRepository()
@@ -51,7 +67,6 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(data)
     } catch (error) {
-        // ✅ AxiosError 타입 가드
         const errRes =
             error && typeof error === 'object' && 'isAxiosError' in error
                 ? (error as AxiosError).response?.data
