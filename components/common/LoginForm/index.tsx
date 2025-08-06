@@ -1,15 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import AuthInput from '@/components/common/AuthInput';
 import { useLoginValidation } from '@/hooks/useLoginValidation';
+import { useLogin } from '@/hooks/useLogin';
 import styles from './loginForm.module.scss';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { errors, validateField, clearError, setLoginError } = useLoginValidation();
+  const loginMutation = useLogin();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -31,16 +32,10 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const result = await signIn('credentials', {
-      username: email,
-      password: password,
-      redirect: false,
-    });
-    
-    if (result?.ok) {
-      window.location.href = '/';
-    } else {
-      setLoginError('로그인에 실패했습니다.');
+    try {
+      await loginMutation.mutateAsync({ email, password });
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : '로그인에 실패했습니다.');
     }
   };
 
@@ -72,9 +67,9 @@ export default function LoginForm() {
       <button 
         type="submit" 
         className={`${styles.login_button} ${isLoginButtonActive ? styles.active : ''}`}
-        disabled={!isLoginButtonActive}
+        disabled={!isLoginButtonActive || loginMutation.isPending}
       >
-        로그인
+        {loginMutation.isPending ? '로그인 중...' : '로그인'}
       </button>
     </form>
   );
