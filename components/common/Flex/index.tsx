@@ -12,6 +12,8 @@ interface IProps {
   gap?: number;
   paddingVertical?: number;
   paddingHorizontal?: number;
+  marginVertical?: number;
+  marginHorizontal?: number;
 }
 
 const Flex = ({
@@ -24,13 +26,20 @@ const Flex = ({
   gap = 0,
   paddingVertical = 0,
   paddingHorizontal = 0,
+  marginVertical = 0,
+  marginHorizontal = 0,
 }: IProps) => {
   return (
     <div
       className={`${className} ${styles.flex_style} ${styles['align_' + align]} ${styles['justify_' + justify]} ${
         styles['width_' + width]
       }`}
-      style={{ padding: `${paddingVertical}px ${paddingHorizontal}px`, flexDirection: direction, gap: gap + 'px' }}
+      style={{
+        padding: `${paddingVertical}px ${paddingHorizontal}px`,
+        flexDirection: direction,
+        gap: gap + 'px',
+        margin: `${marginVertical}px ${marginHorizontal}px`,
+      }}
     >
       {children}
     </div>
