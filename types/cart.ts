@@ -5,14 +5,14 @@ export interface CartRef {
   productId: number;
   optionValueId: number;
   count: number;
+  id: number;
 }
 
 export interface ICart {
   count: number;
   id: number;
-  createdAt: Date;
-  optionMappingId: number;
-  product: IProduct;
-  productOptionMapping: IProductOptionMapping;
-  userId: string;
+  createdAt?: Date;
+  optionValueId: number;
+  product?: IProduct;
+  userId?: string;
 }

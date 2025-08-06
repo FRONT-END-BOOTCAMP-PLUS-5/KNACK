@@ -19,6 +19,7 @@ export interface IProduct {
   categoryId: number;
   brand: IBrand;
   category: ICategory;
+  productOptionMappings: IProductOptionMapping[];
 }
 
 export interface IProductOptionMapping {
