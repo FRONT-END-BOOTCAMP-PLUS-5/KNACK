@@ -10,6 +10,7 @@ interface IProps {
   price: number;
   thumbnailImage: string;
   subImages: string;
+  subCategoryId: number;
 }
 
 export class PrProductRepository implements ProductRepository {
@@ -20,7 +21,8 @@ export class PrProductRepository implements ProductRepository {
   }
 
   async insertProduct(): Promise<number> {
-    const { brandId, categoryId, engName, gender, korName, price, thumbnailImage, subImages } = this.productData;
+    const { brandId, categoryId, engName, gender, korName, price, thumbnailImage, subImages, subCategoryId } =
+      this.productData;
 
     const result = await prisma.product.create({
       data: {
@@ -32,6 +34,7 @@ export class PrProductRepository implements ProductRepository {
         categoryId: categoryId,
         thumbnailImage: thumbnailImage,
         subImages: subImages,
+        subCategoryId: subCategoryId,
       },
     });
 
