@@ -256,7 +256,7 @@ const CartPage = () => {
               className={`${styles.option_button} ${selectOptionId === item?.id && styles.active}`}
               onClick={() => setSelectOptionId(item?.id)}
             >
-              {item?.name} / {item?.id}
+              {item?.name}
             </button>
           ))}
         </section>
