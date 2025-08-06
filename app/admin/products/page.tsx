@@ -8,7 +8,7 @@ import { useState } from 'react';
 const ProductsPage = () => {
   const [korName, setKorName] = useState('');
   const [engName, setEngName] = useState('');
-  const [price, setPrice] = useState('');
+  const [price, setPrice] = useState(0);
   const [gender, setGender] = useState('');
   const [categoryId, setCategoryId] = useState(0);
   const [brandId, setBrandId] = useState(0);
@@ -42,7 +42,7 @@ const ProductsPage = () => {
       <Flex direction="column" gap={12}>
         <input type="text" placeholder="한글 상품명" onChange={(e) => setKorName(e.target.value)} />
         <input type="text" placeholder="영어 상품명" onChange={(e) => setEngName(e.target.value)} />
-        <input type="number" placeholder="가격" onChange={(e) => setPrice(e.target.value)} />
+        <input type="number" placeholder="가격" onChange={(e) => setPrice(Number(e.target.value))} />
         <input type="text" placeholder="성별" onChange={(e) => setGender(e.target.value)} />
         <input type="text" placeholder="썸네일 이미지" onChange={(e) => setThumbnailImage(e.target.value)} />
         <input type="text" placeholder="슬라이드 이미지" onChange={(e) => setSubImages(e.target.value)} />
