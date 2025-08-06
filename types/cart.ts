@@ -3,7 +3,7 @@ import { IProduct, IProductOptionMapping } from './product';
 export interface CartRef {
   userId: string;
   productId: number;
-  optionMappingId: number;
+  optionValueId: number;
   count: number;
 }
 

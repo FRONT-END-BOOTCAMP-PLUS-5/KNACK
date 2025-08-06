@@ -5,7 +5,7 @@ import { Cart } from '../domains/entities/Cart';
 interface IProps {
   userId: string;
   productId: number;
-  optionMappingId: number;
+  optionValueId: number;
   count: number;
 }
 
@@ -17,13 +17,13 @@ export class PrCartRepository implements CartRepository {
   }
 
   async insertCart(): Promise<number> {
-    const { count, optionMappingId, productId, userId } = this.cartData ?? {};
+    const { count, optionValueId, productId, userId } = this.cartData ?? {};
 
     const result = await prisma.cart.create({
       data: {
         productId: productId ?? 0,
         count: count ?? 0,
-        optionMappingId: optionMappingId ?? 0,
+        optionValueId: optionValueId ?? 0,
         userId: userId ?? '',
       },
     });
@@ -35,8 +35,21 @@ export class PrCartRepository implements CartRepository {
     const result = await prisma.cart.findMany({
       where: { userId: '7571e92b-f38b-4878-959c-f76ab9290ed8' },
       include: {
-        productOptionMapping: { include: { optionType: { include: { optionValue: true } } } },
-        product: { include: { brand: true, category: true } },
+        product: {
+          include: {
+            brand: true,
+            category: true,
+            productOptionMappings: {
+              include: {
+                optionType: {
+                  include: {
+                    optionValue: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
