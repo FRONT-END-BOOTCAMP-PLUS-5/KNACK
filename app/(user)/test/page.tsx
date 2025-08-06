@@ -4,17 +4,18 @@ import { cartService } from '@/services/cart';
 import { CartRef } from '@/types/cart';
 
 const TestPage = () => {
-  const { addCart } = cartService;
+  const { upsertCart } = cartService;
 
   const handleAddCart = () => {
     const cartData: CartRef = {
       count: 1,
       optionValueId: 2,
-      productId: 2,
+      productId: 1,
       userId: '7571e92b-f38b-4878-959c-f76ab9290ed8',
+      id: 0,
     };
 
-    addCart(cartData)
+    upsertCart(cartData)
       .then((res) => {
         console.log('res', res);
       })
