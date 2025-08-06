@@ -64,24 +64,6 @@ export default function AddressBox() {
                     ) : (
                         <p className={styles.no_address}>주소가 선택되지 않았습니다.</p>
                     )}
-
-                    <div className={styles.address_list}>
-                        {addresses.map((addr) => (
-                            <label key={addr.id} className={styles.address_item}>
-                                <input
-                                    type="radio"
-                                    name="address"
-                                    checked={selectedAddress?.id === addr.id}
-                                    onChange={() => handleSelect(addr.id)}
-                                    className={styles.radio}
-                                />
-                                <div className={styles.address_text}>
-                                    <strong>{addr.isDefault ? '[기본] ' : ''}{addr.name}</strong>
-                                    <div className={styles.sub_text}>{addr.main} {addr.detail}</div>
-                                </div>
-                            </label>
-                        ))}
-                    </div>
                 </>
             )}
 

@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { KnackAddressRepository } from '@/backend/address/repositories/KnackAddressRepository'
 import { UpdateAddressUseCase } from '@/backend/address/applications/usecases/UpdateAddressUseCase'
 import { CreateAddressUseCase } from '@/backend/address/applications/usecases/CreateAddressUseCase'
-import { DeleteAddressUseCase } from '@/backend/address/applications/usecases/DeleteAddressUseCase'
+
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]/auth'
 import { GetAddressByUserIdUseCase } from '@/backend/address/applications/usecases/GetAddressByUserIdUseCase'
 
 const repo = new KnackAddressRepository()
-const updateAddressUseCase = new UpdateAddressUseCase(repo)
 const getAddressByUserIdUseCase = new GetAddressByUserIdUseCase(repo)
 
 export async function GET(req: NextRequest) {
@@ -32,14 +31,28 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
+        const session = await getServerSession(authOptions)
+
+        if (!session?.user?.id) {
+            return NextResponse.json({ message: '로그인이 필요합니다.' }, { status: 401 })
+        }
+
+        const userId = session.user.id // UUID string
         const body = await req.json()
+
         const createAddress = new CreateAddressUseCase(repo)
-        const newAddress = await createAddress.execute(body)
+
+        const newAddress = await createAddress.execute({
+            ...body,
+            userId, // ✅ 세션에서 직접 주입
+        })
+
         return NextResponse.json(newAddress, { status: 201 })
     } catch (error: unknown) {
         const message =
             error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
         console.error('주소 생성 실패:', error)
+
         return NextResponse.json(
             { message: '주소 생성 중 오류 발생', error: message },
             { status: 400 }
@@ -47,42 +60,3 @@ export async function POST(req: NextRequest) {
     }
 }
 
-export async function PUT(req: NextRequest) {
-    try {
-        const body = await req.json()
-        await updateAddressUseCase.execute(body)
-        return NextResponse.json({ message: '주소가 성공적으로 수정되었습니다.' })
-    } catch (error: unknown) {
-        const message =
-            error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
-        console.error('주소 수정 실패:', error)
-
-        return NextResponse.json(
-            { message: '주소 수정 중 오류 발생', error: message },
-            { status: 500 }
-        )
-    }
-}
-
-export async function DELETE(req: NextRequest) {
-    try {
-        const { id } = await req.json()
-
-        if (!id) {
-            return NextResponse.json({ message: '주소 ID가 필요합니다.' }, { status: 400 })
-        }
-
-        const deleteAddress = new DeleteAddressUseCase(repo)
-        await deleteAddress.execute(id)
-
-        return NextResponse.json({ message: '주소가 성공적으로 삭제되었습니다.' })
-    } catch (error: unknown) {
-        const message =
-            error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
-        console.error('주소 삭제 실패:', error)
-        return NextResponse.json(
-            { message: '주소 삭제 중 오류 발생', error: message },
-            { status: 400 }
-        )
-    }
-}

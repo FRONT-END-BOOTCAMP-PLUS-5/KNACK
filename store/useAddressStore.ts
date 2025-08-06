@@ -10,10 +10,18 @@ interface Address {
 
 interface AddressStore {
     selectedAddress: Address | null
-    setSelectedAddress: (addr: Address) => void
+    setSelectedAddress: (address: Address) => void
+    clearAddress: () => void
 }
 
 export const useAddressStore = create<AddressStore>((set) => ({
     selectedAddress: null,
-    setSelectedAddress: (addr) => set({ selectedAddress: addr }),
+
+    setSelectedAddress: (address) => {
+        set({ selectedAddress: address })
+    },
+
+    clearAddress: () => {
+        set({ selectedAddress: null })
+    },
 }))
