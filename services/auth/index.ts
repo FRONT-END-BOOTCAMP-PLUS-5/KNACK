@@ -1,23 +1,11 @@
 import { signIn } from 'next-auth/react';
+import { post } from '@/utils/requester';
 import { SignupFormData, SignupResponse, LoginFormData } from '@/types/auth';
 
 // API 호출 함수 - 회원가입
 export const signupUser = async (formData: SignupFormData): Promise<SignupResponse> => {
   try {
-    const response = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || '회원가입에 실패했습니다.');
-    }
-
+    const data = await post<SignupResponse>('/api/auth/signup', formData);
     return data;
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : '회원가입에 실패했습니다.');
