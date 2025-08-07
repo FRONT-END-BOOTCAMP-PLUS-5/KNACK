@@ -266,8 +266,8 @@ model Order {
   createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   deliveryStatus Int?      @map("delivery_status")
   count          Int?      @default(0)
-  paymentId      Int       @map("payment_id")
-  payment        Payment   @relation(fields: [paymentId], references: [id])
+  paymentId      Int?       @map("payment_id")
+  payment        Payment?   @relation(fields: [paymentId], references: [id])
   product        Product   @relation(fields: [productId], references: [id])
   user           User      @relation(fields: [userId], references: [id])
 
