@@ -16,8 +16,8 @@ export interface IProduct {
   category: ICategory;
   colorKorName: string;
   colorEngName: string;
-  modelNumber: number | null;
-  releaseDate: Date | null;
+  modelNumber: string | null;
+  releaseDate: string | null;
   topImages: string | null;
   reviews: IReview[];
   _count: {
