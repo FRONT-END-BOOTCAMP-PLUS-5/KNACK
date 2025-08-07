@@ -1,40 +1,46 @@
 import prisma from '@/backend/utils/prisma';
 import { ProductRepository } from '../domains/repositories/ProductRepository';
-
-interface IProps {
-  korName: string;
-  engName: string;
-  gender: string;
-  categoryId: number;
-  brandId: number;
-  price: number;
-  thumbnailImage: string;
-  subImages: string;
-  subCategoryId: number;
-}
+import { IPostProductDto } from '../applications/dtos/PostProductDto';
 
 export class PrProductRepository implements ProductRepository {
   private productData;
 
-  constructor(productData: IProps) {
+  constructor(productData: IPostProductDto) {
     this.productData = productData;
   }
 
   async insertProduct(): Promise<number> {
-    const { brandId, categoryId, engName, gender, korName, price, thumbnailImage, subImages, subCategoryId } =
-      this.productData;
+    const {
+      brandId,
+      categoryId,
+      engName,
+      gender,
+      korName,
+      price,
+      thumbnailImage,
+      subImages,
+      subCategoryId,
+      colorEngName,
+      colorKorName,
+      modelNumber,
+      releaseDate,
+    } = this.productData;
 
     const result = await prisma.product.create({
       data: {
-        engName: engName,
-        korName: korName,
+        engName: engName ?? '',
+        korName: korName ?? '',
         price: price,
         gender: gender,
-        brandId: brandId,
-        categoryId: categoryId,
+        brandId: brandId ?? 0,
+        categoryId: categoryId ?? 0,
         thumbnailImage: thumbnailImage,
         subImages: subImages,
         subCategoryId: subCategoryId,
+        colorEngName: colorEngName,
+        colorKorName: colorKorName,
+        modelNumber: modelNumber,
+        releaseDate: releaseDate,
       },
     });
 
