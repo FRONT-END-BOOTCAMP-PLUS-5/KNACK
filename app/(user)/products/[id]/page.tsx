@@ -12,9 +12,9 @@ import AdditionalBenefits from '@/components/products/AdditionalBenefits';
 import { IProduct } from '@/types/productDetail';
 
 interface IProps {
-  params: {
-    id: number;
-  };
+  params: Promise<{
+    id: string;
+  }>;
 }
 
 const REVIEW_PROGRESS = [
@@ -36,7 +36,7 @@ const ProductDetail = async ({ params }: IProps) => {
 
   const { getProduct } = productsService;
 
-  const productData: IProduct = await getProduct(id).then((res) => {
+  const productData: IProduct = await getProduct(Number(id)).then((res) => {
     return res;
   });
 
