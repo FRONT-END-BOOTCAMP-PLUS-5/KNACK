@@ -1,0 +1,29 @@
+.position {
+  position: relative;
+}
+
+.tab_wrap {
+  border-bottom: 1px solid #f0f0f0;
+  height: 44px;
+
+  & .tab_button {
+    width: 25%;
+    height: 100%;
+    background: #fff;
+    border: none;
+    font-size: 1.4rem;
+
+    &.active {
+      font-weight: 700;
+      transition: 0.3s;
+    }
+  }
+}
+
+.active_border {
+  border-bottom: 2px solid $black;
+  transition: 0.3s;
+  width: 25%;
+  bottom: 0;
+  position: absolute;
+}
