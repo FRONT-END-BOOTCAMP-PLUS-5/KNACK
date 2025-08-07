@@ -1,0 +1,186 @@
+.card {
+    font-size: 14px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    h3 {
+        font-size: 15px;
+        font-weight: bold;
+    }
+}
+
+.item_count {
+    font-size: 14px;
+    color: #333;
+}
+
+.coupon_toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+
+    input {
+        display: none;
+    }
+
+    .slider {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        border-radius: 20px;
+    }
+}
+
+.product_box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.image {
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.details {
+    flex: 1;
+
+    .name {
+        font-weight: 600;
+    }
+
+    .subtitle,
+    .model {
+        color: #777;
+        font-size: 13px;
+    }
+
+    .points {
+        font-size: 12px;
+        color: green;
+        margin-top: 4px;
+    }
+}
+
+.price {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.delivery {
+    margin-top: 16px;
+
+    .delivery_label {
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .radio_option {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        position: relative;
+
+        input[type='radio'] {
+            opacity: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .custom_radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #000;
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        input[type='radio']:checked+.custom_radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .radio_text {
+            display: flex;
+            justify-content: space-between; // 👉 양쪽 정렬
+            align-items: center;
+            width: 100%; // ✅ 라벨 전체 너비 사용
+
+            .main {
+                font-weight: 500;
+            }
+
+            .sub {
+                font-size: 12px;
+                color: #999;
+            }
+        }
+    }
+}
+
+
+.coupon {
+    margin: 16px 0;
+    display: flex;
+    gap: 8px;
+
+    input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    button {
+        padding: 8px 12px;
+        font-size: 13px;
+        background: #eee;
+        border: none;
+        border-radius: 4px;
+        cursor: not-allowed;
+    }
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 8px 0;
+    border-top: 1px solid #eee;
+}
+
+.notice {
+    font-size: 12px;
+    color: #888;
+    margin-top: 12px;
+    line-height: 1.4;
+}

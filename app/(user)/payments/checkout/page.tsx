@@ -1,30 +1,69 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { loadTossPayments } from '@tosspayments/payment-sdk'
 import styles from './CheckoutPage.module.scss'
 import AddressBox from '@/components/Address/AddressBox'
-import { useAddressStore } from '@/store/useAddressStore' // ✅ 추가
+import { useAddressStore } from '@/store/useAddressStore'
 import requester from '@/utils/requester'
-import PaymentFooter from '@/components/common/PaymentFooter/PaymentFooter'
+import PaymentFooter from '@/components/Payments/PaymentFooter/PaymentFooter'
+import OrderSummaryCard from '@/components/Payments/Order/OrderSummaryCard'
+import { useOrderStore } from '@/store/useOrderStore'
+import { AddressDto } from '@/backend/address/applications/dtos/AddressDto'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
 
-const products = [
-    { id: 'prod1', name: '보드게임 A', price: 15000 },
-    { id: 'prod2', name: '보드게임 B', price: 22000 },
-    { id: 'prod3', name: '보드게임 C', price: 30000 },
-]
-
 export default function CheckoutPage() {
-    const [selectedIds, setSelectedIds] = useState<string[]>([])
-    const { selectedAddress } = useAddressStore() // ✅ zustand에서 선택된 주소 가져오기
+    const {
+        getTotalPrice,
+        setOrderItems,
+        setDeliveryType,
+    } = useOrderStore()
 
-    const toggleProduct = (id: string) => {
-        setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
-        )
-    }
+    const { selectedAddress, setSelectedAddress } = useAddressStore()
+
+    const totalPrice = getTotalPrice()
+
+    // ✅ 최초 진입 시 mock 데이터 저장
+    useEffect(() => {
+        const mockProduct = {
+            productId: 3,
+            kor_name: '리바이스 x 오아시스 데카 로고 티셔츠 블랙',
+            eng_name: "Levi's x Oasis Deca Logo T-Shirt Black",
+            price: 64000,
+            quantity: 1,
+            thumbnail_image: 'levis_nike_trucker_jacket_lightblue-thumbnail.webp',
+        }
+
+        setOrderItems([mockProduct])
+        setDeliveryType('FAST', 5000)
+        sessionStorage.setItem('orderItems', JSON.stringify([mockProduct]))
+    }, [setOrderItems, setDeliveryType])
+
+    useEffect(() => {
+        const fetchDefaultAddress = async () => {
+            try {
+                const res = await requester.get('/api/addresses')
+                const addresses: AddressDto[] = res.data
+
+                const defaultAddr = addresses.find(addr => addr.isDefault)
+                if (defaultAddr) {
+                    sessionStorage.setItem('selectedAddress', JSON.stringify(defaultAddr))
+                    setSelectedAddress({
+                        id: defaultAddr.id,
+                        name: defaultAddr.name,
+                        phone: defaultAddr.phone ?? '',
+                        fullAddress: `${defaultAddr.main} ${defaultAddr.detail ?? ''}`.trim(),
+                        request: defaultAddr.message ?? '',
+                    })
+                }
+            } catch (err) {
+                console.error('주소 불러오기 실패', err)
+            }
+        }
+
+        fetchDefaultAddress()
+    }, [setSelectedAddress])
 
     const handleSaveRequestMessage = async () => {
         const { selectedAddress } = useAddressStore.getState()
@@ -35,8 +74,8 @@ export default function CheckoutPage() {
         }
 
         try {
-            const res = await requester.put(`/api/addresses/${selectedAddress.id}`, {
-                message: selectedAddress.request, // ✅ 요청사항만 수정
+            const res = await requester.patch(`/api/addresses/${selectedAddress.id}`, {
+                message: selectedAddress.request,
             })
 
             console.log('요청사항 저장 완료:', res.data)
@@ -46,12 +85,8 @@ export default function CheckoutPage() {
         }
     }
 
-    const totalAmount = products
-        .filter((p) => selectedIds.includes(p.id))
-        .reduce((sum, p) => sum + p.price, 0)
-
     const handlePayment = async () => {
-        if (totalAmount === 0) {
+        if (totalPrice === 0) {
             alert('상품을 선택해주세요.')
             return
         }
@@ -67,7 +102,7 @@ export default function CheckoutPage() {
             const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY)
 
             await tossPayments.requestPayment('카드', {
-                amount: totalAmount,
+                amount: totalPrice,
                 orderId: `order_${Date.now()}`,
                 orderName: '보드게임 묶음결제',
                 customerName: selectedAddress.name || '홍길동',
@@ -82,32 +117,13 @@ export default function CheckoutPage() {
 
     return (
         <main className={styles.checkout_container}>
-
             <section className={styles.address_section}>
                 <AddressBox />
             </section>
 
-            <ul className={styles.product_list}>
-                {products.map((product) => (
-                    <li key={product.id}>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={selectedIds.includes(product.id)}
-                                onChange={() => toggleProduct(product.id)}
-                            />
-                            {product.name} - {product.price.toLocaleString()}원
-                        </label>
-                    </li>
-                ))}
-            </ul>
+            <OrderSummaryCard />
 
-            <div className={styles.summary}>
-                <p className={styles.total_text}>
-                    총 결제 금액: <strong className={styles.total_amount}>{totalAmount.toLocaleString()}원</strong>
-                </p>
-            </div>
-            <PaymentFooter totalPrice={totalAmount} onPay={handlePayment} />
+            <PaymentFooter totalPrice={totalPrice} onPay={handlePayment} />
         </main>
     )
 }
