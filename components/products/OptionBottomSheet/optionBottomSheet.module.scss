@@ -1,0 +1,72 @@
+.option_sheet_product {
+  display: flex;
+  gap: 12px;
+  padding-bottom: 12px;
+
+  & .image {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    background: $light-gray02;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.option_flex_wrap {
+  background: #fafafa;
+  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 16px 0;
+}
+
+.option_button {
+  min-width: 114px;
+  min-height: 52px;
+  border-radius: 10px;
+  box-shadow: rgb(235, 235, 235) 0px 0px 0px 1px inset;
+  background: #fff;
+  font-size: 1.5rem;
+  color: #222;
+  border: none;
+
+  &.active {
+    box-shadow: rgb(34, 34, 34) 0px 0px 0px 1px inset;
+    font-weight: 600;
+  }
+}
+
+.option_change_button_wrap {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 440px;
+  padding: 24px 22px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+  border-radius: 16px 16px 0 0;
+}
+
+.price_select_button {
+  width: 100%;
+  height: 52px;
+  background: #fff;
+  box-shadow: rgb(235, 235, 235) 0px 0px 0px 1px inset;
+  border: none;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  justify-content: space-between;
+
+  &.active {
+    box-shadow: rgb(0, 0, 0) 0px 0px 0px 1px inset;
+  }
+}

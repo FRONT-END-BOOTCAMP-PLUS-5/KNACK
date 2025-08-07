@@ -38,18 +38,10 @@ const DefaultInfo = ({ data }: IProps) => {
       <Flex className={styles.origin_info_box} paddingVertical={20}>
         <Flex direction="column" gap={4} width="self">
           <Text color="gray2" size={1.2}>
-            발매가
-          </Text>
-          <Text color="gray1" size={1.3}>
-            279,000원
-          </Text>
-        </Flex>
-        <Flex direction="column" gap={4} width="self" className={styles.flex_border}>
-          <Text color="gray2" size={1.2}>
             모델번호
           </Text>
           <Text color="gray1" size={1.3}>
-            002TM0000
+            {data?.modelNumber}
           </Text>
         </Flex>
         <Flex direction="column" gap={4} width="self" className={styles.flex_border}>
@@ -57,7 +49,7 @@ const DefaultInfo = ({ data }: IProps) => {
             출시일
           </Text>
           <Text color="gray1" size={1.3}>
-            25/07/10
+            {data?.releaseDate}
           </Text>
         </Flex>
         <Flex direction="column" gap={4} width="self" className={styles.flex_border}>
@@ -65,7 +57,7 @@ const DefaultInfo = ({ data }: IProps) => {
             대표 색상
           </Text>
           <Text color="gray1" size={1.3}>
-            Light Blue
+            {data?.colorEngName}
           </Text>
         </Flex>
       </Flex>
