@@ -99,6 +99,11 @@ model Product {
   engName                          String                 @map("eng_name") @db.VarChar
   korName                          String                 @map("kor_name") @db.VarChar
   subCategoryId                    Int                    @map("sub_category_id")
+  modelNumber                      Int?                   @map("model_number")
+  releaseDate                      DateTime?              @map("release_date") @db.Timestamptz(6)
+  colorKorName                     String                 @map("color_kor_name") @db.VarChar
+  colorEngName                     String                 @map("color_eng_name") @db.VarChar
+
   coupons                          Coupon[]
   inquires                         Inquiry[]
   likes                            Like[]
@@ -111,9 +116,25 @@ model Product {
   reviews                          Review[]
   carts                            Cart[]
   subCategory                      SubCategory            @relation(fields: [subCategoryId], references: [id])
+  productStockMapping              ProductStockMapping[]
 
   @@map("products")
 }
+
+model ProductStockMapping {
+  id             Int             @id @default(autoincrement())
+  productId      Int             @map("product_id")
+  stock          Int             @default(0)
+  optionTypeId   Int             @map("option_type_id")
+  optionValueId  Int             @map("option_value_id")
+
+  product        Product         @relation(fields: [productId], references: [id])
+  optionType     OptionType      @relation(fields: [optionTypeId], references: [id])
+  optionValue    OptionValue     @relation(fields: [optionValueId], references: [id])
+
+  @@map("product_stock_mappings")
+}
+
 
 model Coupon {
   id             Int             @id @default(autoincrement())
@@ -183,17 +204,19 @@ model OptionType {
   isPrivate             Boolean                @default(true) @map("is_private")
   productOptionMappings ProductOptionMapping[]
   optionValue           OptionValue[]         
+  productStockMapping   ProductStockMapping[]
 
   @@map("option_types")
 }
 
 model OptionValue {
-  id          Int          @id @default(autoincrement())
-  isPrivate   Boolean      @default(true) @map("is_private")
-  name        String       @db.VarChar
-  typeId      Int          @map("type_id")
-  optionTypes OptionType @relation(fields: [typeId], references: [id])
-  cart        Cart[]
+  id                    Int          @id @default(autoincrement())
+  isPrivate             Boolean      @default(true) @map("is_private")
+  name                  String       @db.VarChar
+  typeId                Int          @map("type_id")
+  optionTypes           OptionType @relation(fields: [typeId], references: [id])
+  cart                  Cart[]
+  productStockMapping   ProductStockMapping[]
 
   @@map("option_values")
 }
@@ -202,7 +225,7 @@ model ProductOptionMapping {
   id            Int         @id @default(autoincrement())
   productId     Int         @map("product_id")
   optionTypeId  Int         @map("option_type_id")
-  stock         Int?        @default(0)
+  
   optionType    OptionType  @relation(fields: [optionTypeId], references: [id])
   product       Product     @relation(fields: [productId], references: [id])
 
@@ -211,8 +234,8 @@ model ProductOptionMapping {
 
 model Brand {
   id        Int       @id @default(autoincrement())
-  korName String    @map("kor_name") @db.VarChar
-  engName String    @map("eng_name") @db.VarChar
+  korName   String    @map("kor_name") @db.VarChar
+  engName   String    @map("eng_name") @db.VarChar
   logoImage String    @map("logo_image") @db.VarChar
   isPrivate Boolean   @default(true) @map("is_private")
   products  Product[]
