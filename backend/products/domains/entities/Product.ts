@@ -5,7 +5,7 @@ export interface IProduct {
   subImages: string | null;
   price: number | null;
   discountPercent: number | null;
-  detailContents: string | null;
+  detailImages: string | null;
   isRecommended: boolean;
   createdAt: Date | null;
   gender: string | null;
@@ -14,6 +14,11 @@ export interface IProduct {
   korName: string;
   brand: IBrand;
   category: ICategory;
+  colorKorName: string;
+  colorEngName: string;
+  modelNumber: number | null;
+  releaseDate: Date | null;
+  topImages: string | null;
   reviews: IReview[];
   _count: {
     reviews: number;

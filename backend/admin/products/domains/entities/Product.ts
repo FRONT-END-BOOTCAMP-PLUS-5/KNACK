@@ -1,20 +1,24 @@
-export class Product {
-  constructor(
-    public id: number | null,
-    public description_text: string | null,
-    public thumbnail_image: string | null,
-    public sub_images: string | null,
-    public price: number | null,
-    public discount_percent: number | null,
-    public detail_contents: string | null,
-    public brand_id: number | null,
-    public category_id: number | null,
-    public is_recommended: boolean | null,
-    public is_private: boolean | null,
-    public created_at: Date,
-    public gender: string,
-    public hit: number | null,
-    public eng_name: string | null,
-    public kor_name: string | null
-  ) {}
+export interface IProduct {
+  id: number;
+  descriptionText: string | null;
+  thumbnailImage: string;
+  subImages: string | null;
+  price: number | null;
+  discountPercent: number | null;
+  detailImages: string | null;
+  brandId: number | null;
+  categoryId: number | null;
+  isRecommended: boolean | null;
+  isPrivate: boolean | null;
+  createdAt: Date;
+  gender: string;
+  hit: number | null;
+  engName: string | null;
+  korName: string | null;
+  colorKorName: string;
+  colorEngName: string;
+  modelNumber: number;
+  releaseDate: Date;
+  subCategoryId: number;
+  topImages: string | null;
 }
