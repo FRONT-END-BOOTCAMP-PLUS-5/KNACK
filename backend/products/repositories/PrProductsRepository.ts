@@ -28,6 +28,18 @@ export class PrProductRepository implements ProductRepository {
           modelNumber: true,
           releaseDate: true,
           topImages: true,
+          productOptionMappings: {
+            select: {
+              optionType: {
+                select: {
+                  id: true,
+                  name: true,
+                  isPrivate: true,
+                  optionValue: true,
+                },
+              },
+            },
+          },
           brand: {
             select: {
               id: true,
