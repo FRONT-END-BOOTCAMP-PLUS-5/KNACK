@@ -67,8 +67,6 @@ export class PrProductRepository implements ProductRepository {
         },
       });
 
-      console.log('result', result);
-
       return result;
     } catch (error) {
       console.error('Error in PrProductRepository.find:', error);
