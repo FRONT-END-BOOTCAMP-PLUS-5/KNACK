@@ -3,18 +3,22 @@ import Text from '@/components/common/Text';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import Image from 'next/image';
 
-const ProductDetailImage = () => {
+interface IProps {
+  detailImage?: string | null;
+}
+
+const ProductDetailImage = ({ detailImage }: IProps) => {
+  const detailImages = detailImage?.split(',');
+
   return (
     <section className={styles.container}>
       <Text tag="h2" size={1.7} weight={600} marginLeft={16} marginRight={16} paddingTop={24} marginBottom={16}>
         상세 정보
       </Text>
       <div className={styles.image_box}>
-        <Image
-          src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/levis_nike_trucker_jacket_lightblue-thumbnail.webp`}
-          fill
-          alt="상품 대표 이미지"
-        />
+        {detailImages?.map((item) => (
+          <Image key={item} src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${item}`} fill alt="상품 이미지" />
+        ))}
       </div>
     </section>
   );

@@ -1,15 +1,21 @@
 import styles from './productDetail.module.scss';
 import ProductTopImage from '@/components/products/ProductTopImage';
 import DefaultInfo from '@/components/products/DefaultInfo';
-import Text from '@/components/common/Text';
-import Flex from '@/components/common/Flex';
 import Divider from '@/components/common/Divider';
-import AdditionalBnefits from '@/components/products/AdditionalBnefits';
 import DeliveryInfo from '@/components/products/DeliveryInfo';
 import BrandInfo from '@/components/products/BrandInfo';
 import Tab from '@/components/products/Tab';
 import ProductDetailImage from '@/components/products/ProductDetailImage';
-import Button from '@/components/common/Button';
+import TextReview from '@/components/products/TextReview';
+import { productsService } from '@/services/products';
+import AdditionalBenefits from '@/components/products/AdditionalBenefits';
+import { IProduct } from '@/types/productDetail';
+
+interface IProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
 const REVIEW_PROGRESS = [
   { id: 0, percent: '80%', rating: 5 },
@@ -25,59 +31,28 @@ const REVIEW_RESULT_TEXT = [
   { id: 2, normal: '퀄리티가', bold: '만족스러워요', percent: '74%' },
 ];
 
-const ProductDetail = () => {
+const ProductDetail = async ({ params }: IProps) => {
+  const { id } = await params;
+
+  const { getProduct } = productsService;
+
+  const productData: IProduct = await getProduct(Number(id)).then((res) => {
+    return res;
+  });
+
   return (
     <div className={styles.product_detail_container}>
-      <ProductTopImage />
-      <DefaultInfo />
-      <AdditionalBnefits />
+      <ProductTopImage thumbnailImage={productData?.thumbnailImage} sliderImage={productData?.subImages ?? ''} />
+      <DefaultInfo data={productData} />
+      <AdditionalBenefits />
       <Divider height={1} paddingHorizontal={16} />
       <DeliveryInfo />
       <Divider />
-      <BrandInfo />
+      <BrandInfo brandData={productData?.brand} />
       <Divider />
       <Tab />
-      <ProductDetailImage />
-      <section className={styles.review_container}>
-        <Text tag="h2" size={1.7} weight={600} paddingTop={24} paddingBottom={16}>
-          일반 리뷰 51
-        </Text>
-        <Flex gap={32}>
-          <Text size={4} weight={700}>
-            4.7
-            <Text tag="span">★</Text>
-          </Text>
-          <Flex direction="column">
-            {REVIEW_PROGRESS?.map((item) => (
-              <Flex align="center" gap={8} key={item?.id} marginVertical={4}>
-                <div className={styles.review_progress_bar}>
-                  <div className={styles.progress} style={{ width: item.percent }} />
-                </div>
-
-                <Text className={styles.progress_rating} size={1.1} color="gray5">
-                  {item?.rating}
-                </Text>
-              </Flex>
-            ))}
-          </Flex>
-        </Flex>
-        <Flex direction="column" className={styles.review_result_text_wrap}>
-          {REVIEW_RESULT_TEXT?.map((item) => (
-            <Flex gap={8} key={item?.id} paddingVertical={6}>
-              <Text tag="p" className={styles.result_title} size={1.4}>
-                {item?.normal}
-                <Text tag="span" size={1.4} weight={600}>
-                  {item?.bold}
-                </Text>
-              </Text>
-              <Text size={1.4} weight={600}>
-                {item?.percent}
-              </Text>
-            </Flex>
-          ))}
-        </Flex>
-        <Button text="리뷰 더보기" size="large" style="border" />
-      </section>
+      <ProductDetailImage detailImage={productData?.detailContents} />
+      <TextReview reviewProgress={REVIEW_PROGRESS} reviewTextData={REVIEW_RESULT_TEXT} />
     </div>
   );
 };

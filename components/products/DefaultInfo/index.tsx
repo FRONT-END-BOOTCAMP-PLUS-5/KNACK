@@ -1,8 +1,13 @@
 import styles from './defaultInfo.module.scss';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
+import { IProduct } from '@/types/productDetail';
 
-const DefaultInfo = () => {
+interface IProps {
+  data?: IProduct;
+}
+
+const DefaultInfo = ({ data }: IProps) => {
   return (
     <article className={styles.default_info}>
       <Flex direction="column" gap={2}>
@@ -10,19 +15,23 @@ const DefaultInfo = () => {
           즉시 구매가
         </Text>
         <Text size={2} color="black1" weight={700}>
-          629,000원
+          {data?.price?.toLocaleString()}원
         </Text>
       </Flex>
       <Flex direction="column" marginVertical={20}>
         <Text size={1.7} marginBottom={4}>
-          {`Levi's x Nike Trucker Jacket Light Blue`}
+          {data?.engName}
         </Text>
         <Text size={1.3} color="gray1" marginBottom={10}>
-          리바이스 x 나이키 트러커 자켓 라이트 블루
+          {data?.korName}
         </Text>
         <Flex gap={6}>
-          <Text size={1.3}>★ 4.7</Text>
-          <Text size={1.3}>리뷰 70</Text>
+          <Text size={1.3}>
+            ★
+            {data?.reviews &&
+              (data?.reviews?.reduce((acc, cur) => acc + (cur?.rating ?? 0), 0) ?? 0 / data?.reviews?.length)}
+          </Text>
+          <Text size={1.3}>리뷰 {data?._count?.reviews}</Text>
         </Flex>
       </Flex>
       <button className={styles.size_open_button}>모든 사이즈</button>
