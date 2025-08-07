@@ -18,7 +18,7 @@ export class KnackOrderRepository implements OrderRepository {
                         salePrice: o.salePrice,
                         deliveryStatus: o.deliveryStatus,
                         createdAt: o.createdAt,
-                        paymentId: 0, // Temporary, will be updated later
+                        paymentId: null,
                     },
                 })
             )

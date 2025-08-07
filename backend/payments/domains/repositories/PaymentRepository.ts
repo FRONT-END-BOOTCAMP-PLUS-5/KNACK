@@ -3,7 +3,10 @@
 import { CreatePaymentDto } from "../../applications/dtos/CreatePaymentDto"
 
 export interface PaymentRepository {
-    save(payment: CreatePaymentDto): Promise<void>
+    /**
+     * 결제 저장
+     */
+    save(payment: CreatePaymentDto): Promise<number | null>
 
     /**
      * Toss 결제 승인 응답에서 받은 고유 TossPaymentKey로 결제 조회

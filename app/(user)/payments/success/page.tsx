@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import styles from './SuccessPage.module.scss'
 import requester from '@/utils/requester'
@@ -39,8 +39,13 @@ export default function PaymentSuccess() {
     }, [setOrderItems, setSelectedAddress])
 
     // ✅ 2. 결제 및 주문 저장
+
+    const hasRun = useRef(false)
+
     useEffect(() => {
-        if (!session?.user || !params || orderItems.length === 0 || !selectedAddress?.id) return
+        if (!session?.user || !params || orderItems.length === 0 || !selectedAddress?.id || hasRun.current) return
+
+        hasRun.current = true
 
         const paymentKey = params.get('paymentKey')
         const orderId = params.get('orderId')
@@ -60,6 +65,7 @@ export default function PaymentSuccess() {
                         salePrice: item.price,
                         count: item.quantity,
                         addressId,
+                        paymentId: null,
                     })),
                 })
 
@@ -68,6 +74,7 @@ export default function PaymentSuccess() {
                 // 2. 결제 저장
                 await requester.post('/api/payments', {
                     tossPaymentKey: paymentKey,
+                    orderId: orderId,
                     userId: session.user.id,
                     addressId,
                     amount,

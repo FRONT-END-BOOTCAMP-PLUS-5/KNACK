@@ -12,38 +12,34 @@ export async function POST(req: NextRequest) {
     const repo = new KnackPaymentRepository();
     try {
         const session = await getServerSession(authOptions)
-        console.log(session);
         if (!session?.user) {
             return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 })
         }
 
-        console.log('🔐 유저 세션 정보:', session.user)
+        const { tossPaymentKey, orderId, amount, addressId, method, status, orderIds } = await req.json()
 
-        const { paymentKey, orderId, amount, addressId, orderIds } = await req.json()
-
-        console.log({
-            paymentKey,
-            orderId,
-            amount,
-        })
-
-        const data = await tossPOST('/payments/confirm', { paymentKey, orderId, amount }, 'toss')
+        const data = await tossPOST('/payments/confirm', { paymentKey: tossPaymentKey, orderId, amount }, 'toss')
 
         const paymentDto: CreatePaymentDto = {
             tossPaymentKey: data.paymentKey,
             userId: session.user.id, // ✅ 세션 기반 userId 사용
             addressId,
             paymentNumber: BigInt(await repo.generateTodayPaymentNumber()),
-            price: data.price,
-            approvedAt: new Date(data.approvedAt),
-            createdAt: new Date(data.requestedAt),
-            method: data.method,
-            status: data.status,
+            price: amount,
+            approvedAt: data.approvedAt ? new Date(data.approvedAt) : new Date(),
+            createdAt: data.requestedAt ? new Date(data.requestedAt) : new Date(),
+            method,
+            status,
             orderIds, // 프론트에서 전달하거나 서버에서 조회할 수도 있음
         }
 
         const paymentRepo = new KnackPaymentRepository()
-        await paymentRepo.save(paymentDto)
+        const savedPayment = await paymentRepo.save(paymentDto)
+        if (savedPayment) {
+            await paymentRepo.updateOrderPaymentIds(orderIds, savedPayment)
+        } else {
+            throw new Error('Payment 저장 후 ID를 찾을 수 없습니다.')
+        }
 
         if (data.method === 'CARD' && data.card) {
             const cardRepo = new KnackCardRepository()
