@@ -98,6 +98,8 @@ model Product {
   hit                              Int?                   @default(0)
   engName                          String                 @map("eng_name") @db.VarChar
   korName                          String                 @map("kor_name") @db.VarChar
+  sub_category_id                  Int
+  carts                            Cart[]
   coupons                          Coupon[]
   inquires                         Inquiry[]
   likes                            Like[]
@@ -105,6 +107,7 @@ model Product {
   productOptionMappings            ProductOptionMapping[]
   brand                            Brand                  @relation(fields: [brandId], references: [id])
   category                         Category               @relation(fields: [categoryId], references: [id])
+  sub_categories                   SubCategory            @relation(fields: [sub_category_id], references: [id])
   relatedProducts_ProductRelated   RelatedProduct[]       @relation("ProductRelated")
   relatedProducts_RelatedToProduct RelatedProduct[]       @relation("RelatedToProduct")
   reviews                          Review[]
@@ -175,43 +178,43 @@ model Review {
 }
 
 model OptionType {
-  id           Int           @id @default(autoincrement())
-  name         String        @db.VarChar
-  isPrivate    Boolean       @default(true) @map("is_private")
-  optionValues OptionValue[]
+  id                      Int                    @id @default(autoincrement())
+  name                    String                 @db.VarChar
+  isPrivate               Boolean                @default(true) @map("is_private")
+  optionValues            OptionValue[]
+  product_option_mappings ProductOptionMapping[]
 
   @@map("option_types")
 }
 
 model OptionValue {
-  id                    Int                    @id @default(autoincrement())
-  typeId                Int                    @map("type_id")
-  isPrivate             Boolean                @default(true) @map("is_private")
-  name                  String                 @db.VarChar
-  optionType            OptionType             @relation(fields: [typeId], references: [id])
-  productOptionMappings ProductOptionMapping[]
+  id         Int        @id @default(autoincrement())
+  isPrivate  Boolean    @default(true) @map("is_private")
+  name       String     @db.VarChar
+  typeId     Int        @map("type_id")
+  carts      Cart[]
+  optionType OptionType @relation(fields: [typeId], references: [id])
 
   @@map("option_values")
 }
 
 model ProductOptionMapping {
-  id            Int         @id @default(autoincrement())
-  productId     Int         @map("product_id")
-  optionValueId Int         @map("option_value_id")
-  stock         Int?        @default(0)
-  carts         Cart[]
-  optionValue   OptionValue @relation(fields: [optionValueId], references: [id])
-  product       Product     @relation(fields: [productId], references: [id])
+  id             Int        @id @default(autoincrement())
+  productId      Int        @map("product_id")
+  stock          Int?       @default(0)
+  option_type_id Int
+  option_types   OptionType @relation(fields: [option_type_id], references: [id])
+  product        Product    @relation(fields: [productId], references: [id])
 
   @@map("product_option_mappings")
 }
 
 model Brand {
   id        Int       @id @default(autoincrement())
-  korName String    @map("kor_name") @db.VarChar
-  engName String    @map("eng_name") @db.VarChar
   logoImage String    @map("logo_image") @db.VarChar
   isPrivate Boolean   @default(true) @map("is_private")
+  engName   String    @map("eng_name") @db.VarChar
+  korName   String    @map("kor_name") @db.VarChar
   products  Product[]
 
   @@map("brands")
@@ -231,11 +234,12 @@ model Category {
 
 model SubCategory {
   id         Int       @id @default(autoincrement())
-  engName    String    @map("eng_name") @db.VarChar
-  korName    String    @map("kor_name") @db.VarChar
   categoryId Int       @map("category_id")
   createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   isPrivate  Boolean   @default(true) @map("is_private")
+  engName    String    @map("eng_name") @db.VarChar
+  korName    String    @map("kor_name") @db.VarChar
+  products   Product[]
   category   Category  @relation(fields: [categoryId], references: [id])
 
   @@map("sub_categories")
@@ -275,7 +279,7 @@ model Payment {
   userId         String    @map("user_id") @db.Uuid
   price          Int?      @default(0)
   createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  paymentNumber  Int       @map("payment_number")
+  paymentNumber  BigInt    @map("payment_number")
   addressId      Int       @map("address_id")
   approvedAt     DateTime? @map("approved_at") @db.Timestamptz(6)
   method         String    @db.VarChar
@@ -305,14 +309,15 @@ model Address {
 }
 
 model Cart {
-  id                   Int                  @id @default(autoincrement())
-  userId               String               @map("user_id") @db.Uuid
-  productId            Int                  @map("product_id")
-  optionMappingId      Int                  @map("option_mapping_id")
-  createdAt            DateTime?            @default(now()) @map("created_at") @db.Timestamptz(6)
-  count                Int?                 @default(1)
-  productOptionMapping ProductOptionMapping @relation(fields: [optionMappingId], references: [id])
-  user                 User                 @relation(fields: [userId], references: [id])
+  id              Int         @id @default(autoincrement())
+  userId          String      @map("user_id") @db.Uuid
+  productId       Int         @map("product_id")
+  createdAt       DateTime?   @default(now()) @map("created_at") @db.Timestamptz(6)
+  count           Int?        @default(1)
+  option_value_id Int
+  option_values   OptionValue @relation(fields: [option_value_id], references: [id])
+  products        Product     @relation(fields: [productId], references: [id])
+  user            User        @relation(fields: [userId], references: [id])
 
   @@map("carts")
 }

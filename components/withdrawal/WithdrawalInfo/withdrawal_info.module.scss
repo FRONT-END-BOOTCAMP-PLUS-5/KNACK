@@ -1,0 +1,119 @@
+.withdrawal_info {
+  margin-bottom: 40px;
+}
+
+.withdraw_restriction {
+  margin-bottom: 40px;
+  padding: 24px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border-left: 4px solid #dc3545;
+}
+
+.delete_title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #dc3545;
+  margin-bottom: 16px;
+}
+
+.delete_desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.delete_list {
+  margin-bottom: 20px;
+}
+
+.delete_item {
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.delete_text {
+  font-size: 14px;
+  color: #333;
+}
+
+.delete_warning {
+  font-size: 14px;
+  color: #dc3545;
+  font-weight: 600;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.delete_limit {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.retention_policy {
+  padding: 24px;
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+}
+
+.retention_title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.retention_desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.retention_list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.retention_item {
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.retention_subtitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.retention_ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.retention_ul li {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  padding: 4px 0;
+  position: relative;
+  padding-left: 16px;
+
+  &::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #007bff;
+  }
+}
