@@ -1,0 +1,34 @@
+.review_container {
+  padding: 0 15px 28px;
+
+  & .review_progress_bar {
+    width: 100%;
+    height: 5px;
+    background: $light-gray02;
+    position: relative;
+    border-radius: 2px;
+    overflow: hidden;
+
+    & .progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: $black;
+      height: 5px;
+    }
+  }
+
+  & .progress_rating {
+    height: 5px;
+    display: flex;
+    align-items: center;
+  }
+
+  & .review_result_text_wrap {
+    margin: 16px 0 24px !important;
+
+    & .result_title {
+      flex: 1;
+    }
+  }
+}

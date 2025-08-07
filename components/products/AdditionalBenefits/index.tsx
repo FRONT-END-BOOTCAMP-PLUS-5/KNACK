@@ -1,8 +1,8 @@
 import Text from '@/components/common/Text';
-import styles from './additionalBnefits.module.scss';
+import styles from './additionalBenefits.module.scss';
 import Flex from '@/components/common/Flex';
 
-const AdditionalBnefits = () => {
+const AdditionalBenefits = () => {
   return (
     <section className={styles.additional_bnefits_wrap}>
       <Text tag="h2" size={1.4} paddingBottom={12}>
@@ -24,4 +24,4 @@ const AdditionalBnefits = () => {
   );
 };
 
-export default AdditionalBnefits;
+export default AdditionalBenefits;
