@@ -13,14 +13,14 @@ export async function GET(request: NextRequest) {
       keyword: searchParams.get('keyword') || undefined,
 
       color: searchParams.get('color') || undefined,
-      brand: searchParams.get('brand') || undefined,
-      category: searchParams.get('category') || undefined,
-      subCategory: searchParams.get('subCategory') || undefined,
+      brandId: searchParams.get('brandId') ? parseInt(searchParams.get('brandId')!) : undefined,
+      categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
+      subCategoryId: searchParams.get('subCategoryId') ? parseInt(searchParams.get('subCategoryId')!) : undefined,
       priceMin: searchParams.get('priceMin') ? parseInt(searchParams.get('priceMin')!) : undefined,
       priceMax: searchParams.get('priceMax') ? parseInt(searchParams.get('priceMax')!) : undefined,
       discountMin: searchParams.get('discountMin') ? parseInt(searchParams.get('discountMin')!) : undefined,
       discountMax: searchParams.get('discountMax') ? parseInt(searchParams.get('discountMax')!) : undefined,
-      size: searchParams.get('size') || undefined,
+      // size: searchParams.get('size') || undefined,
       benefit: (searchParams.get('benefit') as 'under_price') || undefined,
 
       sort: (searchParams.get('sort') as SortOption) || 'latest',

@@ -1,7 +1,6 @@
 import { ProductSearchRepository } from '@/backend/search/domains/repositories/ProductSearchRepository';
 import { GetProductsRequestDto, GetProductsResponseDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import { ProductFilters, PaginationParams } from '@/backend/search/domains/entities/ProductFilters';
-import { ProductMapper } from '@/backend/search/infrastructure/mappers/ProductMapper';
 
 export class GetProductsUseCase {
   constructor(private productSearchRepository: ProductSearchRepository) {}
@@ -16,14 +15,14 @@ export class GetProductsUseCase {
     const filters: ProductFilters = {
       keyword: request.keyword,
       color: request.color,
-      brand: request.brand,
-      category: request.category,
-      subCategory: request.subCategory,
+      brandId: request.brandId,
+      categoryId: request.categoryId,
+      subCategoryId: request.subCategoryId,
       priceMin: request.priceMin,
       priceMax: request.priceMax,
       discountMin: request.discountMin,
       discountMax: request.discountMax,
-      size: request.size,
+      // size: request.size,
       benefit: request.benefit,
     };
 
@@ -41,7 +40,7 @@ export class GetProductsUseCase {
     });
 
     return {
-      products: ProductMapper.toDtoList(result.products),
+      products: result.products,
       pageInfo: result.pageInfo,
       pagination: result.pagination,
     };

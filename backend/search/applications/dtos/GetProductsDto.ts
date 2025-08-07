@@ -4,14 +4,14 @@ export interface GetProductsRequestDto {
   keyword?: string;
 
   color?: string;
-  brand?: string;
-  category?: string;
-  subCategory?: string;
+  brandId?: number;
+  categoryId?: number;
+  subCategoryId?: number;
   priceMin?: number;
   priceMax?: number;
   discountMin?: number;
   discountMax?: number;
-  size?: string;
+  // size?: string;
   benefit?: 'under_price';
 
   sort?: SortOption;
@@ -43,7 +43,7 @@ export interface ProductDto {
   subImages?: string[];
   price: number;
   discountPercent?: number;
-  detailContents?: string | null;
+  // detailContents?: string | null;
   brandId?: number;
   categoryId?: number;
   isRecommended: boolean;
@@ -54,25 +54,33 @@ export interface ProductDto {
   engName: string;
   korName: string;
 
-  color?: string | null;
-  size?: string | null;
+  colorKorName: string;
+  colorEngName: string;
+  modelNumber: string | null;
+  releaseDate: string | null;
 
-  brand: {
-    id: number;
-    korName: string;
-    engName?: string;
-  };
-  categories: {
-    id: number;
-    korName: string;
-    engName: string;
-  }[];
-  subCategories: {
-    id: number;
-    korName: string;
-    engName: string;
-    categoryId: number;
-  }[];
+  brand: Brand;
+  categories: Category[];
+  subCategories: SubCategory[];
   reviewsCount: number;
   likesCount: number;
+}
+
+interface Brand {
+  id: number;
+  korName: string;
+  engName?: string;
+}
+
+interface Category {
+  id: number;
+  korName: string;
+  engName: string;
+}
+
+interface SubCategory {
+  id: number;
+  korName: string;
+  engName: string;
+  categoryId: number;
 }

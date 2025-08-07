@@ -35,20 +35,14 @@ export class PrProductsRepository implements ProductSearchRepository {
         ];
       }
 
-      if (filters.brand) {
-        whereConditions.brand = {
-          korName: { contains: filters.brand, mode: 'insensitive' },
-        };
+      if (filters.brandId) {
+        whereConditions.brandId = filters.brandId;
       }
-      if (filters.category) {
-        whereConditions.category = {
-          korName: { contains: filters.category, mode: 'insensitive' },
-        };
+      if (filters.categoryId) {
+        whereConditions.categoryId = filters.categoryId;
       }
-      if (filters.subCategory) {
-        whereConditions.subCategory = {
-          korName: { contains: filters.subCategory, mode: 'insensitive' },
-        };
+      if (filters.subCategoryId) {
+        whereConditions.subCategoryId = filters.subCategoryId;
       }
       if (filters.priceMin !== undefined || filters.priceMax !== undefined) {
         whereConditions.price = {};
@@ -140,7 +134,7 @@ export class PrProductsRepository implements ProductSearchRepository {
           product.subImages ? product.subImages.split(',') : [],
           product.price || 0,
           product.discountPercent || 0,
-          product.detailContents,
+          // product.detailContents,
           product.brandId,
           product.categoryId,
           product.isRecommended,
@@ -150,6 +144,10 @@ export class PrProductsRepository implements ProductSearchRepository {
           product.hit || 0,
           product.engName,
           product.korName,
+          product.modelNumber,
+          product.releaseDate,
+          product.colorKorName,
+          product.colorEngName,
           new Brand(product.brand.id, product.brand.korName, product.brand.engName),
           [new Category(product.category.id, product.category.korName, product.category.engName)],
           product.subCategory
