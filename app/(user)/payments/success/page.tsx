@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react'
 import { useOrderStore } from '@/store/useOrderStore'
 import { useAddressStore } from '@/store/useAddressStore'
 import axios from 'axios'
+import router from 'next/router'
 
 export default function PaymentSuccess() {
     const params = useSearchParams()
@@ -46,6 +47,10 @@ export default function PaymentSuccess() {
         if (!session?.user || !params || orderItems.length === 0 || !selectedAddress?.id || hasRun.current) return
 
         hasRun.current = true
+
+        const alreadyProcessed = sessionStorage.getItem('paymentProcessed') === 'true'
+        if (alreadyProcessed) return
+        sessionStorage.setItem('paymentProcessed', 'true')
 
         const paymentKey = params.get('paymentKey')
         const orderId = params.get('orderId')
@@ -90,11 +95,13 @@ export default function PaymentSuccess() {
                 sessionStorage.removeItem('orderItems')
                 sessionStorage.removeItem('selectedAddress')
                 sessionStorage.clear() // 또는 위 두 줄만
+                router.replace('/')
 
             } catch (err) {
                 console.error('❌ 결제 저장 실패', err)
                 if (axios.isAxiosError(err)) {
                     console.error('📛 서버 응답:', err.response?.data)
+                    sessionStorage.removeItem('paymentProcessed')
                 }
             }
         }
