@@ -5,11 +5,9 @@ import Text from '@/components/common/Text';
 import Flex from '@/components/common/Flex';
 import Divider from '@/components/common/Divider';
 import AdditionalBnefits from '@/components/products/AdditionalBnefits';
-import Image from 'next/image';
 import DeliveryInfo from '@/components/products/DeliveryInfo';
 import BrandInfo from '@/components/products/BrandInfo';
 import Tab from '@/components/products/Tab';
-import { STORAGE_PATHS } from '@/constraint/auth';
 import ProductDetailImage from '@/components/products/ProductDetailImage';
 import Button from '@/components/common/Button';
 
