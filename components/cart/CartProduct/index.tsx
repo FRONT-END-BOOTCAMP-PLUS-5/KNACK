@@ -50,7 +50,7 @@ const CartProduct = ({ cartData, selectCarts, addSelectCart, optionOpen, onClick
 
           <p className={styles.option_text}>
             {
-              cartData?.product?.productOptionMappings[0].optionType?.optionValue?.filter(
+              cartData?.product?.productOptionMappings[0]?.optionType?.optionValue?.filter(
                 (fItem) => fItem?.id === cartData?.optionValueId
               )[0].name
             }

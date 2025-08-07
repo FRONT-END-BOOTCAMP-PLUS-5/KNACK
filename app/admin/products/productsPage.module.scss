@@ -5,6 +5,10 @@
   width: 500px;
   align-items: center;
 
+  & .input_flex {
+    flex-wrap: wrap;
+  }
+
   & input {
     height: 25px;
     border: 1px solid #ddd;
