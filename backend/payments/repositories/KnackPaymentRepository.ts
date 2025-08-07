@@ -85,7 +85,7 @@ export class KnackPaymentRepository implements PaymentRepository {
 
         let nextSequence = 1
         if (latestPayment) {
-            const latestSeq = latestPayment.paymentNumber % 1e8
+            const latestSeq = Number(latestPayment.paymentNumber) % 1e8
             nextSequence = latestSeq + 1
         }
 

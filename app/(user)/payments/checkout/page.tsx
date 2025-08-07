@@ -6,6 +6,7 @@ import styles from './CheckoutPage.module.scss'
 import AddressBox from '@/components/Address/AddressBox'
 import { useAddressStore } from '@/store/useAddressStore' // ✅ 추가
 import requester from '@/utils/requester'
+import PaymentFooter from '@/components/common/PaymentFooter/PaymentFooter'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
 
@@ -81,10 +82,8 @@ export default function CheckoutPage() {
 
     return (
         <main className={styles.checkout_container}>
-            <h1>결제하기</h1>
 
             <section className={styles.address_section}>
-                <h3>배송지 선택</h3>
                 <AddressBox />
             </section>
 
@@ -107,8 +106,8 @@ export default function CheckoutPage() {
                 <p className={styles.total_text}>
                     총 결제 금액: <strong className={styles.total_amount}>{totalAmount.toLocaleString()}원</strong>
                 </p>
-                <button onClick={handlePayment}>{totalAmount.toLocaleString()}원·결제하기</button>
             </div>
+            <PaymentFooter totalPrice={totalAmount} onPay={handlePayment} />
         </main>
     )
 }

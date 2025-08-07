@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
             tossPaymentKey: data.paymentKey,
             userId: session.user.id, // ✅ 세션 기반 userId 사용
             addressId,
-            paymentNumber: await repo.generateTodayPaymentNumber(),
+            paymentNumber: BigInt(await repo.generateTodayPaymentNumber()),
             price: data.price,
             approvedAt: new Date(data.approvedAt),
             createdAt: new Date(data.requestedAt),

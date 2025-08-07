@@ -1,8 +1,4 @@
 .address_box {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
-    background-color: #fff;
     font-size: 14px;
 }
 
@@ -18,21 +14,17 @@
     }
 
     .change_btn {
-        background-color: #f0f0f0;
+        background: transparent;
+        border: 1px solid #EBEBEB;
         padding: 6px 12px;
         border-radius: 4px;
         font-size: 13px;
-        border: none;
         cursor: pointer;
     }
 }
 
 .info_box {
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 12px;
     margin-bottom: 16px;
-    background-color: #fafafa;
 
     div {
         margin-bottom: 6px;

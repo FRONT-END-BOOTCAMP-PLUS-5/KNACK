@@ -62,7 +62,7 @@ export default function AddressBox() {
                                 value={request}
                                 onChange={(e) => setRequest(e.target.value)}
                             >
-                                <option value="">요청사항 선택</option>
+                                <option value="">요청사항 없음</option>
                                 <option value="문 앞에 두고 벨 눌러주세요">문 앞에 두고 벨 눌러주세요</option>
                                 <option value="배송 전 연락 부탁드립니다">배송 전 연락 부탁드립니다</option>
                                 <option value="경비실에 맡겨주세요">경비실에 맡겨주세요</option>
