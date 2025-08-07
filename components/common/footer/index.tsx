@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import styles from '@/components/common/footer/footer.module.scss';
 import { DEFAULT_ACTIVE_TAB } from '@/constraint/footer';
 import { getFooterTabs } from '@/utils/footer/index';
@@ -10,8 +9,6 @@ import { TabId } from '@/types/footer';
 
 export default function Footer() {
   const router = useRouter();
-  const pathname = usePathname();
-  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<TabId>(DEFAULT_ACTIVE_TAB);
 
   const handleTabClick = (tab: TabId) => {
@@ -29,11 +26,6 @@ export default function Footer() {
         router.push('/cart');
         break;
       case 'MY':
-        // 로그인 상태 확인
-        if (!session) {
-          router.push('/login');
-          return;
-        }
         router.push('/my');
         break;
       default:

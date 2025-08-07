@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { WithdrawalAgreements } from '@/types/withdrawal';
-import styles from './withdrawal_form.module.scss';
+import styles from './withdrawalForm.module.scss';
 
 interface IProps {
   onSubmit: (password: string) => void;

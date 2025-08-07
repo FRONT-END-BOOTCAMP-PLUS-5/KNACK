@@ -1,4 +1,4 @@
-import styles from './withdrawal_info.module.scss';
+import styles from './withdrawalInfo.module.scss';
 
 export default function WithdrawalInfo() {
   return (
@@ -39,7 +39,7 @@ export default function WithdrawalInfo() {
 
       {/* 정보 보관 정책 */}
       <div className={styles.retention_policy}>
-        <h2 className={styles.retention_title}>정보 보관 정책 (관련 법령 및 내부 기준에 따름)</h2>
+        <h2 className={styles.retention_title}>정보 보관 정책 (법령 내부 기준에 따름)</h2>
         <p className={styles.retention_desc}>
           일부 정보는 관련 법령 및 내부 기준에 따라 별도로 보관될 수 있습니다.
         </p>

@@ -1,35 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { useEffect } from 'react';
-import styles from './my_page.module.scss';
+import styles from './myPage.module.scss';
 
 export default function MyPage(){
     const router = useRouter();
-    const { data: session, status } = useSession();
-    
-    // 로그인 상태 확인
-    useEffect(() => {
-        if (status === 'loading') return; // 로딩 중이면 대기
-        
-        if (!session) {
-            // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
-            router.push('/login');
-            return;
-        }
-    }, [session, status, router]);
-    
-    // 로딩 중이거나 로그인되지 않은 경우 로딩 표시
-    if (status === 'loading' || !session) {
-        return (
-            <main className={styles.my_page}>
-                <div className={styles.my_content}>
-                    <div className={styles.loading}>로딩 중...</div>
-                </div>
-            </main>
-        );
-    }
     
     const handleWithdrawalClick = () => {
         router.push('/my/withdrawal');

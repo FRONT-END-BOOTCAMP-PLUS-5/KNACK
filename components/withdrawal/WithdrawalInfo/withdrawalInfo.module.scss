@@ -1,36 +1,35 @@
 .withdrawal_info {
-  margin-bottom: 40px;
+  margin-bottom: 4rem;
 }
 
 .withdraw_restriction {
-  margin-bottom: 40px;
-  padding: 24px;
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  border-left: 4px solid #dc3545;
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 1.2rem;
+  padding: 2.4rem;
+  margin-bottom: 2rem;
 }
 
 .delete_title {
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #dc3545;
-  margin-bottom: 16px;
+  margin-bottom: 1.6rem;
 }
 
 .delete_desc {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #666;
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
   line-height: 1.6;
 }
 
 .delete_list {
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
 }
 
 .delete_item {
-  padding: 8px 0;
-  border-bottom: 1px solid #e9ecef;
+  padding: 0.8rem 0;
   
   &:last-child {
     border-bottom: none;
@@ -38,62 +37,61 @@
 }
 
 .delete_text {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #333;
 }
 
 .delete_warning {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #dc3545;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 1.2rem;
   line-height: 1.5;
 }
 
 .delete_limit {
-  font-size: 13px;
+  font-size: 1.3rem;
   color: #666;
   line-height: 1.5;
 }
 
 .retention_policy {
-  padding: 24px;
+  padding: 2.4rem;
   background-color: #fff;
   border: 1px solid #e9ecef;
-  border-radius: 12px;
+  border-radius: 1.2rem;
 }
 
 .retention_title {
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #333;
-  margin-bottom: 16px;
+  margin-bottom: 1.6rem;
 }
 
 .retention_desc {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #666;
-  margin-bottom: 24px;
+  margin-bottom: 2.4rem;
   line-height: 1.6;
 }
 
 .retention_list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 2rem;
 }
 
 .retention_item {
-  padding: 16px;
   background-color: #f8f9fa;
-  border-radius: 8px;
+  border-radius: 0.8rem;
 }
 
 .retention_subtitle {
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 600;
   color: #333;
-  margin-bottom: 12px;
+  margin-bottom: 1.2rem;
 }
 
 .retention_ul {
@@ -103,17 +101,17 @@
 }
 
 .retention_ul li {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #666;
   line-height: 1.6;
-  padding: 4px 0;
+  padding: 0.4rem 0;
   position: relative;
-  padding-left: 16px;
+  padding-left: 1.6rem;
 
   &::before {
     content: "•";
     position: absolute;
     left: 0;
-    color: #007bff;
+    color: #000;
   }
 }

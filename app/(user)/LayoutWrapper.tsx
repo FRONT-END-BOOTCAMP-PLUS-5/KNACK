@@ -28,7 +28,7 @@ export default function LayoutWrapper({ children }: IProps) {
   }, []);
   
   // 헤더와 푸터를 숨길 경로들 (auth 그룹)
-  const hideLayoutPaths = ['/login', '/signup', '/find-email', '/find-password', '/my/withdrawal'];
+  const hideLayoutPaths = ['/login', '/signup', '/find-email', '/find-password', '/my'];
   const shouldHideLayout = hideLayoutPaths.some(path => pathname.startsWith(path));
   
   // 하이드레이션 완료 전까지는 로딩 표시
