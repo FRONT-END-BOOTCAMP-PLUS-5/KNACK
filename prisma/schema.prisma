@@ -88,7 +88,8 @@ model Product {
   subImages                        String?                @map("sub_images") @db.VarChar
   price                            Int?                   @default(0)
   discountPercent                  Int?                   @default(0) @map("discount_percent")
-  detailContents                   String?                @map("detail_contents") @db.VarChar
+  detailImages                     String?                @map("detail_images") @db.VarChar
+  topImages                        String?                @map("top_images") @db.VarChar
   brandId                          Int                    @map("brand_id")
   categoryId                       Int                    @map("category_id")
   isRecommended                    Boolean                @default(false) @map("is_recommended")
@@ -99,8 +100,8 @@ model Product {
   engName                          String                 @map("eng_name") @db.VarChar
   korName                          String                 @map("kor_name") @db.VarChar
   subCategoryId                    Int                    @map("sub_category_id")
-  modelNumber                      Int?                   @map("model_number")
-  releaseDate                      DateTime?              @map("release_date") @db.Timestamptz(6)
+  modelNumber                      String?                @map("model_number")
+  releaseDate                      String?                @map("release_date") @db.VarChar
   colorKorName                     String                 @map("color_kor_name") @db.VarChar
   colorEngName                     String                 @map("color_eng_name") @db.VarChar
 
