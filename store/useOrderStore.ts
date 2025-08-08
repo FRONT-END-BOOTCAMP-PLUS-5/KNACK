@@ -4,11 +4,10 @@ type DeliveryType = 'FAST' | 'STOCK'
 
 interface OrderItem {
     productId: number
-    kor_name: string
-    eng_name: string
     price: number
     quantity: number
     thumbnail_image: string
+    deliveryType: string
 }
 
 interface OrderState {

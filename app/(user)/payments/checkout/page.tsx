@@ -12,6 +12,7 @@ import { useOrderStore } from '@/store/useOrderStore'
 import { AddressDto } from '@/backend/address/applications/dtos/AddressDto'
 import PointSection from '@/components/Payments/Points/PointSection'
 import FinalOrderSummary from '@/components/Payments/Order/FInalOrderSummary'
+import { IProduct } from '@/types/product'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
 
@@ -19,6 +20,7 @@ export default function CheckoutPage() {
     const {
         getTotalPrice,
         getTotalPriceWithoutDelivery,
+        orderItems,
         setOrderItems,
         setDeliveryType,
         deliveryFee,
@@ -32,18 +34,29 @@ export default function CheckoutPage() {
 
     // ✅ 최초 진입 시 mock 데이터 저장
     useEffect(() => {
-        const mockProduct = {
-            productId: 5,
-            kor_name: '리바이스 x 오아시스 데카 로고 티셔츠 블랙',
-            eng_name: "Levi's x Oasis Deca Logo T-Shirt Black",
-            price: 64000,
-            quantity: 1,
-            thumbnail_image: 'levis_nike_trucker_jacket_lightblue-thumbnail.webp',
-        }
+        const checkout = [
+            { productId: 5, quantity: 1, optionValueId: 5, deliveryMethod: 'normal' }
+        ];
 
-        setOrderItems([mockProduct])
-        setDeliveryType('FAST', 5000)
-        sessionStorage.setItem('orderItems', JSON.stringify([mockProduct]))
+        (async () => {
+            const res = await requester.get(`/api/products`, { params: { id: checkout[0].productId } })
+            const p = res.data.result as IProduct | null
+            if (!p) return
+
+            // 응답이 단일 객체이므로, 우리가 원하는 store 형식의 배열을 직접 만든다
+            const items = [{
+                productId: p.id,
+                price: p.price,
+                quantity: checkout[0].quantity,
+                thumbnail_image: p.thumbnailImage,
+                deliveryType: checkout[0].deliveryMethod,
+            }]
+
+            setOrderItems(items)                              // 상태 업데이트
+            sessionStorage.setItem('orderItems', JSON.stringify(items)) // 방금 만든 로컬 변수 사용
+            setDeliveryType('FAST', 5000)
+        })()
+        // ⚠ 의존성에 orderItems 넣지 말 것 (초기 빈 배열 저장/재실행 문제)
     }, [setOrderItems, setDeliveryType])
 
     useEffect(() => {
@@ -80,8 +93,8 @@ export default function CheckoutPage() {
         }
 
         try {
-            const res = await requester.patch(`/api/addresses/${selectedAddress.id}/message`, {
-                requestMessage: selectedAddress.request,
+            const res = await requester.patch(`/api/addresses/${selectedAddress.id}`, {
+                message: selectedAddress.request,
             })
 
             console.log('요청사항 저장 완료:', res.data)
