@@ -1,21 +1,32 @@
 'use client'
 
 import React from 'react'
-import { useOrderStore } from '@/store/useOrderStore'
 import styles from './OrderSummaryCard.module.scss'
 import Image from 'next/image'
 import { STORAGE_PATHS } from '@/constraint/auth'
 
-export default function OrderSummaryCard() {
-    const {
-        orderItems,
-        deliveryType,
-        setDeliveryType,
-        getTotalPrice,
-    } = useOrderStore()
+type OrderItem = {
+    productId: number
+    price: number
+    quantity: number
+    thumbnail_image: string
+    kor_name?: string
+    eng_name?: string
+}
 
-    const totalPrice = getTotalPrice()
+type Props = {
+    orderItems: OrderItem[]
+    deliveryType: 'FAST' | 'STOCK'
+    onChangeDelivery: (type: 'FAST' | 'STOCK') => void
+    totalPrice: number
+}
 
+export default function OrderSummaryCard({
+    orderItems,
+    deliveryType,
+    onChangeDelivery,
+    totalPrice,
+}: Props) {
     if (!orderItems?.length) return <div>주문 상품이 없습니다.</div>
 
     return (
@@ -66,7 +77,7 @@ export default function OrderSummaryCard() {
                         name="delivery"
                         value="FAST"
                         checked={deliveryType === 'FAST'}
-                        onChange={() => setDeliveryType('FAST', 5000)}
+                        onChange={() => onChangeDelivery('FAST')}
                     />
                     <span className={styles.custom_radio}></span>
                     <div className={styles.radio_text}>
@@ -81,7 +92,7 @@ export default function OrderSummaryCard() {
                         name="delivery"
                         value="STOCK"
                         checked={deliveryType === 'STOCK'}
-                        onChange={() => setDeliveryType('STOCK', 0)}
+                        onChange={() => onChangeDelivery('STOCK')}
                     />
                     <span className={styles.custom_radio}></span>
                     <div className={styles.radio_text}>

@@ -1,126 +1,82 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useAddressStore } from '@/store/useAddressStore'
 import KakaoPostCodeLoader from './KakaoPostCodeLoader'
 import { openKakaoPostcode } from '@/utils/openKakaoPostCode'
 import styles from './AddressModal.module.scss'
 import requester from '@/utils/requester'
 
-interface Address {
+type ApiAddress = {
     id: number
     name: string
     phone: string
     zipCode: string
     main: string
-    detail: string
-    message: string
+    detail: string | null
+    message: string | null
     isDefault?: boolean
 }
 
-interface Props {
-    onClose: () => void
+export type SelectedAddress = {
+    id: number
+    name: string
+    phone: string
+    fullAddress: string
+    request: string
 }
 
-export default function AddressModal({ onClose }: Props) {
-    const { selectedAddress, setSelectedAddress } = useAddressStore()
+type Props = {
+    onClose: () => void
+    selectedAddress: SelectedAddress | null
+    onChangeSelected: (addr: SelectedAddress) => void
+}
+
+export default function AddressModal({ onClose, selectedAddress, onChangeSelected }: Props) {
     const [step, setStep] = useState<'list' | 'form'>('list')
-    const [fullAddress, setFullAddress] = useState('')
+    const [savedAddresses, setSavedAddresses] = useState<ApiAddress[]>([])
+
+    // form fields
+    const [editingAddressId, setEditingAddressId] = useState<number | null>(null)
+    const [fullAddress, setFullAddress] = useState('') // main
     const [zipCode, setZipCode] = useState('')
     const [name, setName] = useState('')
     const [phone, setPhone] = useState('')
-    const [request, setRequest] = useState('')
-    const [savedAddresses, setSavedAddresses] = useState<Address[]>([])
+    const [detail, setDetail] = useState('') // 상세주소(= request로 쓰이던 값)
 
-    const [editingAddressId, setEditingAddressId] = useState<number | null>(null)
-    const [userId, setUserId] = useState<string>('') // ✅ 사용자 ID
+    // 주소 목록 불러오기
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await requester.get<ApiAddress[]>('/api/addresses')
+                setSavedAddresses(res.data)
+            } catch (e) {
+                console.error('주소 목록 불러오기 실패:', e)
+            }
+        })()
+    }, [])
 
+    // 카카오 주소 검색
     const handleSearch = () => {
         openKakaoPostcode(({ full, zipCode }) => {
-            console.log(full, zipCode)
             setFullAddress(full)
             setZipCode(zipCode)
             setStep('form')
         })
     }
 
+    // 기본 배송지 설정
     const handleSetDefault = async (id: number) => {
         try {
             await requester.patch(`/api/addresses/${id}`)
-            const updated = savedAddresses.map((a) => ({
-                ...a,
-                isDefault: a.id === id,
-            }))
-            setSavedAddresses(updated)
+            setSavedAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === id })))
         } catch (e) {
             alert('기본 배송지 설정 실패')
         }
     }
 
-    const handleEdit = (addr: Address) => {
-        setEditingAddressId(addr.id)
-        setFullAddress(addr.main)
-        setName(addr.name)
-        setPhone(addr.phone)
-        setZipCode(addr.zipCode)
-        setRequest(addr.detail)
-        setStep('form')
-    }
-
-    const handleDelete = async (id: number) => {
-        if (!confirm('정말 삭제하시겠습니까?')) return
-        try {
-            await requester.delete(`/api/addresses/${id}`)
-            setSavedAddresses((prev) => prev.filter((a) => a.id !== id))
-        } catch (e) {
-            alert('삭제 실패')
-        }
-    }
-
-    const handleSubmit = async () => {
-        if (!name || !phone || !fullAddress || !zipCode) {
-            alert('모든 필드를 입력해주세요.')
-            return
-        }
-
-        const payload = {
-            // userId는 서버에서 세션으로 주입되므로 프론트에서 보낼 필요 없음
-            name,
-            phone,
-            zipCode,
-            main: fullAddress,      // ✅ 정확한 전체 주소 그대로
-            detail: request,        // ✅ 상세주소
-        }
-
-        try {
-            let saved
-            if (editingAddressId !== null) {
-                const res = await requester.put(`/api/addresses/${editingAddressId}`, payload)
-                console.log(res)
-                saved = res.data
-            } else {
-                const res = await requester.post('/api/addresses', payload)
-                saved = res.data
-            }
-
-            const newAddress = {
-                id: saved.id,
-                name: saved.name,
-                phone: saved.phone ?? '',
-                fullAddress: `${saved.main} ${saved.detail ?? ''}`.trim(),
-                request: saved.message ?? '',
-            }
-
-            setSelectedAddress(newAddress)
-            onClose()
-        } catch (error) {
-            console.error('주소 저장 실패:', error)
-            alert('주소 저장에 실패했습니다.')
-        }
-    }
-
-    const handleSelectSaved = (addr: Address) => {
-        setSelectedAddress({
+    // 선택
+    const handleSelectSaved = (addr: ApiAddress) => {
+        onChangeSelected({
             id: addr.id,
             name: addr.name,
             phone: addr.phone ?? '',
@@ -130,18 +86,80 @@ export default function AddressModal({ onClose }: Props) {
         onClose()
     }
 
-    useEffect(() => {
-        const fetchAddresses = async () => {
-            try {
-                const res = await requester.get(`/api/addresses`)
-                setSavedAddresses(res.data)
-            } catch (e) {
-                console.error('주소 목록 불러오기 실패:', e)
+    // 수정 시작
+    const handleEdit = (addr: ApiAddress) => {
+        setEditingAddressId(addr.id)
+        setFullAddress(addr.main)
+        setZipCode(addr.zipCode)
+        setName(addr.name)
+        setPhone(addr.phone)
+        setDetail(addr.detail ?? '')
+        setStep('form')
+    }
+
+    // 삭제
+    const handleDelete = async (id: number) => {
+        if (!confirm('정말 삭제하시겠습니까?')) return
+        try {
+            await requester.delete(`/api/addresses/${id}`)
+            setSavedAddresses(prev => prev.filter(a => a.id !== id))
+            // 삭제된 주소가 현재 선택된 주소면 선택 해제
+            if (selectedAddress?.id === id) {
+                onChangeSelected?.({ id: 0, name: '', phone: '', fullAddress: '', request: '' })
             }
+        } catch (e) {
+            alert('삭제 실패')
+        }
+    }
+
+    // 저장(신규/수정)
+    const handleSubmit = async () => {
+        if (!name || !phone || !fullAddress || !zipCode) {
+            alert('모든 필드를 입력해주세요.')
+            return
         }
 
-        fetchAddresses()
-    }, [])
+        const payload = {
+            name,
+            phone,
+            zipCode,
+            main: fullAddress,
+            detail, // 상세주소
+            // message는 별도 PATCH(/message)로 관리 중이면 생략
+        }
+
+        try {
+            if (editingAddressId !== null) {
+                const res = await requester.put<ApiAddress>(`/api/addresses/${editingAddressId}`, payload)
+                const saved = res.data
+                setSavedAddresses(prev =>
+                    prev.map(a => (a.id === saved.id ? saved : a))
+                )
+                onChangeSelected({
+                    id: saved.id,
+                    name: saved.name,
+                    phone: saved.phone ?? '',
+                    fullAddress: `${saved.main} ${saved.detail ?? ''}`.trim(),
+                    request: saved.message ?? '',
+                })
+            } else {
+                const res = await requester.post<ApiAddress>('/api/addresses', payload)
+                const saved = res.data
+                setSavedAddresses(prev => [saved, ...prev])
+                onChangeSelected({
+                    id: saved.id,
+                    name: saved.name,
+                    phone: saved.phone ?? '',
+                    fullAddress: `${saved.main} ${saved.detail ?? ''}`.trim(),
+                    request: saved.message ?? '',
+                })
+            }
+            onClose()
+        } catch (error) {
+            console.error('주소 저장 실패:', error)
+            alert('주소 저장에 실패했습니다.')
+        }
+    }
 
     return (
         <div className={styles.modal_overlay}>
@@ -150,8 +168,8 @@ export default function AddressModal({ onClose }: Props) {
                 <h3 className={styles.title}>배송지 선택</h3>
                 <button className={styles.close_btn} onClick={onClose}>✕</button>
 
-
-                {savedAddresses.map((addr) => (
+                {/* 저장된 주소 리스트 */}
+                {savedAddresses.map(addr => (
                     <div key={addr.id} className={styles.saved_item}>
                         <label className={styles.radio_line}>
                             <input
@@ -162,7 +180,8 @@ export default function AddressModal({ onClose }: Props) {
                             />
                             <div className={styles.address_info}>
                                 <div className={styles.header}>
-                                    <strong>{addr.name}</strong> <span className={styles.phone}>({addr.phone})</span>
+                                    <strong>{addr.name}</strong>
+                                    <span className={styles.phone}>({addr.phone})</span>
                                     {addr.isDefault && <span className={styles.default_badge}>기본 배송지</span>}
                                 </div>
                                 <div className={styles.address_lines}>
@@ -208,16 +227,14 @@ export default function AddressModal({ onClose }: Props) {
                         <input
                             type="text"
                             placeholder="상세주소"
-                            value={request}
-                            onChange={(e) => setRequest(e.target.value)}
+                            value={detail}
+                            onChange={(e) => setDetail(e.target.value)}
                             className={styles.input}
                         />
 
                         <button className={styles.save_btn} onClick={handleSubmit}>저장</button>
                     </div>
                 )}
-
-
             </div>
         </div>
     )
