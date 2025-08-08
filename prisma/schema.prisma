@@ -104,6 +104,7 @@ model Product {
   releaseDate     String?   @map("release_date") @db.VarChar
   colorKorName    String    @map("color_kor_name") @db.VarChar
   colorEngName    String    @map("color_eng_name") @db.VarChar
+  keywordColorId  Int      @map("keyword_color_id")
 
   coupons                          Coupon[]
   inquires                         Inquiry[]
@@ -118,6 +119,7 @@ model Product {
   carts                            Cart[]
   subCategory                      SubCategory            @relation(fields: [subCategoryId], references: [id])
   productStockMapping              ProductStockMapping[]
+  optionValue                      OptionValue            @relation(fields: [keywordColorId], references: [id])
 
   @@map("products")
 }
@@ -217,6 +219,7 @@ model OptionValue {
   optionTypes         OptionType            @relation(fields: [typeId], references: [id])
   cart                Cart[]
   productStockMapping ProductStockMapping[]
+  product             Product[]
 
   @@map("option_values")
 }
