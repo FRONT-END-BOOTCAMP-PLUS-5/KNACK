@@ -1,12 +1,25 @@
+'use client';
+import { GetProductsResponseDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import styles from './search_product_list.module.scss';
 import { ProductCardLarge } from '@/components/common/ProductCard';
+import SearchProductListEmpty from './SearchProductListEmpty';
 
-export default function SearchProductList() {
+interface IProps {
+  initialData: GetProductsResponseDto;
+}
+
+export default function SearchProductList({ initialData }: IProps) {
   return (
-    <div className={styles.search_product_list}>
-      {Array.from({ length: 20 }).map((_, index) => (
-        <ProductCardLarge key={index} />
-      ))}
-    </div>
+    <>
+      {initialData.products.length > 0 ? (
+        <div className={styles.search_product_list}>
+          {initialData.products.map((product, index) => (
+            <ProductCardLarge key={index} product={product} />
+          ))}
+        </div>
+      ) : (
+        <SearchProductListEmpty />
+      )}
+    </>
   );
 }
