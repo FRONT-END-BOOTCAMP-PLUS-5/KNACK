@@ -38,26 +38,13 @@ export interface GetProductsResponseDto {
 
 export interface ProductDto {
   id: number;
-  descriptionText?: string | null;
   thumbnailImage?: string;
-  subImages?: string[];
   price: number;
   discountPercent?: number;
-  // detailContents?: string | null;
-  brandId?: number;
-  categoryId?: number;
   isRecommended: boolean;
-  isPrivate: boolean;
-  createdAt: Date;
-  gender?: string | null;
   hit: number;
   engName: string;
   korName: string;
-
-  colorKorName: string;
-  colorEngName: string;
-  modelNumber: string | null;
-  releaseDate: string | null;
 
   brand: Brand;
   categories: Category[];

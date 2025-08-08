@@ -22,8 +22,9 @@ export class PrProductsRepository implements ProductSearchRepository {
     const limit = pagination?.limit || 20;
     const offset = pagination?.offset || 0;
 
-    // WHERE 조건 구성
-    const whereConditions: Record<string, unknown> = {};
+    const whereConditions: Record<string, unknown> = {
+      isPrivate: true,
+    };
 
     if (filters) {
       // 키워드 검색 (상품명, 설명에서 검색)
@@ -65,6 +66,7 @@ export class PrProductsRepository implements ProductSearchRepository {
       if (filters.benefit === 'under_price') {
         whereConditions.discountPercent = { gt: 0 };
       }
+      //TODO: keywordColor, gender 필터링 추가
     }
 
     // ORDER BY 조건 구성
@@ -129,25 +131,13 @@ export class PrProductsRepository implements ProductSearchRepository {
       (product) =>
         new Product(
           product.id,
-          product.descriptionText,
           product.thumbnailImage,
-          product.subImages ? product.subImages.split(',') : [],
           product.price || 0,
           product.discountPercent || 0,
-          // product.detailContents,
-          product.brandId,
-          product.categoryId,
           product.isRecommended,
-          product.isPrivate,
-          product.createdAt || new Date(),
-          product.gender,
           product.hit || 0,
           product.engName,
           product.korName,
-          product.modelNumber,
-          product.releaseDate,
-          product.colorKorName,
-          product.colorEngName,
           new Brand(product.brand.id, product.brand.korName, product.brand.engName),
           [new Category(product.category.id, product.category.korName, product.category.engName)],
           product.subCategory
