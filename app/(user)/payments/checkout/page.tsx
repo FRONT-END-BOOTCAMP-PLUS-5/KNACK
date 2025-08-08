@@ -33,7 +33,7 @@ export default function CheckoutPage() {
     // ✅ 최초 진입 시 mock 데이터 저장
     useEffect(() => {
         const mockProduct = {
-            productId: 4,
+            productId: 5,
             kor_name: '리바이스 x 오아시스 데카 로고 티셔츠 블랙',
             eng_name: "Levi's x Oasis Deca Logo T-Shirt Black",
             price: 64000,
@@ -80,8 +80,8 @@ export default function CheckoutPage() {
         }
 
         try {
-            const res = await requester.patch(`/api/addresses/${selectedAddress.id}`, {
-                message: selectedAddress.request,
+            const res = await requester.patch(`/api/addresses/${selectedAddress.id}/message`, {
+                requestMessage: selectedAddress.request,
             })
 
             console.log('요청사항 저장 완료:', res.data)

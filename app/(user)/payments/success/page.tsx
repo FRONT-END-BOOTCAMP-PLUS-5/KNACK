@@ -79,6 +79,7 @@ export default function PaymentSuccess() {
                     })),
                 })
 
+                const createdOrderIds: number[] = orderRes.data.orderIds || []
                 setSavedOrderIds(orderRes.data.orderIds)
 
                 // 2. 결제 저장
@@ -91,7 +92,7 @@ export default function PaymentSuccess() {
                     approvedAt: new Date(),
                     method,
                     status: 'DONE',
-                    orderIds: savedOrderIds,
+                    orderIds: createdOrderIds,
                 })
                 console.log(paymentRes)
                 setPaymentNumber(paymentRes.data.paymentNumber)
