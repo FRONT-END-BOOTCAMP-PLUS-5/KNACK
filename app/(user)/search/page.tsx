@@ -21,6 +21,7 @@ export default async function Search({
     subCategoryId: params.subCategoryId,
     priceMin: params.priceMin,
     priceMax: params.priceMax,
+    size: params.size,
     discountMin: params.discountMin,
     discountMax: params.discountMax,
     benefit: params.benefit,
