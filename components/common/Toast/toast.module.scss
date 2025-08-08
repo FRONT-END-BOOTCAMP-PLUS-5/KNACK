@@ -1,0 +1,80 @@
+.toast {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  max-width: 440px;
+  width:calc(100% - 5%);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.toast_content {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  gap: 12px;
+}
+
+.toast_icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.toast_message {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #fff;
+}
+
+// 에러 타입 (이미지와 똑같은 컬러)
+.error {
+  background-color: #333;
+  
+  .error_icon {
+    color: #dc3545;
+  }
+  
+  .toast_message {
+    color: #fff;
+  }
+}
+
+// 성공 타입
+.success {
+  background-color: #28a745;
+  
+  .success_icon {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+}
+
+// 경고 타입
+.warning {
+  background-color: #ffc107;
+  
+  .warning_icon {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+}
+
+// 정보 타입
+.info {
+  background-color: #17a2b8;
+  
+  .info_icon {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+}

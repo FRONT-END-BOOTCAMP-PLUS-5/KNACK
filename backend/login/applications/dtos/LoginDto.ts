@@ -12,5 +12,7 @@ export interface LoginResponseDto {
     name: string;
     nickname: string;
     roles: string[];
+    deletedAt: Date | null;
+    isActive: boolean;
   };
 } 
