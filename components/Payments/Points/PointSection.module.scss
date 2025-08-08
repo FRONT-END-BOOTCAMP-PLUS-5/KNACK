@@ -1,0 +1,119 @@
+.point_box {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.point_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    label {
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .available_points {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: #666;
+
+        .infoButton {
+            border: none;
+            background: transparent;
+            color: #999;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    }
+}
+
+.input_group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    input {
+        flex: 1;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background-color: #fff;
+    }
+
+    button {
+        padding: 10px 14px;
+        font-size: 14px;
+        background-color: #eee;
+        color: #333;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #ddd;
+        }
+
+        &:disabled {
+            background-color: #f0f0f0;
+            color: #bbb;
+            cursor: not-allowed;
+        }
+    }
+}
+
+// ✅ 모달 스타일
+.modal_backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal_content {
+    width: 90%;
+    max-width: 360px;
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: left;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    h3 {
+        margin-top: 0;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 14px;
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    button {
+        display: block;
+        width: 100%;
+        padding: 10px 0;
+        background-color: #ff5757;
+        color: #fff;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+}

@@ -1,0 +1,30 @@
+.checkout_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+    background-color: #fff;
+    position: relative;
+    height: 56px;
+}
+
+.back_btn {
+    font-size: 24px;
+    /* ✅ 큼직하게 */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    color: #111;
+}
+
+.title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 17px;
+    /* ✅ 좀 더 크고 */
+    font-weight: bold;
+    margin: 0;
+}

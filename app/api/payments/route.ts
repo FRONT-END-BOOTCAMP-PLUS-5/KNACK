@@ -1,33 +1,46 @@
-// 📁 app/api/payments/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { serverPost as tossPOST } from '@/backend/utils/serverRequester'
 import type { AxiosError } from 'axios'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/api/auth/[...nextauth]/auth'
 import { KnackPaymentRepository } from '@/backend/payments/repositories/KnackPaymentRepository'
 import { KnackCardRepository } from '@/backend/payments/repositories/KnackCardRepository'
 import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto'
 import { CreateCardDto } from '@/backend/payments/applications/dtos/CreateCardDto'
 
 export async function POST(req: NextRequest) {
+    const repo = new KnackPaymentRepository();
     try {
-        const { paymentKey, orderId, amount } = await req.json()
+        const session = await getServerSession(authOptions)
+        if (!session?.user) {
+            return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 })
+        }
 
-        const data = await tossPOST('/payments/confirm', { paymentKey, orderId, amount }, 'toss')
+        const { tossPaymentKey, orderId, amount, addressId, method, status, orderIds } = await req.json()
+
+        const data = await tossPOST('/payments/confirm', { paymentKey: tossPaymentKey, orderId, amount }, 'toss')
+        const paymentNumberBig = BigInt(await repo.generateTodayPaymentNumber())
 
         const paymentDto: CreatePaymentDto = {
             tossPaymentKey: data.paymentKey,
-            userId: data.user?.id ?? 'unknown',
-            addressId: data.addressId,
-            paymentNumber: data.paymentNumber ?? 0,
-            price: data.totalAmount,
-            approvedAt: new Date(data.approvedAt),
-            createdAt: new Date(data.requestedAt),
-            method: data.method,
-            status: data.status,
-            orderIds: data.orderIds,
+            userId: session.user.id, // ✅ 세션 기반 userId 사용
+            addressId,
+            paymentNumber: paymentNumberBig,
+            price: amount,
+            approvedAt: data.approvedAt ? new Date(data.approvedAt) : new Date(),
+            createdAt: data.requestedAt ? new Date(data.requestedAt) : new Date(),
+            method,
+            status,
+            orderIds, // 프론트에서 전달하거나 서버에서 조회할 수도 있음
         }
 
         const paymentRepo = new KnackPaymentRepository()
-        await paymentRepo.save(paymentDto)
+        const savedPayment = await paymentRepo.save(paymentDto)
+        if (savedPayment) {
+            await paymentRepo.updateOrderPaymentIds(orderIds, savedPayment)
+        } else {
+            throw new Error('Payment 저장 후 ID를 찾을 수 없습니다.')
+        }
 
         if (data.method === 'CARD' && data.card) {
             const cardRepo = new KnackCardRepository()
@@ -49,9 +62,16 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        return NextResponse.json(data)
+        return NextResponse.json({
+            paymentNumber: paymentNumberBig.toString(), // BigInt 직렬화
+            orderIds,
+            status: 'DONE',
+            approvedAt: paymentDto.approvedAt.toISOString(),
+            method: paymentDto.method,
+            amount,
+        }, { status: 201 })
+
     } catch (error) {
-        // ✅ AxiosError 타입 가드
         const errRes =
             error && typeof error === 'object' && 'isAxiosError' in error
                 ? (error as AxiosError).response?.data

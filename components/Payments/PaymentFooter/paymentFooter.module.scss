@@ -1,0 +1,35 @@
+.payment_footer {
+    padding: 12px 16px;
+    z-index: 100;
+    background-color: #fff;
+    border-top: 1px solid #eee;
+
+    // 기본은 static (PC 등)
+    position: static;
+    width: 100%;
+
+    @media (max-width: 768px) {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+    }
+}
+
+.pay_btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #EF6253;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:disabled {
+        background-color: #d3d3d3;
+        cursor: not-allowed;
+    }
+}
