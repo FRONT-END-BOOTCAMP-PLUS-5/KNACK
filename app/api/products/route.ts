@@ -19,6 +19,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/**
+ * 벌크 조회
+ * @param req
+ * @returns product[]
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}))

@@ -2,7 +2,7 @@ import { create } from 'zustand'
 
 type DeliveryType = 'FAST' | 'STOCK'
 
-interface OrderItem {
+export interface OrderItem {
     productId: number
     price: number
     quantity: number
