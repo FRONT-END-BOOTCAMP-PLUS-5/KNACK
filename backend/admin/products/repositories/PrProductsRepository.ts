@@ -24,6 +24,7 @@ export class PrProductRepository implements ProductRepository {
       colorKorName,
       modelNumber,
       releaseDate,
+      keywordColorId,
     } = this.productData;
 
     const result = await prisma.product.create({
@@ -41,6 +42,7 @@ export class PrProductRepository implements ProductRepository {
         colorKorName: colorKorName,
         modelNumber: modelNumber,
         releaseDate: releaseDate,
+        keywordColorId: keywordColorId,
       },
     });
 
