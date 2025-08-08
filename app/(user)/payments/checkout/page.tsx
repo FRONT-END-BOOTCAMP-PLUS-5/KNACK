@@ -8,7 +8,7 @@ import { useAddressStore } from '@/store/useAddressStore'
 import requester from '@/utils/requester'
 import PaymentFooter from '@/components/Payments/PaymentFooter/PaymentFooter'
 import OrderSummaryCard from '@/components/Payments/Order/OrderSummaryCard'
-import { useOrderStore } from '@/store/useOrderStore'
+import { useOrderStore, OrderItem } from '@/store/useOrderStore'
 import { AddressDto } from '@/backend/address/applications/dtos/AddressDto'
 import PointSection from '@/components/Payments/Points/PointSection'
 import FinalOrderSummary from '@/components/Payments/Order/FInalOrderSummary'
@@ -20,9 +20,7 @@ export default function CheckoutPage() {
     const {
         getTotalPrice,
         getTotalPriceWithoutDelivery,
-        orderItems,
         setOrderItems,
-        setDeliveryType,
         deliveryFee,
         points,
     } = useOrderStore()
@@ -34,30 +32,42 @@ export default function CheckoutPage() {
 
     // ✅ 최초 진입 시 mock 데이터 저장
     useEffect(() => {
-        const checkout = [
-            { productId: 5, quantity: 1, optionValueId: 5, deliveryMethod: 'normal' }
-        ];
+        const initializeCheckout = async () => {
+            try {
+                const checkout = [
+                    { productId: 5, quantity: 1, optionValueId: 5, deliveryMethod: 'normal' }
+                ];
 
-        (async () => {
-            const res = await requester.get(`/api/products`, { params: { id: checkout[0].productId } })
-            const p = res.data.result as IProduct | null
-            if (!p) return
+                const ids = checkout.map(c => c.productId)
+                const { data } = await requester.post('/api/products', { ids })
+                console.log(data.results)
+                const results = data.results as (IProduct | null)[]
 
-            // 응답이 단일 객체이므로, 우리가 원하는 store 형식의 배열을 직접 만든다
-            const items = [{
-                productId: p.id,
-                price: p.price,
-                quantity: checkout[0].quantity,
-                thumbnail_image: p.thumbnailImage,
-                deliveryType: checkout[0].deliveryMethod,
-            }]
+                const items = results.flatMap((p, i) =>
+                    p
+                        ? [{
+                            productId: p.id,
+                            price: p.price,
+                            quantity: checkout[i].quantity,
+                            thumbnail_image: p.thumbnailImage,
+                            deliveryType: checkout[i].deliveryMethod,
+                        }]
+                        : []
+                )
 
-            setOrderItems(items)                              // 상태 업데이트
-            sessionStorage.setItem('orderItems', JSON.stringify(items)) // 방금 만든 로컬 변수 사용
-            setDeliveryType('FAST', 5000)
-        })()
-        // ⚠ 의존성에 orderItems 넣지 말 것 (초기 빈 배열 저장/재실행 문제)
-    }, [setOrderItems, setDeliveryType])
+                setOrderItems(items as OrderItem[]) // OrderItem[] 타입이면 맞춰 캐스팅
+                sessionStorage.setItem('orderItems', JSON.stringify(items))
+
+                if (data.notFound?.length) {
+                    console.warn('not found:', data.notFound)
+                    // TODO: 품절/삭제 안내 UI
+                }
+            } catch (e) {
+                console.error('batch fetch failed:', e)
+            }
+        }
+        initializeCheckout()
+    }, [setOrderItems])
 
     useEffect(() => {
         const fetchDefaultAddress = async () => {

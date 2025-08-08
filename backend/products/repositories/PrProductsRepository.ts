@@ -73,4 +73,11 @@ export class PrProductRepository implements ProductRepository {
       throw new Error('Failed to find product from database.');
     }
   }
+
+  findManyByIds(ids: number[]) {
+    return prisma.product.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, price: true, thumbnailImage: true, korName: true, engName: true },
+    })
+  }
 }
