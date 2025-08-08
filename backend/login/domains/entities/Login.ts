@@ -5,4 +5,6 @@ export interface Login {
   password: string;
   name: string;
   nickname: string;
+  deletedAt: Date | null;
+  isActive: boolean;
 } 

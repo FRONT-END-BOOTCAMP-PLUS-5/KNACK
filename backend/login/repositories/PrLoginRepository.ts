@@ -12,6 +12,8 @@ export class PrLoginRepository implements LoginRepository {
         password: true,
         name: true,
         nickname: true,
+        deletedAt: true,
+        isActive: true,
       }
     });
 
@@ -23,6 +25,8 @@ export class PrLoginRepository implements LoginRepository {
       password: user.password,
       name: user.name,
       nickname: user.nickname,
+      deletedAt: user.deletedAt,
+      isActive: user.isActive,
     };
   }
 } 

@@ -4,8 +4,8 @@ import { usePathname } from 'next/navigation';
 import { SessionProvider } from 'next-auth/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
-import Header from '@/components/common/header/Header';
-import Footer from '@/components/common/footer/Footer';
+import Header from '@/components/common/Header';
+import Footer from '@/components/common/Footer';
 
 interface IProps {
   children: React.ReactNode;
@@ -28,7 +28,7 @@ export default function LayoutWrapper({ children }: IProps) {
   }, []);
   
   // 헤더와 푸터를 숨길 경로들 (auth 그룹)
-  const hideLayoutPaths = ['/login', '/signup', '/find-email', '/find-password'];
+  const hideLayoutPaths = ['/login', '/signup', '/find-email', '/find-password', '/my'];
   const shouldHideLayout = hideLayoutPaths.some(path => pathname.startsWith(path));
   
   // 하이드레이션 완료 전까지는 로딩 표시
