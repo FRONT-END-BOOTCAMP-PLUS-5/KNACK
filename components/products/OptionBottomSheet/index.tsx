@@ -9,19 +9,27 @@ import Text from '@/components/common/Text';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import { IProduct } from '@/types/productDetail';
 import Image from 'next/image';
-import { useState } from 'react';
 
 interface IProps {
   productData?: IProduct;
+  selectOptionId: number;
+  deliveryOptionId: number;
+  setSelectOptionId: (id: number) => void;
+  setDeliveryOption: (id: number) => void;
   onClickCart?: () => void;
   onClickBuy?: () => void;
 }
 
-const OptionBottomSheet = ({ productData, onClickCart, onClickBuy }: IProps) => {
+const OptionBottomSheet = ({
+  productData,
+  selectOptionId,
+  deliveryOptionId,
+  setSelectOptionId,
+  setDeliveryOption,
+  onClickCart,
+  onClickBuy,
+}: IProps) => {
   const { thumbnailImage, korName, engName, productOptionMappings, modelNumber, price } = productData ?? {};
-
-  const [selectOptionId, setSelectOptionId] = useState(0);
-  const [deliveryOption, setDelveryOption] = useState(0);
 
   return (
     <BottomSheet>
@@ -62,11 +70,11 @@ const OptionBottomSheet = ({ productData, onClickCart, onClickBuy }: IProps) => 
       <div className={styles.option_change_button_wrap}>
         <Flex direction="column" gap={6}>
           <button
-            className={`${styles.price_select_button} ${deliveryOption === 0 && styles.active}`}
-            onClick={() => setDelveryOption(0)}
+            className={`${styles.price_select_button} ${deliveryOptionId === 0 && styles.active}`}
+            onClick={() => setDeliveryOption(0)}
           >
             <Flex gap={4} width="self" align="center">
-              <Text size={1.4} weight={deliveryOption === 0 ? 600 : 400}>
+              <Text size={1.4} weight={deliveryOptionId === 0 ? 600 : 400}>
                 빠른배송
               </Text>
               <Text size={1.2} color="gray2">
@@ -76,18 +84,18 @@ const OptionBottomSheet = ({ productData, onClickCart, onClickBuy }: IProps) => 
             <Text
               className={styles.price_text}
               size={1.4}
-              weight={deliveryOption === 0 ? 600 : 400}
-              color={deliveryOption === 0 ? 'red1' : 'black1'}
+              weight={deliveryOptionId === 0 ? 600 : 400}
+              color={deliveryOptionId === 0 ? 'red1' : 'black1'}
             >
               {((price ?? 0) + 30000)?.toLocaleString()}원
             </Text>
           </button>
           <button
-            className={`${styles.price_select_button} ${deliveryOption === 1 && styles.active}`}
-            onClick={() => setDelveryOption(1)}
+            className={`${styles.price_select_button} ${deliveryOptionId === 1 && styles.active}`}
+            onClick={() => setDeliveryOption(1)}
           >
             <Flex gap={4} width="self" align="center">
-              <Text size={1.4} weight={deliveryOption === 1 ? 600 : 400}>
+              <Text size={1.4} weight={deliveryOptionId === 1 ? 600 : 400}>
                 일반배송
               </Text>
               <Text size={1.2} color="gray2">
@@ -97,8 +105,8 @@ const OptionBottomSheet = ({ productData, onClickCart, onClickBuy }: IProps) => 
             <Text
               className={styles.price_text}
               size={1.4}
-              weight={deliveryOption === 1 ? 600 : 400}
-              color={deliveryOption === 1 ? 'red1' : 'black1'}
+              weight={deliveryOptionId === 1 ? 600 : 400}
+              color={deliveryOptionId === 1 ? 'red1' : 'black1'}
             >
               {price?.toLocaleString()}원
             </Text>

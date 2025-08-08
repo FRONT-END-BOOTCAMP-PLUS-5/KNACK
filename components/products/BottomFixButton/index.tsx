@@ -8,13 +8,57 @@ import SaveIcon from '@/public/icons/book_mark.svg';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import OptionBottomSheet from '../OptionBottomSheet';
 import { IProduct } from '@/types/productDetail';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { cartService } from '@/services/cart';
 
 interface IProps {
   productData?: IProduct;
 }
 
 const BottomFixButton = ({ productData }: IProps) => {
+  const router = useRouter();
   const { onOpen, onClose } = useBottomSheetStore();
+  const { upsertCart } = cartService;
+
+  const [selectOptionId, setSelectOptionId] = useState(0);
+  const [deliveryOptionId, setDeliveryOption] = useState(0);
+
+  const onClickNowBuy = () => {
+    const checkoutData = [
+      {
+        productId: productData?.id,
+        quantity: 1,
+        optionValueId: selectOptionId,
+        deliveryMethod: deliveryOptionId === 0 ? 'past' : 'normal',
+      },
+    ];
+
+    localStorage.setItem('checkout', JSON.stringify(checkoutData));
+
+    router.push('/payments/checkout');
+  };
+
+  const onClickCart = () => {
+    const cardData = {
+      count: 1,
+      optionValueId: selectOptionId,
+      productId: productData?.id,
+      userId: '7571e92b-f38b-4878-959c-f76ab9290ed8',
+      id: 0, // upsert 이므로 없는 아이디를 넣어서 insert
+    };
+
+    upsertCart(cardData)
+      .then((res) => {
+        if (res.status === 200) {
+          alert('장바구니에 담았어요.');
+          onClose();
+        }
+      })
+      .catch((error) => {
+        console.log('error', error.message);
+      });
+  };
 
   return (
     <>
@@ -36,7 +80,15 @@ const BottomFixButton = ({ productData }: IProps) => {
           </button>
         </article>
       </div>
-      <OptionBottomSheet productData={productData} />
+      <OptionBottomSheet
+        productData={productData}
+        selectOptionId={selectOptionId}
+        deliveryOptionId={deliveryOptionId}
+        onClickBuy={onClickNowBuy}
+        onClickCart={onClickCart}
+        setSelectOptionId={setSelectOptionId}
+        setDeliveryOption={setDeliveryOption}
+      />
     </>
   );
 };
