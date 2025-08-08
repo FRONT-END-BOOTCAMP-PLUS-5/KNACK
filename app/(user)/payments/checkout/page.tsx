@@ -10,19 +10,25 @@ import PaymentFooter from '@/components/Payments/PaymentFooter/PaymentFooter'
 import OrderSummaryCard from '@/components/Payments/Order/OrderSummaryCard'
 import { useOrderStore } from '@/store/useOrderStore'
 import { AddressDto } from '@/backend/address/applications/dtos/AddressDto'
+import PointSection from '@/components/Payments/Points/PointSection'
+import FinalOrderSummary from '@/components/Payments/Order/FInalOrderSummary'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
 
 export default function CheckoutPage() {
     const {
         getTotalPrice,
+        getTotalPriceWithoutDelivery,
         setOrderItems,
         setDeliveryType,
+        deliveryFee,
+        points,
     } = useOrderStore()
 
     const { selectedAddress, setSelectedAddress } = useAddressStore()
 
     const totalPrice = getTotalPrice()
+    const priceWithoutDelivery = getTotalPriceWithoutDelivery()
 
     // ✅ 최초 진입 시 mock 데이터 저장
     useEffect(() => {
@@ -115,6 +121,10 @@ export default function CheckoutPage() {
         }
     }
 
+    const handleUsePoints = (points: number) => {
+        // TODO: 포인트 사용 로직 구현
+    }
+
     return (
         <main className={styles.checkout_container}>
             <section className={styles.address_section}>
@@ -122,6 +132,15 @@ export default function CheckoutPage() {
             </section>
 
             <OrderSummaryCard />
+            <PointSection availablePoints={points} onChange={handleUsePoints} />
+
+            <FinalOrderSummary
+                price={priceWithoutDelivery}
+                fee={0}
+                shippingFee={deliveryFee}
+                couponAmount={0}
+                pointAmount={points}
+            />
 
             <PaymentFooter totalPrice={totalPrice} onPay={handlePayment} />
         </main>

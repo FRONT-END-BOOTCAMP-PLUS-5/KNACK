@@ -1,6 +1,8 @@
 .payment_footer {
     padding: 12px 16px;
     z-index: 100;
+    background-color: #fff;
+    border-top: 1px solid #eee;
 
     // 기본은 static (PC 등)
     position: static;
