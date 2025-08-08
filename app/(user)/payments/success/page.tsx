@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import styles from './SuccessPage.module.scss'
 import requester from '@/utils/requester'
@@ -8,14 +8,18 @@ import { useSession } from 'next-auth/react'
 import { useOrderStore } from '@/store/useOrderStore'
 import { useAddressStore } from '@/store/useAddressStore'
 import axios from 'axios'
-import router from 'next/router'
+import { useRouter } from 'next/navigation'
 
 export default function PaymentSuccess() {
     const params = useSearchParams()
     const { data: session } = useSession()
 
+    const router = useRouter()
+
     const { orderItems, setOrderItems } = useOrderStore()
     const { selectedAddress, setSelectedAddress } = useAddressStore()
+    const [savedOrderIds, setSavedOrderIds] = useState<number[]>([]);
+    const [paymentNumber, setPaymentNumber] = useState('')
 
     // ✅ 1. sessionStorage에서 상태 복구
     useEffect(() => {
@@ -44,6 +48,7 @@ export default function PaymentSuccess() {
     const hasRun = useRef(false)
 
     useEffect(() => {
+        console.log(session?.user, params, orderItems, selectedAddress)
         if (!session?.user || !params || orderItems.length === 0 || !selectedAddress?.id || hasRun.current) return
 
         hasRun.current = true
@@ -74,10 +79,10 @@ export default function PaymentSuccess() {
                     })),
                 })
 
-                const savedOrderIds = orderRes.data.orderIds
+                setSavedOrderIds(orderRes.data.orderIds)
 
                 // 2. 결제 저장
-                await requester.post('/api/payments', {
+                const paymentRes = await requester.post('/api/payments', {
                     tossPaymentKey: paymentKey,
                     orderId: orderId,
                     userId: session.user.id,
@@ -88,6 +93,8 @@ export default function PaymentSuccess() {
                     status: 'DONE',
                     orderIds: savedOrderIds,
                 })
+                console.log(paymentRes)
+                setPaymentNumber(paymentRes.data.paymentNumber)
 
                 console.log('✅ 결제 및 주문 저장 완료')
 
@@ -95,7 +102,6 @@ export default function PaymentSuccess() {
                 sessionStorage.removeItem('orderItems')
                 sessionStorage.removeItem('selectedAddress')
                 sessionStorage.clear() // 또는 위 두 줄만
-                router.replace('/')
 
             } catch (err) {
                 console.error('❌ 결제 저장 실패', err)
@@ -107,11 +113,34 @@ export default function PaymentSuccess() {
         }
 
         save()
-    }, [params, session, orderItems, selectedAddress])
+    }, [params, session, orderItems, selectedAddress, setSavedOrderIds, savedOrderIds, setPaymentNumber])
+
+    // useEffect(() => {
+    //     if (savedOrderIds.length < 1) {
+    //         // 주문번호 없으면 주문내역 페이지로 바로 이동
+    //         router.replace('/orders')
+    //     }
+    // }, [router, savedOrderIds])
 
     return (
         <div className={styles.success}>
-            <h2>✅ 결제가 완료되었습니다.</h2>
+            <div className={styles.card}>
+                <div className={styles.icon}>✅</div>
+                <h2>결제가 완료되었습니다!</h2>
+                {paymentNumber && (
+                    <p className={styles.order_number}>
+                        주문번호 <strong>{paymentNumber}</strong>
+                    </p>
+                )}
+                <p className={styles.desc}>주문 내역은 아래 버튼을 눌러 확인할 수 있습니다.</p>
+                <button
+                    className={styles.view_btn}
+                    onClick={() => router.push(`/orders`)}
+                >
+                    주문 내역 확인
+                </button>
+            </div>
         </div>
     )
 }
+

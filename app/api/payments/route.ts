@@ -19,12 +19,13 @@ export async function POST(req: NextRequest) {
         const { tossPaymentKey, orderId, amount, addressId, method, status, orderIds } = await req.json()
 
         const data = await tossPOST('/payments/confirm', { paymentKey: tossPaymentKey, orderId, amount }, 'toss')
+        const paymentNumberBig = BigInt(await repo.generateTodayPaymentNumber())
 
         const paymentDto: CreatePaymentDto = {
             tossPaymentKey: data.paymentKey,
             userId: session.user.id, // ✅ 세션 기반 userId 사용
             addressId,
-            paymentNumber: BigInt(await repo.generateTodayPaymentNumber()),
+            paymentNumber: paymentNumberBig,
             price: amount,
             approvedAt: data.approvedAt ? new Date(data.approvedAt) : new Date(),
             createdAt: data.requestedAt ? new Date(data.requestedAt) : new Date(),
@@ -61,7 +62,15 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        return NextResponse.json(data)
+        return NextResponse.json({
+            paymentNumber: paymentNumberBig.toString(), // BigInt 직렬화
+            orderIds,
+            status: 'DONE',
+            approvedAt: paymentDto.approvedAt.toISOString(),
+            method: paymentDto.method,
+            amount,
+        }, { status: 201 })
+
     } catch (error) {
         const errRes =
             error && typeof error === 'object' && 'isAxiosError' in error

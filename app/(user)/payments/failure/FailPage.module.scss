@@ -1,9 +1,53 @@
 .fail {
-    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    background-color: #fafafa;
+    padding: 20px;
 
-    h2 {
-        font-size: 1.5rem;
-        color: #e74c3c;
-        font-weight: bold;
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 32px 24px;
+        text-align: center;
+        max-width: 360px;
+        width: 100%;
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            color: #e74c3c;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .retry_btn {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: #c0392b;
+            }
+        }
     }
 }

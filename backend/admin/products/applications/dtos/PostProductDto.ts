@@ -21,4 +21,5 @@ export interface IPostProductDto {
   releaseDate: string;
   subCategoryId: number;
   topImages: string;
+  keywordColorId: number;
 }

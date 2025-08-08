@@ -12,7 +12,7 @@ export const authOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+            async authorize(credentials) {
         try {
           const { email, password } = credentials ?? {};
 
@@ -33,9 +33,22 @@ export const authOptions = {
             name: result.user.name,
             nickname: result.user.nickname,
             roles: result.user.roles,
+            deletedAt: result.user.deletedAt,
+            isActive: result.user.isActive,
           };
         } catch (error) {
           console.error("Auth error:", error);
+          
+          // 탈퇴한 계정 에러인 경우 커스텀 에러 생성
+          if (error instanceof Error && error.message.includes('탈퇴한 계정')) {
+            throw new Error('WITHDRAWN_ACCOUNT_ERROR');
+          }
+          
+          // 없는 아이디/틀린 비밀번호인 경우 커스텀 에러 생성
+          if (error instanceof Error && error.message.includes('이메일 또는 비밀번호가 올바르지 않습니다')) {
+            throw new Error('INVALID_CREDENTIALS_ERROR');
+          }
+          
           return null;
         }
       },

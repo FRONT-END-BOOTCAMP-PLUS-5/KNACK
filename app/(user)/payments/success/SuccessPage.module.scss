@@ -1,9 +1,63 @@
 .success {
-    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 20px;
 
-    h2 {
-        font-size: 1.5rem;
-        color: #2ecc71;
-        font-weight: bold;
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 32px 24px;
+        text-align: center;
+        max-width: 360px;
+        width: 100%;
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            color: #27ae60;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .order_number {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #444;
+
+            strong {
+                font-weight: 700;
+                color: #27ae60;
+            }
+        }
+
+        .desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .view_btn {
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: #219150;
+            }
+        }
     }
 }

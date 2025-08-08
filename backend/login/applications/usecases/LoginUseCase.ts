@@ -14,6 +14,11 @@ export class LoginUseCase {
       throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
     }
 
+    // 탈퇴한 사용자인지 확인
+    if (login.deletedAt !== null || !login.isActive) {
+      throw new Error('탈퇴한 계정입니다. 재가입이 필요합니다.');
+    }
+
     // 비밀번호 확인
     const isPasswordValid = await bcrypt.compare(password, login.password);
     if (!isPasswordValid) {
@@ -29,6 +34,8 @@ export class LoginUseCase {
         name: login.name,
         nickname: login.nickname,
         roles: ['USER'], // 기본 역할
+        deletedAt: login.deletedAt,
+        isActive: login.isActive,
       },
     };
   }

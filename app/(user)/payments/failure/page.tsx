@@ -75,8 +75,17 @@ export default function PaymentFail() {
 
     return (
         <div className={styles.fail}>
-            <h2>❌ 결제가 실패했습니다.</h2>
-            <p>{message ?? '잠시 후 다시 시도해 주세요.'}</p>
+            <div className={styles.card}>
+                <div className={styles.icon}>❌</div>
+                <h2>결제가 실패했습니다</h2>
+                <p>{message ?? '잠시 후 다시 시도해 주세요.'}</p>
+                <button
+                    className={styles.retry_btn}
+                    onClick={() => window.location.href = '/cart'}
+                >
+                    장바구니로 돌아가기
+                </button>
+            </div>
         </div>
     )
 }

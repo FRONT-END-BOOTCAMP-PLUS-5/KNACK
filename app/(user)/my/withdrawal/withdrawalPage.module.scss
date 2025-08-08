@@ -1,0 +1,44 @@
+.withdrawal_container {
+  min-height: 100vh;
+}
+
+.withdrawal_content {
+
+  overflow: hidden;
+}
+
+.withdrawal_title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #333;
+  text-align: center;
+  padding: 3.2rem 2.4rem 2.4rem;
+  margin: 0;
+}
+
+.cancel_section {
+  background-color: #f8f9fa;
+  margin-top: 1rem;
+}
+
+.cancel_button {
+  width: 100%;
+  padding: 1.4rem 2.4rem;
+  background-color: $black;
+  color: white;
+  border: none;
+  border-radius: 0.8rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: #5a6268;
+  }
+
+  &:disabled {
+    background-color: #adb5bd;
+    cursor: not-allowed;
+  }
+}
