@@ -20,6 +20,7 @@ export interface IProduct {
   releaseDate: string | null;
   topImages: string | null;
   reviews: IReview[];
+  productOptionMappings: IProductOptionMapping[];
   _count: {
     reviews: number;
   };
@@ -51,4 +52,22 @@ interface IReview {
   rating: number | null;
   reviewImages: string | null;
   createdAt: Date | null;
+}
+
+interface IProductOptionMapping {
+  optionType: IOptionType;
+}
+
+interface IOptionValue {
+  id: number;
+  isPrivate: boolean;
+  name: string;
+  typeId: number;
+}
+
+interface IOptionType {
+  id: number;
+  isPrivate: boolean;
+  name: string;
+  optionValue: IOptionValue[];
 }

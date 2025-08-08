@@ -11,12 +11,15 @@ import { productsService } from '@/services/products';
 import AdditionalBenefits from '@/components/products/AdditionalBenefits';
 import { IProduct } from '@/types/productDetail';
 
+import BottomFixButton from '@/components/products/BottomFixButton';
+
 interface IProps {
   params: Promise<{
     id: string;
   }>;
 }
 
+// 리뷰 작성하기 기능이 완성되면 바꿀것
 const REVIEW_PROGRESS = [
   { id: 0, percent: '80%', rating: 5 },
   { id: 1, percent: '23%', rating: 4 },
@@ -25,6 +28,7 @@ const REVIEW_PROGRESS = [
   { id: 4, percent: '4%', rating: 1 },
 ];
 
+// 리뷰 작성하기 기능이 완성되면 바꿀것
 const REVIEW_RESULT_TEXT = [
   { id: 0, normal: '두께감이', bold: '보통이에요', percent: '75%' },
   { id: 1, normal: '무게감이', bold: '보통이에요', percent: '80%' },
@@ -40,6 +44,10 @@ const ProductDetail = async ({ params }: IProps) => {
     return res;
   });
 
+  if (!productData) {
+    return <div>존재하지 않는 상품 입니다.</div>;
+  }
+
   return (
     <div className={styles.product_detail_container}>
       <ProductTopImage thumbnailImage={productData?.thumbnailImage} sliderImage={productData?.subImages ?? ''} />
@@ -51,8 +59,9 @@ const ProductDetail = async ({ params }: IProps) => {
       <BrandInfo brandData={productData?.brand} />
       <Divider />
       <Tab />
-      <ProductDetailImage detailImage={productData?.detailContents} />
+      <ProductDetailImage detailImage={productData?.detailImages} />
       <TextReview reviewProgress={REVIEW_PROGRESS} reviewTextData={REVIEW_RESULT_TEXT} />
+      <BottomFixButton productData={productData} />
     </div>
   );
 };

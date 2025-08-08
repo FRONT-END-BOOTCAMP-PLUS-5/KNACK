@@ -15,22 +15,25 @@ interface IProps {
 export default function LayoutWrapper({ children }: IProps) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 60 * 1000, // 1분
-        retry: 1,
-      },
-    },
-  }));
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000, // 1분
+            retry: 1,
+          },
+        },
+      })
+  );
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   // 헤더와 푸터를 숨길 경로들 (auth 그룹)
-  const hideLayoutPaths = ['/login', '/signup', '/find-email', '/find-password', '/my'];
-  const shouldHideLayout = hideLayoutPaths.some(path => pathname.startsWith(path));
+  const hideLayoutPaths = ['/login', '/signup', '/find-email', '/find-password', '/my', '/products'];
+  const shouldHideLayout = hideLayoutPaths.some((path) => pathname.startsWith(path));
 
   const paymentsHeaderPaths = ['/payments/checkout'].some(path => pathname.startsWith(path));
 
@@ -42,9 +45,7 @@ export default function LayoutWrapper({ children }: IProps) {
   if (shouldHideLayout) {
     return (
       <QueryClientProvider client={queryClient}>
-        <SessionProvider>
-          {children}
-        </SessionProvider>
+        <SessionProvider>{children}</SessionProvider>
       </QueryClientProvider>
     );
   }
@@ -52,10 +53,7 @@ export default function LayoutWrapper({ children }: IProps) {
   if (paymentsHeaderPaths) {
     return (
       <QueryClientProvider client={queryClient}>
-        <SessionProvider>
-          <CheckoutHeader />
-          {children}
-        </SessionProvider>
+        <SessionProvider>{children}</SessionProvider>
       </QueryClientProvider>
     );
   }
@@ -69,4 +67,4 @@ export default function LayoutWrapper({ children }: IProps) {
       </SessionProvider>
     </QueryClientProvider>
   );
-} 
+}
