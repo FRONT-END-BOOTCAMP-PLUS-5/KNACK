@@ -303,12 +303,12 @@ model Payment {
   userId         String    @map("user_id") @db.Uuid
   price          Int?      @default(0)
   createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  paymentNumber  BigInt?       @map("payment_number")
+  paymentNumber  BigInt       @map("payment_number")
   addressId      Int       @map("address_id")
   approvedAt     DateTime? @map("approved_at") @db.Timestamptz(6)
   method         String    @db.VarChar
   status         String    @db.VarChar
-  tossPaymentKey String    @unique @map("toss_payment_key") @db.VarChar
+  tossPaymentKey String?    @unique @map("toss_payment_key") @db.VarChar
   orders         Order[]
   address        Address   @relation(fields: [addressId], references: [id])
   user           User      @relation(fields: [userId], references: [id])
