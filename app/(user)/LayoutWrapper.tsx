@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import CheckoutHeader from '@/components/Payments/PaymentHeader/PaymentHeader';
+import PaymentHeader from '@/components/Payments/PaymentHeader/PaymentHeader';
 
 interface IProps {
   children: React.ReactNode;
@@ -53,6 +54,7 @@ export default function LayoutWrapper({ children }: IProps) {
   if (paymentsHeaderPaths) {
     return (
       <QueryClientProvider client={queryClient}>
+        <PaymentHeader />
         <SessionProvider>{children}</SessionProvider>
       </QueryClientProvider>
     );
