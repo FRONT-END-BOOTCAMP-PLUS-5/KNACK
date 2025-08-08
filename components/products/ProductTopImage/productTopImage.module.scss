@@ -1,0 +1,20 @@
+.image_box {
+  max-width: 440px;
+  width: 100%;
+  height: auto;
+  padding-top: 100%;
+  position: relative;
+  background: rgb(244, 244, 244);
+}
+
+.slide_image_wrap {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px;
+  padding-top: 20px;
+
+  & .slide_image_box {
+    background: $light-gray02;
+    border: 1px solid #ebebeb;
+  }
+}

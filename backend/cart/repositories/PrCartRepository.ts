@@ -1,0 +1,85 @@
+import prisma from '@/backend/utils/prisma';
+import { CartRepository } from '../domains/repositires/CartRepository';
+import { Cart } from '../domains/entities/Cart';
+
+interface IProps {
+  userId: string;
+  productId: number;
+  optionValueId: number;
+  count: number;
+}
+
+export class PrCartRepository implements CartRepository {
+  private cartData;
+
+  constructor(cartData?: IProps) {
+    this.cartData = cartData;
+  }
+
+  async upsertCart(id: number): Promise<number> {
+    const { count, optionValueId, productId, userId } = this.cartData ?? {};
+
+    const result = await prisma.cart.upsert({
+      where: {
+        id: id,
+      },
+      update: {
+        count: count,
+        optionValueId: optionValueId,
+      },
+      create: {
+        productId: productId ?? 0,
+        count: count ?? 0,
+        optionValueId: optionValueId ?? 0,
+        userId: userId ?? '',
+      },
+    });
+
+    return result.id;
+  }
+
+  async getCart(): Promise<Cart[]> {
+    const result = await prisma.cart.findMany({
+      where: { userId: '7571e92b-f38b-4878-959c-f76ab9290ed8' },
+      include: {
+        product: {
+          include: {
+            brand: true,
+            category: true,
+            productOptionMappings: {
+              include: {
+                optionType: {
+                  include: {
+                    optionValue: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return result;
+  }
+
+  async remove(id: number): Promise<number> {
+    const result = await prisma.cart.delete({
+      where: { id: id },
+    });
+
+    return result.id;
+  }
+
+  async manyRemove(ids: number[]): Promise<number> {
+    const result = await prisma.cart.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    return result.count;
+  }
+}

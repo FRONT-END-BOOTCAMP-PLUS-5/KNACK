@@ -4,6 +4,7 @@ import styles from './flex.module.scss';
 
 interface IProps {
   children: React.ReactNode;
+  className?: string;
   direction?: 'row' | 'column';
   align?: 'center' | 'start';
   justify?: 'between' | 'center' | 'start';
@@ -11,10 +12,13 @@ interface IProps {
   gap?: number;
   paddingVertical?: number;
   paddingHorizontal?: number;
+  marginVertical?: number;
+  marginHorizontal?: number;
 }
 
 const Flex = ({
   children,
+  className,
   direction = 'row',
   align = 'start',
   justify = 'start',
@@ -22,13 +26,20 @@ const Flex = ({
   gap = 0,
   paddingVertical = 0,
   paddingHorizontal = 0,
+  marginVertical = 0,
+  marginHorizontal = 0,
 }: IProps) => {
   return (
     <div
-      className={`${styles.flex_style} ${styles['align_' + align]} ${styles['justify_' + justify]} ${
+      className={`${className} ${styles.flex_style} ${styles['align_' + align]} ${styles['justify_' + justify]} ${
         styles['width_' + width]
       }`}
-      style={{ padding: `${paddingVertical}px ${paddingHorizontal}px`, flexDirection: direction, gap: gap + 'px' }}
+      style={{
+        padding: `${paddingVertical}px ${paddingHorizontal}px`,
+        flexDirection: direction,
+        gap: gap + 'px',
+        margin: `${marginVertical}px ${marginHorizontal}px`,
+      }}
     >
       {children}
     </div>

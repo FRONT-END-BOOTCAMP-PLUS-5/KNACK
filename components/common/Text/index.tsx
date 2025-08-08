@@ -1,9 +1,18 @@
 'use client';
 
 const TEXT_COLOR = {
-  black1: '#222222',
-  gray1: '#909090',
-  gray2: '#222222CC',
+  black1: '#222',
+  gray1: '#222222cc',
+  gray2: '#22222280',
+  gray3: '#333',
+  gray4: '#4e4e4e',
+  gray5: '#00000057',
+  lightGray1: '#a7a7a7',
+  lightGray2: '#f4f4f4',
+  white: '#fff',
+  red1: '#ef6253',
+  red2: '#ff4757',
+  green1: '#41b979',
 };
 
 interface IProps {
@@ -12,12 +21,55 @@ interface IProps {
   size?: number;
   color?: keyof typeof TEXT_COLOR;
   weight?: 400 | 500 | 600 | 700;
+  className?: string;
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
+  paddingTop?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
+  paddingRight?: number;
 }
 
-const Text = ({ children, tag = 'p', size = 1.4, color = 'black1', weight = 400 }: IProps) => {
+const Text = ({
+  children,
+  tag = 'p',
+  size = 1.4,
+  color = 'black1',
+  weight = 400,
+  className,
+  marginTop = 0,
+  marginBottom = 0,
+  marginLeft = 0,
+  marginRight = 0,
+  paddingTop = 0,
+  paddingBottom = 0,
+  paddingLeft = 0,
+  paddingRight = 0,
+}: IProps) => {
   const Tag = tag;
 
-  return <Tag style={{ fontSize: size + 'rem', color: TEXT_COLOR[color], fontWeight: weight }}>{children}</Tag>;
+  return (
+    <Tag
+      className={className}
+      style={{
+        fontSize: size + 'rem',
+        color: TEXT_COLOR[color],
+        fontWeight: weight,
+        marginTop: marginTop,
+        marginBottom: marginBottom,
+        marginLeft: marginLeft,
+        marginRight: marginRight,
+        paddingTop: paddingTop,
+        paddingBottom: paddingBottom,
+        paddingLeft: paddingLeft,
+        paddingRight: paddingRight,
+      }}
+    >
+      {children}
+    </Tag>
+  );
 };
 
 export default Text;
