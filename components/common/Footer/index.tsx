@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import styles from '@/components/common/footer/footer.module.scss';
+import styles from './footer.module.scss';
 import { DEFAULT_ACTIVE_TAB } from '@/constraint/footer';
 import { getFooterTabs } from '@/utils/footer/index';
 import { TabId } from '@/types/footer';
