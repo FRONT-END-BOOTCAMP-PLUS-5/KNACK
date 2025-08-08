@@ -67,7 +67,7 @@ export default function CheckoutPage() {
             ; (async () => {
                 try {
                     const ids = checkout.map(c => c.productId)
-                    const { data } = await requester.post('/api/products/batch', { ids })
+                    const { data } = await requester.post('/api/products', { ids })
                     const results = data.results as (IProduct | null)[]
 
                     const items: OrderItem[] = results.flatMap((p, i) =>
@@ -128,9 +128,14 @@ export default function CheckoutPage() {
         () => orderItems.reduce((sum, it) => sum + it.price * it.quantity, 0),
         [orderItems]
     )
+    const couponAmount = 0 // 쿠폰 도입 시 교체
+    const totalBeforePoints = useMemo(
+        () => Math.max(0, priceWithoutDelivery + deliveryFee - couponAmount),
+        [priceWithoutDelivery, deliveryFee, couponAmount]
+    )
     const totalPrice = useMemo(
-        () => Math.max(0, priceWithoutDelivery + deliveryFee - points),
-        [priceWithoutDelivery, deliveryFee, points]
+        () => Math.max(0, totalBeforePoints - points),
+        [totalBeforePoints, points]
     )
 
     // ----- save request message -----
@@ -197,8 +202,9 @@ export default function CheckoutPage() {
             />
 
             <PointSection
-                availablePoints={100000 /* 예시 */}
-                onChange={(p) => setPoints(Math.max(0, p))}
+                availablePoints={100000 /* 보유 포인트 */}
+                maxUsablePoints={totalBeforePoints}              // 🔥 추가
+                onChange={(p) => setPoints(Math.max(0, Math.min(p, totalBeforePoints)))} // 🔥 캡 적용
             />
 
             <FinalOrderSummary

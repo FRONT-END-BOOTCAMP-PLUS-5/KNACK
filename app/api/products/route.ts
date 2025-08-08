@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       }
     )
   } catch (err) {
-    console.error('products/batch error:', err)
+    console.error('products error:', err)
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
   }
 }

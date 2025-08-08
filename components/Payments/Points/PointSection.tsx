@@ -3,23 +3,28 @@
 import { useState } from 'react'
 import styles from './PointSection.module.scss'
 
-interface PointSectionProps {
+type PointSectionProps = {
     availablePoints: number
-    onChange: (points: number) => void
+    maxUsablePoints: number
+    onChange: (value: number) => void
 }
 
-export default function PointSection({ availablePoints, onChange }: PointSectionProps) {
+export default function PointSection({ availablePoints, maxUsablePoints, onChange }: PointSectionProps) {
     const [showModal, setShowModal] = useState(false)
-    const [inputValue, setInputValue] = useState<number | string>('');
+    const [inputValue, setInputValue] = useState<string>('')
 
     const MIN_POINT_USAGE = 1000
+    const clamp = (n: number) =>
+        Math.max(0, Math.min(n, Math.min(availablePoints, maxUsablePoints)))
 
     const handleMaxUse = () => {
-        if (availablePoints >= MIN_POINT_USAGE) {
-            setInputValue(availablePoints)
-        } else {
+        const cap = Math.min(availablePoints, maxUsablePoints)
+        if (cap < MIN_POINT_USAGE) {
             alert(`${MIN_POINT_USAGE.toLocaleString()}P 이상부터 사용할 수 있습니다.`)
+            return
         }
+        setInputValue(String(cap))
+        onChange(cap)
     }
 
     return (
@@ -27,39 +32,31 @@ export default function PointSection({ availablePoints, onChange }: PointSection
             <div className={styles.point_header}>
                 <label>포인트</label>
                 <div className={styles.available_points}>
-                    <button onClick={() => setShowModal(true)} className={styles.infoButton}>
-                        ⓘ
-                    </button>
+                    <button onClick={() => setShowModal(true)} className={styles.infoButton}>ⓘ</button>
                     <span>{availablePoints.toLocaleString()}P</span>
                 </div>
             </div>
 
             <div className={styles.input_group}>
                 <input
-                    type="text" // ✅ number 대신 text 사용
-                    inputMode="numeric" // ✅ 모바일 키패드 숫자 전용
-                    pattern="[0-9]*"    // ✅ 숫자만 허용 (폼 제출 시)
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     placeholder="0"
                     value={inputValue}
                     onChange={(e) => {
-                        let raw = e.target.value;
-
-                        // 숫자 이외 문자 제거
-                        raw = raw.replace(/\D/g, '');
-
-                        // 앞자리 0 제거 (단, 전체 지우는 건 허용)
-                        if (raw.length > 1 && raw.startsWith('0')) {
-                            raw = raw.replace(/^0+/, '');
-                        }
-
-                        // 최대 사용 가능 포인트 제한
-                        const num = Math.min(Number(raw || '0'), availablePoints);
-
-                        setInputValue(num === 0 ? '' : String(num)); // 0이면 공란 처리
-                        onChange(num); // 부모로는 숫자 전달
+                        let raw = e.target.value.replace(/\D/g, '')
+                        if (raw.length > 1) raw = raw.replace(/^0+/, '')
+                        const num = clamp(Number(raw || '0'))
+                        setInputValue(num === 0 ? '' : String(num))
+                        onChange(num)
                     }}
                 />
-                <button onClick={handleMaxUse} disabled={availablePoints < MIN_POINT_USAGE}>
+                <button
+                    onClick={handleMaxUse}
+                    // 최소 사용 조건을 버튼 비활성에도 반영하려면 다음처럼:
+                    disabled={Math.min(availablePoints, maxUsablePoints) < MIN_POINT_USAGE}
+                >
                     최대 사용
                 </button>
             </div>
