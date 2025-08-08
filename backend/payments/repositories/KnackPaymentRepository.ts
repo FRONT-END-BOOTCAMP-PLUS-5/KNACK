@@ -55,7 +55,7 @@ export class KnackPaymentRepository implements PaymentRepository {
       price: data.price ?? 0,
       createdAt: data.createdAt ?? new Date(),
       paymentNumber: data.paymentNumber,
-      tossPaymentKey: data.tossPaymentKey ?? 0,
+      tossPaymentKey: data.tossPaymentKey ?? null,
       approvedAt: data.approvedAt ?? new Date(),
       method: data.method,
       status: data.status as 'DONE' | 'CANCELED',
