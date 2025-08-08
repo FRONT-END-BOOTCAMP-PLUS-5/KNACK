@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth'
 import { KnackAddressRepository } from '@/backend/address/repositories/KnackAddressRepository'
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
@@ -11,7 +11,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         }
 
         const repo = new KnackAddressRepository()
-        const id = parseInt(params.id, 10)
+        const resolvedParams = await params
+        const id = parseInt(resolvedParams.id, 10)
 
         const address = await repo.getById(id)
         if (!address || address.userId !== session.user.id) {

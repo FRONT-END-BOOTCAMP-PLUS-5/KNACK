@@ -26,6 +26,12 @@
     margin-bottom: 12px;
 }
 
+.product_list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; // 상품 간 간격
+}
+
 .switch {
     position: relative;
     width: 40px;

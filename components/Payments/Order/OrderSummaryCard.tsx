@@ -10,16 +10,13 @@ export default function OrderSummaryCard() {
     const {
         orderItems,
         deliveryType,
-        deliveryFee,
         setDeliveryType,
         getTotalPrice,
     } = useOrderStore()
 
     const totalPrice = getTotalPrice()
 
-    if (!orderItems.length) return <div>주문 상품이 없습니다.</div>
-
-    const product = orderItems[0] // 현재 단일 상품 가정
+    if (!orderItems?.length) return <div>주문 상품이 없습니다.</div>
 
     return (
         <div className={styles.card}>
@@ -36,23 +33,28 @@ export default function OrderSummaryCard() {
                 </label>
             </div>
 
-            <div className={styles.product_box}>
-                <Image
-                    src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${product.thumbnail_image}`}
-                    alt={product.kor_name}
-                    className={styles.image}
-                    width={80}
-                    height={80}
-                />
-                <div className={styles.details}>
-                    <div className={styles.name}>{product.eng_name}</div>
-                    <div className={styles.subtitle}>{product.kor_name}</div>
-                    <div className={styles.model}>상품번호: #{product.productId}</div>
-                    <div className={styles.points}>240 / 빠른배송</div>
-                </div>
-                <div className={styles.price}>
-                    {(product.price * product.quantity).toLocaleString()}원
-                </div>
+            {/* ✅ 여러 상품 리스트 */}
+            <div className={styles.product_list}>
+                {orderItems.map((item, idx) => (
+                    <div className={styles.product_box} key={`${item.productId}-${idx}`}>
+                        <Image
+                            src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${item.thumbnail_image}`}
+                            alt={item.kor_name ?? item.eng_name ?? `product-${item.productId}`}
+                            className={styles.image}
+                            width={80}
+                            height={80}
+                        />
+                        <div className={styles.details}>
+                            <div className={styles.name}>{item.eng_name ?? ''}</div>
+                            <div className={styles.subtitle}>{item.kor_name ?? ''}</div>
+                            <div className={styles.model}>상품번호: #{item.productId}</div>
+                            <div className={styles.points}>수량 {item.quantity}개</div>
+                        </div>
+                        <div className={styles.price}>
+                            {(item.price * item.quantity).toLocaleString()}원
+                        </div>
+                    </div>
+                ))}
             </div>
 
             <div className={styles.delivery}>
@@ -69,7 +71,7 @@ export default function OrderSummaryCard() {
                     <span className={styles.custom_radio}></span>
                     <div className={styles.radio_text}>
                         <div className={styles.main}>빠른배송</div>
-                        <div className={styles.sub}>검수 완료 · 내일 8/8(금) 도착 예정</div>
+                        <div className={styles.sub}>검수 완료 · 내일 도착 예정</div>
                     </div>
                 </label>
 

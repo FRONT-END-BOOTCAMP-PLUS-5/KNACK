@@ -35,10 +35,12 @@ export default function CheckoutPage() {
         const initializeCheckout = async () => {
             try {
                 const checkout = [
-                    { productId: 5, quantity: 1, optionValueId: 5, deliveryMethod: 'normal' }
-                ];
+                    { productId: 5, quantity: 1, optionValueId: 5, deliveryMethod: 'normal' },
+                    { productId: 6, quantity: 1, optionValueId: 6, deliveryMethod: 'normal' },
+                ]
+                // const checkout = JSON.parse(localStorage.getItem('checkout') || '[]')
 
-                const ids = checkout.map(c => c.productId)
+                const ids = checkout.map((c) => c.productId)
                 const { data } = await requester.post('/api/products', { ids })
                 console.log(data.results)
                 const results = data.results as (IProduct | null)[]
@@ -51,6 +53,8 @@ export default function CheckoutPage() {
                             quantity: checkout[i].quantity,
                             thumbnail_image: p.thumbnailImage,
                             deliveryType: checkout[i].deliveryMethod,
+                            kor_name: p.korName,
+                            eng_name: p.engName,
                         }]
                         : []
                 )

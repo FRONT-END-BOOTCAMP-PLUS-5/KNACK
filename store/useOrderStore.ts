@@ -3,6 +3,8 @@ import { create } from 'zustand'
 type DeliveryType = 'FAST' | 'STOCK'
 
 export interface OrderItem {
+    eng_name: string
+    kor_name: string
     productId: number
     price: number
     quantity: number
