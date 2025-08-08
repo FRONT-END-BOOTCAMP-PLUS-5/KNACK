@@ -33,7 +33,7 @@ export default function CheckoutPage() {
     // ✅ 최초 진입 시 mock 데이터 저장
     useEffect(() => {
         const mockProduct = {
-            productId: 3,
+            productId: 4,
             kor_name: '리바이스 x 오아시스 데카 로고 티셔츠 블랙',
             eng_name: "Levi's x Oasis Deca Logo T-Shirt Black",
             price: 64000,

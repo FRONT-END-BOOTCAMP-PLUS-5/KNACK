@@ -71,7 +71,7 @@ export class KnackPaymentRepository implements PaymentRepository {
             price: data.price ?? 0,
             createdAt: data.createdAt ?? new Date(),
             paymentNumber: data.paymentNumber,
-            tossPaymentKey: data.tossPaymentKey,
+            tossPaymentKey: data.tossPaymentKey ?? '',
             approvedAt: data.approvedAt ?? new Date(),
             method: data.method,
             status: data.status as 'DONE' | 'CANCELED',
@@ -106,5 +106,34 @@ export class KnackPaymentRepository implements PaymentRepository {
 
         const paymentNumber = base + nextSequence
         return paymentNumber
+    }
+
+    // ✅ 실패 저장 (paymentKey 없음)
+    async createFailedPayment(params: {
+        params: CreatePaymentDto
+    }): Promise<void> {
+        const { userId, addressId, method, price = 0, orderIds = [] } = params.params
+
+        await prisma.$transaction(async (tx) => {
+            const payment = await tx.payment.create({
+                data: {
+                    userId,
+                    addressId,
+                    method,
+                    price,
+                    status: "FAILED",
+                    tossPaymentKey: null,
+                    approvedAt: null,
+                    paymentNumber: await this.generateTodayPaymentNumber(),
+                },
+            })
+
+            if (orderIds.length > 0) {
+                await tx.order.updateMany({
+                    where: { id: { in: orderIds } },
+                    data: { paymentId: payment.id },
+                })
+            }
+        })
     }
 }

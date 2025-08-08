@@ -24,4 +24,8 @@ export interface PaymentRepository {
     updateStatusByTossPaymentKey(tossPaymentKey: string, status: string): Promise<void>
 
     generateTodayPaymentNumber(): Promise<number>
+
+    createFailedPayment(params: {
+        params: CreatePaymentDto
+    }): Promise<void>
 }
