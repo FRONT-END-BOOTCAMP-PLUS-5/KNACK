@@ -1,0 +1,52 @@
+.bottom_fix_wrap {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  padding: 12px;
+  transform: translateX(-50%);
+  max-width: 440px;
+  width: 100%;
+
+  & .contents {
+    height: 48px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    & .icon_wrap {
+      width: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    & .buy_button {
+      display: flex;
+      background: $red01;
+      border: none;
+      border-radius: 10px;
+      height: 100%;
+      align-items: center;
+      flex: 1;
+
+      & .but_text {
+        width: 44px;
+        border-right: 1px solid rgba(34, 34, 34, 0.1);
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      & .price {
+        flex: 1;
+        text-align: left;
+      }
+    }
+  }
+}

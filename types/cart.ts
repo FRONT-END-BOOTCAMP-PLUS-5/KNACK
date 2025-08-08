@@ -1,4 +1,4 @@
-import { IProduct, IProductOptionMapping } from './product';
+import { IProduct } from './product';
 
 export interface CartRef {
   userId: string;
