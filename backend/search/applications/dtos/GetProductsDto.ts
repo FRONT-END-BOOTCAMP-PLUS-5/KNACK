@@ -3,7 +3,7 @@ import { SortOption } from '@/backend/search/domains/entities/ProductFilters';
 export interface GetProductsRequestDto {
   keyword?: string;
 
-  color?: string;
+  keywordColorId?: number;
   brandId?: number;
   categoryId?: number;
   subCategoryId?: number;
@@ -13,6 +13,8 @@ export interface GetProductsRequestDto {
   discountMax?: number;
   // size?: string;
   benefit?: 'under_price';
+  gender?: string;
+  soldOutInvisible?: boolean;
 
   sort?: SortOption;
 
@@ -45,7 +47,6 @@ export interface ProductDto {
   hit: number;
   engName: string;
   korName: string;
-
   brand: Brand;
   categories: Category[];
   subCategories: SubCategory[];

@@ -15,7 +15,7 @@ export default async function Search({
 
   const queryParams = {
     keyword: params.keyword,
-    color: params.color,
+    keywordColorId: params.keywordColorId,
     brandId: params.brandId,
     categoryId: params.categoryId,
     subCategoryId: params.subCategoryId,
@@ -24,9 +24,11 @@ export default async function Search({
     discountMin: params.discountMin,
     discountMax: params.discountMax,
     benefit: params.benefit,
+    gender: params.gender,
     sort: params.sort,
     cursor: params.cursor,
     limit: params.limit,
+    soldOutInvisible: params.soldOutInvisible,
   };
 
   for (const [key, value] of Object.entries(queryParams)) {

@@ -27,7 +27,6 @@ export class PrProductsRepository implements ProductSearchRepository {
     };
 
     if (filters) {
-      // 키워드 검색 (상품명, 설명에서 검색)
       if (filters.keyword) {
         whereConditions.OR = [
           { korName: { contains: filters.keyword, mode: 'insensitive' } },
@@ -66,7 +65,22 @@ export class PrProductsRepository implements ProductSearchRepository {
       if (filters.benefit === 'under_price') {
         whereConditions.discountPercent = { gt: 0 };
       }
-      //TODO: keywordColor, gender 필터링 추가
+
+      if (filters.keywordColorId) {
+        whereConditions.keywordColorId = filters.keywordColorId;
+      }
+      if (filters.gender) {
+        whereConditions.gender = filters.gender;
+      }
+      if (filters.soldOutInvisible) {
+        whereConditions.NOT = {
+          productStockMapping: {
+            every: {
+              stock: 0,
+            },
+          },
+        };
+      }
     }
 
     // ORDER BY 조건 구성

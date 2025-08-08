@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const requestDto: GetProductsRequestDto = {
       keyword: searchParams.get('keyword') || undefined,
 
-      color: searchParams.get('color') || undefined,
+      keywordColorId: searchParams.get('keywordColorId') ? parseInt(searchParams.get('keywordColorId')!) : undefined,
       brandId: searchParams.get('brandId') ? parseInt(searchParams.get('brandId')!) : undefined,
       categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
       subCategoryId: searchParams.get('subCategoryId') ? parseInt(searchParams.get('subCategoryId')!) : undefined,
@@ -22,6 +22,8 @@ export async function GET(request: NextRequest) {
       discountMax: searchParams.get('discountMax') ? parseInt(searchParams.get('discountMax')!) : undefined,
       // size: searchParams.get('size') || undefined,
       benefit: (searchParams.get('benefit') as 'under_price') || undefined,
+      gender: searchParams.get('gender') || undefined,
+      soldOutInvisible: searchParams.get('soldOutInvisible') === 'true' ? true : false,
 
       sort: (searchParams.get('sort') as SortOption) || 'latest',
 
