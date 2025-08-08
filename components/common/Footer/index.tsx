@@ -1,18 +1,36 @@
 'use client';
 
 import { useState } from 'react';
-import styles from '@/components/common/footer/footer.module.scss';
+import { useRouter } from 'next/navigation';
+import styles from './footer.module.scss';
 import { DEFAULT_ACTIVE_TAB } from '@/constraint/footer';
 import { getFooterTabs } from '@/utils/footer/index';
 import { TabId } from '@/types/footer';
 
 export default function Footer() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>(DEFAULT_ACTIVE_TAB);
 
   const handleTabClick = (tab: TabId) => {
     setActiveTab(tab);
-    // 페이지 이동 대신 현재는 탭 상태만 변경
-    console.log(`${tab} 탭 클릭됨`);
+    
+    // 페이지 이동
+    switch (tab) {
+      case 'HOME':
+        router.push('/');
+        break;
+      case 'SHOP':
+        router.push('/search');
+        break;
+      case 'SAVED':
+        router.push('/cart');
+        break;
+      case 'MY':
+        router.push('/my');
+        break;
+      default:
+        break;
+    }
   };
 
   const tabs = getFooterTabs();
