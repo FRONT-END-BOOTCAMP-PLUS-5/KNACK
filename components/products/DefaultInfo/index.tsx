@@ -1,6 +1,9 @@
+'use client';
+
 import styles from './defaultInfo.module.scss';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
+import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import { IProduct } from '@/types/productDetail';
 
 interface IProps {
@@ -8,6 +11,8 @@ interface IProps {
 }
 
 const DefaultInfo = ({ data }: IProps) => {
+  const { onOpen } = useBottomSheetStore();
+
   return (
     <article className={styles.default_info}>
       <Flex direction="column" gap={2}>
@@ -34,7 +39,9 @@ const DefaultInfo = ({ data }: IProps) => {
           <Text size={1.3}>리뷰 {data?._count?.reviews}</Text>
         </Flex>
       </Flex>
-      <button className={styles.size_open_button}>모든 사이즈</button>
+      <button className={styles.size_open_button} onClick={onOpen}>
+        모든 사이즈
+      </button>
       <Flex className={styles.origin_info_box} paddingVertical={20}>
         <Flex direction="column" gap={4} width="self">
           <Text color="gray2" size={1.2}>
