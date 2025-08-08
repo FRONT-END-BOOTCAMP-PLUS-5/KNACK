@@ -1,12 +1,26 @@
 // 📁 app/payments/failure/page.tsx
 'use client'
-import { useEffect, useMemo, useRef } from 'react'
+
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import requester from '@/utils/requester' // axios 인스턴스 import
+import requester from '@/utils/requester'
 import styles from './FailPage.module.scss'
 import { useSession } from 'next-auth/react'
-import { useOrderStore } from '@/store/useOrderStore'
-import { useAddressStore } from '@/store/useAddressStore'
+
+type OrderItem = {
+    productId: number
+    price: number
+    quantity: number
+    deliveryType?: string // 'FAST' | 'STOCK' | 'fast' | 'normal' 등 들어올 수 있음
+}
+
+type SelectedAddress = {
+    id: number
+    name: string
+    phone?: string
+    fullAddress?: string
+    request?: string
+} | null
 
 export default function PaymentFail() {
     const sp = useSearchParams()
@@ -21,40 +35,48 @@ export default function PaymentFail() {
         [sp]
     )
 
-    const { orderItems, setOrderItems, deliveryFee } = useOrderStore()
-    const { selectedAddress, setSelectedAddress } = useAddressStore()
+    const [orderItems, setOrderItems] = useState<OrderItem[]>([])
+    const [selectedAddress, setSelectedAddress] = useState<SelectedAddress>(null)
+    const [deliveryFee, setDeliveryFee] = useState<number>(0)
 
-    // ✅ 1. sessionStorage에서 상태 복구
+    // sessionStorage에서 복구
     useEffect(() => {
-        const rawItems = sessionStorage.getItem('orderItems')
-        const rawAddress = sessionStorage.getItem('selectedAddress')
+        try {
+            const rawItems = sessionStorage.getItem('orderItems')
+            if (rawItems) {
+                const parsed: OrderItem[] = JSON.parse(rawItems)
+                setOrderItems(parsed)
 
-        if (rawItems) {
-            try {
-                setOrderItems(JSON.parse(rawItems))
-            } catch (e) {
-                console.error('❌ orderItems 파싱 실패:', e)
+                // 배송비 계산: FAST/fast/normal 이 하나라도 있으면 5,000원, 아니면 0원
+                const hasFast =
+                    parsed.some(it =>
+                        ['FAST', 'fast', 'normal'].includes(String(it.deliveryType || '').toLowerCase())
+                    )
+                setDeliveryFee(hasFast ? 5000 : 0)
             }
+        } catch (e) {
+            console.error('❌ orderItems 파싱 실패:', e)
         }
 
-        if (rawAddress) {
-            try {
-                setSelectedAddress(JSON.parse(rawAddress))
-            } catch (e) {
-                console.error('❌ selectedAddress 파싱 실패:', e)
-            }
+        try {
+            const rawAddress = sessionStorage.getItem('selectedAddress')
+            if (rawAddress) setSelectedAddress(JSON.parse(rawAddress))
+        } catch (e) {
+            console.error('❌ selectedAddress 파싱 실패:', e)
         }
-    }, [setOrderItems, setSelectedAddress])
+    }, [])
 
     const hasRun = useRef(false)
 
     useEffect(() => {
         const sendFailLog = async () => {
             if (!session?.user || !selectedAddress?.id || hasRun.current) return
-
             hasRun.current = true
 
             try {
+                const priceSum =
+                    orderItems.reduce((acc, cur) => acc + cur.price * cur.quantity, 0) + deliveryFee
+
                 await requester.post('/api/payments/fail', {
                     orderIds: orderId ? [Number(orderId)] : [],
                     failureCode: code,
@@ -62,8 +84,7 @@ export default function PaymentFail() {
                     method: 'TOSS',
                     userId: session.user.id,
                     addressId: selectedAddress.id,
-                    price: orderItems.reduce((acc, cur) => acc + cur.price * cur.quantity, 0) + deliveryFee,
-                    // 필요한 경우 userId, addressId, price 등 보강
+                    price: priceSum,
                 })
             } catch (err) {
                 console.error('결제 실패 로그 저장 오류:', err)
@@ -81,7 +102,7 @@ export default function PaymentFail() {
                 <p>{message ?? '잠시 후 다시 시도해 주세요.'}</p>
                 <button
                     className={styles.retry_btn}
-                    onClick={() => window.location.href = '/cart'}
+                    onClick={() => (window.location.href = '/cart')}
                 >
                     장바구니로 돌아가기
                 </button>
