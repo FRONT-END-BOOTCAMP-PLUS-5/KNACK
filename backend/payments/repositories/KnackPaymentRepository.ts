@@ -1,9 +1,9 @@
 // 📁 backend/infrastructure/db/PrismaPaymentRepository.ts
-import { PrismaClient } from '@prisma/client'
-import { PaymentRepository } from '@/backend/payments/domains/repositories/PaymentRepository'
-import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto'
+import { PrismaClient } from '@prisma/client';
+import { PaymentRepository } from '@/backend/payments/domains/repositories/PaymentRepository';
+import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 export class KnackPaymentRepository implements PaymentRepository {
 
@@ -45,14 +45,14 @@ export class KnackPaymentRepository implements PaymentRepository {
         await prisma.order.updateMany({
             where: { id: { in: orderIds } },
             data: { paymentId },
-        })
+        });
     }
 
     async updateStatusByTossPaymentKey(tossPaymentKey: string, status: string): Promise<void> {
         await prisma.payment.update({
             where: { tossPaymentKey }, // 🔧 paymentNumber → TossPaymentKey로 수정
             data: { status },
-        })
+        });
     }
 
     async findByTossPaymentKey(tossPaymentKey: string): Promise<CreatePaymentDto | null> {
@@ -61,9 +61,9 @@ export class KnackPaymentRepository implements PaymentRepository {
             include: {
                 orders: { select: { id: true } },
             },
-        })
+        });
 
-        if (!data) return null
+        if (!data) return null;
 
         return {
             userId: data.userId,
