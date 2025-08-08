@@ -22,7 +22,7 @@ export class GetProductsUseCase {
       priceMax: request.priceMax,
       discountMin: request.discountMin,
       discountMax: request.discountMax,
-      // size: request.size,
+      size: request.size,
       benefit: request.benefit,
       gender: request.gender,
       soldOutInvisible: request.soldOutInvisible,

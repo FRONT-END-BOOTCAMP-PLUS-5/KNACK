@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       priceMax: searchParams.get('priceMax') ? parseInt(searchParams.get('priceMax')!) : undefined,
       discountMin: searchParams.get('discountMin') ? parseInt(searchParams.get('discountMin')!) : undefined,
       discountMax: searchParams.get('discountMax') ? parseInt(searchParams.get('discountMax')!) : undefined,
-      // size: searchParams.get('size') || undefined,
+      size: searchParams.get('size') || undefined,
       benefit: (searchParams.get('benefit') as 'under_price') || undefined,
       gender: searchParams.get('gender') || undefined,
       soldOutInvisible: searchParams.get('soldOutInvisible') === 'true' ? true : false,

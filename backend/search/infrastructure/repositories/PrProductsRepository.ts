@@ -81,6 +81,15 @@ export class PrProductsRepository implements ProductSearchRepository {
           },
         };
       }
+      if (filters.size) {
+        whereConditions.productStockMapping = {
+          some: {
+            optionValue: {
+              name: filters.size,
+            },
+          },
+        };
+      }
     }
 
     // ORDER BY 조건 구성
@@ -124,6 +133,11 @@ export class PrProductsRepository implements ProductSearchRepository {
         brand: true,
         category: true,
         subCategory: true,
+        productStockMapping: {
+          select: {
+            stock: true,
+          },
+        },
         _count: {
           select: {
             reviews: true,
@@ -141,33 +155,37 @@ export class PrProductsRepository implements ProductSearchRepository {
     const actualProducts = hasNext ? products.slice(0, limit) : products;
 
     // 응답 데이터 구성
-    const mappedProducts: Product[] = actualProducts.map(
-      (product) =>
-        new Product(
-          product.id,
-          product.thumbnailImage,
-          product.price || 0,
-          product.discountPercent || 0,
-          product.isRecommended,
-          product.hit || 0,
-          product.engName,
-          product.korName,
-          new Brand(product.brand.id, product.brand.korName, product.brand.engName),
-          [new Category(product.category.id, product.category.korName, product.category.engName)],
-          product.subCategory
-            ? [
-                new SubCategory(
-                  product.subCategory.id,
-                  product.subCategory.korName,
-                  product.subCategory.engName,
-                  product.subCategory.categoryId
-                ),
-              ]
-            : [],
-          product._count.reviews,
-          product._count.likes
-        )
-    );
+    const mappedProducts: Product[] = actualProducts.map((product) => {
+      // isSoldOut 계산: 모든 재고가 0이면 true
+      const isSoldOut =
+        product.productStockMapping.length > 0 && product.productStockMapping.every((stock) => stock.stock === 0);
+
+      return new Product(
+        product.id,
+        product.thumbnailImage,
+        product.price || 0,
+        product.discountPercent || 0,
+        product.isRecommended,
+        product.hit || 0,
+        product.engName,
+        product.korName,
+        new Brand(product.brand.id, product.brand.korName, product.brand.engName),
+        [new Category(product.category.id, product.category.korName, product.category.engName)],
+        product.subCategory
+          ? [
+              new SubCategory(
+                product.subCategory.id,
+                product.subCategory.korName,
+                product.subCategory.engName,
+                product.subCategory.categoryId
+              ),
+            ]
+          : [],
+        product._count.reviews,
+        product._count.likes,
+        isSoldOut
+      );
+    });
 
     // 페이지네이션 정보 계산
     const totalCount = await this.prisma.product.count({ where: whereConditions });

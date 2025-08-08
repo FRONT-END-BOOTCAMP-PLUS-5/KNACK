@@ -11,7 +11,7 @@ export class ProductFilters {
     public readonly priceMax?: number,
     public readonly discountMin?: number,
     public readonly discountMax?: number,
-    // public readonly size?: string,
+    public readonly size?: string,
     public readonly benefit?: 'under_price',
     public readonly gender?: string,
     public readonly soldOutInvisible?: boolean

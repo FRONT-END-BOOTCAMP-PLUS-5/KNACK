@@ -12,12 +12,13 @@ export class Product {
     public readonly categories: Category[] = [],
     public readonly subCategories: SubCategory[] = [],
     public readonly reviewsCount: number = 0,
-    public readonly likesCount: number = 0
+    public readonly likesCount: number = 0,
+    public readonly isSoldOut: boolean = false
   ) {}
 }
 
 export class Brand {
-  constructor(public readonly id: number, public readonly korName: string, public readonly engName?: string) {}
+  constructor(public readonly id: number, public readonly korName: string, public readonly engName: string) {}
 }
 
 export class Category {

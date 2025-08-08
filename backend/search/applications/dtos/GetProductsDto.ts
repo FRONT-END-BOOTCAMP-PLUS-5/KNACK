@@ -11,7 +11,7 @@ export interface GetProductsRequestDto {
   priceMax?: number;
   discountMin?: number;
   discountMax?: number;
-  // size?: string;
+  size?: string;
   benefit?: 'under_price';
   gender?: string;
   soldOutInvisible?: boolean;
@@ -52,12 +52,13 @@ export interface ProductDto {
   subCategories: SubCategory[];
   reviewsCount: number;
   likesCount: number;
+  isSoldOut: boolean;
 }
 
 interface Brand {
   id: number;
   korName: string;
-  engName?: string;
+  engName: string;
 }
 
 interface Category {
