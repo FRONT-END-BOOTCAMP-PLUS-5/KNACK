@@ -4,8 +4,8 @@ import { usePathname } from 'next/navigation';
 import { SessionProvider } from 'next-auth/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
-import Header from '@/components/common/Headers';
-import Footer from '@/components/common/Footers';
+import Header from '@/components/common/Header';
+import Footer from '@/components/common/Footer';
 
 interface IProps {
   children: React.ReactNode;
