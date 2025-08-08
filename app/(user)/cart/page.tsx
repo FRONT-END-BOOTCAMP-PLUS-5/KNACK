@@ -103,7 +103,12 @@ const CartPage = () => {
 
   const onClickPayment = () => {
     const checkoutData = selectCarts?.map((item) => {
-      return { productId: item?.id, quantity: 1, optionValueId: item?.optionValueId, deliveryMethod: 'normal' };
+      return {
+        productId: item?.product?.id,
+        quantity: 1,
+        optionValueId: item?.optionValueId,
+        deliveryMethod: 'normal',
+      };
     });
 
     localStorage.setItem('checkout', JSON.stringify(checkoutData));

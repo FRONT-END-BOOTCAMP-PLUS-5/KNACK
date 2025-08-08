@@ -28,7 +28,7 @@ const CartProduct = ({ cartData, selectCarts, addSelectCart, optionOpen, onClick
   const nowPayment = () => {
     const checkoutData = [
       {
-        productId: cartData?.id,
+        productId: cartData?.product?.id,
         quantity: 1,
         optionValueId: cartData?.optionValueId,
         deliveryMethod: 'normal',
@@ -70,8 +70,6 @@ const CartProduct = ({ cartData, selectCarts, addSelectCart, optionOpen, onClick
                 (fItem) => fItem?.id === cartData?.optionValueId
               )[0].name
             }
-
-            {cartData?.optionValueId}
           </p>
         </div>
       </Link>
