@@ -18,10 +18,12 @@ import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import Image from 'next/image';
 import Button from '@/components/common/Button';
+import { useRouter } from 'next/navigation';
 
 const CartPage = () => {
   const { getCart, removeCart, removesCart, upsertCart } = cartService;
   const { onOpen, onClose } = useBottomSheetStore();
+  const router = useRouter();
 
   const [carts, setCarts] = useState<ICart[]>([]);
   const [selectCarts, setSelectCarts] = useState<ICart[]>([]);
@@ -97,6 +99,16 @@ const CartPage = () => {
     onOpen();
     setSelectedCart(selectCart);
     setSelectOptionId(selectCart?.optionValueId);
+  };
+
+  const onClickPayment = () => {
+    const checkoutData = selectCarts?.map((item) => {
+      return { productId: item?.id, quantity: 1, optionValueId: item?.optionValueId, deliveryMethod: 'normal' };
+    });
+
+    localStorage.setItem('checkout', JSON.stringify(checkoutData));
+
+    router.push('/payments/checkout');
   };
 
   const addSelectCart = (selectData: ICart, checked: boolean) => {
@@ -201,7 +213,7 @@ const CartPage = () => {
         </section>
         <Divider />
       </section>
-      <PaymentButton selectCarts={selectCarts} />
+      <PaymentButton selectCarts={selectCarts} onClickPayment={onClickPayment} />
       <ConfirmModal open={deleteOpen} onClose={() => setDeleteOpen(false)} onConfirm={() => handleRemoveCart()}>
         <Flex direction="column" align="center" gap={16}>
           <Text tag="h2" weight={700} size={1.8} color="black1">

@@ -1,3 +1,5 @@
+import { IProductOptionMapping } from './product';
+
 export interface IProduct {
   id: number;
   descriptionText: string | null;
@@ -5,7 +7,7 @@ export interface IProduct {
   subImages: string | null;
   price: number | null;
   discountPercent: number | null;
-  detailContents: string | null;
+  detailImages: string | null;
   isRecommended: boolean;
   createdAt: Date | null;
   gender: string | null;
@@ -14,7 +16,13 @@ export interface IProduct {
   korName: string;
   brand: IBrand;
   category: ICategory;
+  colorKorName: string;
+  colorEngName: string;
+  modelNumber: string | null;
+  releaseDate: string | null;
+  topImages: string | null;
   reviews: IReview[];
+  productOptionMappings: IProductOptionMapping[];
   _count: {
     reviews: number;
   };
