@@ -7,6 +7,7 @@ const TEXT_COLOR = {
   gray3: '#333',
   gray4: '#4e4e4e',
   gray5: '#00000057',
+  gray6: '#22222266',
   lightGray1: '#a7a7a7',
   lightGray2: '#f4f4f4',
   white: '#fff',

@@ -1,6 +1,9 @@
+'use client';
+
 import styles from './defaultInfo.module.scss';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
+import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import { IProduct } from '@/types/productDetail';
 
 interface IProps {
@@ -8,6 +11,8 @@ interface IProps {
 }
 
 const DefaultInfo = ({ data }: IProps) => {
+  const { onOpen } = useBottomSheetStore();
+
   return (
     <article className={styles.default_info}>
       <Flex direction="column" gap={2}>
@@ -34,22 +39,16 @@ const DefaultInfo = ({ data }: IProps) => {
           <Text size={1.3}>리뷰 {data?._count?.reviews}</Text>
         </Flex>
       </Flex>
-      <button className={styles.size_open_button}>모든 사이즈</button>
+      <button className={styles.size_open_button} onClick={onOpen}>
+        모든 사이즈
+      </button>
       <Flex className={styles.origin_info_box} paddingVertical={20}>
         <Flex direction="column" gap={4} width="self">
-          <Text color="gray2" size={1.2}>
-            발매가
-          </Text>
-          <Text color="gray1" size={1.3}>
-            279,000원
-          </Text>
-        </Flex>
-        <Flex direction="column" gap={4} width="self" className={styles.flex_border}>
           <Text color="gray2" size={1.2}>
             모델번호
           </Text>
           <Text color="gray1" size={1.3}>
-            002TM0000
+            {data?.modelNumber}
           </Text>
         </Flex>
         <Flex direction="column" gap={4} width="self" className={styles.flex_border}>
@@ -57,7 +56,7 @@ const DefaultInfo = ({ data }: IProps) => {
             출시일
           </Text>
           <Text color="gray1" size={1.3}>
-            25/07/10
+            {data?.releaseDate}
           </Text>
         </Flex>
         <Flex direction="column" gap={4} width="self" className={styles.flex_border}>
@@ -65,7 +64,7 @@ const DefaultInfo = ({ data }: IProps) => {
             대표 색상
           </Text>
           <Text color="gray1" size={1.3}>
-            Light Blue
+            {data?.colorEngName}
           </Text>
         </Flex>
       </Flex>

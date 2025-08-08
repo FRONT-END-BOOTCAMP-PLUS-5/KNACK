@@ -21,6 +21,7 @@ const ProductsPage = () => {
   const [releaseDate, setReleaseDate] = useState('');
   const [modelNumber, setModelNumber] = useState('');
   const [detailImages, setDetailImages] = useState('');
+  const [keywordColorId, setKeywordColorId] = useState(0);
 
   const createProduct = () => {
     const data = {
@@ -39,6 +40,7 @@ const ProductsPage = () => {
       releaseDate: releaseDate,
       modelNumber: modelNumber,
       detailImages: detailImages,
+      keywordColorId: keywordColorId,
     };
 
     axios
@@ -73,6 +75,11 @@ const ProductsPage = () => {
         <input type="text" placeholder="출시일" onChange={(e) => setReleaseDate(e.target.value)} />
         <input type="text" placeholder="상품 상세이미지" onChange={(e) => setDetailImages(e.target.value)} />
         <input type="text" placeholder="상품 모델 번호" onChange={(e) => setModelNumber(e.target.value)} />
+        <input
+          type="text"
+          placeholder="키워드 색상 아이디"
+          onChange={(e) => setKeywordColorId(Number(e.target.value))}
+        />
       </Flex>
 
       <button onClick={createProduct}>상품 추가하기</button>
