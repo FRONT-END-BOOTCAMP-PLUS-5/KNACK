@@ -17,6 +17,12 @@ declare module "next-auth" {
     name: string;
     nickname: string;
     roles: string[];
+    deletedAt?: Date | null;
+    isActive?: boolean;
+  }
+
+  interface Profile {
+    picture?: string;
   }
 }
 

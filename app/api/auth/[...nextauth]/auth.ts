@@ -1,5 +1,6 @@
-import { Session, User, SessionStrategy } from "next-auth";
+import { Session, User, SessionStrategy, Account, Profile } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { AdapterUser } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { LoginUseCase } from "@/backend/login/applications/usecases/LoginUseCase";
@@ -62,7 +63,11 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }: { user: any; account: any; profile: any }) {
+    async signIn({ user, account, profile }: { 
+      user: AdapterUser | User; 
+      account: Account | null; 
+      profile?: Profile 
+    }) {
       // 소셜 로그인인 경우
       if (account?.provider === 'google') {
         console.log('Google 로그인 시도:', {
