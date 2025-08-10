@@ -17,6 +17,30 @@ export class SocialLoginUseCase {
         throw new Error('탈퇴한 계정입니다.');
       }
       
+      // 기존 사용자의 email이나 name이 비어있으면 업데이트
+      if (!user.email || !user.name) {
+        const updatedUser = await this.socialLoginRepository.updateUser(existingUserAuth.userId, {
+          email: user.email || email,
+          name: user.name || name,
+          nickname: user.nickname || name,
+        });
+        
+        return {
+          success: true,
+          message: '소셜 로그인이 완료되었습니다.',
+          user: {
+            id: updatedUser.id,
+            email: updatedUser.email,
+            name: updatedUser.name,
+            nickname: updatedUser.nickname,
+            roles: ['USER'],
+            deletedAt: updatedUser.deletedAt,
+            isActive: updatedUser.isActive,
+          },
+          isNewUser: false,
+        };
+      }
+      
       return {
         success: true,
         message: '소셜 로그인이 완료되었습니다.',

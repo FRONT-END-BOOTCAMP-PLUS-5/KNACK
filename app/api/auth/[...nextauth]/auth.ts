@@ -83,6 +83,23 @@ export const authOptions = {
         });
         
         try {
+          // 카카오 로그인 시 기본값 설정
+          let email = profile?.email || '';
+          let name = profile?.name || '';
+          
+          if (account.provider === 'kakao') {
+            email = `kakao_${account.providerAccountId}@kakao.com`;
+            name = `카카오사용자_${account.providerAccountId}`;
+          }
+          
+          // email과 name이 비어있으면 기본값 설정
+          if (!email) {
+            email = `${account.provider}_${account.providerAccountId}@${account.provider}.com`;
+          }
+          if (!name) {
+            name = `${account.provider}사용자_${account.providerAccountId}`;
+          }
+  
           // 소셜 로그인 UseCase 실행
           const socialLoginRepository = new PrSocialLoginRepository();
           const socialLoginUseCase = new SocialLoginUseCase(socialLoginRepository);
@@ -90,8 +107,8 @@ export const authOptions = {
           const result = await socialLoginUseCase.execute({
             provider: account.provider,
             providerId: account.providerAccountId,
-            email: profile?.email || '',
-            name: profile?.name || '',
+            email: email,
+            name: name,
             profileImage: profile?.picture,
           });
           
