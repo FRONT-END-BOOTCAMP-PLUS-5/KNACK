@@ -7,7 +7,7 @@ import SearchSort from '@/components/search/SearchSort';
 export default async function Search({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const params = await searchParams;
   const basedUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
@@ -34,7 +34,7 @@ export default async function Search({
 
   for (const [key, value] of Object.entries(queryParams)) {
     if (value) {
-      url.searchParams.set(key, value as string);
+      url.searchParams.set(key, value);
     }
   }
 
