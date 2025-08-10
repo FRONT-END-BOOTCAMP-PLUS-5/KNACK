@@ -8,7 +8,7 @@
 
   .tab_menu_list {
     display: flex;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid $light-gray05;
     flex-wrap: nowrap;
     height: 45px;
     overflow-x: auto;
@@ -28,6 +28,10 @@
       &:first-child {
         margin-left: 0;
       }
+
+      &.active {
+        font-weight: 700;
+      }
     }
 
     .tab_menu_button {
@@ -40,10 +44,6 @@
       outline: none;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
-
-      &.active {
-        font-weight: 700;
-      }
     }
 
     .tab_menu_badge {

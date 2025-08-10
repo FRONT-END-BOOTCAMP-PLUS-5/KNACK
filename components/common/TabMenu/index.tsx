@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import DragScroll from '@/components/common/DragScroll';
-import styles from './tab_menu.module.scss';
+import styles from './tabMenu.module.scss';
 
 interface ITabItem {
   id: number;
@@ -15,9 +15,17 @@ interface IProps {
   onTabSelect: (tabId: number) => void;
   showScrollbar?: boolean;
   autoScroll?: boolean;
+  style?: React.CSSProperties;
 }
 
-export default function TabMenu({ tabs, selectedTab, onTabSelect, showScrollbar = false, autoScroll = true }: IProps) {
+export default function TabMenu({
+  tabs,
+  selectedTab,
+  onTabSelect,
+  showScrollbar = false,
+  autoScroll = true,
+  style,
+}: IProps) {
   const tabRefs = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
@@ -35,7 +43,7 @@ export default function TabMenu({ tabs, selectedTab, onTabSelect, showScrollbar 
   }, [selectedTab, tabs, autoScroll]);
 
   return (
-    <section className={styles.tab_menu_container}>
+    <section className={styles.tab_menu_container} style={style}>
       <DragScroll className={styles.tab_menu_scroll} showScrollbar={showScrollbar}>
         <ul className={styles.tab_menu_list}>
           {tabs.map((item, index) => (
