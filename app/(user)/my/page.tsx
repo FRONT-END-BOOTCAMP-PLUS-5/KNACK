@@ -4,7 +4,10 @@ import { useRouter } from 'next/navigation';
 import styles from './myPage.module.scss';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
-import Button from '@/components/common/Button';
+import Divider from '@/components/common/Divider';
+import BuyList from '@/components/my/BuyList';
+import ActionGrid from '@/components/my/ActionGrid';
+import MyNav from '@/components/my/MyNav';
 
 export default function MyPage() {
   const router = useRouter();
@@ -14,21 +17,31 @@ export default function MyPage() {
   };
 
   return (
-    <main className={styles.my_page}>
+    <section className={styles.my_page}>
       <section>
-        <Flex>
+        <Flex paddingVertical={16} paddingHorizontal={24}>
           <span className={styles.profile_image}>프로필</span>
           <Flex direction="column" width="self">
-            <Text>닉네임</Text>
-            <Text>아이디</Text>
-            <Button style="border" size="medium" text="프로필 관리" />
+            <Text size={1.8} weight={600}>
+              닉네임
+            </Text>
+            <Text size={1.4} color="gray2" marginTop={2}>
+              아이디
+            </Text>
+            <button className={styles.profile_edit_button}>프로필 관리</button>
           </Flex>
         </Flex>
       </section>
+      <Divider />
+      <ActionGrid />
+      <div className={styles.block} />
+      <BuyList />
+      <div className={styles.block} />
+      <MyNav />
 
       <button className={styles.withdrawal_button} onClick={handleWithdrawalClick}>
         회원탈퇴
       </button>
-    </main>
+    </section>
   );
 }

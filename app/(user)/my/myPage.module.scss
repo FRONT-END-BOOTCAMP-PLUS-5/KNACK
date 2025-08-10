@@ -1,7 +1,6 @@
 .my_page {
   min-height: 100vh;
   background-color: #fff;
-  padding: 20px;
 }
 
 .withdrawal_button {
@@ -25,6 +24,10 @@
   }
 }
 
+.block {
+  height: 28px;
+}
+
 .profile_image {
   width: 90px;
   height: 90px;
@@ -34,4 +37,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 12px;
+}
+
+.profile_edit_button {
+  margin-top: 14px;
+  font-size: 1.2rem;
+  background: #fff;
+  border-radius: 10px;
+  height: 34px;
+  border: 1px solid #d3d3d3;
+  padding: 0 14px;
+  color: $gray01;
 }
