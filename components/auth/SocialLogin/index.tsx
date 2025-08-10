@@ -12,9 +12,9 @@ export default function SocialLogin() {
     if (provider === 'google') {
       signIn('google', { callbackUrl: '/' });
     }
-    // 카카오 로그인 (나중에 구현)
+    // 카카오 로그인
     else if (provider === 'kakao') {
-      console.log('카카오 로그인은 아직 구현되지 않았습니다.');
+      signIn('kakao', { callbackUrl: '/' });
     }
   };
 

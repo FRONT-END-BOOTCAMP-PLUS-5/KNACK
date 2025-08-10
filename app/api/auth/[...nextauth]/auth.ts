@@ -3,6 +3,7 @@ import { JWT } from "next-auth/jwt";
 import { AdapterUser } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import KakaoProvider from "next-auth/providers/kakao";
 import { LoginUseCase } from "@/backend/login/applications/usecases/LoginUseCase";
 import { PrLoginRepository } from "@/backend/login/repositories/PrLoginRepository";
 import { SocialLoginUseCase } from "@/backend/auth/applications/usecases/SocialLoginUseCase";
@@ -13,6 +14,10 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    KakaoProvider({
+      clientId: process.env.KAKAO_CLIENT_ID!,
+      clientSecret: process.env.KAKAO_CLIENT_SECRET!,
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -69,8 +74,8 @@ export const authOptions = {
       profile?: Profile 
     }) {
       // 소셜 로그인인 경우
-      if (account?.provider === 'google') {
-        console.log('Google 로그인 시도:', {
+      if (account?.provider === 'google' || account?.provider === 'kakao') {
+        console.log(`${account.provider} 로그인 시도:`, {
           provider: account.provider,
           providerAccountId: account.providerAccountId,
           email: profile?.email,
