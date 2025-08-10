@@ -31,6 +31,7 @@ interface IProps {
   paddingBottom?: number;
   paddingLeft?: number;
   paddingRight?: number;
+  style?: React.CSSProperties;
 }
 
 const Text = ({
@@ -48,6 +49,7 @@ const Text = ({
   paddingBottom = 0,
   paddingLeft = 0,
   paddingRight = 0,
+  style,
 }: IProps) => {
   const Tag = tag;
 
@@ -66,6 +68,7 @@ const Text = ({
         paddingBottom: paddingBottom,
         paddingLeft: paddingLeft,
         paddingRight: paddingRight,
+        ...style,
       }}
     >
       {children}
