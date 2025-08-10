@@ -1,0 +1,61 @@
+.tab_menu_container {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  .tab_menu_list {
+    display: flex;
+    border-bottom: 1px solid #f0f0f0;
+    flex-wrap: nowrap;
+    height: 45px;
+    overflow-x: auto;
+    padding: 0 16px;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overflow-y: hidden;
+
+    .tab_menu_item {
+      position: relative;
+      margin-left: 20px;
+      flex-shrink: 0;
+      font-size: 1.5rem;
+
+      &:first-child {
+        margin-left: 0;
+      }
+    }
+
+    .tab_menu_button {
+      display: inline-flex;
+      height: 100%;
+      padding: 15px 0 0;
+      color: $black;
+      background-color: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+
+      &.active {
+        font-weight: 700;
+      }
+    }
+
+    .tab_menu_badge {
+      padding-left: 2px;
+    }
+  }
+}
+
+.active_border {
+  border-bottom: 2px solid $black;
+  transition: 0.3s;
+  width: 100%;
+  bottom: 0;
+  position: absolute;
+}

@@ -1,8 +1,6 @@
 import { GetProductsResponseDto } from '@/backend/search/applications/dtos/GetProductsDto';
-import SearchBottomSheet from '@/components/search/SearchBottomSheet';
-import SearchFilter from '@/components/search/SearchFilter';
+import SearchCsrWrapper from '@/components/search/SearchCsrWrapper';
 import SearchProductList from '@/components/search/SearchProductList';
-import SearchSort from '@/components/search/SearchSort';
 
 export default async function Search({
   searchParams,
@@ -40,14 +38,11 @@ export default async function Search({
 
   const res = await fetch(url);
   const initialData: GetProductsResponseDto = await res.json();
-  console.log('@@@@@initialData: ' + JSON.stringify(initialData));
 
   return (
     <main>
-      <SearchFilter />
-      <SearchSort />
+      <SearchCsrWrapper />
       <SearchProductList initialData={initialData} />
-      <SearchBottomSheet />
     </main>
   );
 }
