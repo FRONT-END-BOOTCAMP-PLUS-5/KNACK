@@ -1,68 +1,7 @@
 .checkout_container {
-    max-width: 800px;
-    margin: 0 40 40 40px auto;
-    padding: 32px;
     background: transparent;
-    border-radius: 16px;
     font-family: 'Noto Sans KR', sans-serif;
     padding-bottom: 88px;
-
-    h1 {
-        font-size: 28px;
-        font-weight: 700;
-        color: #222;
-        margin-bottom: 32px;
-        text-align: center;
-        position: relative;
-
-    }
-
-    .summary {
-        margin-top: 40px;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end; // ✅ 우측 정렬
-        gap: 16px;
-
-        .total_text {
-            font-size: 20px;
-            font-weight: 500;
-            margin: 0;
-        }
-
-        .total_amount {
-            font-size: 24px;
-            color: #e60023; // 진한 빨강
-            font-weight: bold;
-            margin-left: 6px;
-        }
-
-        button {
-            background-color: #EF6253;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            width: 100%;
-        }
-    }
-
-}
-
-.address_section {
-    border-radius: 12px;
-    margin-bottom: 32px;
-
-    h3 {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: #333;
-
-        padding-left: 12px;
-    }
+    padding: 0rem;
+    margin-top: 44px;
 }

@@ -12,6 +12,8 @@ import FinalOrderSummary from '@/components/Payments/Order/FInalOrderSummary'
 import { AddressDto } from '@/backend/address/applications/dtos/AddressDto'
 import { IProduct } from '@/types/product'
 import AddressModal from '@/components/Address/AddressModal'
+import { formatFullAddress } from '@/utils/openKakaoPostCode'
+import RequestModal from '@/components/Address/RequestModal'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
 
@@ -32,6 +34,14 @@ type OrderItem = {
     eng_name?: string
 }
 
+type AddressDtoWithPostalFields = AddressDto & {
+    postalCode?: string;
+    postCode?: string;
+    zipcode?: string;
+    zipCode?: string;
+    zonecode?: string;
+};
+
 export default function CheckoutPage() {
     // ----- Local UI States (Zustand 제거) -----
     const [checkout, setCheckout] = useState<CheckoutRow[]>([])
@@ -45,8 +55,10 @@ export default function CheckoutPage() {
         phone: string
         fullAddress: string
         request: string
+        postalCode?: string;
     } | null>(null)
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
+    const [isReqOpen, setReqOpen] = useState(false);
 
     // ----- load checkout from localStorage -----
     useEffect(() => {
@@ -95,27 +107,35 @@ export default function CheckoutPage() {
 
     // ----- fetch default address -----
     useEffect(() => {
-        ; (async () => {
+        (async () => {
             try {
-                const res = await requester.get('/api/addresses')
-                const addresses: AddressDto[] = res.data
-                const def = addresses.find(a => a.isDefault)
+                const res = await requester.get('/api/addresses');
+                const addresses: AddressDto[] = res.data;
+                const def = addresses.find(a => a.isDefault);
                 if (def) {
+                    const zip =
+                        (def as AddressDto & { postalCode?: string; postCode?: string; zipcode?: string; zipCode?: string; zonecode?: string }).postalCode ??
+                        (def as AddressDto & { postalCode?: string; postCode?: string; zipcode?: string; zipCode?: string; zonecode?: string }).postCode ??
+                        (def as AddressDto & { postalCode?: string; postCode?: string; zipcode?: string; zipCode?: string; zonecode?: string }).zipcode ??
+                        (def as AddressDto & { postalCode?: string; postCode?: string; zipcode?: string; zipCode?: string; zonecode?: string }).zipCode ??
+                        (def as AddressDto & { postalCode?: string; postCode?: string; zipcode?: string; zipCode?: string; zonecode?: string }).zonecode ?? '';
+
                     const addr = {
                         id: def.id,
                         name: def.name,
                         phone: def.phone ?? '',
-                        fullAddress: `${def.main} ${def.detail ?? ''}`.trim(),
+                        fullAddress: formatFullAddress(def),    // ✅ [우편번호] + 주소
                         request: def.message ?? '',
-                    }
-                    setSelectedAddress(addr)
-                    sessionStorage.setItem('selectedAddress', JSON.stringify(addr))
+                        postalCode: zip || undefined,
+                    };
+                    setSelectedAddress(addr);
+                    sessionStorage.setItem('selectedAddress', JSON.stringify(addr));
                 }
             } catch (err) {
-                console.error('주소 불러오기 실패', err)
+                console.error('주소 불러오기 실패', err);
             }
-        })()
-    }, [])
+        })();
+    }, []);
 
     // ----- delivery controls -----
     const onChangeDelivery = (type: 'FAST' | 'STOCK') => {
@@ -178,18 +198,19 @@ export default function CheckoutPage() {
         }
     }
 
+    const onOpenRequestModal = () => { setReqOpen(true) };
+
     return (
         <main className={styles.checkout_container}>
-            <section className={styles.address_section}>
-                <AddressBox
-                    selectedAddress={selectedAddress ?? null}
-                    onOpenModal={() => setIsAddressModalOpen(true)}
-                    onChangeRequest={(req) => {
-                        if (!selectedAddress) return
-                        setSelectedAddress({ ...selectedAddress, request: req }) // zustand 업데이트
-                    }}
-                />
-            </section>
+            <AddressBox
+                selectedAddress={selectedAddress ?? null}
+                onOpenModal={() => setIsAddressModalOpen(true)}
+                onOpenRequestModal={() => setReqOpen(true)}
+                onChangeRequest={(req) => {
+                    if (!selectedAddress) return
+                    setSelectedAddress({ ...selectedAddress, request: req }) // zustand 업데이트
+                }}
+            />
 
             {/* 주문 요약 카드: 여러 상품 렌더링하는 버전 사용 */}
             <OrderSummaryCard
@@ -221,10 +242,43 @@ export default function CheckoutPage() {
             {isAddressModalOpen && (
                 <AddressModal
                     onClose={() => setIsAddressModalOpen(false)}
-                    selectedAddress={selectedAddress}
-                    onChangeSelected={setSelectedAddress}
+                    selectedAddress={selectedAddress ? {
+                        ...selectedAddress,
+                        message: selectedAddress.request
+                    } : null}
+                    onChangeSelected={(a) => {
+                        const zip =
+                            (a as unknown as AddressDtoWithPostalFields).postalCode ??
+                            (a as unknown as AddressDtoWithPostalFields).postCode ??
+                            (a as unknown as AddressDtoWithPostalFields).zipcode ??
+                            (a as unknown as AddressDtoWithPostalFields).zipCode ??
+                            (a as unknown as AddressDtoWithPostalFields).zonecode ?? '';
+
+                        const mapped = {
+                            id: a.id,
+                            name: a.name,
+                            phone: a.phone ?? '',
+                            fullAddress: a.fullAddress,   // ✅ Use existing fullAddress property
+                            request: a.message ?? '',
+                            postalCode: zip || undefined,
+                        };
+                        setSelectedAddress(mapped);
+                        sessionStorage.setItem('selectedAddress', JSON.stringify(mapped));
+                    }}
                 />
             )}
+
+            <RequestModal
+                open={isReqOpen}
+                value={selectedAddress?.request ?? ''}
+                onClose={() => setReqOpen(false)}
+                onApply={(next) => {
+                    if (!selectedAddress) return;
+                    const updated = { ...selectedAddress, request: next };
+                    setSelectedAddress(updated);
+                    sessionStorage.setItem('selectedAddress', JSON.stringify(updated));
+                }}
+            />
         </main>
     )
 }

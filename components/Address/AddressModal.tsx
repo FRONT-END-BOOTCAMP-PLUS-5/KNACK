@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import KakaoPostCodeLoader from './KakaoPostCodeLoader'
-import { openKakaoPostcode } from '@/utils/openKakaoPostCode'
+import { formatAddressDisplay, openKakaoPostcode } from '@/utils/openKakaoPostCode'
 import styles from './AddressModal.module.scss'
 import requester from '@/utils/requester'
 
@@ -18,6 +18,7 @@ type ApiAddress = {
 }
 
 export type SelectedAddress = {
+    message: string
     id: number
     name: string
     phone: string
@@ -76,15 +77,19 @@ export default function AddressModal({ onClose, selectedAddress, onChangeSelecte
 
     // 선택
     const handleSelectSaved = (addr: ApiAddress) => {
-        onChangeSelected({
+        const selected = {
             id: addr.id,
             name: addr.name,
             phone: addr.phone ?? '',
-            fullAddress: `${addr.main} ${addr.detail ?? ''}`.trim(),
+            fullAddress: formatAddressDisplay({ zipCode: addr.zipCode, main: addr.main, detail: addr.detail }), // ✅
             request: addr.message ?? '',
-        })
-        onClose()
-    }
+            message: '',
+        };
+        onChangeSelected(selected);
+        // 성공 페이지 등에서 쓰면 세션에도 저장
+        sessionStorage.setItem('selectedAddress', JSON.stringify(selected));   // ✅
+        onClose();
+    };
 
     // 수정 시작
     const handleEdit = (addr: ApiAddress) => {
@@ -105,7 +110,10 @@ export default function AddressModal({ onClose, selectedAddress, onChangeSelecte
             setSavedAddresses(prev => prev.filter(a => a.id !== id))
             // 삭제된 주소가 현재 선택된 주소면 선택 해제
             if (selectedAddress?.id === id) {
-                onChangeSelected?.({ id: 0, name: '', phone: '', fullAddress: '', request: '' })
+                onChangeSelected?.({
+                    id: 0, name: '', phone: '', fullAddress: '', request: '',
+                    message: ''
+                })
             }
         } catch (e) {
             alert('삭제 실패')
@@ -119,47 +127,43 @@ export default function AddressModal({ onClose, selectedAddress, onChangeSelecte
             return
         }
 
-        const payload = {
-            name,
-            phone,
-            zipCode,
-            main: fullAddress,
-            detail, // 상세주소
-            // message는 별도 PATCH(/message)로 관리 중이면 생략
-        }
-
+        const payload = { name, phone, zipCode, main: fullAddress, detail };
         try {
             if (editingAddressId !== null) {
-                const res = await requester.put<ApiAddress>(`/api/addresses/${editingAddressId}`, payload)
-                const saved = res.data
-                setSavedAddresses(prev =>
-                    prev.map(a => (a.id === saved.id ? saved : a))
-                )
-                onChangeSelected({
+                const res = await requester.put<ApiAddress>(`/api/addresses/${editingAddressId}`, payload);
+                const saved = res.data;
+                setSavedAddresses(prev => prev.map(a => (a.id === saved.id ? saved : a)));
+                const selected = {
                     id: saved.id,
                     name: saved.name,
                     phone: saved.phone ?? '',
-                    fullAddress: `${saved.main} ${saved.detail ?? ''}`.trim(),
+                    fullAddress: formatAddressDisplay({ zipCode: saved.zipCode, main: saved.main, detail: saved.detail }), // ✅
                     request: saved.message ?? '',
-                })
+                    message: '',
+                };
+                onChangeSelected(selected);
+                sessionStorage.setItem('selectedAddress', JSON.stringify(selected)); // ✅
             } else {
-                const res = await requester.post<ApiAddress>('/api/addresses', payload)
-                const saved = res.data
-                setSavedAddresses(prev => [saved, ...prev])
-                onChangeSelected({
+                const res = await requester.post<ApiAddress>('/api/addresses', payload);
+                const saved = res.data;
+                setSavedAddresses(prev => [saved, ...prev]);
+                const selected = {
                     id: saved.id,
                     name: saved.name,
                     phone: saved.phone ?? '',
-                    fullAddress: `${saved.main} ${saved.detail ?? ''}`.trim(),
+                    fullAddress: formatAddressDisplay({ zipCode: saved.zipCode, main: saved.main, detail: saved.detail }), // ✅
                     request: saved.message ?? '',
-                })
+                    message: '',
+                };
+                onChangeSelected(selected);
+                sessionStorage.setItem('selectedAddress', JSON.stringify(selected)); // ✅
             }
-            onClose()
-        } catch (error) {
-            console.error('주소 저장 실패:', error)
-            alert('주소 저장에 실패했습니다.')
+            onClose();
+        } catch (e) {
+            console.error('주소 저장 실패:', e);
+            alert('주소 저장에 실패했습니다.');
         }
-    }
+    };
 
     return (
         <div className={styles.modal_overlay}>

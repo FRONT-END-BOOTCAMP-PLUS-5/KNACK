@@ -14,12 +14,14 @@ type SelectedAddress = {
 type Props = {
     selectedAddress: SelectedAddress | null
     onOpenModal: () => void
+    onOpenRequestModal?: () => void;
     onChangeRequest: (request: string) => void
 }
 
 export default function AddressBox({
     selectedAddress,
     onOpenModal,
+    onOpenRequestModal,
     onChangeRequest,
 }: Props) {
     const [request, setRequest] = useState<string>('')
@@ -41,49 +43,41 @@ export default function AddressBox({
     const showCustomInput = request === '직접 입력'
 
     return (
-        <div className={styles.address_box}>
-            <div className={styles.header}>
-                <span className={styles.title}>배송 주소</span>
-                <button className={styles.change_btn} onClick={onOpenModal}>주소 변경</button>
+        <div className={styles.container}>
+            <div className={styles.section_divider} />
+
+            <div className={styles.address_box}>
+                <div className={styles.div_20px} />
+                <div className={styles.header}>
+                    <p className={styles.title}>배송 주소</p>
+                    <button className={styles.change_btn} onClick={onOpenModal}><p className={styles.text_lookup}>주소 변경</p></button>
+                </div>
+                <div className={styles.div_8px} />
+                {selectedAddress ? (
+                    <>
+                        <div className={styles.table}>
+                            <div className={styles.label}><p>받는 분</p></div>
+                            <div className={styles.value}>{selectedAddress.name}</div>
+
+                            <div className={styles.label}><p>연락처</p></div>
+                            <div className={styles.value}>{selectedAddress.phone}</div>
+
+                            <div className={styles.label}><p>주소</p></div>
+                            <div className={styles.value}>{selectedAddress.fullAddress}</div>
+                        </div>
+
+                        <div className={styles.request_row} onClick={onOpenRequestModal}>
+                            <span className={styles.request_text}>{request || '요청사항 없음'}</span>
+                            <span className={styles.chevron} aria-hidden="true" />
+                        </div>
+                    </>
+                ) : (
+                    <p className={styles.no_address}>주소가 선택되지 않았습니다.</p>
+                )}
             </div>
 
-            {selectedAddress ? (
-                <div className={styles.info_box}>
-                    <div><span className={styles.label}>받는 분</span> {selectedAddress.name}</div>
-                    <div><span className={styles.label}>연락처</span> {selectedAddress.phone}</div>
-                    <div><span className={styles.label}>주소</span> {selectedAddress.fullAddress}</div>
-
-                    <div className={styles.select_box}>
-                        <select
-                            className={styles.select}
-                            value={showCustomInput ? '직접 입력' : (request || '')}
-                            onChange={(e) => handleSelectChange(e.target.value)}
-                        >
-                            <option value="">요청사항 없음</option>
-                            <option value="문 앞에 두고 벨 눌러주세요">문 앞에 두고 벨 눌러주세요</option>
-                            <option value="배송 전 연락 부탁드립니다">배송 전 연락 부탁드립니다</option>
-                            <option value="경비실에 맡겨주세요">경비실에 맡겨주세요</option>
-                            <option value="직접 입력">직접 입력</option>
-                        </select>
-
-                        {showCustomInput && (
-                            <input
-                                type="text"
-                                placeholder="요청사항을 입력해주세요"
-                                className={styles.input}
-                                value={request === '직접 입력' ? '' : request}
-                                onChange={(e) => {
-                                    const val = e.target.value
-                                    setRequest(val)
-                                    onChangeRequest(val)
-                                }}
-                            />
-                        )}
-                    </div>
-                </div>
-            ) : (
-                <p className={styles.no_address}>주소가 선택되지 않았습니다.</p>
-            )}
+            {/* 아래쪽 회색 선 */}
+            <div className={styles.section_divider} />
         </div>
     )
 }

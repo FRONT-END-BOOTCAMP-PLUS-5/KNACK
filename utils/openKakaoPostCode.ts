@@ -1,3 +1,5 @@
+import { AddressDto } from "@/backend/address/applications/dtos/AddressDto";
+
 interface DaumPostcode {
     new(options: {
         oncomplete: (data: KakaoPostcodeData) => void;
@@ -50,4 +52,23 @@ export const openKakaoPostcode = (
     }).open()
 }
 
+export const formatFullAddress = (a: AddressDto) => {
+    // DTO에서 어떤 키를 쓰는지 모를 수 있으니 안전하게 후보 모두 체크
+    const zip =
+        (a as AddressDto & { postalCode?: string; postCode?: string; zipcode?: string; zipCode?: string; zonecode?: string }).postalCode ??
+        (a as AddressDto & { postalCode?: string; postCode?: string; zipcode?: string; zipCode?: string; zonecode?: string }).postCode ??
+        (a as AddressDto & { postalCode?: string; postCode?: string; zipcode?: string; zipCode?: string; zonecode?: string }).zipcode ??
+        (a as AddressDto & { postalCode?: string; postCode?: string; zipcode?: string; zipCode?: string; zonecode?: string }).zipCode ??
+        (a as AddressDto & { postalCode?: string; postCode?: string; zipcode?: string; zipCode?: string; zonecode?: string }).zonecode ?? // (카카오 주소)
+        '';
 
+    const zipPart = zip ? `[${zip}] ` : '';
+    const main = a.main ?? '';
+    const detail = (a.detail ?? '').trim();
+    const detailPart = detail ? ` ${detail}` : '';
+
+    return `${zipPart}${main}${detailPart}`.trim();
+}
+
+export const formatAddressDisplay = (a: { zipCode?: string; main: string; detail?: string | null }) =>
+    `${a.zipCode ? `[${a.zipCode}] ` : ''}${a.main}${a.detail ? ` ${a.detail}` : ''}`.trim();

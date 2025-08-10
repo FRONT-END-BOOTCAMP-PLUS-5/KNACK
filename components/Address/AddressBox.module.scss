@@ -1,131 +1,191 @@
-.address_box {
-    font-size: 14px;
+/* AddressBox.module.scss — cleaned & unified */
+
+/* === Tokens === */
+$color-title: #222;
+$color-muted: #909090;
+$color-divider: #f4f4f4;
+$color-border: #ebebeb;
+$color-chip: #fafafa;
+$radius: 10px;
+$pad-x: 16px;
+
+$font-system: Pretendard Variable, Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, Roboto, "Helvetica Neue", "Segoe UI",
+    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic",
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+
+/* === Mixins / Utilities === */
+@mixin system-text {
+    -webkit-text-size-adjust: none;
+    -webkit-font-smoothing: antialiased;
+    font-family: $font-system;
+    font-feature-settings: "frac" 0, "numr" 0;
 }
 
+@mixin clamp($lines: 1) {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $lines;
+    overflow: hidden;
+}
+
+@mixin pill-button($bg, $fg, $border: $color-border) {
+    appearance: none;
+    border: 1px solid $border;
+    background: $bg;
+    color: $fg;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* === Section Dividers / Spacing === */
+.section_divider {
+    height: 8px;
+    background: $color-divider;
+}
+
+.div_20px {
+    height: 20px;
+}
+
+.div_8px {
+    height: 8px;
+}
+
+/* === Container === */
+.address_box {
+    @include system-text;
+    margin: 0 $pad-x;
+    background: #fff;
+}
+
+/* === Header === */
 .header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    gap: 8px;
+    width: 100%;
 
     .title {
+        @include clamp(1);
+        font-weight: 600;
         font-size: 16px;
-        font-weight: bold;
+        color: $color-title;
+        line-height: 1.2;
+        flex: 1 1 auto;
+        min-width: 0;
     }
 
     .change_btn {
-        background: transparent;
-        border: 1px solid #EBEBEB;
-        padding: 6px 12px;
-        border-radius: 4px;
-        font-size: 13px;
-        cursor: pointer;
-    }
-}
+        @include pill-button(#fff, $color-title); // 보더/라운드/기본 패딩 포함
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
 
-.info_box {
-    margin-bottom: 16px;
+        height: 24px;
+        padding: 0 10px; // 좌우 여백만
+        border: 1px solid $color-border; // 연한 테두리
+        border-radius: 999px;
 
-    div {
-        margin-bottom: 6px;
+        /* ✅ 글자 안 잘리게 */
+        width: auto; // 고정 너비 제거
+        max-width: none;
+        white-space: nowrap; // 한 줄 유지
+        overflow: visible; // 잘림 해제
+        text-overflow: clip;
 
-        .label {
-            display: inline-block;
-            min-width: 60px;
-            font-weight: 500;
+        .text_lookup {
+            font-size: 12px;
+            line-height: 1;
+            white-space: nowrap; // 내부도 한 줄 유지
         }
     }
+
+    /* 필요 시 진하게(검정 배경) 쓰는 버전 */
+    .change_btn--primary {
+        @include pill-button(#222, #fff, transparent);
+        height: 24px;
+        padding: 0 10px;
+        white-space: nowrap;
+    }
 }
 
-.address_list {
+/* === Two-column label/value table === */
+.table {
+    @include system-text;
+    color: $color-title;
+    display: grid;
+    row-gap: 4px;
+    width: 100%;
+    grid-template-columns: max-content minmax(0, 1fr); // 라벨폭 + 값폭
+    // ⬅ gap(주황)
+    align-items: start;
+
+}
+
+.label {
+    text-align: left;
+    color: $color-muted;
+    font-size: 14px;
+    line-height: 1.5;
+    column-gap: 2px;
+    margin-right: 8px;
+    width: 84px;
+    align-items: flex-start;
+    display: flex;
+    white-space: nowrap;
+}
+
+.value {
+    color: $color-title;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 2px;
+    color: #222;
+    font-size: 14px;
+    /* ellipsis/줄바꿈 안전장치 */
+    overflow-wrap: anywhere;
+    /* 긴 주소도 옆 칸에서만 줄바꿈 */
+    word-break: keep-all;
+
 }
 
-.address_item {
+/* === Request row (pill) === */
+.request_row {
     display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 10px;
-    border: 1px solid #eaeaea;
-    border-radius: 6px;
-    background-color: #fcfcfc;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8px 0px 16px;
+    padding: 12px 14px;
+    border: 1px solid $color-border;
+    border-radius: $radius;
+    background: #fff;
     cursor: pointer;
 
-    input[type='radio'] {
-        margin-top: 5px;
+    .request_text {
+        font-size: 14px;
+        color: $color-title;
     }
 
-    .address_text {
-        display: flex;
-        flex-direction: column;
-
-        .sub_text {
-            font-size: 13px;
-            color: #666;
-        }
+    .chevron::after {
+        content: '›';
+        font-size: 18px;
+        line-height: 1;
+        color: #333;
     }
 }
 
-.loading,
+/* === Misc === */
 .no_address {
     color: #999;
     font-size: 14px;
-}
-
-.select_box {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 12px;
-
-    .label {
-        font-weight: 600;
-        font-size: 14px;
-        margin-bottom: 4px;
-    }
-
-    .select {
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 14px;
-        background-color: #fff;
-        transition: border 0.2s;
-
-        &:focus {
-            outline: none;
-            border-color: #007aff;
-        }
-    }
-
-    .not_selected {
-        color: #aaa;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 14px;
-        background-color: #fff;
-        transition: border 0.2s;
-    }
-
-    .select option[value=""] {
-        color: #aaa;
-    }
-
-    .input {
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 14px;
-        background-color: #f9f9f9;
-        transition: border 0.2s;
-
-        &:focus {
-            outline: none;
-            border-color: #007aff;
-            background-color: #fff;
-        }
-    }
 }

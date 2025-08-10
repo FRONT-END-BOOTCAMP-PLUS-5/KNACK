@@ -1,192 +1,376 @@
-.card {
-    font-size: 14px;
+/* OrderSummaryCard.module.scss — KREAM mobile replica */
+$title: #222;
+$muted: #a7a7a7;
+$label: #909090;
+$line: #f0f0f0;
+$border: #ebebeb;
+$chip: #fafafa;
+$radius: 10px;
+
+:root {
+    /* 배경 토큰 느낌 */
+    --background-color: #fff;
 }
 
+.divider8 {
+    height: 8px;
+    background: #f4f4f4;
+}
+
+/* === 섹션 래퍼(.layout_list_vertical 대응) === */
+.sectionWrap {
+    background: var(--background-color);
+    overflow: hidden;
+    border-radius: 0 0 $radius $radius;
+    /* 상단 0, 하단만 10 */
+}
+
+/* 섹션 내부 컨텐트 영역 */
+.card {
+    background: #fff;
+}
+
+/* 좌우 패딩은 모든 1단계 섹션 요소에 통일(=KREAM 16px) */
+.header {
+    border-radius: 0px;
+    height: 56px;
+    padding: 16px;
+    background-color: rgb(255, 255, 255);
+}
+
+.coupon_toggle,
+.product_list,
+.delivery,
+.coupon,
+.total_bar,
+.notice,
+.section_title {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+/* ----- 헤더 ----- */
 .header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12px;
+    align-items: center;
+    padding-top: 20px;
+    padding-bottom: 8px;
 
     h3 {
-        font-size: 15px;
-        font-weight: bold;
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: $title;
+    }
+
+    .item_count {
+        font-size: 12px;
+        color: $label;
+        border: 1px solid $border;
+        border-radius: 999px;
+        padding: 4px 8px;
+        background: #fff;
     }
 }
 
-.item_count {
-    font-size: 14px;
-    color: #333;
-}
-
+/* ----- 쿠폰 토글 줄 ----- */
 .coupon_toggle {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    font-size: 13px;
-    margin-bottom: 12px;
-}
+    justify-content: space-between;
+    padding-top: 0;
+    padding-bottom: 8px;
 
-.product_list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px; // 상품 간 간격
-}
-
-.switch {
-    position: relative;
-    width: 40px;
-    height: 22px;
-
-    input {
-        display: none;
+    span {
+        font-size: 13px;
+        color: $muted;
     }
 
-    .slider {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        border-radius: 20px;
+    .switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+
+        input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            background: #e5e5e5;
+            border-radius: 999px;
+
+            &:before {
+                content: "";
+                position: absolute;
+                left: 3px;
+                top: 3px;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: #fff;
+            }
+        }
     }
 }
+
+/* 얇은 1px 라인 (섹션 내부 구분) */
+.hr {
+    height: 1px;
+    background: $line;
+}
+
+/* ----- 상품 리스트 ----- */
+.product_list {}
 
 .product_box {
-    display: flex;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
     gap: 12px;
-    margin-bottom: 16px;
-}
+    padding: 12px 0;
+    border-bottom: 1px solid $line;
 
-.image {
-    width: 80px;
-    height: 80px;
-    border-radius: 6px;
-    object-fit: cover;
-}
-
-.details {
-    flex: 1;
-
-    .name {
-        font-weight: 600;
+    &:last-child {
+        border-bottom: 0;
     }
 
-    .subtitle,
-    .model {
-        color: #777;
-        font-size: 13px;
+    .image {
+        border-radius: $radius;
+        background: #f4f4f4;
+        object-fit: cover;
     }
 
-    .points {
-        font-size: 12px;
-        color: green;
-        margin-top: 4px;
+    .details {
+        min-width: 0;
+        display: grid;
+        gap: 4px;
+        align-content: start;
+
+        .name {
+            font-size: 14px;
+            color: $title;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: $muted;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .model {
+            font-size: 12px;
+            color: $muted;
+        }
+
+        .meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+
+            .size {
+                font-size: 14px;
+                color: $title;
+                font-weight: 700;
+            }
+
+            .meta_sep {
+                color: $title;
+                opacity: .9;
+            }
+
+            .fast {
+                position: relative;
+                font-size: 14px;
+                color: $title;
+                font-weight: 700;
+
+                &::before {
+                    content: "";
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    background: #27c281;
+                    display: inline-block;
+                    margin-right: 6px;
+                    vertical-align: middle;
+                }
+            }
+        }
+    }
+
+    .price_wrap {
+        min-width: 86px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+
+        .price {
+            font-size: 16px;
+            color: $title;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .kebab {
+            border: 0;
+            background: transparent;
+            color: #bbb;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+        }
     }
 }
 
-.price {
-    font-weight: bold;
-    white-space: nowrap;
+/* ----- 섹션 타이틀 ----- */
+.section_title {
+    padding-top: 16px;
+    padding-bottom: 8px;
+    font-size: 14px;
+    color: $title;
+    font-weight: 700;
 }
 
+/* ----- 배송방법(라디오) ----- */
 .delivery {
-    margin-top: 16px;
-
-    .delivery_label {
-        font-weight: 600;
-        margin-bottom: 10px;
-    }
+    padding-bottom: 8px;
 
     .radio_option {
         display: flex;
-        align-items: flex-start;
-        gap: 8px;
-        margin-bottom: 12px;
-        cursor: pointer;
-        position: relative;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
 
-        input[type='radio'] {
-            opacity: 0;
+        input {
             position: absolute;
-            pointer-events: none;
+            opacity: 0;
         }
 
         .custom_radio {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #000;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(34, 34, 34, .2) inset;
             position: relative;
-            flex-shrink: 0;
+            flex: 0 0 24px;
+
+            &::after {
+                content: "";
+                position: absolute;
+                inset: 5px;
+                border-radius: 50%;
+                background: #222;
+                opacity: 0;
+                transition: .15s;
+            }
         }
 
-        input[type='radio']:checked+.custom_radio::after {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background-color: #000;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        input:checked~.custom_radio {
+            box-shadow: 0 0 0 2px #222 inset;
+        }
+
+        input:checked~.custom_radio::after {
+            opacity: 1;
         }
 
         .radio_text {
-            display: flex;
-            justify-content: space-between; // 👉 양쪽 정렬
-            align-items: center;
-            width: 100%; // ✅ 라벨 전체 너비 사용
-
             .main {
-                font-weight: 500;
+                font-size: 14px;
+                color: $title;
+                font-weight: 700;
             }
 
             .sub {
-                font-size: 12px;
-                color: #999;
+                font-size: 13px;
+                color: $label;
             }
         }
     }
+
+    .radio_option+.radio_option {
+        border-top: 1px solid $line;
+    }
 }
 
-
+/* ----- 할인쿠폰 줄 ----- */
 .coupon {
-    margin: 16px 0;
-    display: flex;
+    padding-bottom: 8px;
+    display: grid;
+    grid-template-columns: 1fr auto;
     gap: 8px;
 
     input {
-        flex: 1;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+        height: 42px;
+        border-radius: $radius;
+        border: 1px solid $border;
+        background: $chip;
+        padding: 0 12px;
+        font-size: 14px;
+        color: rgba(0, 0, 0, .3);
     }
 
     button {
-        padding: 8px 12px;
-        font-size: 13px;
-        background: #eee;
-        border: none;
-        border-radius: 4px;
+        height: 42px;
+        padding: 0 12px;
+        border-radius: 999px;
+        border: 0;
+        background: #d3d3d3;
+        color: #fff;
+        font-size: 12px;
         cursor: not-allowed;
     }
 }
 
-.total {
+/* ----- 결제금액 바 ----- */
+.total_bar {
+    margin-top: 8px;
+    background: #fafafa;
+    padding-top: 16px;
+    padding-bottom: 16px;
     display: flex;
-    justify-content: space-between;
-    font-size: 15px;
-    font-weight: bold;
-    padding: 8px 0;
-    border-top: 1px solid #eee;
+    align-items: center;
+    gap: 8px;
+
+    span {
+        font-size: 14px;
+        color: $title;
+    }
+
+    strong {
+        margin-left: auto;
+        font-size: 14px;
+        color: $title;
+        font-weight: 700;
+    }
+
+    .chev {
+        width: 12px;
+        height: 12px;
+        margin-left: 4px;
+        display: inline-block;
+        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'><path fill='%234E4E4E' d='M1.375 3.956l.53-.53L6 7.52l4.095-4.094.53.53L6 8.581 1.375 3.956Z'/></svg>") no-repeat center/12px 12px;
+    }
 }
 
+/* ----- 안내문 ----- */
 .notice {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    margin: 0;
+    background: #fafafa;
     font-size: 12px;
-    color: #888;
-    margin-top: 12px;
-    line-height: 1.4;
+    color: $label;
+    line-height: 1.6;
 }
