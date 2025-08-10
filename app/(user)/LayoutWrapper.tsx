@@ -30,29 +30,48 @@ export default function LayoutWrapper({ children }: IProps) {
     setMounted(true);
   }, []);
 
-  // 헤더와 푸터를 숨길 경로들 (auth 그룹)
-  const hideLayoutPaths = ['/login', '/signup', '/find-email', '/find-password', '/my', '/products'];
-  const shouldHideLayout = hideLayoutPaths.some((path) => pathname.startsWith(path));
+  // 헤더만 숨길 경로들
+  const hideHeaderPaths = [
+    '/login', 
+    '/signup', 
+    '/find-email', 
+    '/find-password'
+  ];
+
+  // 푸터만 숨길 경로들  
+  const hideFooterPaths = [
+    '/my',
+    '/products',
+    '/cart',
+    '/payments',
+    '/search'
+  ];
+
+  // 헤더와 푸터 모두 숨길 경로들
+  const hideAllLayoutPaths = [
+    '/login', 
+    '/signup', 
+    '/find-email', 
+    '/find-password'
+  ];
+
+  const shouldHideHeader = hideHeaderPaths.some((path) => pathname.startsWith(path)) || 
+                          hideAllLayoutPaths.some((path) => pathname.startsWith(path));
+
+  const shouldHideFooter = hideFooterPaths.some((path) => pathname.startsWith(path)) || 
+                          hideAllLayoutPaths.some((path) => pathname.startsWith(path));
 
   // 하이드레이션 완료 전까지는 로딩 표시
   if (!mounted) {
     return <div>Loading...</div>;
   }
 
-  if (shouldHideLayout) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <SessionProvider>{children}</SessionProvider>
-      </QueryClientProvider>
-    );
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
-        <Header />
+        {!shouldHideHeader && <Header />}
         {children}
-        <Footer />
+        {!shouldHideFooter && <Footer />}
       </SessionProvider>
     </QueryClientProvider>
   );
