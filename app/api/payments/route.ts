@@ -16,9 +16,11 @@ export async function POST(req: NextRequest) {
             return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 })
         }
 
-        const { tossPaymentKey, orderId, amount, addressId, method, status, orderIds } = await req.json()
+        const { tossPaymentKey, orderId, amount, addressId, orderIds } = await req.json()
 
         const data = await tossPOST('/payments/confirm', { paymentKey: tossPaymentKey, orderId, amount }, 'toss')
+        const method = data.method as string
+        const status = data.status as string
         const paymentNumberBig = BigInt(await repo.generateTodayPaymentNumber())
 
         const paymentDto: CreatePaymentDto = {
@@ -30,7 +32,7 @@ export async function POST(req: NextRequest) {
             approvedAt: data.approvedAt ? new Date(data.approvedAt) : new Date(),
             createdAt: data.requestedAt ? new Date(data.requestedAt) : new Date(),
             method,
-            status,
+            status: status as 'DONE' | 'CANCELED',
             orderIds, // 프론트에서 전달하거나 서버에서 조회할 수도 있음
         }
 

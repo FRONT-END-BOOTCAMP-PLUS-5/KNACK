@@ -36,6 +36,7 @@ export default function PaymentSuccess() {
         try {
             const rawItems = sessionStorage.getItem('orderItems')
             if (rawItems) setOrderItems(JSON.parse(rawItems))
+            console.log(JSON.parse(rawItems) || "");
         } catch (e) {
             console.error('❌ orderItems 파싱 실패:', e)
         }
@@ -56,10 +57,10 @@ export default function PaymentSuccess() {
         if (orderItems.length === 0) return
         if (hasRun.current) return
 
-        const paymentKey = params.get('paymentKey')
+        const tossPaymentKey = params.get('paymentKey')
         const tossOrderId = params.get('orderId')
         const amount = Number(params.get('amount') ?? 0)
-        if (!paymentKey || !tossOrderId || !amount) return
+        if (!tossPaymentKey || !tossOrderId || !amount) return
 
         const alreadyProcessed = sessionStorage.getItem('paymentProcessed') === 'true'
         if (alreadyProcessed) return
@@ -84,8 +85,8 @@ export default function PaymentSuccess() {
                     setSavedOrderIds(createdOrderIds)
 
                     // 2) 결제 확인/저장 (서버에서 Toss confirm + DB 저장)
-                    const paymentRes = await requester.post('/api/payments/confirm', {
-                        paymentKey,           // toss paymentKey
+                    const paymentRes = await requester.post('/api/payments', {
+                        tossPaymentKey,           // toss paymentKey
                         orderId: tossOrderId, // toss orderId
                         amount,               // 결제 금액
                         addressId: selectedAddress.id,

@@ -8,14 +8,8 @@ const prisma = new PrismaClient();
 export class KnackPaymentRepository implements PaymentRepository {
 
     async save(payment: CreatePaymentDto): Promise<number | null> {
+        console.log(payment)
 
-        if (!payment.userId || !payment.addressId || !payment.tossPaymentKey || !payment.method || !payment.status || !payment.paymentNumber) {
-            throw new Error('필수 필드 누락: userId, addressId, tossPaymentKey, method, status, paymentNumber')
-        }
-
-        if (!payment.orderIds || payment.orderIds.length === 0) {
-            throw new Error('orderIds가 비어 있습니다.')
-        }
         const created = await prisma.payment.create({
             data: {
                 userId: payment.userId,

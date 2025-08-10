@@ -163,10 +163,11 @@ export default function CheckoutPage() {
             await handleSaveRequestMessage()
 
             const toss = await loadTossPayments(TOSS_CLIENT_KEY)
+            console.log(toss);
             await toss.requestPayment('카드', {
                 amount: totalPrice,
                 orderId: `order_${Date.now()}`, // 권장: 서버에서 선발급한 orderNumber 사용
-                orderName: '보드게임 묶음결제',
+                orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''} 주문`,
                 customerName: selectedAddress.name || '홍길동',
                 successUrl: `${window.location.origin}/payments/success`,
                 failUrl: `${window.location.origin}/payments/failure`,
