@@ -1,0 +1,35 @@
+.switch_wrap {
+  width: 51px;
+  height: 31px;
+  position: relative;
+  border-radius: 15.5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: none;
+
+  &.normal {
+    background: #e4e4e4;
+  }
+
+  &.active {
+    background: #222;
+  }
+}
+
+.circle {
+  width: 27px;
+  height: 27px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+  &.normal {
+    transform: translate(2px, -50%);
+  }
+
+  &.active {
+    transform: translate(22px, -50%);
+  }
+}
