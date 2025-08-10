@@ -66,10 +66,12 @@ $divider: #f4f4f4;
 }
 
 /* 굵은 회색 섹션 구분선(양옆 꽉) */
-.section_divider {
+.thick_divider {
     height: 8px;
-    background: $divider;
-    margin: 10px -16px 0; // 좌우 패딩 무시하고 꽉
+    background: #f4f4f4;
+    /* 부모에 좌우 패딩이 16px이면 패딩을 상쇄해서 꽉 차 보이게 */
+    margin: 0 -16px;
+    /* 필요 없으면 이 줄 제거 */
 }
 
 /* 하단 총 결제금액 박스 */

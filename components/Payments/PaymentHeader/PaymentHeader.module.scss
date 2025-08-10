@@ -1,11 +1,16 @@
 .checkout_header {
     background-color: #fff;
     left: 0;
-    position: fixed;
     right: 0;
     top: 0;
     z-index: 3;
     border-bottom: 1px solid #eee;
+    max-width: 480px;
+    position: sticky;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
 
     .inner {
         height: 44px;
@@ -15,23 +20,33 @@
     }
 
     .btn_cancel {
-        height: 24px;
-        left: 22px;
         position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
+        left: 12px;
+        /* 필요시 top:50%; transform:translateY(-50%); */
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
     }
 }
 
 .back_btn {
-    height: 24px;
-    left: 22px;
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+    left: 0px;
+    /* 필요시 top:50%; transform:translateY(-50%); */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
 }
-
-.hi {}
 
 .title {
     align-items: center;

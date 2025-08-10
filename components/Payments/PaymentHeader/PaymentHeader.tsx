@@ -14,10 +14,10 @@ export default function CheckoutHeader() {
 
     return (
         <header className={styles.checkout_header}>
+            <a className={styles.btn_cancel} onClick={handleBack}>
+                <Image src="/icons/header-back.svg" alt="" width={24} height={24} />
+            </a>
             <div className={styles.inner}>
-                <a className={styles.btn_cancel} onClick={handleBack}>
-                    <Image src="/icons/header-back.svg" alt="" width={24} height={24} />
-                </a>
                 <h1 className={styles.title}><span className={styles.title_txt}>배송/결제</span></h1>
             </div>
         </header>
