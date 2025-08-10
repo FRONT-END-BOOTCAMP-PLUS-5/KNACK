@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import styles from './OrderSummaryCard.module.scss'
 import Image from 'next/image'
 import { STORAGE_PATHS } from '@/constraint/auth'
@@ -27,17 +27,34 @@ export default function OrderSummaryCard({
     onChangeDelivery,
     totalPrice,
 }: Props) {
+    // 금액 계산 - Hooks must be called before any early returns
+    const productTotal = useMemo(
+        () => orderItems?.reduce((sum, it) => sum + it.price * it.quantity, 0) || 0,
+        [orderItems]
+    )
+    const inspectionFee = 0 // 스샷처럼 "무료"
+    const shippingFee = useMemo(() => (deliveryType === 'FAST' ? 5000 : 0), [deliveryType])
+
+    // 총합과 일치하도록 수수료 자동 보정(음수 방지)
+    const serviceFee = useMemo(() => {
+        const fee = totalPrice - (productTotal + inspectionFee + shippingFee)
+        return Math.max(0, fee)
+    }, [totalPrice, productTotal, shippingFee])
+
+    const [openTotal, setOpenTotal] = useState(true)
+
     if (!orderItems?.length) return <div>주문 상품이 없습니다.</div>
 
     return (
         <>
-            {/* 섹션 래퍼: KREAM의 .layout_list_vertical 대응 */}
-            < section className={styles.sectionWrap /* 상단 라운드 없고 하단만 10px */} >
+            <section className={styles.sectionWrap}>
                 <div className={styles.card}>
                     <div className={styles.header}>
-                        <h3>주문 상품 및 쿠폰</h3>
-                        <span className={styles.item_count}>총 {orderItems.length}건</span>
+                        <p>주문 상품 및 쿠폰</p>
+                        <p className={styles.item_count}>총 {orderItems.length}건</p>
                     </div>
+
+                    <div className={styles.hr} />
 
                     <div className={styles.coupon_toggle}>
                         <span>적용할 쿠폰이 없습니다</span>
@@ -66,7 +83,7 @@ export default function OrderSummaryCard({
                                     <div className={styles.meta}>
                                         <span className={styles.size}>240(US 5)</span>
                                         <span className={styles.meta_sep}>/</span>
-                                        <span className={styles.fast}>빠른배송</span>
+                                        <span className={styles.inline_icon}><Image src="/icons/lightning.png" alt="체크" width={12} height={12} />빠른배송</span>
                                     </div>
                                 </div>
                                 <div className={styles.price_wrap}>
@@ -82,7 +99,10 @@ export default function OrderSummaryCard({
                     <div className={styles.section_title}>배송방법</div>
                     <div className={styles.delivery}>
                         <label className={styles.radio_option}>
-                            <input type="radio" name="delivery" value="FAST"
+                            <input
+                                type="radio"
+                                name="delivery"
+                                value="FAST"
                                 checked={deliveryType === 'FAST'}
                                 onChange={() => onChangeDelivery('FAST')}
                             />
@@ -94,7 +114,10 @@ export default function OrderSummaryCard({
                         </label>
 
                         <label className={styles.radio_option}>
-                            <input type="radio" name="delivery" value="STOCK"
+                            <input
+                                type="radio"
+                                name="delivery"
+                                value="STOCK"
                                 checked={deliveryType === 'STOCK'}
                                 onChange={() => onChangeDelivery('STOCK')}
                             />
@@ -112,18 +135,45 @@ export default function OrderSummaryCard({
                         <button disabled>쿠폰 선택</button>
                     </div>
 
-                    <div className={styles.total_bar}>
+                    {/* 결제금액 (토글 가능한 요약 + 상세) */}
+                    <button
+                        type="button"
+                        className={styles.total_bar}
+                        aria-expanded={openTotal}
+                        onClick={() => setOpenTotal(v => !v)}
+                    >
                         <span>결제금액</span>
-                        <strong>{totalPrice.toLocaleString()}원</strong>
-                        <i className={styles.chev} aria-hidden />
-                    </div>
+                        <div className={styles.total_right}>
+                            <strong>{totalPrice.toLocaleString()}원</strong>
+                            {openTotal ? (
+                                <Image src="/icons/fold_2.svg" alt="펼치기" width={12} height={12} />
+                            ) : (
+                                <Image src="/icons/fold_1.svg" alt="접기" width={12} height={12} />
+                            )
+                            }
+                        </div>
+                    </button>
 
+                    {openTotal && (
+                        <div className={styles.total_details}>
+                            <div className={styles.row}>
+                                <span>상품금액</span>
+                                <span className={styles.price}>{productTotal.toLocaleString()}원</span>
+                            </div>
+                            <div className={styles.row}>
+                                <span>배송비</span>
+                                <span className={styles.price}>{shippingFee.toLocaleString()}원</span>
+                            </div>
+                        </div>
+                    )}
+                    <div className={styles.divider_horizontal}></div>
                     <p className={styles.notice}>
                         상품은 개인 또는 입점 사업자가 판매하며<br />
                         각 거래 조건 등은 판매자 정보를 통해 확인해주시기 바랍니다.
                     </p>
                 </div>
-            </section >
+            </section>
+            <div className={styles.divider_horizontal}></div>
         </>
     )
 }

@@ -1,152 +1,100 @@
+$bg: #fff;
+$title: #222;
+$muted: #909090;
+$line: #f0f0f0;
+$divider: #f4f4f4;
+
 .summary_box {
-    border-top: 1px solid #eee;
-    margin-top: 20px;
-    padding-top: 20px;
+    background: $bg;
+    /* 상단/하단 회색 섹션과 자연스럽게 이어지도록 */
+    padding: 0 16px 12px;
+}
+
+.row_header {
     font-size: 14px;
-    width: 100%;
+    font-weight: 700;
+    color: $title;
+    padding: 12px 0 8px;
+}
 
-    .row_header {
-        font-weight: 700;
-        font-size: 15px;
-        margin-bottom: 10px;
-    }
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+}
 
-    .row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: 6px 0;
-        line-height: 1.6;
-        width: 100%;
+.label {
+    font-size: 14px;
+    color: $muted;
+}
 
-        .label {
-            color: #777;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            flex: 1;
-            /* ← 라벨은 남는 폭을 차지 */
-            min-width: 0;
-            /* ← 긴 텍스트도 줄맞춤 유지 */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+.value {
+    font-size: 14px;
+    color: $title;
+    text-align: right;
+}
 
-            .tooltip {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 16px;
-                height: 16px;
-                margin-left: 4px;
-                border: 1px solid #bbb;
-                border-radius: 50%;
-                font-size: 11px;
-                color: #9aa0a6;
-                line-height: 1;
-                cursor: help;
-            }
-        }
+.emph {
+    /* 구매가 금액만 굵게 */
+    font-weight: 700;
+}
 
-        .value {
-            flex: 0;
-            /* ← 우측 금액은 가변폭 X */
-            min-width: 86px;
-            /* ← 자릿수 안정 */
-            text-align: right;
-            font-size: 14px;
-            font-weight: 500;
-            color: #111;
-            white-space: nowrap;
-            font-variant-numeric: tabular-nums;
-            /* ← 자리 맞춤 */
-        }
-    }
+.muted {
+    /* 무료 표시 */
+    color: $muted;
+}
 
-    .divider {
-        border-top: 1px solid #eee;
-        margin: 12px 0;
-    }
+.dash {
+    /* '-'일 때 그레이 */
+    color: $muted;
+}
 
-    .total {
-        justify-content: space-between;
-        align-items: center;
+/* ? 동그라미 */
+.tooltip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+    border: 1px solid #d3d3d3;
+    border-radius: 50%;
+    font-size: 11px;
+    line-height: 16px;
+    color: #4e4e4e;
+}
 
-        background-color: #f5f5f5;
-        border-radius: 8px;
-        padding: 16px 18px;
-        margin-top: 14px;
+/* 굵은 회색 섹션 구분선(양옆 꽉) */
+.section_divider {
+    height: 8px;
+    background: $divider;
+    margin: 10px -16px 0; // 좌우 패딩 무시하고 꽉
+}
 
-        font-size: 20px;
-        font-weight: 700;
+/* 하단 총 결제금액 박스 */
+.total_bar {
+    border-top: 1px solid $line;
+    border-bottom: 1px solid $line;
+    display: flex;
+    background: #fafafa;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 12px 4px;
+    margin-bottom: 88px;
+}
 
-        p {
-            margin: 0;
+.total_label {
+    margin-bottom: 60px;
+    font-size: 16px;
+    color: $title;
+    font-weight: 500;
+}
 
-            &:first-child {
-                color: #333;
-                font-weight: 500;
-            }
-
-            &:last-child {
-                text-align: right;
-                font-variant-numeric: tabular-nums;
-                white-space: nowrap;
-                transform: translateX(4px); // 살짝 어긋남
-            }
-        }
-    }
-
-    /* ✅ 모바일 */
-    @media (max-width: 480px) {
-        margin-top: 20px;
-        padding-top: 20px;
-        font-size: 13px;
-
-        .row_header {
-            font-size: 14px;
-        }
-
-        .row {
-            gap: 6px;
-
-            .label {
-                font-size: 13px;
-            }
-
-            .value {
-                font-size: 13px;
-                min-width: 78px;
-            }
-        }
-
-        .total {
-            justify-content: space-between;
-            align-items: center;
-
-            background-color: #f5f5f5;
-            border-radius: 8px;
-            padding: 16px 18px;
-            margin-top: 14px;
-
-            font-size: 17px;
-            font-weight: 700;
-
-            p {
-                margin: 0;
-
-                &:first-child {
-                    color: #333;
-                    font-weight: 500;
-                }
-
-                &:last-child {
-                    text-align: right;
-                    font-variant-numeric: tabular-nums;
-                    white-space: nowrap;
-                    transform: translateX(4px); // 살짝 어긋남
-                }
-            }
-        }
-    }
+.total_price {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    font-size: 20px;
+    font-weight: 800;
+    color: $title;
 }

@@ -54,23 +54,15 @@ $radius: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 20px;
-    padding-bottom: 8px;
+    border-radius: 0px;
+    height: 56px;
+    padding: 16px;
 
-    h3 {
+    p {
         margin: 0;
-        font-size: 14px;
-        font-weight: 700;
+        font-size: 16px;
+        font-weight: 600;
         color: $title;
-    }
-
-    .item_count {
-        font-size: 12px;
-        color: $label;
-        border: 1px solid $border;
-        border-radius: 999px;
-        padding: 4px 8px;
-        background: #fff;
     }
 }
 
@@ -80,7 +72,7 @@ $radius: 10px;
     align-items: center;
     justify-content: space-between;
     padding-top: 0;
-    padding-bottom: 8px;
+    height: 56px;
 
     span {
         font-size: 13px;
@@ -126,6 +118,21 @@ $radius: 10px;
 
 /* ----- 상품 리스트 ----- */
 .product_list {}
+
+.inline_icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    /* 아이콘-텍스트 간격 */
+    line-height: 1;
+    /* 세로정렬 튀는 것 방지 */
+    white-space: nowrap;
+
+    /* next/image 내부 img가 baseline에 걸려 보이면 보정 */
+    :global(img) {
+        display: block;
+    }
+}
 
 .product_box {
     display: grid;
@@ -188,24 +195,6 @@ $radius: 10px;
                 color: $title;
                 opacity: .9;
             }
-
-            .fast {
-                position: relative;
-                font-size: 14px;
-                color: $title;
-                font-weight: 700;
-
-                &::before {
-                    content: "";
-                    width: 6px;
-                    height: 6px;
-                    border-radius: 50%;
-                    background: #27c281;
-                    display: inline-block;
-                    margin-right: 6px;
-                    vertical-align: middle;
-                }
-            }
         }
     }
 
@@ -236,11 +225,11 @@ $radius: 10px;
 
 /* ----- 섹션 타이틀 ----- */
 .section_title {
-    padding-top: 16px;
+    padding-top: 14px;
     padding-bottom: 8px;
     font-size: 14px;
     color: $title;
-    font-weight: 700;
+    font-weight: 500;
 }
 
 /* ----- 배송방법(라디오) ----- */
@@ -251,7 +240,7 @@ $radius: 10px;
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 10px 0;
+        padding-bottom: 6px;
 
         input {
             position: absolute;
@@ -286,10 +275,15 @@ $radius: 10px;
         }
 
         .radio_text {
+            display: flex;
+            column-gap: 4px;
+            align-items: baseline;
+
             .main {
                 font-size: 14px;
                 color: $title;
-                font-weight: 700;
+                font-weight: 500; // 기본
+                margin-right: 8px;
             }
 
             .sub {
@@ -297,16 +291,17 @@ $radius: 10px;
                 color: $label;
             }
         }
-    }
 
-    .radio_option+.radio_option {
-        border-top: 1px solid $line;
+        /* ✅ 체크된 항목만 굵게 */
+        input:checked~.radio_text .main {
+            font-weight: 700;
+        }
     }
 }
 
 /* ----- 할인쿠폰 줄 ----- */
 .coupon {
-    padding-bottom: 8px;
+    padding-bottom: 16px;
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 8px;
@@ -322,8 +317,9 @@ $radius: 10px;
     }
 
     button {
-        height: 42px;
+        height: 23px;
         padding: 0 12px;
+        margin-top: 8px;
         border-radius: 999px;
         border: 0;
         background: #d3d3d3;
@@ -345,7 +341,8 @@ $radius: 10px;
 
     span {
         font-size: 14px;
-        color: $title;
+        color: #909090;
+        font-weight: 500;
     }
 
     strong {
@@ -364,13 +361,131 @@ $radius: 10px;
     }
 }
 
-/* ----- 안내문 ----- */
-.notice {
-    padding-top: 16px;
-    padding-bottom: 16px;
-    margin: 0;
+.total_bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background: #fafafa;
+    border: 0;
+    padding: 12px 12px;
+    margin: 0; // 여백 제거
+    cursor: pointer;
+
+    /* 포커스/탭 하이라이트 제거 (선택) */
+    appearance: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+
+    /* ✅ 여기서 라인 그리기 */
+    border-bottom: 1px solid #f0f0f0;
+
+    /* 기본 하이라이트/포커스 제거 */
+    appearance: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent; // iOS/안드로이드 크롬 탭 하이라이트 제거
+
+    &:focus,
+    &:focus-visible,
+    &:active {
+        outline: none;
+        box-shadow: none;
+    }
+
+    /* Firefox 내부 포커스 테두리 제거 */
+    &::-moz-focus-inner {
+        border: 0;
+    }
+
+    span {
+        font-size: 14px;
+        color: #222;
+    }
+
+    strong {
+        font-size: 14px;
+        font-weight: 700;
+        color: #222;
+    }
+}
+
+
+.total_right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chev {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-right: 2px solid #4e4e4e;
+    border-bottom: 2px solid #4e4e4e;
+    transform: rotate(-45deg);
+    transition: transform .15s ease;
+}
+
+.up {
+    transform: rotate(135deg);
+}
+
+/* 펼침 */
+.down {
+    transform: rotate(-45deg);
+}
+
+/* 접힘 */
+
+.total_details {
+    padding: 16px;
+    background: #fafafa;
+    // margin-top: -8px; // 바 붙는 느낌
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+
+    span {
+        font-size: 14px;
+        color: #909090;
+    }
+
+    .price {
+        color: #222;
+    }
+
+    span:last-child {
+        font-weight: 400;
+    }
+}
+
+.withInfo {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.notice {
+    background: #fff;
+    color: #909090;
     font-size: 12px;
-    color: $label;
-    line-height: 1.6;
+    line-height: 1.5;
+    padding: 12px;
+}
+
+.divider_horizontal {
+    width: 100%;
+    height: 8px;
+    background: #f4f4f4; // 필요하면 변수로: var(--divider, #f4f4f4)
+    display: block;
+    flex-shrink: 0; // 부모가 flex일 때 높이 유지
+    margin: 0; // 여백 없음
+    border: 0;
 }
