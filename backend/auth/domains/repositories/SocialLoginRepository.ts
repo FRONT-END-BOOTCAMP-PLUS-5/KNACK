@@ -27,10 +27,4 @@ export interface SocialLoginRepository {
     passwordHash: string;
   }): Promise<UserAuth>;
   
-  // 사용자 정보 업데이트
-  updateUser(userId: string, userData: {
-    email?: string;
-    name?: string;
-    nickname?: string;
-  }): Promise<User>;
 }

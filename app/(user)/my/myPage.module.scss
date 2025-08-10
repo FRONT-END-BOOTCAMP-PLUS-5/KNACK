@@ -1,3 +1,5 @@
+@import '@/styles/colors';
+
 .my_page {
   min-height: 100vh;
   background-color: #f8f9fa;
@@ -48,8 +50,15 @@
   font-weight: 500;
 }
 
+.logout_text {
+  font-size: 16px; /* 메뉴 아이템과 동일한 폰트 크기 */
+  color: $red02; /* 공통 컬러 사용 */
+  font-weight: 500;
+  cursor: pointer;
+}
+
 .withdrawal_section {
-  margin-top: 32px;
+  margin-top: 24px;
   padding-top: 24px;
   border-top: 2px solid #e9ecef;
 }
@@ -57,7 +66,7 @@
 .withdrawal_button {
   width: 100%;
   padding: 14px 24px;
-  background-color: #dc3545;
+  background-color: $red02; /* 공통 컬러 사용 */
   color: white;
   border: none;
   border-radius: 8px;

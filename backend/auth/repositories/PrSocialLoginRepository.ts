@@ -116,31 +116,4 @@ export class PrSocialLoginRepository implements SocialLoginRepository {
     };
   }
   
-  async updateUser(userId: string, userData: {
-    email?: string;
-    name?: string;
-    nickname?: string;
-  }): Promise<User> {
-    const updateData: any = {};
-    if (userData.email) updateData.email = userData.email;
-    if (userData.name) updateData.name = userData.name;
-    if (userData.nickname) updateData.nickname = userData.nickname;
-    
-    const user = await prisma.user.update({
-      where: { id: userId },
-      data: updateData,
-    });
-
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      nickname: user.nickname,
-      password: user.password,
-      profileImage: user.profileImage || undefined,
-      deletedAt: user.deletedAt,
-      isActive: user.isActive,
-      createdAt: user.createdAt,
-    };
-  }
 }
