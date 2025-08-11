@@ -5,7 +5,7 @@ import styles from './button.module.scss';
 interface IProps {
   text: string;
   style?: 'border' | 'black' | 'orange';
-  size?: 'medium' | 'large';
+  size?: 'medium' | 'large' | 'self';
   className?: string;
   onClick?: () => void;
 }
