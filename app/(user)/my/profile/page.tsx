@@ -5,6 +5,7 @@ import Text from '@/components/common/Text';
 import Flex from '@/components/common/Flex';
 import Switch from '@/components/common/Switch';
 import { useState } from 'react';
+import Link from 'next/link';
 
 const ProfilePage = () => {
   const [privacyOn, setPrivacyOn] = useState(false);
@@ -62,6 +63,10 @@ const ProfilePage = () => {
           <Switch isActive={emailOn} onActive={() => setEmailOn(!emailOn)} />
         </Flex>
       </section>
+
+      <Link href={'/my/withdrawal'} className={styles.withdrawal_button}>
+        회원탈퇴
+      </Link>
     </section>
   );
 };

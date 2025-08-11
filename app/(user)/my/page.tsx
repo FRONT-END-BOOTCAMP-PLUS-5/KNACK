@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import styles from './myPage.module.scss';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
@@ -10,12 +9,6 @@ import ActionGrid from '@/components/my/ActionGrid';
 import MyNav from '@/components/my/MyNav';
 
 export default function MyPage() {
-  const router = useRouter();
-
-  const handleWithdrawalClick = () => {
-    router.push('/my/withdrawal');
-  };
-
   return (
     <section className={styles.my_page}>
       <section>
@@ -38,10 +31,6 @@ export default function MyPage() {
       <BuyList />
       <div className={styles.block} />
       <MyNav />
-
-      <button className={styles.withdrawal_button} onClick={handleWithdrawalClick}>
-        회원탈퇴
-      </button>
     </section>
   );
 }
