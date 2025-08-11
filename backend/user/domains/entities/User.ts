@@ -3,4 +3,6 @@ export interface UpdateUser {
   email: string;
   name: string;
   profileImage: string;
+  sns: boolean;
+  marketing: boolean;
 }
