@@ -2,6 +2,7 @@ import Text from '@/components/common/Text';
 import styles from './myNav.module.scss';
 import Flex from '@/components/common/Flex';
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 
 const MY_NAV_LIST = [
   {
@@ -23,6 +24,17 @@ const MY_NAV_LIST = [
 ];
 
 const MyNav = () => {
+  const handleLogout = async () => {
+    try {
+      await signOut({
+        callbackUrl: '/',
+        redirect: true,
+      });
+    } catch (error) {
+      console.error('로그아웃 에러:', error);
+    }
+  };
+
   return (
     <section className={styles.my_account_wrap}>
       <Text size={1.6} weight={700} paddingBottom={8}>
@@ -35,6 +47,9 @@ const MyNav = () => {
           </Link>
         </Flex>
       ))}
+      <button className={styles.logout_button} onClick={handleLogout}>
+        로그아웃
+      </button>
     </section>
   );
 };
