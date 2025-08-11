@@ -2,24 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 import styles from './myPage.module.scss';
-import { signOut } from 'next-auth/react';
 
 export default function MyPage(){
     const router = useRouter();
     
     const handleWithdrawalClick = () => {
         router.push('/my/withdrawal');
-    };
-
-    const handleLogout = async () => {
-        try {
-            await signOut({ 
-                callbackUrl: '/', 
-                redirect: true 
-            });
-        } catch (error) {
-            console.error('로그아웃 에러:', error);
-        }
     };
     
     return(
@@ -40,12 +28,6 @@ export default function MyPage(){
                     <div className={styles.menu_item}>
                         <span className={styles.menu_text}>설정</span>
                     </div>
-                    
-                    {/* 로그아웃 - 메뉴 아이템과 동일한 UI */}
-                    <div className={styles.menu_item}>
-                        <span className={styles.logout_text} onClick={handleLogout}>로그아웃</span>
-                    </div>
-                    
                     {/* 회원탈퇴 버튼 */}
                     <div className={styles.withdrawal_section}>
                         <button 
