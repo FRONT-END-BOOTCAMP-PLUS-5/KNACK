@@ -8,19 +8,53 @@ import { useEffect, useState } from 'react';
 import { useUserStore } from '@/store/userStore';
 import Image from 'next/image';
 import UserDefault from '@/public/images/profile_default.png';
+import { myService } from '@/services/my';
+import { IUpdateUserRef } from '@/types/user';
 
 const ProfileEditPage = () => {
   const [profileNameOn, setProfileNameOn] = useState(false);
   const [nameOn, setNameOn] = useState(false);
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState('');
+  const [profileImage, setProfileImage] = useState<string | null>('');
 
-  const { user } = useUserStore();
+  const { user, fetchUserData } = useUserStore();
+  const { updateUser } = myService;
+
+  const updateProfile = () => {
+    const data: IUpdateUserRef = {
+      nickname: nickname,
+      name: name,
+      profileImage: profileImage ?? '',
+    };
+
+    updateUser(data)
+      .then((res) => {
+        console.log('res', res);
+        setProfileNameOn(false);
+        setNameOn(false);
+        fetchUserData(user?.id ?? '');
+      })
+      .catch((error) => {
+        console.log('error', error.message);
+      });
+  };
+
+  const handleCancelProfileName = () => {
+    setProfileNameOn(false);
+    setNickname(user?.nickname ?? '');
+  };
+
+  const handleCancelName = () => {
+    setNameOn(false);
+    setName(user?.name ?? '');
+  };
 
   useEffect(() => {
     if (user) {
       setName(user?.name);
       setNickname(user?.nickname);
+      setProfileImage(user?.profileImage);
     }
   }, [user]);
 
@@ -32,7 +66,7 @@ const ProfileEditPage = () => {
         </span>
         <Flex direction="column" width="self">
           <Text size={1.8} weight={600}>
-            {nickname}
+            {user?.nickname}
           </Text>
           <button className={styles.profile_edit_button}>이미지 변경</button>
         </Flex>
@@ -73,9 +107,9 @@ const ProfileEditPage = () => {
                 text="취소"
                 size="self"
                 style="border"
-                onClick={() => setProfileNameOn(false)}
+                onClick={handleCancelProfileName}
               />
-              <Button className={styles.button_size} text="저장" size="self" style="black" />
+              <Button className={styles.button_size} text="저장" size="self" style="black" onClick={updateProfile} />
             </Flex>
           </Flex>
         )}
@@ -114,9 +148,9 @@ const ProfileEditPage = () => {
                 text="취소"
                 size="self"
                 style="border"
-                onClick={() => setNameOn(false)}
+                onClick={handleCancelName}
               />
-              <Button className={styles.button_size} text="저장" size="self" style="black" />
+              <Button className={styles.button_size} text="저장" size="self" style="black" onClick={updateProfile} />
             </Flex>
           </Flex>
         )}
