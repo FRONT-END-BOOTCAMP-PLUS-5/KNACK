@@ -20,11 +20,6 @@ const MY_NAV_LIST = [
     url: '/my/address',
     name: '주소록',
   },
-  {
-    id: 3,
-    url: '/my/size',
-    name: '나의 맞춤 정보',
-  },
 ];
 
 const MyNav = () => {
