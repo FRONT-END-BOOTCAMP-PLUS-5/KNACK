@@ -9,12 +9,6 @@ import { PrLoginRepository } from "@/backend/login/repositories/PrLoginRepositor
 import { SocialLoginUseCase } from "@/backend/auth/applications/usecases/SocialLoginUseCase";
 import { PrSocialLoginRepository } from "@/backend/auth/repositories/PrSocialLoginRepository";
 
-// 카카오 프로필 타입 확장
-interface KakaoProfile extends Profile {
-  nickname?: string;
-  account_email?: string;
-}
-
 export const authOptions = {
   providers: [
     GoogleProvider({
@@ -84,26 +78,8 @@ export const authOptions = {
         console.log(`${account.provider} 로그인 시도:`, {
           provider: account.provider,
           providerAccountId: account.providerAccountId,
-          email: profile?.email,
-          name: profile?.name,
-          // 카카오 전용 정보 로깅
-          ...(account.provider === 'kakao' && {
-            nickname: (profile as KakaoProfile)?.nickname,
-            account_email: (profile as KakaoProfile)?.account_email,
-          }),
         });
-        
-        // 카카오 로그인 시 더 자세한 디버깅
-        if (account.provider === 'kakao') {
-          console.log('=== 카카오 로그인 디버깅 ===');
-          console.log('전체 profile 객체:', JSON.stringify(profile, null, 2));
-          console.log('전체 account 객체:', JSON.stringify(account, null, 2));
-          console.log('전체 user 객체:', JSON.stringify(user, null, 2));
-          console.log('profile 타입:', typeof profile);
-          console.log('profile 키들:', profile ? Object.keys(profile) : 'profile is undefined');
-          console.log('=== 디버깅 끝 ===');
-        }
-        
+
         try {
           let email = '';
           let name = '';
@@ -113,23 +89,8 @@ export const authOptions = {
             email = profile?.email || '';
             name = profile?.name || '';
           } else if (account.provider === 'kakao') {
-            // 카카오 로그인 - user 객체에 이미 올바른 정보가 들어있음
-            console.log('카카오 user 객체:', {
-              id: user.id,
-              name: user.name,
-              email: user.email
-            });
-            
-            // user 객체의 정보를 그대로 사용 (기본값 없이)
-            email = user.email;
-            name = user.name;
-            
-            console.log('카카오 정보 매핑 결과:', {
-              원본_email: user.email,
-              원본_name: user.name,
-              최종_email: email,
-              최종_name: name
-            });
+            // 카카오 로그인 - user 객체의 정보를 직접 사용
+            // email과 name 변수 할당 불필요
           }
           
           // email과 name이 비어있으면 기본값 설정
@@ -140,18 +101,15 @@ export const authOptions = {
             name = `${account.provider}사용자_${account.providerAccountId}`;
           }
 
-          // 임시로 기존 사용자 체크 제거 (디버깅용)
-          console.log('SocialLoginUseCase 실행 준비:', { email, name, provider: account.provider, providerId: account.providerAccountId });
-
-          // 소셜 로그인 UseCase 실행 (항상 실행)
+          // 소셜 로그인 UseCase 실행
           const socialLoginRepository = new PrSocialLoginRepository();
           const socialLoginUseCase = new SocialLoginUseCase(socialLoginRepository);
           
           const result = await socialLoginUseCase.execute({
             provider: account.provider,
             providerId: account.providerAccountId,
-            email: email,
-            name: name,
+            email: account.provider === 'kakao' ? user.email : email,
+            name: account.provider === 'kakao' ? user.name : name,
             profileImage: profile?.picture,
           });
           
