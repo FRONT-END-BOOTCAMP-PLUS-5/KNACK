@@ -36,7 +36,6 @@ export default function PaymentSuccess() {
         try {
             const rawItems = sessionStorage.getItem('orderItems')
             if (rawItems) setOrderItems(JSON.parse(rawItems))
-            console.log(JSON.parse(rawItems) || "");
         } catch (e) {
             console.error('❌ orderItems 파싱 실패:', e)
         }
