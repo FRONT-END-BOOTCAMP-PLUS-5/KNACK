@@ -19,7 +19,7 @@ export default function SearchPrice() {
   };
 
   return (
-    <article className={`${styles.search_price} ${styles.contents_container}`}>
+    <article className={styles.search_price}>
       <div>
         <Flex justify="between" align="start" className={styles.search_price_title} paddingHorizontal={16}>
           <Text tag="h4" size={1.4} weight={600} marginBottom={12}>
@@ -34,63 +34,65 @@ export default function SearchPrice() {
           ))}
         </Flex>
       </div>
-      <Flex
-        justify="between"
-        align="center"
-        paddingHorizontal={14}
-        paddingVertical={8}
-        className={styles.slider_label_wrap}
-      >
-        <Text color="gray2">0만원</Text>
-        <Text color="gray2">1000만원+</Text>
-      </Flex>
-      <Flex justify="center" align="center" paddingHorizontal={16} paddingVertical={8}>
-        <Slider
-          min={0}
-          max={10000000}
-          step={10000}
-          value={value}
-          onChange={handleChange}
-          valueLabelDisplay="auto"
-          valueLabelFormat={formatValue}
-          sx={{
-            color: 'black',
-            width: 'calc(100% - 24px)',
-            '& .MuiSlider-thumb': {
-              backgroundColor: 'white',
-              border: '1px solid #222',
-              width: '24px',
-              height: '24px',
-              '&.Mui-active': {
-                boxShadow: 'none',
-              },
+      <div className={styles.search_price_slider_wrap}>
+        <Flex
+          justify="between"
+          align="center"
+          paddingHorizontal={14}
+          paddingVertical={8}
+          className={styles.slider_label_wrap}
+        >
+          <Text color="gray2">0만원</Text>
+          <Text color="gray2">1000만원+</Text>
+        </Flex>
+        <Flex justify="center" align="center" paddingHorizontal={16} paddingVertical={8}>
+          <Slider
+            min={0}
+            max={10000000}
+            step={10000}
+            value={value}
+            onChange={handleChange}
+            valueLabelDisplay="auto"
+            valueLabelFormat={formatValue}
+            sx={{
+              color: 'black',
+              width: 'calc(100% - 24px)',
+              '& .MuiSlider-thumb': {
+                backgroundColor: 'white',
+                border: '1px solid #222',
+                width: '24px',
+                height: '24px',
+                '&.Mui-active': {
+                  boxShadow: 'none',
+                },
 
-              '&:hover, &.Mui-focusVisible': {
-                boxShadow: 'none',
+                '&:hover, &.Mui-focusVisible': {
+                  boxShadow: 'none',
+                },
               },
-            },
-            '& .MuiSlider-track': {
-              backgroundColor: '#333',
-              height: '6px',
-            },
-            '& .MuiSlider-rail': {
-              backgroundColor: '#cecece',
-              height: '6px',
-            },
-            '& .MuiSlider-valueLabelOpen': {
-              fontSize: '1.1rem',
-              fontWeight: 700,
-              borderRadius: '4px',
-              padding: '2px 4px',
-              backgroundColor: '#22222280',
-              '&:before': {
-                display: 'none',
+              '& .MuiSlider-track': {
+                backgroundColor: '#333',
+                height: '6px',
               },
-            },
-          }}
-          className={styles.search_price_slider}
-        />
-      </Flex>
+              '& .MuiSlider-rail': {
+                backgroundColor: '#cecece',
+                height: '6px',
+              },
+              '& .MuiSlider-valueLabelOpen': {
+                fontSize: '1.1rem',
+                fontWeight: 700,
+                borderRadius: '4px',
+                padding: '2px 4px',
+                backgroundColor: '#22222280',
+                '&:before': {
+                  display: 'none',
+                },
+              },
+            }}
+            className={styles.search_price_slider}
+          />
+        </Flex>
+      </div>
     </article>
   );
 }

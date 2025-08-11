@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 export default function SearchColor() {
   return (
-    <ul className={`${styles.search_color} ${styles.contents_container}`}>
+    <ul className={styles.search_color}>
       {PRODUCT_FILTER_COLOR.map((item) => (
         <li className={styles.search_color_item} key={item.id}>
           <div className={styles.search_color_item_box}>

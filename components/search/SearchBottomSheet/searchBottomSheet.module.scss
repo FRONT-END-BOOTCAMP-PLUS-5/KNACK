@@ -39,10 +39,13 @@
   }
 }
 
+.bottom_sheet_bottom_selected_filter {
+  padding: 16px 16px 8px !important;
+}
+
 .contents_container {
   height: 100%;
-  margin-top: 40px;
-  padding: 16px 0;
+  margin-top: 14px;
 }
 
 // 성별 필터
@@ -92,7 +95,45 @@
   }
 }
 
+// 브랜드 필터
+.search_brand {
+  padding: 8px 16px;
+  font-size: 1.4rem;
+  position: relative;
+}
+
+.search_brand_input_wrap {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.search_brand_list_wrap {
+  padding: 18px 0;
+}
+
+.search_brand_list_header {
+  font-weight: 600;
+}
+
+.search_brand_list {
+  border-bottom: 1px solid $light-gray04;
+}
+.search_brand_list_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+
+  > img {
+    opacity: 0.6;
+  }
+}
+
 // 가격대 필터
+.search_price_slider_wrap {
+  padding-top: 14px;
+}
+
 .search_price_button_wrap {
   flex-wrap: wrap;
 }

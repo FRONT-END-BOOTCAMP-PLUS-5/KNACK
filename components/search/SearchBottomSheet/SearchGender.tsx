@@ -5,7 +5,7 @@ import { PRODUCT_FILTER_GENDER } from '@/constraint/product';
 
 export default function SearchGender() {
   return (
-    <section className={`${styles.search_gender} ${styles.contents_container}`}>
+    <section className={styles.search_gender}>
       <Text
         tag="h4"
         size={1.4}

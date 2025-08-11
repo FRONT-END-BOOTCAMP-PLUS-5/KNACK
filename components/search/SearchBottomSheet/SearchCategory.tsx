@@ -3,7 +3,7 @@ import styles from './searchBottomSheet.module.scss';
 
 export default function SearchCategory() {
   return (
-    <section className={`${styles.search_category} ${styles.contents_container}`}>
+    <section className={styles.search_category}>
       <Text
         tag="h4"
         size={1.4}

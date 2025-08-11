@@ -6,6 +6,8 @@ import styles from './bottom_sheet.module.scss';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import Image from 'next/image';
 import closeLarge from '@/public/icons/close_large.svg';
+import Flex from '../Flex';
+import Text from '../Text';
 
 interface IProps {
   children: React.ReactNode;
@@ -15,6 +17,7 @@ interface IProps {
   closeOnOverlayClick?: boolean;
   showHandle?: boolean;
   style?: React.CSSProperties;
+  isCloseButton?: boolean;
 }
 
 export default function BottomSheet({
@@ -25,6 +28,7 @@ export default function BottomSheet({
   closeOnOverlayClick = true,
   showHandle = true,
   style,
+  isCloseButton = true,
 }: IProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const { isOpen, onClose } = useBottomSheetStore();
@@ -113,10 +117,16 @@ export default function BottomSheet({
 
             {title && (
               <div className={styles.header}>
-                <h3 className={styles.title}>{title}</h3>
-                <button className={styles.close_button} onClick={onClose} aria-label="닫기">
-                  <Image src={closeLarge} alt="닫기" width={24} height={24} />
-                </button>
+                <Flex justify="center" paddingVertical={16}>
+                  <Text tag="h2" size={1.8} weight={600}>
+                    {title}
+                  </Text>
+                </Flex>
+                {isCloseButton && (
+                  <button className={styles.close_button} onClick={onClose} aria-label="닫기">
+                    <Image src={closeLarge} alt="닫기" width={24} height={24} />
+                  </button>
+                )}
               </div>
             )}
 

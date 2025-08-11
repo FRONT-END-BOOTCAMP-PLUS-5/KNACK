@@ -6,7 +6,7 @@ import { PRODUCT_FILTER_DISCOUNT } from '@/constraint/product';
 
 export default function SearchDiscount() {
   return (
-    <article className={`${styles.search_discount} ${styles.contents_container}`}>
+    <article className={styles.search_discount}>
       <div>
         <Flex justify="between" align="start" className={styles.search_discount_title} paddingHorizontal={16}>
           <Text tag="h4" size={1.4} weight={600} marginBottom={12}>
