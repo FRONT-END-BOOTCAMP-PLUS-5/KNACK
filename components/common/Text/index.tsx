@@ -22,6 +22,7 @@ interface IProps {
   size?: number;
   color?: keyof typeof TEXT_COLOR;
   weight?: 400 | 500 | 600 | 700;
+  lineHeight?: string;
   className?: string;
   marginTop?: number;
   marginBottom?: number;
@@ -40,6 +41,7 @@ const Text = ({
   color = 'black1',
   weight = 400,
   className,
+  lineHeight = 'normal',
   marginTop = 0,
   marginBottom = 0,
   marginLeft = 0,
@@ -66,6 +68,7 @@ const Text = ({
         paddingBottom: paddingBottom,
         paddingLeft: paddingLeft,
         paddingRight: paddingRight,
+        lineHeight: lineHeight,
       }}
     >
       {children}

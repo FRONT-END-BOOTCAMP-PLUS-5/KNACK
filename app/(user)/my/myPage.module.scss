@@ -1,85 +1,31 @@
 .my_page {
   min-height: 100vh;
-  background-color: #f8f9fa;
-  padding: 20px;
+  background-color: #fff;
 }
 
-.my_content {
-  max-width: 600px;
-  margin: 0 auto;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+.block {
+  height: 28px;
 }
 
-.my_title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #333;
-  text-align: center;
-  padding: 32px 24px 24px;
-  margin: 0;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.menu_section {
-  padding: 24px;
-}
-
-.menu_item {
-  padding: 16px 0;
-  border-bottom: 1px solid #f1f3f4;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #f8f9fa;
-  }
-
-  &:last-of-type {
-    border-bottom: none;
-  }
-}
-
-.menu_text {
-  font-size: 16px;
-  color: #333;
-  font-weight: 500;
-}
-
-.withdrawal_section {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 2px solid #e9ecef;
-}
-
-.withdrawal_button {
-  width: 100%;
-  padding: 14px 24px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #c82333;
-  }
-
-  &:active {
-    background-color: #bd2130;
-  }
-}
-
-.loading {
+.profile_image {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 1px solid rgba(34, 34, 34, 0.05);
+  background: #ededed;
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 200px;
-  font-size: 16px;
-  color: #666;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.profile_edit_button {
+  margin-top: 14px;
+  font-size: 1.2rem;
+  background: #fff;
+  border-radius: 10px;
+  height: 34px;
+  border: 1px solid #d3d3d3;
+  padding: 0 14px;
+  color: $gray01;
 }

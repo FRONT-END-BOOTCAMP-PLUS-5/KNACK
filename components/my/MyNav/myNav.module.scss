@@ -1,0 +1,15 @@
+.my_account_wrap {
+  padding: 0 16px;
+
+  & .nav_item {
+    border-bottom: 1px solid #ebebeb;
+  }
+}
+
+.logout_button {
+  background: #fff;
+  border: none;
+  color: $red01;
+  font-size: 1.4rem;
+  padding: 14px 0;
+}

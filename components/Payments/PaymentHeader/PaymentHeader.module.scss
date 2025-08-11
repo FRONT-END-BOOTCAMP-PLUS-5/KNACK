@@ -1,0 +1,65 @@
+.checkout_header {
+    background-color: #fff;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 3;
+    border-bottom: 1px solid #eee;
+    max-width: 480px;
+    position: sticky;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+
+    .inner {
+        height: 44px;
+        min-width: 320px;
+        padding: 0 49px;
+        position: relative;
+    }
+
+    .btn_cancel {
+        position: absolute;
+        left: 12px;
+        /* 필요시 top:50%; transform:translateY(-50%); */
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+    }
+}
+
+.back_btn {
+    position: absolute;
+    left: 0px;
+    /* 필요시 top:50%; transform:translateY(-50%); */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+}
+
+.title {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+}
+
+.title_txt {
+    color: #000;
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.27px;
+    word-break: break-all;
+}
