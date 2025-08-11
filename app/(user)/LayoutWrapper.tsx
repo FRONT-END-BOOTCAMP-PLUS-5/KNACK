@@ -40,7 +40,6 @@ export default function LayoutWrapper({ children }: IProps) {
 
   // 푸터만 숨길 경로들  
   const hideFooterPaths = [
-    '/my',
     '/products',
     '/cart',
     '/payments',
