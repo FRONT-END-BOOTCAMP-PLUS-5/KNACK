@@ -1,11 +1,24 @@
-import { Session, User, SessionStrategy } from "next-auth";
+import { Session, User, SessionStrategy, Account, Profile } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { AdapterUser } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import KakaoProvider from "next-auth/providers/kakao";
 import { LoginUseCase } from "@/backend/login/applications/usecases/LoginUseCase";
 import { PrLoginRepository } from "@/backend/login/repositories/PrLoginRepository";
+import { SocialLoginUseCase } from "@/backend/auth/applications/usecases/SocialLoginUseCase";
+import { PrSocialLoginRepository } from "@/backend/auth/repositories/PrSocialLoginRepository";
 
 export const authOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    KakaoProvider({
+      clientId: process.env.KAKAO_CLIENT_ID!,
+      clientSecret: process.env.KAKAO_CLIENT_SECRET!,
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -55,6 +68,72 @@ export const authOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile }: { 
+      user: AdapterUser | User; 
+      account: Account | null; 
+      profile?: Profile 
+    }) {
+      // 소셜 로그인인 경우
+      if (account?.provider === 'google' || account?.provider === 'kakao') {
+        console.log(`${account.provider} 로그인 시도:`, {
+          provider: account.provider,
+          providerAccountId: account.providerAccountId,
+        });
+
+        try {
+          let email = '';
+          let name = '';
+          
+          if (account.provider === 'google') {
+            // 구글 로그인 - 기존 로직 그대로 유지
+            email = profile?.email || '';
+            name = profile?.name || '';
+          } else if (account.provider === 'kakao') {
+            // 카카오 로그인 - user 객체의 정보를 직접 사용
+            // email과 name 변수 할당 불필요
+          }
+          
+          // email과 name이 비어있으면 기본값 설정
+          if (!email) {
+            email = `${account.provider}_${account.providerAccountId}@${account.provider}.com`;
+          }
+          if (!name) {
+            name = `${account.provider}사용자_${account.providerAccountId}`;
+          }
+
+          // 소셜 로그인 UseCase 실행
+          const socialLoginRepository = new PrSocialLoginRepository();
+          const socialLoginUseCase = new SocialLoginUseCase(socialLoginRepository);
+          
+          const result = await socialLoginUseCase.execute({
+            provider: account.provider,
+            providerId: account.providerAccountId,
+            email: account.provider === 'kakao' ? user.email : email,
+            name: account.provider === 'kakao' ? user.name : name,
+            profileImage: profile?.picture,
+          });
+          
+          console.log('소셜 로그인 결과:', result);
+          
+          // NextAuth user 객체에 필요한 정보 주입
+          user.id = result.user.id;
+          user.email = result.user.email;
+          user.name = result.user.name;
+          user.nickname = result.user.nickname;
+          user.roles = result.user.roles;
+          user.deletedAt = result.user.deletedAt;
+          user.isActive = result.user.isActive;
+          
+          return true;
+        } catch (error) {
+          console.error('소셜 로그인 에러:', error);
+          return false;
+        }
+      }
+      
+      // 기존 credentials 로그인은 그대로 진행
+      return true;
+    },
     async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
         token.id = user.id;

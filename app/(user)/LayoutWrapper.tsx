@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
-import CheckoutHeader from '@/components/Payments/PaymentHeader/PaymentHeader';
 import PaymentHeader from '@/components/Payments/PaymentHeader/PaymentHeader';
 
 interface IProps {
@@ -32,9 +31,35 @@ export default function LayoutWrapper({ children }: IProps) {
     setMounted(true);
   }, []);
 
-  // 헤더와 푸터를 숨길 경로들 (auth 그룹)
-  const hideLayoutPaths = ['/login', '/signup', '/find-email', '/find-password', '/my', '/products'];
-  const shouldHideLayout = hideLayoutPaths.some((path) => pathname.startsWith(path));
+  // 헤더만 숨길 경로들
+  const hideHeaderPaths = [
+    '/login', 
+    '/signup', 
+    '/find-email', 
+    '/find-password'
+  ];
+
+  // 푸터만 숨길 경로들  
+  const hideFooterPaths = [
+    '/products',
+    '/cart',
+    '/payments',
+    '/search'
+  ];
+
+  // 헤더와 푸터 모두 숨길 경로들
+  const hideAllLayoutPaths = [
+    '/login', 
+    '/signup', 
+    '/find-email', 
+    '/find-password'
+  ];
+
+  const shouldHideHeader = hideHeaderPaths.some((path) => pathname.startsWith(path)) || 
+                          hideAllLayoutPaths.some((path) => pathname.startsWith(path));
+
+  const shouldHideFooter = hideFooterPaths.some((path) => pathname.startsWith(path)) || 
+                          hideAllLayoutPaths.some((path) => pathname.startsWith(path));
 
   const paymentsHeaderPaths = ['/payments/checkout'].some(path => pathname.startsWith(path));
 
@@ -43,13 +68,6 @@ export default function LayoutWrapper({ children }: IProps) {
     return <div>Loading...</div>;
   }
 
-  if (shouldHideLayout) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <SessionProvider>{children}</SessionProvider>
-      </QueryClientProvider>
-    );
-  }
 
   if (paymentsHeaderPaths) {
     return (
@@ -63,9 +81,9 @@ export default function LayoutWrapper({ children }: IProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
-        <Header />
+        {!shouldHideHeader && <Header />}
         {children}
-        <Footer />
+        {!shouldHideFooter && <Footer />}
       </SessionProvider>
     </QueryClientProvider>
   );
