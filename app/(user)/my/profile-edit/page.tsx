@@ -30,7 +30,6 @@ const ProfileEditPage = () => {
 
     updateUser(data)
       .then((res) => {
-        console.log('res', res);
         setProfileNameOn(false);
         setNameOn(false);
         fetchUserData(user?.id ?? '');
