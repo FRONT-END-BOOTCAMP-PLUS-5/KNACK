@@ -1,0 +1,13 @@
+.buy_list_section {
+  padding: 0 16px;
+
+  & .buy_list {
+    background: #fafafa;
+    border-radius: 12px;
+    height: 80px;
+  }
+
+  & .box_border {
+    border-left: 1px solid #ebebeb;
+  }
+}

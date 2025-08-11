@@ -1,0 +1,59 @@
+.profile_image {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 1px solid rgba(34, 34, 34, 0.05);
+  background: #ededed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.profile_edit_button {
+  margin-top: 14px;
+  font-size: 1.2rem;
+  background: #fff;
+  border-radius: 10px;
+  height: 34px;
+  border: 1px solid #d3d3d3;
+  padding: 0 14px;
+  color: $gray01;
+}
+
+.profile_info {
+  padding-top: 25px !important;
+  border-bottom: 1px solid #ebebeb;
+
+  &.border_none {
+    border-bottom: none;
+  }
+}
+
+.profile_group {
+  padding-top: 48px;
+}
+
+.change_button {
+  font-size: 1.2rem;
+  background: #fff;
+  border-radius: 10px;
+  height: 34px;
+  border: 1px solid #d3d3d3;
+  padding: 0 14px;
+  color: $gray01;
+}
+
+.change_input {
+  padding: 8px 0;
+  border: none;
+  border-bottom: 1px solid #ebebeb;
+  margin-bottom: 28px;
+  width: 100%;
+  font-size: 1.5rem;
+}
+
+.button_size {
+  height: 42px;
+  padding: 0 38px;
+}
