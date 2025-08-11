@@ -1,0 +1,23 @@
+.profile_image {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 1px solid rgba(34, 34, 34, 0.05);
+  background: #ededed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  position: relative;
+}
+
+.profile_edit_button {
+  margin-top: 14px;
+  font-size: 1.2rem;
+  background: #fff;
+  border-radius: 10px;
+  height: 34px;
+  border: 1px solid #d3d3d3;
+  padding: 0 14px;
+  color: $gray01;
+}

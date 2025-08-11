@@ -4,13 +4,23 @@ import styles from './profilePage.module.scss';
 import Text from '@/components/common/Text';
 import Flex from '@/components/common/Flex';
 import Switch from '@/components/common/Switch';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useUserStore } from '@/store/userStore';
 
 const ProfilePage = () => {
   const [privacyOn, setPrivacyOn] = useState(false);
   const [smsOn, setSmsOn] = useState(false);
   const [emailOn, setEmailOn] = useState(false);
+
+  const { user } = useUserStore();
+
+  useEffect(() => {
+    if (user) {
+      setSmsOn(user?.sns);
+      setPrivacyOn(user?.marketing);
+    }
+  }, [user]);
 
   return (
     <section className={styles.my_profile_wrap}>
@@ -22,7 +32,7 @@ const ProfilePage = () => {
           이메일 주소
         </Text>
         <Text size={1.6} weight={500} paddingTop={8} paddingBottom={8}>
-          wkd*****@naver.com
+          {user?.email}
         </Text>
       </Flex>
       <Flex direction="column" className={styles.profile_info} paddingVertical={12}>
