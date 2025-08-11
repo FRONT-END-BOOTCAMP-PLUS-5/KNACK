@@ -1,245 +1,209 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import KakaoPostCodeLoader from './KakaoPostCodeLoader'
-import { formatAddressDisplay, openKakaoPostcode } from '@/utils/openKakaoPostCode'
 import styles from './AddressModal.module.scss'
+import KakaoPostCodeLoader from './KakaoPostCodeLoader'
 import requester from '@/utils/requester'
+import { formatAddressDisplay, formatPhoneNumber, openKakaoPostcode, phonePattern } from '@/utils/openKakaoPostCode'
+import Image from 'next/image'
+import { AddressAddModal } from './AddressAddModal'
 
-type ApiAddress = {
-    id: number
-    name: string
-    phone: string
-    zipCode: string
-    main: string
-    detail: string | null
-    message: string | null
-    isDefault?: boolean
+export type ApiAddress = {
+    id: number; name: string; phone: string;
+    zipCode: string; main: string; detail: string | null;
+    message: string | null; isDefault?: boolean
 }
-
 export type SelectedAddress = {
-    message: string
-    id: number
-    name: string
-    phone: string
-    fullAddress: string
-    request: string
+    id: number; name: string; phone: string;
+    fullAddress: string; request: string; message: string
 }
 
-type Props = {
+interface AddressModalProps {
     onClose: () => void
     selectedAddress: SelectedAddress | null
     onChangeSelected: (addr: SelectedAddress) => void
+    onOpenCreate?: (initial?: Partial<ApiAddress>) => void
 }
 
-export default function AddressModal({ onClose, selectedAddress, onChangeSelected }: Props) {
-    const [step, setStep] = useState<'list' | 'form'>('list')
-    const [savedAddresses, setSavedAddresses] = useState<ApiAddress[]>([])
+export default function AddressModal({
+    onClose, selectedAddress, onChangeSelected, onOpenCreate,
+}: AddressModalProps) {
+    const [saved, setSaved] = useState<ApiAddress[]>([])
+    const selectedId = selectedAddress?.id ?? 0
+    // 상단 state 추가
+    const [openAddModal, setOpenAddModal] = useState(false)
+    const [editing, setEditing] = useState<ApiAddress | null>(null)
+    const [initial, setInitial] = useState<Partial<ApiAddress> | null>(null)
 
-    // form fields
-    const [editingAddressId, setEditingAddressId] = useState<number | null>(null)
-    const [fullAddress, setFullAddress] = useState('') // main
-    const [zipCode, setZipCode] = useState('')
-    const [name, setName] = useState('')
-    const [phone, setPhone] = useState('')
-    const [detail, setDetail] = useState('') // 상세주소(= request로 쓰이던 값)
+    // 주소 목록 로드 함수 분리 (재사용)
+    const loadAddresses = async () => {
+        try {
+            const res = await requester.get<ApiAddress[]>('/api/addresses')
+            const list = [...res.data].sort((a, b) => Number(!!b.isDefault) - Number(!!a.isDefault))
+            setSaved(list)
+        } catch (e) {
+            console.error('주소 목록 불러오기 실패:', e)
+        }
+    }
 
-    // 주소 목록 불러오기
+    useEffect(() => {
+        loadAddresses()
+    }, [])
+
+
     useEffect(() => {
         (async () => {
             try {
                 const res = await requester.get<ApiAddress[]>('/api/addresses')
-                setSavedAddresses(res.data)
+                const list = [...res.data].sort((a, b) => Number(!!b.isDefault) - Number(!!a.isDefault))
+                setSaved(list)
             } catch (e) {
                 console.error('주소 목록 불러오기 실패:', e)
             }
         })()
     }, [])
 
-    // 카카오 주소 검색
-    const handleSearch = () => {
-        openKakaoPostcode(({ full, zipCode }) => {
-            setFullAddress(full)
-            setZipCode(zipCode)
-            setStep('form')
-        })
+    const handleSelect = (addr: ApiAddress) => {
+        const sel: SelectedAddress = {
+            id: addr.id,
+            name: addr.name,
+            phone: addr.phone ?? '',
+            fullAddress: formatAddressDisplay({ zipCode: addr.zipCode, main: addr.main, detail: addr.detail }),
+            request: addr.message ?? '',
+            message: '',
+        }
+        onChangeSelected(sel)
+        sessionStorage.setItem('selectedAddress', JSON.stringify(sel))
+        onClose()
     }
 
-    // 기본 배송지 설정
-    const handleSetDefault = async (id: number) => {
+    const setDefault = async (id: number) => {
         try {
             await requester.patch(`/api/addresses/${id}`)
-            setSavedAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === id })))
-        } catch (e) {
+            setSaved(prev => prev.map(a => ({ ...a, isDefault: a.id === id })))
+        } catch {
             alert('기본 배송지 설정 실패')
         }
     }
 
-    // 선택
-    const handleSelectSaved = (addr: ApiAddress) => {
-        const selected = {
-            id: addr.id,
-            name: addr.name,
-            phone: addr.phone ?? '',
-            fullAddress: formatAddressDisplay({ zipCode: addr.zipCode, main: addr.main, detail: addr.detail }), // ✅
-            request: addr.message ?? '',
-            message: '',
-        };
-        onChangeSelected(selected);
-        // 성공 페이지 등에서 쓰면 세션에도 저장
-        sessionStorage.setItem('selectedAddress', JSON.stringify(selected));   // ✅
-        onClose();
-    };
-
-    // 수정 시작
-    const handleEdit = (addr: ApiAddress) => {
-        setEditingAddressId(addr.id)
-        setFullAddress(addr.main)
-        setZipCode(addr.zipCode)
-        setName(addr.name)
-        setPhone(addr.phone)
-        setDetail(addr.detail ?? '')
-        setStep('form')
+    const edit = (addr: ApiAddress) => {
+        setEditing(addr)
+        setInitial(null)
+        setOpenAddModal(true)
     }
 
-    // 삭제
-    const handleDelete = async (id: number) => {
+    const remove = async (id: number) => {
         if (!confirm('정말 삭제하시겠습니까?')) return
         try {
             await requester.delete(`/api/addresses/${id}`)
-            setSavedAddresses(prev => prev.filter(a => a.id !== id))
-            // 삭제된 주소가 현재 선택된 주소면 선택 해제
-            if (selectedAddress?.id === id) {
-                onChangeSelected?.({
-                    id: 0, name: '', phone: '', fullAddress: '', request: '',
-                    message: ''
-                })
+            setSaved(prev => prev.filter(a => a.id !== id))
+            if (selectedId === id) {
+                onChangeSelected({ id: 0, name: '', phone: '', fullAddress: '', request: '', message: '' })
             }
-        } catch (e) {
+        } catch {
             alert('삭제 실패')
         }
     }
 
-    // 저장(신규/수정)
-    const handleSubmit = async () => {
-        if (!name || !phone || !fullAddress || !zipCode) {
-            alert('모든 필드를 입력해주세요.')
-            return
-        }
+    const openSearchAndCreate = () => {
+        setEditing(null)
+        setOpenAddModal(true)
+    }
 
-        const payload = { name, phone, zipCode, main: fullAddress, detail };
-        try {
-            if (editingAddressId !== null) {
-                const res = await requester.put<ApiAddress>(`/api/addresses/${editingAddressId}`, payload);
-                const saved = res.data;
-                setSavedAddresses(prev => prev.map(a => (a.id === saved.id ? saved : a)));
-                const selected = {
-                    id: saved.id,
-                    name: saved.name,
-                    phone: saved.phone ?? '',
-                    fullAddress: formatAddressDisplay({ zipCode: saved.zipCode, main: saved.main, detail: saved.detail }), // ✅
-                    request: saved.message ?? '',
-                    message: '',
-                };
-                onChangeSelected(selected);
-                sessionStorage.setItem('selectedAddress', JSON.stringify(selected)); // ✅
-            } else {
-                const res = await requester.post<ApiAddress>('/api/addresses', payload);
-                const saved = res.data;
-                setSavedAddresses(prev => [saved, ...prev]);
-                const selected = {
-                    id: saved.id,
-                    name: saved.name,
-                    phone: saved.phone ?? '',
-                    fullAddress: formatAddressDisplay({ zipCode: saved.zipCode, main: saved.main, detail: saved.detail }), // ✅
-                    request: saved.message ?? '',
-                    message: '',
-                };
-                onChangeSelected(selected);
-                sessionStorage.setItem('selectedAddress', JSON.stringify(selected)); // ✅
+    // 키보드로도 선택 가능
+    const keySelect =
+        (addr: ApiAddress) =>
+            (e: React.KeyboardEvent<HTMLElement>) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleSelect(addr)
+                }
             }
-            onClose();
-        } catch (e) {
-            console.error('주소 저장 실패:', e);
-            alert('주소 저장에 실패했습니다.');
-        }
-    };
 
     return (
         <div className={styles.modal_overlay}>
             <KakaoPostCodeLoader />
-            <div className={styles.modal}>
-                <h3 className={styles.title}>배송지 선택</h3>
-                <button className={styles.close_btn} onClick={onClose}>✕</button>
+            <div className={styles.modal} role="dialog" aria-modal="true">
+                <header className={styles.header_bar}>
+                    <h2 className={styles.title}>주소록</h2>
+                    <button aria-label="닫기" className={styles.icon_btn} onClick={onClose}>✕</button>
+                </header>
 
-                {/* 저장된 주소 리스트 */}
-                {savedAddresses.map(addr => (
-                    <div key={addr.id} className={styles.saved_item}>
-                        <label className={styles.radio_line}>
-                            <input
-                                type="radio"
-                                name="selectedAddress"
-                                checked={selectedAddress?.id === addr.id}
-                                onChange={() => handleSelectSaved(addr)}
-                            />
-                            <div className={styles.address_info}>
-                                <div className={styles.header}>
-                                    <strong>{addr.name}</strong>
-                                    <span className={styles.phone}>({addr.phone})</span>
-                                    {addr.isDefault && <span className={styles.default_badge}>기본 배송지</span>}
+                <button className={styles.primary_outline_btn} onClick={openSearchAndCreate}>
+                    + 새 주소 추가하기
+                </button>
+
+                <ul className={styles.list}>
+                    {saved.map(addr => {
+                        const isSelected = selectedId === addr.id
+                        return (
+                            <li key={addr.id} className={styles.item_row}>
+                                <div
+                                    className={`${styles.item_button} ${isSelected ? styles.selected : ''}`}
+                                    onClick={() => handleSelect(addr)}
+                                    onKeyDown={keySelect(addr)}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-pressed={isSelected}
+                                >
+                                    {/* 우측 상단 액션 버튼 */}
+                                    <div className={styles.item_actions} onClick={(e) => e.stopPropagation()}>
+                                        <span
+                                            role="button"
+                                            tabIndex={0}
+                                            className={styles.text_btn}
+                                            onClick={() => edit(addr)}
+                                            onKeyDown={(e) => e.key === 'Enter' && edit(addr)}
+                                        >
+                                            <Image src="/icons/modify.svg" alt="수정" width={16} height={16} />
+                                        </span>
+                                        <span
+                                            role="button"
+                                            tabIndex={0}
+                                            className={styles.text_btn}
+                                            onClick={() => remove(addr.id)}
+                                            onKeyDown={(e) => e.key === 'Enter' && remove(addr.id)}
+                                        >
+                                            <Image src="/icons/delete.svg" alt="삭제" width={16} height={16} />
+                                        </span>
+                                    </div>
+
+                                    {/* 주소 정보 */}
+                                    <div className={styles.info_box}>
+                                        <div className={styles.name_line}>
+                                            <span className={styles.name}>{addr.name}</span>
+                                            {addr.isDefault && <span className={styles.badge}>기본 배송지</span>}
+                                        </div>
+                                        <div className={styles.addr_text}>
+                                            ({addr.zipCode}) {addr.main}{addr.detail ? ` ${addr.detail}` : ''}
+                                        </div>
+                                        <div className={styles.phone_text}>
+                                            {phonePattern.test(addr.phone) ? formatPhoneNumber(addr.phone) : addr.phone}
+                                        </div>
+                                    </div>
+
+                                    {isSelected && <span className={styles.checkmark}>✓</span>}
                                 </div>
-                                <div className={styles.address_lines}>
-                                    <p><strong>우편번호:</strong> {addr.zipCode}</p>
-                                    <p><strong>주소:</strong> {addr.main}</p>
-                                    {addr.detail && <p><strong>상세:</strong> {addr.detail}</p>}
-                                </div>
-                            </div>
-                        </label>
-
-                        <div className={styles.button_group}>
-                            {!addr.isDefault && (
-                                <button onClick={() => handleSetDefault(addr.id)}>기본으로</button>
-                            )}
-                            <button onClick={() => handleEdit(addr)}>수정</button>
-                            <button onClick={() => handleDelete(addr.id)}>삭제</button>
-                        </div>
-                    </div>
-                ))}
-
-                <button className={styles.search_btn} onClick={handleSearch}>+ 새 주소 검색</button>
-
-                {step === 'form' && (
-                    <div className={styles.form}>
-                        <p className={styles.address_display}><strong>주소:</strong> {fullAddress}</p>
-
-                        <input
-                            type="text"
-                            placeholder="받는 분 이름"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className={styles.input}
-                        />
-
-                        <input
-                            type="tel"
-                            placeholder="연락처 (010-1234-5678)"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            className={styles.input}
-                        />
-
-                        <input
-                            type="text"
-                            placeholder="상세주소"
-                            value={detail}
-                            onChange={(e) => setDetail(e.target.value)}
-                            className={styles.input}
-                        />
-
-                        <button className={styles.save_btn} onClick={handleSubmit}>저장</button>
-                    </div>
-                )}
+                            </li>
+                        )
+                    })}
+                </ul>
             </div>
+            {openAddModal && (
+                <AddressAddModal
+                    editing={editing}                 // 있으면 수정, 없으면 신규
+                    onClose={() => setOpenAddModal(false)}  // 부모(AddressModal)는 유지, 자식만 닫기
+                    onSaved={async (selectedAddr) => {
+                        // 저장 성공 시 목록 리프레시
+                        await loadAddresses();
+
+                        // 방금 저장/수정한 주소를 선택 상태로 반영 (부모는 그대로 유지)
+                        onChangeSelected(selectedAddr);
+
+                        setOpenAddModal(false);
+                    }}
+                />
+            )}
         </div>
     )
 }

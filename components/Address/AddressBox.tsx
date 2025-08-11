@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import styles from './AddressBox.module.scss'
+import { formatPhoneNumber, phonePattern } from '@/utils/openKakaoPostCode'
 
 type SelectedAddress = {
     id: number
@@ -30,18 +31,6 @@ export default function AddressBox({
         setRequest(selectedAddress?.request ?? '')
     }, [selectedAddress])
 
-    const handleSelectChange = (v: string) => {
-        // "직접 입력"은 입력창 보여주고 값은 아직 비움
-        if (v !== '직접 입력') {
-            setRequest(v)
-            onChangeRequest(v)
-        } else {
-            setRequest('직접 입력')
-        }
-    }
-
-    const showCustomInput = request === '직접 입력'
-
     return (
         <div className={styles.container}>
             <div className={styles.section_divider} />
@@ -60,7 +49,7 @@ export default function AddressBox({
                             <div className={styles.value}>{selectedAddress.name}</div>
 
                             <div className={styles.label}><p>연락처</p></div>
-                            <div className={styles.value}>{selectedAddress.phone}</div>
+                            <div className={styles.value}>{selectedAddress.phone && phonePattern.test(selectedAddress.phone) ? formatPhoneNumber(selectedAddress.phone) : selectedAddress.phone || '-'}</div>
 
                             <div className={styles.label}><p>주소</p></div>
                             <div className={styles.value}>{selectedAddress.fullAddress}</div>
