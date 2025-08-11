@@ -1,0 +1,98 @@
+// 바텀시트
+.bottom_sheet_header {
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 100;
+}
+
+.bottom_sheet_bottom_wrap {
+  position: sticky;
+  bottom: 0;
+  background-color: #fff;
+  z-index: 100;
+
+  .bottom_sheet_bottom {
+    > button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      min-width: 100px;
+      word-break: keep-all;
+      letter-spacing: -0.16px;
+      padding: 0 25px;
+      border: 1px solid $light-gray04;
+      border-radius: 10px;
+      height: 52px;
+    }
+    &_clear {
+      color: $gray01;
+      background-color: $white;
+    }
+    &_submit {
+      color: $white;
+      background-color: $black;
+      font-weight: 700;
+      width: 100%;
+    }
+  }
+}
+
+.contents_container {
+  height: 100%;
+  margin-top: 40px;
+  padding: 16px 0;
+}
+
+// 성별 필터
+.search_gender {
+  margin-bottom: 12px;
+
+  &_button_wrap {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding: 0 16px;
+  }
+}
+
+// 색상 필터
+.search_color {
+  padding: 18px 16px;
+  display: grid;
+  column-gap: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  &_item {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: -moz-fit-content;
+    height: fit-content;
+    margin: 0 auto;
+    padding: 10px 0;
+    position: relative;
+    text-align: center;
+
+    &_box {
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+
+      > div {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}
+
+// 가격대 필터
+.search_price_button_wrap {
+  flex-wrap: wrap;
+}

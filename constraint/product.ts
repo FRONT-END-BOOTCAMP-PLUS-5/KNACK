@@ -37,3 +37,20 @@ export const PRODUCT_FILTER_GENDER = [
   { id: 2, name: '여성', value: 'f' },
   { id: 3, name: '공용', value: 'all' },
 ] as const;
+
+export const PRODUCT_FILTER_DISCOUNT = [
+  { id: 1, name: '30% 이하', value: '-30' },
+  { id: 2, name: '30%-50%', value: '30-50' },
+  { id: 3, name: '50% 이상', value: '50-' },
+] as const;
+
+export const PRODUCT_FILTER_PRICE = [
+  { id: 1, name: '10만원 이하', value: '0-99999' },
+  { id: 2, name: '10만원대', value: '100000-199999' },
+  { id: 3, name: '20만원대', value: '200000-299999' },
+  { id: 4, name: '30만원대', value: '300000-399999' },
+  { id: 5, name: '30-50만원', value: '300000-500000' },
+  { id: 6, name: '50-100만원', value: '500000-1000000' },
+  { id: 7, name: '100-500만원', value: '1000000-5000000' },
+  { id: 8, name: '500만원 이상', value: '5000000-' },
+] as const;
