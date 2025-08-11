@@ -14,7 +14,7 @@ export class GetProductsUseCase {
 
     const filters: ProductFilters = {
       keyword: request.keyword,
-      color: request.color,
+      keywordColorId: request.keywordColorId,
       brandId: request.brandId,
       categoryId: request.categoryId,
       subCategoryId: request.subCategoryId,
@@ -22,8 +22,10 @@ export class GetProductsUseCase {
       priceMax: request.priceMax,
       discountMin: request.discountMin,
       discountMax: request.discountMax,
-      // size: request.size,
+      size: request.size,
       benefit: request.benefit,
+      gender: request.gender,
+      soldOutInvisible: request.soldOutInvisible,
     };
 
     const pagination: PaginationParams = {

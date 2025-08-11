@@ -4,6 +4,7 @@ import { PrProductsRepository } from '@/backend/search/infrastructure/repositori
 import { GetProductsRequestDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import { SortOption } from '@/backend/search/domains/entities/ProductFilters';
 import prisma from '@/backend/utils/prisma';
+import { getBooleanParam, getIntParam } from '@/utils/searchParams';
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,23 +13,25 @@ export async function GET(request: NextRequest) {
     const requestDto: GetProductsRequestDto = {
       keyword: searchParams.get('keyword') || undefined,
 
-      color: searchParams.get('color') || undefined,
-      brandId: searchParams.get('brandId') ? parseInt(searchParams.get('brandId')!) : undefined,
-      categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
-      subCategoryId: searchParams.get('subCategoryId') ? parseInt(searchParams.get('subCategoryId')!) : undefined,
-      priceMin: searchParams.get('priceMin') ? parseInt(searchParams.get('priceMin')!) : undefined,
-      priceMax: searchParams.get('priceMax') ? parseInt(searchParams.get('priceMax')!) : undefined,
-      discountMin: searchParams.get('discountMin') ? parseInt(searchParams.get('discountMin')!) : undefined,
-      discountMax: searchParams.get('discountMax') ? parseInt(searchParams.get('discountMax')!) : undefined,
-      // size: searchParams.get('size') || undefined,
+      keywordColorId: getIntParam(searchParams, 'keywordColorId'),
+      brandId: getIntParam(searchParams, 'brandId'),
+      categoryId: getIntParam(searchParams, 'categoryId'),
+      subCategoryId: getIntParam(searchParams, 'subCategoryId'),
+      priceMin: getIntParam(searchParams, 'priceMin'),
+      priceMax: getIntParam(searchParams, 'priceMax'),
+      discountMin: getIntParam(searchParams, 'discountMin'),
+      discountMax: getIntParam(searchParams, 'discountMax'),
+      size: searchParams.get('size') || undefined,
       benefit: (searchParams.get('benefit') as 'under_price') || undefined,
+      gender: searchParams.get('gender') || undefined,
+      soldOutInvisible: getBooleanParam(searchParams, 'soldOutInvisible'),
 
       sort: (searchParams.get('sort') as SortOption) || 'latest',
 
       cursor: searchParams.get('cursor') || undefined,
-      offset: searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : undefined,
-      limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20,
-      page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : undefined,
+      offset: getIntParam(searchParams, 'offset'),
+      limit: getIntParam(searchParams, 'limit'),
+      page: getIntParam(searchParams, 'page'),
     };
 
     const repository = new PrProductsRepository(prisma);
