@@ -11,7 +11,7 @@ export class SocialLoginUseCase {
     let existingUserAuth = await this.socialLoginRepository.findByProviderAndProviderId(provider, providerId);
     
     if (existingUserAuth) {
-      // 기존 소셜 계정이 있으면 해당 사용자 반환
+      // 기존 소셜 계정이 있으면 해당 사용자 반환 (기존 정보 그대로)
       const user = await this.socialLoginRepository.findUserById(existingUserAuth.userId);
       if (!user || user.deletedAt || !user.isActive) {
         throw new Error('탈퇴한 계정입니다.');
@@ -22,9 +22,9 @@ export class SocialLoginUseCase {
         message: '소셜 로그인이 완료되었습니다.',
         user: {
           id: user.id,
-          email: user.email,
-          name: user.name,
-          nickname: user.nickname,
+          email: user.email,        // 기존 이메일 그대로
+          name: user.name,          // 기존 이름 그대로
+          nickname: user.nickname,  // 기존 닉네임 그대로
           roles: ['USER'],
           deletedAt: user.deletedAt,
           isActive: user.isActive,
@@ -37,7 +37,7 @@ export class SocialLoginUseCase {
     let existingUser = await this.socialLoginRepository.findUserByEmail(email);
     
     if (existingUser) {
-      // 같은 이메일의 기존 계정이 있으면 소셜 계정 연결
+      // 같은 이메일의 기존 계정이 있으면 소셜 계정 연결 (기존 정보 유지)
       await this.socialLoginRepository.createUserAuth({
         provider,
         providerId,
@@ -50,9 +50,9 @@ export class SocialLoginUseCase {
         message: '기존 계정과 소셜 계정이 연결되었습니다.',
         user: {
           id: existingUser.id,
-          email: existingUser.email,
-          name: existingUser.name,
-          nickname: existingUser.nickname,
+          email: existingUser.email,        // 기존 이메일 그대로
+          name: existingUser.name,          // 기존 이름 그대로
+          nickname: existingUser.nickname,  // 기존 닉네임 그대로
           roles: ['USER'],
           deletedAt: existingUser.deletedAt,
           isActive: existingUser.isActive,
@@ -61,7 +61,7 @@ export class SocialLoginUseCase {
       };
     }
 
-    // 3. 새로운 사용자 생성
+    // 3. 새로운 사용자 생성 (새 사용자만)
     const newUser = await this.socialLoginRepository.createUser({
       email,
       name,
