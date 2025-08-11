@@ -103,6 +103,7 @@
     .product_name {
       color: $gray03;
       font-size: 1.3rem;
+      margin-top: 2px;
 
       > p {
         overflow: hidden;
@@ -118,6 +119,7 @@
       font-size: 1.1rem;
       font-weight: 600;
       color: $light-gray01;
+      margin-top: 2px;
 
       > p {
         @include mixins.text-ellipsis;
@@ -132,12 +134,21 @@
       }
     }
 
+    .product_sold_out {
+      display: inline-block;
+      background-color: $white;
+      color: $gray06;
+      border: 1px solid $light-gray03;
+      margin-top: 6px;
+      padding: 3px 4px;
+    }
+
     .price_info {
       .price {
-        font-size: 1.2rem;
-        font-weight: 600;
+        font-size: 1.4rem;
+        font-weight: 700;
         color: $gray03;
-        margin: 0;
+        margin-top: 10px;
       }
     }
 

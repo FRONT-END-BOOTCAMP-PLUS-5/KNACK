@@ -14,7 +14,7 @@ interface IProps {
   showOverlay?: boolean;
   closeOnOverlayClick?: boolean;
   showHandle?: boolean;
-  className?: string;
+  style?: React.CSSProperties;
 }
 
 export default function BottomSheet({
@@ -24,7 +24,7 @@ export default function BottomSheet({
   showOverlay = true,
   closeOnOverlayClick = true,
   showHandle = true,
-  className = '',
+  style,
 }: IProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const { isOpen, onClose } = useBottomSheetStore();
@@ -45,11 +45,12 @@ export default function BottomSheet({
   };
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const threshold = 100;
+    const threshold = 20;
     const velocity = info.velocity.y;
     const offset = info.offset.y;
+    const shouldClose = offset > threshold || velocity > 20 || (velocity >= 0 && velocity > 45);
 
-    if (offset > threshold || velocity > 500) {
+    if (shouldClose) {
       onClose();
     }
   };
@@ -88,18 +89,18 @@ export default function BottomSheet({
 
           <motion.div
             ref={sheetRef}
-            className={`${styles.bottom_sheet} ${className}`}
+            className={styles.bottom_sheet}
             style={{ height: getHeightValue() }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{
               type: 'spring',
-              damping: 30,
-              stiffness: 250,
+              damping: 40,
+              stiffness: 400,
             }}
             drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
+            dragConstraints={{ top: 0 }}
             dragElastic={0.1}
             onDragEnd={handleDragEnd}
             dragMomentum={false}
@@ -119,7 +120,9 @@ export default function BottomSheet({
               </div>
             )}
 
-            <div className={styles.content}>{children}</div>
+            <div className={styles.content} style={style}>
+              {children}
+            </div>
           </motion.div>
         </div>
       )}
