@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
+import PaymentHeader from '@/components/Payments/PaymentHeader/PaymentHeader';
 
 interface IProps {
   children: React.ReactNode;
@@ -60,9 +61,21 @@ export default function LayoutWrapper({ children }: IProps) {
   const shouldHideFooter = hideFooterPaths.some((path) => pathname.startsWith(path)) || 
                           hideAllLayoutPaths.some((path) => pathname.startsWith(path));
 
+  const paymentsHeaderPaths = ['/payments/checkout'].some(path => pathname.startsWith(path));
+
   // 하이드레이션 완료 전까지는 로딩 표시
   if (!mounted) {
     return <div>Loading...</div>;
+  }
+
+
+  if (paymentsHeaderPaths) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <PaymentHeader />
+        <SessionProvider>{children}</SessionProvider>
+      </QueryClientProvider>
+    );
   }
 
   return (

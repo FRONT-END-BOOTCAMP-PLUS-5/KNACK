@@ -3,7 +3,7 @@ import { Product } from './Product';
 export class ProductFilters {
   constructor(
     public readonly keyword?: string,
-    public readonly color?: string,
+    public readonly keywordColorId?: number,
     public readonly brandId?: number,
     public readonly categoryId?: number,
     public readonly subCategoryId?: number,
@@ -11,8 +11,10 @@ export class ProductFilters {
     public readonly priceMax?: number,
     public readonly discountMin?: number,
     public readonly discountMax?: number,
-    // public readonly size?: string,
-    public readonly benefit?: 'under_price'
+    public readonly size?: string,
+    public readonly benefit?: 'under_price',
+    public readonly gender?: string,
+    public readonly soldOutInvisible?: boolean
   ) {}
 }
 

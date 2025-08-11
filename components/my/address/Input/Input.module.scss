@@ -1,0 +1,80 @@
+.input_group {
+  margin-bottom: 2.4rem;
+  width: 100%;
+}
+
+.input_group label {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #222;
+}
+
+.input_wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input_wrapper input {
+  width: 100%;
+  height: 4rem;
+  padding: 0 4.8rem 0 0rem;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 0;
+  font-size: 1.3rem;
+  color: #222;
+  background-color: #fff;
+  outline: none;
+  transition: border-bottom-color 0.2s ease;
+
+  &::placeholder {
+    color: #999;
+  }
+
+  &:focus {
+    border-bottom: 2px solid #222;
+  }
+
+  &.input_error {
+    border-bottom-color: $red02;
+  }
+
+  // autofill 스타일 제거
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: #222 !important;
+  }
+}
+
+.clear_button {
+  position: absolute;
+  right: 1.2rem;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #999;
+  cursor: pointer;
+  padding: 0.4rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: #666;
+  }
+}
+
+.error_message {
+  display: block;
+  font-size: 1.3rem;
+  color: $red02;
+  margin-top: 0.8rem;
+  line-height: 1.4;
+}

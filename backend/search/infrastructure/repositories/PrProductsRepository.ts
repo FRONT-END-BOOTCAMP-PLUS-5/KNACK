@@ -22,11 +22,11 @@ export class PrProductsRepository implements ProductSearchRepository {
     const limit = pagination?.limit || 20;
     const offset = pagination?.offset || 0;
 
-    // WHERE 조건 구성
-    const whereConditions: Record<string, unknown> = {};
+    const whereConditions: Record<string, unknown> = {
+      isPrivate: true,
+    };
 
     if (filters) {
-      // 키워드 검색 (상품명, 설명에서 검색)
       if (filters.keyword) {
         whereConditions.OR = [
           { korName: { contains: filters.keyword, mode: 'insensitive' } },
@@ -64,6 +64,31 @@ export class PrProductsRepository implements ProductSearchRepository {
       }
       if (filters.benefit === 'under_price') {
         whereConditions.discountPercent = { gt: 0 };
+      }
+
+      if (filters.keywordColorId) {
+        whereConditions.keywordColorId = filters.keywordColorId;
+      }
+      if (filters.gender) {
+        whereConditions.gender = filters.gender;
+      }
+      if (filters.soldOutInvisible) {
+        whereConditions.NOT = {
+          productStockMapping: {
+            every: {
+              stock: 0,
+            },
+          },
+        };
+      }
+      if (filters.size) {
+        whereConditions.productStockMapping = {
+          some: {
+            optionValue: {
+              name: filters.size,
+            },
+          },
+        };
       }
     }
 
@@ -108,6 +133,11 @@ export class PrProductsRepository implements ProductSearchRepository {
         brand: true,
         category: true,
         subCategory: true,
+        productStockMapping: {
+          select: {
+            stock: true,
+          },
+        },
         _count: {
           select: {
             reviews: true,
@@ -125,45 +155,37 @@ export class PrProductsRepository implements ProductSearchRepository {
     const actualProducts = hasNext ? products.slice(0, limit) : products;
 
     // 응답 데이터 구성
-    const mappedProducts: Product[] = actualProducts.map(
-      (product) =>
-        new Product(
-          product.id,
-          product.descriptionText,
-          product.thumbnailImage,
-          product.subImages ? product.subImages.split(',') : [],
-          product.price || 0,
-          product.discountPercent || 0,
-          // product.detailContents,
-          product.brandId,
-          product.categoryId,
-          product.isRecommended,
-          product.isPrivate,
-          product.createdAt || new Date(),
-          product.gender,
-          product.hit || 0,
-          product.engName,
-          product.korName,
-          product.modelNumber,
-          product.releaseDate,
-          product.colorKorName,
-          product.colorEngName,
-          new Brand(product.brand.id, product.brand.korName, product.brand.engName),
-          [new Category(product.category.id, product.category.korName, product.category.engName)],
-          product.subCategory
-            ? [
-                new SubCategory(
-                  product.subCategory.id,
-                  product.subCategory.korName,
-                  product.subCategory.engName,
-                  product.subCategory.categoryId
-                ),
-              ]
-            : [],
-          product._count.reviews,
-          product._count.likes
-        )
-    );
+    const mappedProducts: Product[] = actualProducts.map((product) => {
+      // isSoldOut 계산: 모든 재고가 0이면 true
+      const isSoldOut =
+        product.productStockMapping.length > 0 && product.productStockMapping.every((stock) => stock.stock === 0);
+
+      return new Product(
+        product.id,
+        product.thumbnailImage,
+        product.price || 0,
+        product.discountPercent || 0,
+        product.isRecommended,
+        product.hit || 0,
+        product.engName,
+        product.korName,
+        new Brand(product.brand.id, product.brand.korName, product.brand.engName),
+        [new Category(product.category.id, product.category.korName, product.category.engName)],
+        product.subCategory
+          ? [
+              new SubCategory(
+                product.subCategory.id,
+                product.subCategory.korName,
+                product.subCategory.engName,
+                product.subCategory.categoryId
+              ),
+            ]
+          : [],
+        product._count.reviews,
+        product._count.likes,
+        isSoldOut
+      );
+    });
 
     // 페이지네이션 정보 계산
     const totalCount = await this.prisma.product.count({ where: whereConditions });

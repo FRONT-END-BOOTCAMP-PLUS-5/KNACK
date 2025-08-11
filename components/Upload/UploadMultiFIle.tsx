@@ -58,9 +58,6 @@ export default function UploadMultiFile({ uploadUrl, storagePath }: Props) {
     }
 
     const handleDelete = async (file: UploadedFile) => {
-        const confirmDelete = confirm(`${file.name} 파일을 삭제할까요?`)
-        if (!confirmDelete) return
-
         try {
             await requester.delete('/api/upload', { data: { key: file.s3Key } })
             setUploadedFiles((prev) => prev.filter((f) => f.s3Key !== file.s3Key))

@@ -1,53 +1,5 @@
 .checkout_container {
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: 'Pretendard', sans-serif;
-
-    h1 {
-        font-size: 1.8rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .product_list {
-        list-style: none;
-        padding: 0;
-
-        li {
-            margin-bottom: 0.75rem;
-
-            label {
-                cursor: pointer;
-
-                input {
-                    margin-right: 0.5rem;
-                }
-            }
-        }
-    }
-
-    .summary {
-        margin-top: 2rem;
-        font-size: 1.1rem;
-
-        p {
-            margin-bottom: 1rem;
-        }
-
-        button {
-            background: #0064ff;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            font-weight: bold;
-            font-size: 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-
-            &:hover {
-                background: #004fcc;
-            }
-        }
-    }
+    background: transparent;
+    padding-bottom: 88px;
+    padding: 0rem;
 }

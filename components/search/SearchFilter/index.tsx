@@ -5,17 +5,23 @@ import DragScroll from '@/components/common/DragScroll';
 import styles from './search_filter.module.scss';
 import Image from 'next/image';
 import arrowDown from '@/public/icons/arrow_down.svg';
-import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import { PRODUCT_FILTER } from '@/constraint/product';
 
-const SearchFilter: React.FC = () => {
-  const { onOpen } = useBottomSheetStore();
+interface IProps {
+  handleSelect: (id: number, isOpen: boolean) => void;
+}
 
+const SearchFilter: React.FC<IProps> = ({ handleSelect }) => {
   return (
     <div className={styles.filter_section}>
       <DragScroll className={styles.filter_scroll} showScrollbar={false}>
         {PRODUCT_FILTER.map((option) => (
-          <button type="button" onClick={() => onOpen()} key={option.id} className={styles.filter_button}>
+          <button
+            type="button"
+            onClick={() => handleSelect(option.id, true)}
+            key={option.id}
+            className={styles.filter_button}
+          >
             <p>
               <span>{option.name}</span>
               <span>1</span>

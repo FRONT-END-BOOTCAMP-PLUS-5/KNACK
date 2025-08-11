@@ -3,6 +3,7 @@
 import styles from './flex.module.scss';
 
 interface IProps {
+  tag?: 'div' | 'ul' | 'li' | 'nav' | 'article' | 'main' | 'section' | 'aside' | 'details';
   children: React.ReactNode;
   className?: string;
   direction?: 'row' | 'column';
@@ -17,8 +18,9 @@ interface IProps {
 }
 
 const Flex = ({
+  tag = 'div',
   children,
-  className,
+  className = '',
   direction = 'row',
   align = 'start',
   justify = 'start',
@@ -29,8 +31,10 @@ const Flex = ({
   marginVertical = 0,
   marginHorizontal = 0,
 }: IProps) => {
+  const Tag = tag;
+
   return (
-    <div
+    <Tag
       className={`${className} ${styles.flex_style} ${styles['align_' + align]} ${styles['justify_' + justify]} ${
         styles['width_' + width]
       }`}
@@ -42,7 +46,7 @@ const Flex = ({
       }}
     >
       {children}
-    </div>
+    </Tag>
   );
 };
 

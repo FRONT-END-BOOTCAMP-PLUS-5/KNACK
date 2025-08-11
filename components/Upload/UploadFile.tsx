@@ -62,9 +62,6 @@ export default function UploadFile({ uploadUrl, storagePath }: Props) {
     }
 
     const handleDelete = async () => {
-        const confirmDelete = confirm(`${fileName} 파일을 삭제할까요?`)
-        if (!confirmDelete) return
-
         try {
             if (s3Key) {
                 await requester.delete('/api/upload', { data: { key: s3Key } })
