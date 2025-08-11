@@ -1,12 +1,46 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { SessionProvider } from 'next-auth/react';
+import { SessionProvider, useSession } from 'next-auth/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
+import { useUserStore } from '@/store/userStore';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import PaymentHeader from '@/components/Payments/PaymentHeader/PaymentHeader';
+
+// 전역 상태 컨텍스트 생성 (기존 타입 활용)
+const GlobalContext = createContext<any>(null);
+
+// 전역 상태 훅
+export const useGlobalState = () => {
+  const context = useContext(GlobalContext);
+  if (!context) {
+    throw new Error('useGlobalState must be used within GlobalProvider');
+  }
+  return context;
+};
+
+// 전역 상태 프로바이더 컴포넌트
+function GlobalProvider({ children }: { children: React.ReactNode }) {
+  const { data: session, status } = useSession();
+  const { user, isLoading, error, fetchUserData, updateUserPoint, updateMarketingConsent } = useUserStore();
+  
+  return (
+    <GlobalContext.Provider value={{ 
+      session, 
+      status, 
+      user, 
+      isLoading, 
+      error, 
+      fetchUserData, 
+      updateUserPoint, 
+      updateMarketingConsent 
+    }}>
+      {children}
+    </GlobalContext.Provider>
+  );
+}
 
 interface IProps {
   children: React.ReactNode;
@@ -73,7 +107,11 @@ export default function LayoutWrapper({ children }: IProps) {
     return (
       <QueryClientProvider client={queryClient}>
         <PaymentHeader />
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <GlobalProvider>
+            {children}
+          </GlobalProvider>
+        </SessionProvider>
       </QueryClientProvider>
     );
   }
@@ -81,9 +119,11 @@ export default function LayoutWrapper({ children }: IProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
-        {!shouldHideHeader && <Header />}
-        {children}
-        {!shouldHideFooter && <Footer />}
+        <GlobalProvider>
+          {!shouldHideHeader && <Header />}
+          {children}
+          {!shouldHideFooter && <Footer />}
+        </GlobalProvider>
       </SessionProvider>
     </QueryClientProvider>
   );

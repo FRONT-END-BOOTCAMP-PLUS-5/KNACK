@@ -1,12 +1,11 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import { useUserStore } from '@/store/userStore';
+import styles from './userTest.module.scss';
+import { useGlobalState } from '@/app/(user)/LayoutWrapper';
 import { useEffect } from 'react';
 
 export default function UserTestPage() {
-  const { data: session, status } = useSession();
-  const { user, isLoading, error, fetchUserData, updateUserPoint, updateMarketingConsent } = useUserStore();
+  const { session, status, user, isLoading, error, fetchUserData, updateUserPoint, updateMarketingConsent } = useGlobalState();
 
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.id) {
