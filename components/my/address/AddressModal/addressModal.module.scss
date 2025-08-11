@@ -1,0 +1,39 @@
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: #fff;
+}
+
+.address_header {
+  text-align: center;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.back_button {
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  transform: translate(0, -50%);
+  background: none;
+  border: none;
+}
+
+.address_save_button {
+  height: 52px;
+  border-radius: 12px;
+  width: 100%;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 32px;
+  color: #fff;
+  border: none;
+  background: #2223;
+
+  &.active {
+    background: #222;
+  }
+}

@@ -1,45 +1,36 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import styles from './myPage.module.scss';
+import Flex from '@/components/common/Flex';
+import Text from '@/components/common/Text';
+import Divider from '@/components/common/Divider';
+import BuyList from '@/components/my/BuyList';
+import ActionGrid from '@/components/my/ActionGrid';
+import MyNav from '@/components/my/MyNav';
 
-export default function MyPage(){
-    const router = useRouter();
-    
-    const handleWithdrawalClick = () => {
-        router.push('/my/withdrawal');
-    };
-    
-    return(
-        <main className={styles.my_page}>
-            <div className={styles.my_content}>
-                <h1 className={styles.my_title}>마이페이지</h1>
-                
-                <div className={styles.menu_section}>
-                    <div className={styles.menu_item}>
-                        <span className={styles.menu_text}>내 정보</span>
-                    </div>
-                    <div className={styles.menu_item}>
-                        <span className={styles.menu_text}>주문 내역</span>
-                    </div>
-                    <div className={styles.menu_item}>
-                        <span className={styles.menu_text}>관심 상품</span>
-                    </div>
-                    <div className={styles.menu_item}>
-                        <span className={styles.menu_text}>설정</span>
-                    </div>
-                    
-                    {/* 회원탈퇴 버튼 */}
-                    <div className={styles.withdrawal_section}>
-                        <button 
-                            className={styles.withdrawal_button}
-                            onClick={handleWithdrawalClick}
-                        >
-                            회원탈퇴
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </main>
-    )
+export default function MyPage() {
+  return (
+    <section className={styles.my_page}>
+      <section>
+        <Flex paddingVertical={16} paddingHorizontal={24}>
+          <span className={styles.profile_image}>프로필</span>
+          <Flex direction="column" width="self">
+            <Text size={1.8} weight={600}>
+              닉네임
+            </Text>
+            <Text size={1.4} color="gray2" marginTop={2}>
+              아이디
+            </Text>
+            <button className={styles.profile_edit_button}>프로필 관리</button>
+          </Flex>
+        </Flex>
+      </section>
+      <Divider />
+      <ActionGrid />
+      <div className={styles.block} />
+      <BuyList />
+      <div className={styles.block} />
+      <MyNav />
+    </section>
+  );
 }
