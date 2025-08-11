@@ -2,12 +2,7 @@
 
 import { useState } from 'react'
 import styles from './PointSection.module.scss'
-
-type PointSectionProps = {
-    availablePoints: number
-    maxUsablePoints: number
-    onChange: (value: number) => void
-}
+import { PointSectionProps } from '@/types/order'
 
 export default function PointSection({
     availablePoints,

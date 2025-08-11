@@ -6,22 +6,7 @@ import Image from 'next/image'
 import { STORAGE_PATHS } from '@/constraint/auth'
 import FastDeliveryModal from '../Modals/FastDeliveryModal'
 import WarehouseStorageModal from '../Modals/WarehouseStorageModal'
-
-type OrderItem = {
-    productId: number
-    price: number
-    quantity: number
-    thumbnail_image: string
-    kor_name?: string
-    eng_name?: string
-}
-
-type Props = {
-    orderItems: OrderItem[]
-    deliveryType: 'FAST' | 'STOCK'
-    onChangeDelivery: (type: 'FAST' | 'STOCK') => void
-    totalPrice: number
-}
+import { Props } from '@/types/order'
 
 export default function OrderSummaryCard({
     orderItems,

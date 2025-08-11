@@ -3,23 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './RequestModal.module.scss';
 import Image from 'next/image';
+import { requestProps } from '@/types/order';
 
-type Props = {
-    open: boolean;
-    value: string;                          // 현재 저장된 요청사항 (빈 문자열이면 ‘없음’)
-    onClose: () => void;
-    onApply: (next: string) => void;        // 최종 선택(빈 문자열 = 없음)
-};
-
-const PRESETS = [
-    '요청사항 없음',
-    '문 앞에 놓아주세요',
-    '경비실에 맡겨 주세요',
-    '파손 위험 상품입니다. 배송 시 주의해주세요',
-    '직접 입력',
-] as const;
-
-export default function RequestModal({ open, value, onClose, onApply }: Props) {
+export default function RequestModal({ open, value, onClose, onApply }: requestProps) {
     const [selected, setSelected] = useState<string>('');
     const [custom, setCustom] = useState<string>('');
     const inputRef = useRef<HTMLInputElement>(null);

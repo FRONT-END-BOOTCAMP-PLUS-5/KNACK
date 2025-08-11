@@ -4,29 +4,13 @@ import { useEffect, useState } from 'react'
 import styles from './AddressModal.module.scss'
 import KakaoPostCodeLoader from './KakaoPostCodeLoader'
 import requester from '@/utils/requester'
-import { formatAddressDisplay, formatPhoneNumber, openKakaoPostcode, phonePattern } from '@/utils/openKakaoPostCode'
+import { formatAddressDisplay, formatPhoneNumber, phonePattern } from '@/utils/openKakaoPostCode'
 import Image from 'next/image'
 import { AddressAddModal } from './AddressAddModal'
-
-export type ApiAddress = {
-    id: number; name: string; phone: string;
-    zipCode: string; main: string; detail: string | null;
-    message: string | null; isDefault?: boolean
-}
-export type SelectedAddress = {
-    id: number; name: string; phone: string;
-    fullAddress: string; request: string; message: string
-}
-
-interface AddressModalProps {
-    onClose: () => void
-    selectedAddress: SelectedAddress | null
-    onChangeSelected: (addr: SelectedAddress) => void
-    onOpenCreate?: (initial?: Partial<ApiAddress>) => void
-}
+import { AddressModalProps, ApiAddress, SelectedAddress } from '@/types/order'
 
 export default function AddressModal({
-    onClose, selectedAddress, onChangeSelected, onOpenCreate,
+    onClose, selectedAddress, onChangeSelected,
 }: AddressModalProps) {
     const [saved, setSaved] = useState<ApiAddress[]>([])
     const selectedId = selectedAddress?.id ?? 0
@@ -70,20 +54,10 @@ export default function AddressModal({
             phone: addr.phone ?? '',
             fullAddress: formatAddressDisplay({ zipCode: addr.zipCode, main: addr.main, detail: addr.detail }),
             request: addr.message ?? '',
-            message: '',
         }
         onChangeSelected(sel)
         sessionStorage.setItem('selectedAddress', JSON.stringify(sel))
         onClose()
-    }
-
-    const setDefault = async (id: number) => {
-        try {
-            await requester.patch(`/api/addresses/${id}`)
-            setSaved(prev => prev.map(a => ({ ...a, isDefault: a.id === id })))
-        } catch {
-            alert('기본 배송지 설정 실패')
-        }
     }
 
     const edit = (addr: ApiAddress) => {
@@ -98,7 +72,7 @@ export default function AddressModal({
             await requester.delete(`/api/addresses/${id}`)
             setSaved(prev => prev.filter(a => a.id !== id))
             if (selectedId === id) {
-                onChangeSelected({ id: 0, name: '', phone: '', fullAddress: '', request: '', message: '' })
+                onChangeSelected({ id: 0, name: '', phone: '', fullAddress: '', request: '' })
             }
         } catch {
             alert('삭제 실패')

@@ -1,12 +1,5 @@
+import { FinalOrderSummaryProps } from '@/types/order'
 import styles from './FinalOrderSummary.module.scss'
-
-interface FinalOrderSummaryProps {
-    price: number
-    fee?: number
-    shippingFee: number
-    couponAmount?: number
-    pointAmount?: number
-}
 
 export default function FinalOrderSummary({
     price,

@@ -2,12 +2,7 @@
 
 import React from 'react'
 import styles from './paymentFooter.module.scss'
-
-interface PaymentFooterProps {
-    totalPrice: number
-    onPay: () => void
-    disabled?: boolean
-}
+import { PaymentFooterProps } from '@/types/order'
 
 export default function PaymentFooter({
     totalPrice,
@@ -19,9 +14,9 @@ export default function PaymentFooter({
 
     return (
         <footer className={styles.payment_footer}>
-            <button className={styles.pay_btn} onClick={onPay} disabled={disabled}>
-                {formatPrice(totalPrice)} · 결제하기
-            </button>
+            <div className={styles.payment_footer__inner}>
+                <button className={styles.pay_btn} disabled={disabled}>결제하기</button>
+            </div>
         </footer>
     )
 }

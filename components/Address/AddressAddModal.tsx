@@ -5,16 +5,9 @@ import styles from './AddressModal.module.scss'
 import KakaoPostCodeLoader from './KakaoPostCodeLoader'
 import requester from '@/utils/requester'
 import { formatAddressDisplay, openKakaoPostcode } from '@/utils/openKakaoPostCode'
-import type { ApiAddress, SelectedAddress } from './AddressModal'
+import type { ApiAddress, SelectedAddress } from '@/types/order'
 import Image from 'next/image'
-
-interface AddressAddModalProps {
-    onClose: () => void
-    onSaved?: (addr: SelectedAddress) => void
-    editing?: ApiAddress | null
-    /** 신규 등록 시 카카오 검색에서 넘겨줄 초기값 (선택) */
-    initial?: Partial<Pick<ApiAddress, 'zipCode' | 'main'>>
-}
+import { AddressAddModalProps } from '@/types/order'
 
 const NAME_MIN = 2
 const NAME_MAX = 50
@@ -86,7 +79,6 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
                 phone: saved.phone ?? '',
                 fullAddress: formatAddressDisplay({ zipCode: saved.zipCode, main: saved.main, detail: saved.detail }),
                 request: saved.message ?? '',
-                message: '',
             }
             sessionStorage.setItem('selectedAddress', JSON.stringify(selected))
             onSaved?.(selected)
