@@ -6,21 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import requester from '@/utils/requester'
 import styles from './FailPage.module.scss'
 import { useSession } from 'next-auth/react'
-
-type OrderItem = {
-    productId: number
-    price: number
-    quantity: number
-    deliveryType?: string // 'FAST' | 'STOCK' | 'fast' | 'normal' 등 들어올 수 있음
-}
-
-type SelectedAddress = {
-    id: number
-    name: string
-    phone?: string
-    fullAddress?: string
-    request?: string
-} | null
+import { OrderItem, SelectedAddress } from '@/types/order'
 
 export default function PaymentFail() {
     const sp = useSearchParams()

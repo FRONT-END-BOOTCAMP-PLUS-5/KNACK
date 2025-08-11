@@ -14,33 +14,9 @@ import { IProduct } from '@/types/product'
 import AddressModal from '@/components/Address/AddressModal'
 import { formatFullAddress } from '@/utils/openKakaoPostCode'
 import RequestModal from '@/components/Address/RequestModal'
+import { AddressDtoWithPostalFields, CheckoutRow, OrderItem } from '@/types/order'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
-
-type CheckoutRow = {
-    productId: number
-    quantity: number
-    optionValueId?: number
-    deliveryMethod: 'normal' | 'fast' | string
-}
-
-type OrderItem = {
-    productId: number
-    price: number
-    quantity: number
-    thumbnail_image: string
-    deliveryType: string
-    kor_name?: string
-    eng_name?: string
-}
-
-type AddressDtoWithPostalFields = AddressDto & {
-    postalCode?: string;
-    postCode?: string;
-    zipcode?: string;
-    zipCode?: string;
-    zonecode?: string;
-};
 
 export default function CheckoutPage() {
     // ----- Local UI States (Zustand 제거) -----
@@ -59,6 +35,67 @@ export default function CheckoutPage() {
     } | null>(null)
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
     const [isReqOpen, setReqOpen] = useState(false);
+
+    // ----- delivery controls -----
+    const onChangeDelivery = (type: 'FAST' | 'STOCK') => {
+        setDeliveryType(type)
+        setDeliveryFee(type === 'FAST' ? 5000 : 0)
+    }
+
+    // ----- totals -----
+    const priceWithoutDelivery = useMemo(
+        () => orderItems.reduce((sum, it) => sum + it.price * it.quantity, 0),
+        [orderItems]
+    )
+    const couponAmount = 0 // 쿠폰 도입 시 교체
+    const totalBeforePoints = useMemo(
+        () => Math.max(0, priceWithoutDelivery + deliveryFee - couponAmount),
+        [priceWithoutDelivery, deliveryFee, couponAmount]
+    )
+    const totalPrice = useMemo(
+        () => Math.max(0, totalBeforePoints - points),
+        [totalBeforePoints, points]
+    )
+
+    // ----- save request message -----
+    const handleSaveRequestMessage = async () => {
+        if (!selectedAddress?.id) {
+            alert('주소가 선택되지 않았습니다.')
+            return
+        }
+        try {
+            await requester.patch(`/api/addresses/${selectedAddress.id}/message`, {
+                requestMessage: selectedAddress.request,
+            })
+        } catch (e) {
+            console.error('요청사항 저장 실패', e)
+            alert('요청사항 저장 중 오류가 발생했습니다.')
+        }
+    }
+
+    // ----- payment -----
+    const handlePayment = async () => {
+        if (!orderItems.length) return alert('상품을 선택해주세요.')
+        if (!selectedAddress) return alert('주소지를 선택해주세요.')
+
+        try {
+            await handleSaveRequestMessage()
+
+            const toss = await loadTossPayments(TOSS_CLIENT_KEY)
+            console.log(toss);
+            await toss.requestPayment('카드', {
+                amount: totalPrice,
+                orderId: `order_${Date.now()}`, // 권장: 서버에서 선발급한 orderNumber 사용
+                orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''} 주문`,
+                customerName: selectedAddress.name || '홍길동',
+                successUrl: `${window.location.origin}/payments/success`,
+                failUrl: `${window.location.origin}/payments/failure`,
+            })
+        } catch (e) {
+            console.error(e)
+            alert('결제 실패')
+        }
+    }
 
     // ----- load checkout from localStorage -----
     useEffect(() => {
@@ -136,69 +173,6 @@ export default function CheckoutPage() {
             }
         })();
     }, []);
-
-    // ----- delivery controls -----
-    const onChangeDelivery = (type: 'FAST' | 'STOCK') => {
-        setDeliveryType(type)
-        setDeliveryFee(type === 'FAST' ? 5000 : 0)
-    }
-
-    // ----- totals -----
-    const priceWithoutDelivery = useMemo(
-        () => orderItems.reduce((sum, it) => sum + it.price * it.quantity, 0),
-        [orderItems]
-    )
-    const couponAmount = 0 // 쿠폰 도입 시 교체
-    const totalBeforePoints = useMemo(
-        () => Math.max(0, priceWithoutDelivery + deliveryFee - couponAmount),
-        [priceWithoutDelivery, deliveryFee, couponAmount]
-    )
-    const totalPrice = useMemo(
-        () => Math.max(0, totalBeforePoints - points),
-        [totalBeforePoints, points]
-    )
-
-    // ----- save request message -----
-    const handleSaveRequestMessage = async () => {
-        if (!selectedAddress?.id) {
-            alert('주소가 선택되지 않았습니다.')
-            return
-        }
-        try {
-            await requester.patch(`/api/addresses/${selectedAddress.id}/message`, {
-                requestMessage: selectedAddress.request,
-            })
-        } catch (e) {
-            console.error('요청사항 저장 실패', e)
-            alert('요청사항 저장 중 오류가 발생했습니다.')
-        }
-    }
-
-    // ----- payment -----
-    const handlePayment = async () => {
-        if (!orderItems.length) return alert('상품을 선택해주세요.')
-        if (!selectedAddress) return alert('주소지를 선택해주세요.')
-
-        try {
-            await handleSaveRequestMessage()
-
-            const toss = await loadTossPayments(TOSS_CLIENT_KEY)
-            console.log(toss);
-            await toss.requestPayment('카드', {
-                amount: totalPrice,
-                orderId: `order_${Date.now()}`, // 권장: 서버에서 선발급한 orderNumber 사용
-                orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''} 주문`,
-                customerName: selectedAddress.name || '홍길동',
-                successUrl: `${window.location.origin}/payments/success`,
-                failUrl: `${window.location.origin}/payments/failure`,
-            })
-        } catch (e) {
-            console.error(e)
-            alert('결제 실패')
-        }
-    }
-
-    const onOpenRequestModal = () => { setReqOpen(true) };
 
     return (
         <main className={styles.checkout_container}>

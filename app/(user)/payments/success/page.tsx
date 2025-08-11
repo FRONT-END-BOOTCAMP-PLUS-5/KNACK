@@ -6,20 +6,7 @@ import styles from './SuccessPage.module.scss'
 import requester from '@/utils/requester'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
-
-type OrderItem = {
-    productId: number
-    price: number
-    quantity: number
-}
-
-type SelectedAddress = {
-    id: number
-    name: string
-    phone?: string
-    fullAddress?: string
-    request?: string
-}
+import { OrderItem, SelectedAddress } from '@/types/order'
 
 export default function PaymentSuccess() {
     const params = useSearchParams()

@@ -4,6 +4,8 @@ import React, { useMemo, useState } from 'react'
 import styles from './OrderSummaryCard.module.scss'
 import Image from 'next/image'
 import { STORAGE_PATHS } from '@/constraint/auth'
+import FastDeliveryModal from '../Modals/FastDeliveryModal'
+import WarehouseStorageModal from '../Modals/WarehouseStorageModal'
 
 type OrderItem = {
     productId: number
@@ -42,6 +44,8 @@ export default function OrderSummaryCard({
     }, [totalPrice, productTotal, shippingFee])
 
     const [openTotal, setOpenTotal] = useState(true)
+    const [openFastModal, setOpenFastModal] = useState(false)
+    const [openWarehouseModal, setOpenWarehouseModal] = useState(false)
 
     if (!orderItems?.length) return <div>주문 상품이 없습니다.</div>
 
@@ -109,7 +113,7 @@ export default function OrderSummaryCard({
                             <span className={styles.custom_radio}></span>
                             <div className={styles.radio_text}>
                                 <div className={styles.main}>빠른배송</div>
-                                <div className={styles.sub}>검수 완료 · 내일 8/11(월) 도착 예정</div>
+                                <div className={styles.sub}>검수 완료 · 내일 8/11(월) 도착 예정 <Image src="/icons/question_circle.png" alt="체크" width={17} height={17} onClick={() => setOpenFastModal(true)} /></div>
                             </div>
                         </label>
 
@@ -124,7 +128,7 @@ export default function OrderSummaryCard({
                             <span className={styles.custom_radio}></span>
                             <div className={styles.radio_text}>
                                 <div className={styles.main}>창고보관</div>
-                                <div className={styles.sub}>배송 없이 빠른 판매</div>
+                                <div className={styles.sub}>배송 없이 빠른 판매 <Image src="/icons/question_circle.png" alt="체크" width={17} height={17} onClick={() => setOpenWarehouseModal(true)} /></div>
                             </div>
                         </label>
                     </div>
@@ -166,6 +170,10 @@ export default function OrderSummaryCard({
                             </div>
                         </div>
                     )}
+
+                    {openFastModal && <FastDeliveryModal onClose={() => setOpenFastModal(false)} />}
+                    {openWarehouseModal && <WarehouseStorageModal onClose={() => setOpenWarehouseModal(false)} />}
+
                     <div className={styles.divider_horizontal}></div>
                     <p className={styles.notice}>
                         상품은 개인 또는 입점 사업자가 판매하며<br />

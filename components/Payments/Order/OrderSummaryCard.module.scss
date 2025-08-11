@@ -284,6 +284,8 @@ $radius: 10px;
             .sub {
                 font-size: 13px;
                 color: $label;
+                display: flex;
+                gap: 4px;
             }
         }
 

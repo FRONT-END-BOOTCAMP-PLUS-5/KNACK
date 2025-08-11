@@ -9,16 +9,10 @@ $color-chip: #fafafa;
 $radius: 10px;
 $pad-x: 16px;
 
-$font-system: Pretendard Variable, Pretendard, -apple-system, BlinkMacSystemFont,
-    system-ui, Roboto, "Helvetica Neue", "Segoe UI",
-    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic",
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
-
 /* === Mixins / Utilities === */
 @mixin system-text {
     -webkit-text-size-adjust: none;
     -webkit-font-smoothing: antialiased;
-    font-family: $font-system;
     font-feature-settings: "frac" 0, "numr" 0;
 }
 
