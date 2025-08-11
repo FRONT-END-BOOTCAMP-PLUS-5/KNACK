@@ -3,27 +3,6 @@
   background-color: #fff;
 }
 
-.withdrawal_button {
-  width: 100%;
-  padding: 14px 24px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #c82333;
-  }
-
-  &:active {
-    background-color: #bd2130;
-  }
-}
-
 .block {
   height: 28px;
 }
