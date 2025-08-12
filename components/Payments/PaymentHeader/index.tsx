@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import styles from './PaymentHeader.module.scss'
+import styles from './paymentHeader.module.scss'
 import Image from 'next/image'
 
 export default function CheckoutHeader() {

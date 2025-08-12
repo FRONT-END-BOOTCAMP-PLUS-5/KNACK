@@ -1,8 +1,11 @@
 // 📁 backend/domain/repositories/PaymentRepository.ts
 
 import { CreatePaymentDto } from "../../applications/dtos/CreatePaymentDto"
+import { GetPaymentDto } from "../../applications/dtos/GetPaymentDto"
 
 export interface PaymentRepository {
+    findWithOrdersByNumber(paymentNumber: bigint, userId: string): Promise<GetPaymentDto | null>
+    findWithOrdersById(paymentId: number, userId: string): Promise<GetPaymentDto | null>
     /**
      * 결제 저장
      */

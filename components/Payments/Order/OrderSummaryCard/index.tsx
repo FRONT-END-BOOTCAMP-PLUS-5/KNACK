@@ -1,11 +1,11 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import styles from './OrderSummaryCard.module.scss'
+import styles from './orderSummaryCard.module.scss'
 import Image from 'next/image'
 import { STORAGE_PATHS } from '@/constraint/auth'
-import FastDeliveryModal from '../Modals/FastDeliveryModal'
-import WarehouseStorageModal from '../Modals/WarehouseStorageModal'
+import FastDeliveryModal from '../../Modals/FastDeliveryModal'
+import WarehouseStorageModal from '../../Modals/WareHouseStorageModal'
 import { Props } from '@/types/order'
 
 export default function OrderSummaryCard({

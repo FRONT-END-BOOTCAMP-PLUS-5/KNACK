@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import styles from './WarehouseStorageModal.module.scss'
+import styles from './warehouseStorageModal.module.scss'
 import Image from 'next/image'
 
 type Props = { onClose: () => void }

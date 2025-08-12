@@ -2,9 +2,9 @@
 
 import React, { useRef, useState } from 'react'
 import Image from 'next/image'
-import styles from './UploadFile.module.scss'
+import styles from './uploadMultiFile.module.scss'
 import requester, { post, filePut } from '@/utils/requester'
-import Button from '../common/Button'
+import Button from '../../common/Button'
 
 interface Props {
     uploadUrl: string

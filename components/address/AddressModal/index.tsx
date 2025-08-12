@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import styles from './AddressModal.module.scss'
-import KakaoPostCodeLoader from './KakaoPostCodeLoader'
+import styles from './addressModal.module.scss'
+import KakaoPostCodeLoader from '../../../utils/KakaoPostCodeLoader'
 import requester from '@/utils/requester'
 import { formatAddressDisplay, formatPhoneNumber, phonePattern } from '@/utils/openKakaoPostCode'
 import Image from 'next/image'
-import { AddressAddModal } from './AddressAddModal'
+import { AddressAddModal } from '../AddressAddModal'
 import { AddressModalProps, ApiAddress, SelectedAddress } from '@/types/order'
 
 export default function AddressModal({

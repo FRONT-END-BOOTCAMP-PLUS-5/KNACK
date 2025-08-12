@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import styles from './AddressBox.module.scss'
+import styles from './addressBox.module.scss'
 import { formatPhoneNumber, phonePattern } from '@/utils/openKakaoPostCode'
 import { addressProps } from '@/types/order'
 

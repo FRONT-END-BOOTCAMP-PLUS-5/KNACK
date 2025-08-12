@@ -3,17 +3,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadTossPayments } from '@tosspayments/payment-sdk'
 import styles from './CheckoutPage.module.scss'
-import AddressBox from '@/components/Address/AddressBox'
+import AddressBox from '@/components/address/AddressBox'
 import requester from '@/utils/requester'
-import PaymentFooter from '@/components/Payments/PaymentFooter/PaymentFooter'
+import PaymentFooter from '@/components/Payments/PaymentFooter'
 import OrderSummaryCard from '@/components/Payments/Order/OrderSummaryCard'
-import PointSection from '@/components/Payments/Points/PointSection'
-import FinalOrderSummary from '@/components/Payments/Order/FInalOrderSummary'
+import PointSection from '@/components/Payments/Points'
+import FinalOrderSummary from '@/components/Payments/Order/FinalOrderSummary'
 import { AddressDto } from '@/backend/address/applications/dtos/AddressDto'
 import { IProduct } from '@/types/product'
-import AddressModal from '@/components/Address/AddressModal'
+import AddressModal from '@/components/address/AddressModal'
 import { formatFullAddress } from '@/utils/openKakaoPostCode'
-import RequestModal from '@/components/Address/RequestModal'
+import RequestModal from '@/components/address/RequestModal'
 import { AddressDtoWithPostalFields, CheckoutRow, OrderItem } from '@/types/order'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
@@ -218,7 +218,7 @@ export default function CheckoutPage() {
                     onClose={() => setIsAddressModalOpen(false)}
                     selectedAddress={selectedAddress ? {
                         ...selectedAddress,
-                        message: selectedAddress.request
+                        request: selectedAddress.request
                     } : null}
                     onChangeSelected={(a) => {
                         const zip =
@@ -228,12 +228,14 @@ export default function CheckoutPage() {
                             (a as unknown as AddressDtoWithPostalFields).zipCode ??
                             (a as unknown as AddressDtoWithPostalFields).zonecode ?? '';
 
+                        if (!a?.id) return; // Early return if no valid address
+
                         const mapped = {
                             id: a.id,
-                            name: a.name,
+                            name: a.name ?? '',
                             phone: a.phone ?? '',
-                            fullAddress: a.fullAddress,   // ✅ Use existing fullAddress property
-                            request: a.message ?? '',
+                            fullAddress: a.fullAddress ?? '',
+                            request: a.request ?? '',
                             postalCode: zip || undefined,
                         };
                         setSelectedAddress(mapped);

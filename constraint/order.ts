@@ -5,3 +5,5 @@ const PRESETS = [
     '파손 위험 상품입니다. 배송 시 주의해주세요',
     '직접 입력',
 ] as const;
+
+export { PRESETS };

@@ -2,7 +2,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import styles from './FastDeliveryModal.module.scss'
+import styles from './fastDeliveryModal.module.scss'
 import Image from 'next/image'
 
 type Props = { onClose: () => void }

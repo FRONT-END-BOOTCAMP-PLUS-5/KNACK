@@ -2,6 +2,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PaymentRepository } from '@/backend/payments/domains/repositories/PaymentRepository';
 import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto';
+import { GetPaymentDto } from '@/backend/payments/applications/dtos/GetPaymentDto';
 
 const prisma = new PrismaClient();
 
@@ -129,5 +130,61 @@ export class KnackPaymentRepository implements PaymentRepository {
                 })
             }
         })
+    }
+
+    async findWithOrdersByNumber(paymentNumber: bigint, userId: string): Promise<GetPaymentDto | null> {
+        const data = await prisma.payment.findFirst({
+            where: {
+                paymentNumber: Number(paymentNumber),
+                userId
+            },
+            include: {
+                orders: { select: { id: true } },
+            },
+        });
+
+        if (!data) return null;
+
+        return {
+            id: data.id,
+            userId: data.userId,
+            addressId: data.addressId,
+            price: data.price ?? 0,
+            createdAt: data.createdAt ?? new Date(),
+            paymentNumber: BigInt(data.paymentNumber),
+            tossPaymentKey: data.tossPaymentKey ?? '',
+            approvedAt: data.approvedAt ?? new Date(),
+            method: data.method,
+            status: data.status as 'DONE' | 'CANCELED',
+            orderIds: data.orders.map(order => order.id),
+        };
+    }
+
+    async findWithOrdersById(paymentId: number, userId: string): Promise<GetPaymentDto | null> {
+        const data = await prisma.payment.findFirst({
+            where: {
+                id: paymentId,
+                userId
+            },
+            include: {
+                orders: { select: { id: true } },
+            },
+        });
+
+        if (!data) return null;
+
+        return {
+            id: data.id,
+            userId: data.userId,
+            addressId: data.addressId,
+            price: data.price ?? 0,
+            createdAt: data.createdAt ?? new Date(),
+            paymentNumber: BigInt(data.paymentNumber),
+            tossPaymentKey: data.tossPaymentKey ?? '',
+            approvedAt: data.approvedAt ?? new Date(),
+            method: data.method,
+            status: data.status as 'DONE' | 'CANCELED',
+            orderIds: data.orders.map(order => order.id),
+        };
     }
 }

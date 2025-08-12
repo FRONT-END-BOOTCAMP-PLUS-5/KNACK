@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import styles from './RequestModal.module.scss';
+import styles from './requestModal.module.scss';
 import Image from 'next/image';
 import { requestProps } from '@/types/order';
+import { PRESETS } from '@/constraint/order';
 
 export default function RequestModal({ open, value, onClose, onApply }: requestProps) {
     const [selected, setSelected] = useState<string>('');

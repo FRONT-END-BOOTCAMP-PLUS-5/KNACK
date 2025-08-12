@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import styles from './AddressModal.module.scss'
-import KakaoPostCodeLoader from './KakaoPostCodeLoader'
+import styles from './addressAddModal.module.scss'
+import KakaoPostCodeLoader from '../../../utils/KakaoPostCodeLoader'
 import requester from '@/utils/requester'
 import { formatAddressDisplay, openKakaoPostcode } from '@/utils/openKakaoPostCode'
 import type { ApiAddress, SelectedAddress } from '@/types/order'

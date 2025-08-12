@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import styles from './PointSection.module.scss'
+import styles from './pointSection.module.scss'
 import { PointSectionProps } from '@/types/order'
 
 export default function PointSection({

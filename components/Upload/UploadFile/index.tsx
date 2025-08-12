@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react'
 import Image from 'next/image'
-import styles from './UploadFile.module.scss'
+import styles from './uploadFile.module.scss'
 import requester, { post, filePut } from '@/utils/requester'
 
 interface Props {

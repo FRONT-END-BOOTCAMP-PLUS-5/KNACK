@@ -6,8 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
-import CheckoutHeader from '@/components/Payments/PaymentHeader/PaymentHeader';
-import PaymentHeader from '@/components/Payments/PaymentHeader/PaymentHeader';
+import PaymentHeader from '@/components/Payments/PaymentHeader';
 
 interface IProps {
   children: React.ReactNode;
