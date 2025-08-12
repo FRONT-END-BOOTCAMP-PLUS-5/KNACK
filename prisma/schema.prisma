@@ -220,6 +220,7 @@ model OptionValue {
   cart                Cart[]
   productStockMapping ProductStockMapping[]
   product             Product[]
+  like                Like[]
 
   @@map("option_values")
 }
@@ -272,12 +273,15 @@ model SubCategory {
 }
 
 model Like {
-  id        Int       @id @default(autoincrement())
-  userId    String    @map("user_id") @db.Uuid
-  productId Int       @map("product_id")
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  product   Product   @relation(fields: [productId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
+  id            Int            @id @default(autoincrement())
+  userId        String         @map("user_id") @db.Uuid
+  productId     Int            @map("product_id")
+  optionValueId Int            @map("option_value_id")
+  createdAt     DateTime?      @default(now()) @map("created_at") @db.Timestamptz(6)
+  product       Product        @relation(fields: [productId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
+  optionValue   OptionValue    @relation(fields: [optionValueId], references: [id])
+
 
   @@map("likes")
 }
