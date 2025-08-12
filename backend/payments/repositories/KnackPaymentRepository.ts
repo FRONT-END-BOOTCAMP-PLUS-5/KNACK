@@ -50,7 +50,7 @@ export class KnackPaymentRepository implements PaymentRepository {
         });
     }
 
-    async findByTossPaymentKey(tossPaymentKey: string): Promise<CreatePaymentDto | null> {
+    async findByTossPaymentKey(tossPaymentKey: string): Promise<GetPaymentDto | null> {
         const data = await prisma.payment.findUnique({
             where: { tossPaymentKey },
             include: {
@@ -61,6 +61,7 @@ export class KnackPaymentRepository implements PaymentRepository {
         if (!data) return null;
 
         return {
+            id: data.id,
             userId: data.userId,
             addressId: data.addressId,
             price: data.price ?? 0,

@@ -117,3 +117,42 @@
     color: #777;
     font-weight: 500;
 }
+
+.rep_box {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    margin: 12px 0 4px;
+}
+
+.rep_thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.rep_info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rep_name {
+    font-weight: 600;
+}
+
+.rep_meta {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.plus_etc {
+    margin-left: 4px;
+    color: #666;
+    font-weight: 500;
+    font-size: .95em;
+}
