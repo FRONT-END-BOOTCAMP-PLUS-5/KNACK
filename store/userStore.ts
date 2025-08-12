@@ -14,13 +14,24 @@ interface User {
   nickname: string;
 }
 
+export interface Session {
+  user?: {
+    id: string;
+    email?: string;
+    name?: string;
+  };
+  status: 'loading' | 'authenticated' | 'unauthenticated';
+}
+
 interface UserStore {
   // 상태
   user: User | null;
+  session: Session | null;
   isLoading: boolean;
   error: string | null;
   
   // 액션들
+  setSession: (session: Session) => void;
   setUser: (user: User) => void;
   updateUser: (updates: Partial<User>) => void;
   clearUser: () => void;
@@ -33,8 +44,12 @@ interface UserStore {
 export const useUserStore = create<UserStore>((set, get) => ({
   // 초기 상태
   user: null,
+  session: null,
   isLoading: false,
   error: null,
+
+  // 세션 정보 설정
+  setSession: (session) => set({ session }),
 
   // 사용자 정보 설정
   setUser: (user) => set({ user, error: null }),

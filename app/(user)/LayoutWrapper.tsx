@@ -1,102 +1,16 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { SessionProvider, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState, useEffect, createContext, useContext } from 'react';
-import { useUserStore } from '@/store/userStore';
+import React, { useState, useEffect } from 'react';
+
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import PaymentHeader from '@/components/Payments/PaymentHeader/PaymentHeader';
+import { useUserStore } from '@/store/userStore';
+import type { Session } from '@/store/userStore';
 
-// 전역 상태 타입 정의
-interface GlobalState {
-  session: any; // NextAuth Session 타입
-  status: 'loading' | 'authenticated' | 'unauthenticated';
-  user: any; // UserStore User 타입
-  isLoading: boolean;
-  error: string | null;
-  fetchUserData: (userId: string) => Promise<void>;
-  updateUserPoint: (newPoint: number) => void;
-  updateMarketingConsent: (consent: boolean) => void;
-}
-
-// 전역 상태 컨텍스트 생성
-const GlobalContext = createContext<GlobalState | null>(null);
-
-// 전역 상태 훅
-export const useGlobalState = () => {
-  const context = useContext(GlobalContext);
-  if (!context) {
-    throw new Error('useGlobalState must be used within GlobalProvider');
-  }
-  return context;
-};
-
-// 전역 상태 프로바이더 컴포넌트
-function GlobalProvider({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession();
-  const { user, isLoading, error, fetchUserData, updateUserPoint, updateMarketingConsent, setUser } = useUserStore();
-  
-  // 세션과 UserStore 동기화
-  useEffect(() => {
-    if (session?.user && !user) {
-      // session.user를 UserStore의 User 타입에 맞게 변환 (기본값만 설정)
-      const userData = {
-        id: session.user.id,
-        name: session.user.name || '',
-        email: session.user.email || '',
-        nickname: session.user.nickname || '',
-        deletedAt: null,
-        createdAt: null,
-        marketing: false,
-        sns: false,
-        profileImage: null,
-        point: 0,
-        isActive: true
-      };
-      setUser(userData);
-      
-      // 실제 DB 데이터 가져오기
-      fetchUserData(session.user.id);
-    }
-  }, [session, user, setUser, fetchUserData]);
-  
-  // 사용자 정보 콘솔 출력
-  useEffect(() => {
-    if (user) {
-      console.log('🔍 LayoutWrapper - 사용자 정보:', {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        nickname: user.nickname,
-        point: user.point,
-        marketing: user.marketing,
-        sns: user.sns,
-        isActive: user.isActive,
-        createdAt: user.createdAt,
-        profileImage: user.profileImage
-      });
-    } else {
-      console.log('🔍 LayoutWrapper - 사용자 정보 없음');
-    }
-  }, [user]);
-  
-  return (
-    <GlobalContext.Provider value={{ 
-      session, 
-      status, 
-      user, 
-      isLoading, 
-      error, 
-      fetchUserData, 
-      updateUserPoint, 
-      updateMarketingConsent 
-    }}>
-      {children}
-    </GlobalContext.Provider>
-  );
-}
 
 interface IProps {
   children: React.ReactNode;
@@ -116,6 +30,39 @@ export default function LayoutWrapper({ children }: IProps) {
         },
       })
   );
+
+  // 세션 사용
+  const { data: session, status } = useSession();
+  const { setSession } = useUserStore();
+
+  // 세션 정보를 userStore에 저장
+  useEffect(() => {
+    if (session) {
+      // useSession의 session 타입을 우리의 Session 인터페이스에 맞게 변환
+      const transformedSession: Session = {
+        user: session.user ? {
+          id: session.user.id || '',
+          email: session.user.email || '',
+          name: session.user.name || ''
+        } : undefined,
+        status: 'authenticated' as const // session이 존재하면 authenticated 상태
+      };
+      setSession(transformedSession);
+    } else {
+      // session이 없으면 unauthenticated 상태
+      setSession({ status: 'unauthenticated' as const });
+    }
+  }, [session, setSession]);
+
+  // 세션 정보 디버깅
+  console.log('=== useSession Debug Info ===');
+  console.log('session:', session);
+  console.log('status:', status);
+  console.log('session?.user:', session?.user);
+  console.log('session?.user?.id:', session?.user?.id);
+  console.log('session?.user?.email:', session?.user?.email);
+  console.log('session?.user?.name:', session?.user?.name);
+  console.log('============================');
 
   useEffect(() => {
     setMounted(true);
@@ -163,24 +110,16 @@ export default function LayoutWrapper({ children }: IProps) {
     return (
       <QueryClientProvider client={queryClient}>
         <PaymentHeader />
-        <SessionProvider>
-          <GlobalProvider>
-            {children}
-          </GlobalProvider>
-        </SessionProvider>
+        {children}
       </QueryClientProvider>
     );
   }
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <GlobalProvider>
-          {!shouldHideHeader && <Header />}
-          {children}
-          {!shouldHideFooter && <Footer />}
-        </GlobalProvider>
-      </SessionProvider>
+      {!shouldHideHeader && <Header />}
+      {children}
+      {!shouldHideFooter && <Footer />}
     </QueryClientProvider>
   );
 }

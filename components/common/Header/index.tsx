@@ -15,13 +15,8 @@ export default function Header() {
   };
 
   const handleCartClick = () => {
-    if (!session) {
-      // 로그인하지 않은 경우 로그인 페이지로 이동
-      window.location.href = '/login';
-    } else {
-      // 로그인한 경우 장바구니 페이지로 이동
-      window.location.href = '/cart';
-    }
+    // 미들웨어에서 이미 로그인 체크하므로 바로 장바구니로 이동
+    window.location.href = '/cart';
   };
 
   return (
