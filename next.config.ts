@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     additionalData: `@use '@/styles/colors.scss' as *;`,
   },
   images: {
-    domains: ['d2ubv3uh3d6fx8.cloudfront.net'],
+    domains: ['d2ubv3uh3d6fx8.cloudfront.net', 'lh3.googleusercontent.com'],
   },
 };
 

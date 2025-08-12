@@ -24,6 +24,7 @@ export class PrProductsRepository implements ProductSearchRepository {
 
     const whereConditions: Record<string, unknown> = {
       isPrivate: true,
+      //TODO: unknown 수정 필요
     };
 
     if (filters) {
