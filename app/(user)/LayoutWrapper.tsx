@@ -54,16 +54,6 @@ export default function LayoutWrapper({ children }: IProps) {
     }
   }, [session, setSession]);
 
-  // 세션 정보 디버깅
-  console.log('=== useSession Debug Info ===');
-  console.log('session:', session);
-  console.log('status:', status);
-  console.log('session?.user:', session?.user);
-  console.log('session?.user?.id:', session?.user?.id);
-  console.log('session?.user?.email:', session?.user?.email);
-  console.log('session?.user?.name:', session?.user?.name);
-  console.log('============================');
-
   useEffect(() => {
     setMounted(true);
   }, []);
