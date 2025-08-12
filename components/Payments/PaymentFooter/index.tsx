@@ -16,7 +16,7 @@ export default function PaymentFooter({
         <footer className={styles.payment_footer}>
             <div className={styles.payment_footer__inner}>
                 <button className={styles.pay_btn} disabled={disabled} onClick={onPay}>
-                    {formatPrice(totalPrice)}·결제하기
+                    {formatPrice(totalPrice)} 결제하기
                 </button>
             </div>
         </footer>
