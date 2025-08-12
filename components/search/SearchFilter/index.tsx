@@ -6,29 +6,36 @@ import styles from './searchFilter.module.scss';
 import Image from 'next/image';
 import arrowDown from '@/public/icons/arrow_down.svg';
 import { PRODUCT_FILTER } from '@/constraint/product';
+import { ISearchProductListRequest } from '@/types/searchProductList';
+import { calcFilterValueLength, isActiveFilter } from '@/utils/searchFilter';
 
 interface IProps {
+  filterQuery: ISearchProductListRequest;
   handleSelect: (id: number, isOpen: boolean) => void;
 }
 
-const SearchFilter: React.FC<IProps> = ({ handleSelect }) => {
+const SearchFilter: React.FC<IProps> = ({ filterQuery, handleSelect }) => {
   return (
     <div className={styles.filter_section}>
       <DragScroll className={styles.filter_scroll} showScrollbar={false}>
-        {PRODUCT_FILTER.map((option) => (
-          <button
-            type="button"
-            onClick={() => handleSelect(option.id, true)}
-            key={option.id}
-            className={styles.filter_button}
-          >
-            <p>
-              <span>{option.name}</span>
-              <span>1</span>
-            </p>
-            <Image src={arrowDown} alt={'화살표 아이콘'} width={14} height={14} />
-          </button>
-        ))}
+        {PRODUCT_FILTER.map((option) => {
+          const isActive = isActiveFilter(option.value, filterQuery);
+          const count = calcFilterValueLength(option.value, filterQuery);
+          return (
+            <button
+              type="button"
+              onClick={() => handleSelect(option.id, true)}
+              key={option.id}
+              className={`${styles.filter_button} ${isActive ? styles.active : ''}`}
+            >
+              <p>
+                <span>{option.name}</span>
+                {count > 0 && <span className={styles.filter_count}>{count}</span>}
+              </p>
+              <Image src={arrowDown} alt={'화살표 아이콘'} width={14} height={14} />
+            </button>
+          );
+        })}
       </DragScroll>
     </div>
   );
