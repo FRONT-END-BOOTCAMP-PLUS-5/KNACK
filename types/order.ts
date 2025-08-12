@@ -112,3 +112,20 @@ export type AvailableCoupon = {
     productId: number
     expirationAt?: string | null
 }
+
+export type AdjustPointsResult = { availablePoints: number; delta: number }
+
+export type CouponLite = {
+    couponId: number
+    name: string
+    salePercent: number
+    productId: number
+    expirationAt?: string | null
+}
+
+export type PropsWithCoupon = Props & {
+    coupons?: CouponLite[]              // 사용 가능한 쿠폰 목록
+    selectedCouponId?: number | null    // 현재 선택된 쿠폰
+    onSelectCoupon?: (id: number | null) => void
+    couponAmount?: number               // 부모에서 계산한 할인금액(있으면 표시)
+}

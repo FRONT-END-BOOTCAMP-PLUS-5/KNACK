@@ -5,16 +5,16 @@ import { loadTossPayments } from '@tosspayments/payment-sdk'
 import styles from './CheckoutPage.module.scss'
 import AddressBox from '@/components/address/AddressBox'
 import requester from '@/utils/requester'
-import PaymentFooter from '@/components/Payments/PaymentFooter'
-import OrderSummaryCard from '@/components/Payments/Order/OrderSummaryCard'
-import PointSection from '@/components/Payments/Points'
-import FinalOrderSummary from '@/components/Payments/Order/FinalOrderSummary'
+import PaymentFooter from '@/components/payments/PaymentFooter'
+import OrderSummaryCard from '@/components/payments/Order/OrderSummaryCard'
+import PointSection from '@/components/payments/Points'
+import FinalOrderSummary from '@/components/payments/Order/FinalOrderSummary'
 import { AddressDto } from '@/backend/address/applications/dtos/AddressDto'
 import { IProduct } from '@/types/product'
 import AddressModal from '@/components/address/AddressModal'
 import { formatFullAddress } from '@/utils/openKakaoPostCode'
 import RequestModal from '@/components/address/RequestModal'
-import { AddressDtoWithPostalFields, CheckoutRow, OrderItem } from '@/types/order'
+import { AddressDtoWithPostalFields, AvailableCoupon, CheckoutRow, OrderItem } from '@/types/order'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
 
@@ -24,7 +24,13 @@ export default function CheckoutPage() {
     const [orderItems, setOrderItems] = useState<OrderItem[]>([])
     const [deliveryType, setDeliveryType] = useState<'FAST' | 'STOCK'>('FAST')
     const [deliveryFee, setDeliveryFee] = useState<number>(5000)
+
+    // ✅ 포인트/쿠폰 상태
+    const [availablePoints, setAvailablePoints] = useState<number>(0)
     const [points, setPoints] = useState<number>(0) // 사용 포인트
+    const [coupons, setCoupons] = useState<AvailableCoupon[]>([])
+    const [selectedCouponId, setSelectedCouponId] = useState<number | null>(null)
+
     const [selectedAddress, setSelectedAddress] = useState<{
         id: number
         name: string
@@ -47,7 +53,18 @@ export default function CheckoutPage() {
         () => orderItems.reduce((sum, it) => sum + it.price * it.quantity, 0),
         [orderItems]
     )
-    const couponAmount = 0 // 쿠폰 도입 시 교체
+
+    // ✅ 쿠폰 할인액 계산 (선택된 1장의 퍼센트 할인)
+    const couponAmount = useMemo(() => {
+        if (!selectedCouponId) return 0
+        const coupon = coupons.find(c => c.couponId === selectedCouponId)
+        if (!coupon) return 0
+        const targetSum = orderItems
+            .filter(i => i.productId === coupon.productId)
+            .reduce((s, i) => s + i.price * i.quantity, 0)
+        return Math.max(0, Math.floor(targetSum * (coupon.salePercent / 100)))
+    }, [selectedCouponId, coupons, orderItems])
+
     const totalBeforePoints = useMemo(
         () => Math.max(0, priceWithoutDelivery + deliveryFee - couponAmount),
         [priceWithoutDelivery, deliveryFee, couponAmount]
@@ -80,6 +97,11 @@ export default function CheckoutPage() {
 
         try {
             await handleSaveRequestMessage()
+
+            // ✅ 성공 페이지에서 보여주려면 세션에 저장
+            sessionStorage.setItem('couponAmount', String(couponAmount))
+            sessionStorage.setItem('pointAmount', String(points))
+            sessionStorage.setItem('selectedCouponId', selectedCouponId ? String(selectedCouponId) : '')
 
             const toss = await loadTossPayments(TOSS_CLIENT_KEY)
             console.log(toss);
@@ -142,6 +164,50 @@ export default function CheckoutPage() {
             })()
     }, [checkout])
 
+    useEffect(() => {
+        if (orderItems.length === 0) return
+            ; (async () => {
+                try {
+                    // 쿠폰
+                    const { data } = await requester.get('/api/coupon')
+                    const fetched: AvailableCoupon[] = data?.items ?? []
+                    console.log(fetched);
+                    setCoupons(fetched)
+
+                    // “가장 할인 큰 쿠폰” 자동 선택
+                    if (fetched.length > 0) {
+                        let bestId: number | null = null
+                        let bestDiscount = -1
+                        for (const c of fetched) {
+                            const target = orderItems
+                                .filter(i => i.productId === c.productId)
+                                .reduce((s, i) => s + i.price * i.quantity, 0)
+                            const disc = Math.floor(target * (c.salePercent / 100))
+                            if (disc > bestDiscount) {
+                                bestDiscount = disc
+                                bestId = c.couponId
+                            }
+                        }
+                        setSelectedCouponId(bestId)
+                    } else {
+                        setSelectedCouponId(null)
+                    }
+
+                    // 포인트
+                    const { data: pData } = await requester.get('/api/points')
+                    setAvailablePoints(Number(pData?.availablePoints ?? 0))
+                } catch (e) {
+                    console.error('쿠폰/포인트 로드 실패', e)
+                }
+            })()
+    }, [orderItems])
+
+    // ✅ 포인트 사용량 캡 (서버 값/합계 변경될 때 보정)
+    useEffect(() => {
+        const cap = Math.min(totalBeforePoints, availablePoints)
+        if (points > cap) setPoints(cap)
+    }, [totalBeforePoints, availablePoints, points])
+
     // ----- fetch default address -----
     useEffect(() => {
         (async () => {
@@ -195,10 +261,14 @@ export default function CheckoutPage() {
                     setDeliveryFee(t === 'FAST' ? 5000 : 0)
                 }}
                 totalPrice={totalPrice}
+                coupons={coupons}                        // 서버에서 받아온 전체/보유 쿠폰
+                selectedCouponId={selectedCouponId}      // 선택된 쿠폰 id
+                onSelectCoupon={setSelectedCouponId}     // 선택 핸들러
+                couponAmount={couponAmount}              // 부모에서 계산하면 전달(선택)
             />
 
             <PointSection
-                availablePoints={100000 /* 보유 포인트 */}
+                availablePoints={availablePoints}
                 maxUsablePoints={totalBeforePoints}              // 🔥 추가
                 onChange={(p) => setPoints(Math.max(0, Math.min(p, totalBeforePoints)))} // 🔥 캡 적용
             />

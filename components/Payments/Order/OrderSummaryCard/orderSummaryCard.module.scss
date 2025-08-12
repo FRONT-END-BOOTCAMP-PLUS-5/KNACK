@@ -486,3 +486,27 @@ $radius: 10px;
     margin: 0; // 여백 없음
     border: 0;
 }
+
+.coupon_row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.coupon_select {
+    flex: 1;
+    height: 40px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 0 10px;
+}
+
+.coupon_clear {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background: #fff;
+    font-weight: 600;
+}

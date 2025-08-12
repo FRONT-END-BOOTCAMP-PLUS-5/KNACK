@@ -4,33 +4,48 @@ import React, { useMemo, useState } from 'react'
 import styles from './orderSummaryCard.module.scss'
 import Image from 'next/image'
 import { STORAGE_PATHS } from '@/constraint/auth'
-import FastDeliveryModal from '../../../payments/modals/FastDeliveryModal'
-import WarehouseStorageModal from '../../../payments/modals/WareHouseStorageModal'
-import { Props } from '@/types/order'
+import FastDeliveryModal from '@/components/payments/Modals/FastDeliveryModal'
+import WarehouseStorageModal from '@/components/payments/Modals/WareHouseStorageModal'
+import { Props, PropsWithCoupon } from '@/types/order'
 
 export default function OrderSummaryCard({
     orderItems,
     deliveryType,
     onChangeDelivery,
     totalPrice,
-}: Props) {
+    coupons = [],
+    selectedCouponId = null,
+    onSelectCoupon,
+    couponAmount,
+}: PropsWithCoupon) {
+    const [openTotal, setOpenTotal] = useState(true)
+    const [openFastModal, setOpenFastModal] = useState(false)
+    const [openWarehouseModal, setOpenWarehouseModal] = useState(false)
+
     // 금액 계산 - Hooks must be called before any early returns
     const productTotal = useMemo(
         () => orderItems?.reduce((sum, it) => sum + it.price * it.quantity, 0) || 0,
         [orderItems]
     )
-    const inspectionFee = 0 // 스샷처럼 "무료"
     const shippingFee = useMemo(() => (deliveryType === 'FAST' ? 5000 : 0), [deliveryType])
 
-    // 총합과 일치하도록 수수료 자동 보정(음수 방지)
-    const serviceFee = useMemo(() => {
-        const fee = totalPrice - (productTotal + inspectionFee + shippingFee)
-        return Math.max(0, fee)
-    }, [totalPrice, productTotal, shippingFee])
+    // 쿠폰 적용 가능한지 판단 (장바구니에 해당 productId 포함)
+    const applicableCoupons = useMemo(() => {
+        const pset = new Set(orderItems.map(i => i.productId))
+        return (coupons ?? []).filter(c => pset.has(c.productId))
+    }, [coupons, orderItems])
 
-    const [openTotal, setOpenTotal] = useState(true)
-    const [openFastModal, setOpenFastModal] = useState(false)
-    const [openWarehouseModal, setOpenWarehouseModal] = useState(false)
+    // 선택된 쿠폰의 할인액 프리뷰 (부모가 내려주면 그 값을 우선)
+    const previewCouponAmount = useMemo(() => {
+        if (typeof couponAmount === 'number') return couponAmount
+        if (!selectedCouponId) return 0
+        const c = applicableCoupons.find(x => x.couponId === selectedCouponId)
+        if (!c) return 0
+        const targetSum = orderItems
+            .filter(it => it.productId === c.productId)
+            .reduce((s, it) => s + it.price * it.quantity, 0)
+        return Math.max(0, Math.floor(targetSum * (c.salePercent / 100)))
+    }, [couponAmount, selectedCouponId, applicableCoupons, orderItems])
 
     if (!orderItems?.length) return <div>주문 상품이 없습니다.</div>
 
@@ -119,10 +134,37 @@ export default function OrderSummaryCard({
                     </div>
 
                     <div className={styles.section_title}>할인쿠폰</div>
-                    <div className={styles.coupon}>
-                        <input type="text" disabled value="사용 가능한 쿠폰이 없습니다." />
-                        <button disabled>쿠폰 선택</button>
-                    </div>
+                    {applicableCoupons.length > 0 ? (
+                        <div className={styles.coupon_row}>
+                            <select
+                                className={styles.coupon_select}
+                                value={selectedCouponId ?? ''}
+                                onChange={(e) => onSelectCoupon?.(e.target.value ? Number(e.target.value) : null)}
+                            >
+                                <option value="">쿠폰 선택 안 함</option>
+                                {applicableCoupons.map(c => (
+                                    <option key={c.couponId} value={c.couponId}>
+                                        {c.name} · {c.salePercent}% ({c.productId})
+                                    </option>
+                                ))}
+                            </select>
+
+                            {selectedCouponId ? (
+                                <button
+                                    type="button"
+                                    className={styles.coupon_clear}
+                                    onClick={() => onSelectCoupon?.(null)}
+                                >
+                                    해제
+                                </button>
+                            ) : null}
+                        </div>
+                    ) : (
+                        <div className={styles.coupon}>
+                            <input type="text" disabled value="사용 가능한 쿠폰이 없습니다." />
+                            <button disabled>쿠폰 선택</button>
+                        </div>
+                    )}
 
                     {/* 결제금액 (토글 가능한 요약 + 상세) */}
                     <button
@@ -153,6 +195,12 @@ export default function OrderSummaryCard({
                                 <span>배송비</span>
                                 <span className={styles.price}>{shippingFee.toLocaleString()}원</span>
                             </div>
+                            {previewCouponAmount > 0 && (
+                                <div className={styles.row}>
+                                    <span>쿠폰 할인</span>
+                                    <span className={styles.price}>- {previewCouponAmount.toLocaleString()}원</span>
+                                </div>
+                            )}
                         </div>
                     )}
 
