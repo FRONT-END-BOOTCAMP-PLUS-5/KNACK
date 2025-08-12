@@ -36,7 +36,7 @@ export default function LayoutWrapper({ children }: IProps) {
   // 로그인 체크 → 사용자 정보 가져오기 → userStore에 저장
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.id) {
-      fetchUserData(session.user.id);
+      fetchUserData();
     }
   }, [session, status, fetchUserData]);
 

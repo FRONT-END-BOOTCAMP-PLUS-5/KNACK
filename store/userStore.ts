@@ -24,7 +24,7 @@ interface UserStore {
   setUser: (user: User) => void;
   updateUser: (updates: Partial<User>) => void;
   clearUser: () => void;
-  fetchUserData: (userId: string) => Promise<void>;
+  fetchUserData: () => Promise<void>;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -46,7 +46,7 @@ export const useUserStore = create<UserStore>((set) => ({
   clearUser: () => set({ user: null, error: null }),
 
   // 서버에서 사용자 정보 가져오기
-  fetchUserData: async (userId: string) => {
+  fetchUserData: async () => {
     set({ isLoading: true, error: null });
 
     try {
