@@ -9,8 +9,6 @@ import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import PaymentHeader from '@/components/Payments/PaymentHeader/PaymentHeader';
 import { useUserStore } from '@/store/userStore';
-import type { Session } from '@/store/userStore';
-
 
 interface IProps {
   children: React.ReactNode;
@@ -31,30 +29,18 @@ export default function LayoutWrapper({ children }: IProps) {
       })
   );
 
-  // 세션 사용
+  // 세션 사용 (NextAuth에서 직접 관리)
   const { data: session, status } = useSession();
-  const { setSession } = useUserStore();
+  const { fetchUserData } = useUserStore();
 
-  // 세션 정보를 userStore에 저장
+  // 로그인 체크 → 사용자 정보 가져오기 → userStore에 저장
   useEffect(() => {
-    if (session) {
-      // useSession의 session 타입을 우리의 Session 인터페이스에 맞게 변환
-      const transformedSession: Session = {
-        user: session.user ? {
-          id: session.user.id || '',
-          email: session.user.email || '',
-          name: session.user.name || ''
-        } : undefined,
-        status: 'authenticated' as const // session이 존재하면 authenticated 상태
-      };
-      setSession(transformedSession);
-    } else {
-      // session이 없으면 unauthenticated 상태
-      setSession({ status: 'unauthenticated' as const });
+    if (status === 'authenticated' && session?.user?.id) {
+      fetchUserData(session.user.id);
     }
-  }, [session, setSession]);
+  }, [session, status, fetchUserData]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     setMounted(true);
   }, []);
 

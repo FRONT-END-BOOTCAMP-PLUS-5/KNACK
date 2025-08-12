@@ -14,42 +14,24 @@ export interface User {
   nickname: string;
 }
 
-export interface Session {
-  user?: {
-    id: string;
-    email?: string;
-    name?: string;
-  };
-  status: 'loading' | 'authenticated' | 'unauthenticated';
-}
-
 interface UserStore {
   // 상태
   user: User | null;
-  session: Session | null;
   isLoading: boolean;
   error: string | null;
 
   // 액션들
-  setSession: (session: Session) => void;
   setUser: (user: User) => void;
   updateUser: (updates: Partial<User>) => void;
   clearUser: () => void;
   fetchUserData: (userId: string) => Promise<void>;
-  updateUserPoint: (newPoint: number) => void;
-  updateProfileImage: (imageUrl: string) => void;
-  updateMarketingConsent: (consent: boolean) => void;
 }
 
-export const useUserStore = create<UserStore>((set, get) => ({
+export const useUserStore = create<UserStore>((set) => ({
   // 초기 상태
   user: null,
-  session: null,
   isLoading: false,
   error: null,
-
-  // 세션 정보 설정
-  setSession: (session) => set({ session }),
 
   // 사용자 정보 설정
   setUser: (user) => set({ user, error: null }),
@@ -83,22 +65,4 @@ export const useUserStore = create<UserStore>((set, get) => ({
       });
     }
   },
-
-  // 포인트 업데이트
-  updateUserPoint: (newPoint) =>
-    set((state) => ({
-      user: state.user ? { ...state.user, point: newPoint } : null,
-    })),
-
-  // 프로필 이미지 업데이트
-  updateProfileImage: (imageUrl) =>
-    set((state) => ({
-      user: state.user ? { ...state.user, profileImage: imageUrl } : null,
-    })),
-
-  // 마케팅 동의 업데이트
-  updateMarketingConsent: (consent) =>
-    set((state) => ({
-      user: state.user ? { ...state.user, marketing: consent } : null,
-    })),
 }));
