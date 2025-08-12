@@ -4,7 +4,7 @@ import { PrProductsRepository } from '@/backend/search/infrastructure/repositori
 import { GetProductsRequestDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import { SortOption } from '@/backend/search/domains/entities/ProductFilters';
 import prisma from '@/backend/utils/prisma';
-import { getBooleanParam, getIntParam } from '@/utils/searchParams';
+import { getBooleanParam, getIntParam, getIntArrayParam, getStringArrayParam } from '@/utils/searchParams';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,15 +13,15 @@ export async function GET(request: NextRequest) {
     const requestDto: GetProductsRequestDto = {
       keyword: searchParams.get('keyword') || undefined,
 
-      keywordColorId: getIntParam(searchParams, 'keywordColorId'),
-      brandId: getIntParam(searchParams, 'brandId'),
-      categoryId: getIntParam(searchParams, 'categoryId'),
-      subCategoryId: getIntParam(searchParams, 'subCategoryId'),
+      keywordColorId: getIntArrayParam(searchParams, 'keywordColorId'),
+      brandId: getIntArrayParam(searchParams, 'brandId'),
+      categoryId: getIntArrayParam(searchParams, 'categoryId'),
+      subCategoryId: getIntArrayParam(searchParams, 'subCategoryId'),
       priceMin: getIntParam(searchParams, 'priceMin'),
       priceMax: getIntParam(searchParams, 'priceMax'),
       discountMin: getIntParam(searchParams, 'discountMin'),
       discountMax: getIntParam(searchParams, 'discountMax'),
-      size: searchParams.get('size') || undefined,
+      size: getStringArrayParam(searchParams, 'size'),
       benefit: (searchParams.get('benefit') as 'under_price') || undefined,
       gender: searchParams.get('gender') || undefined,
       soldOutInvisible: getBooleanParam(searchParams, 'soldOutInvisible'),

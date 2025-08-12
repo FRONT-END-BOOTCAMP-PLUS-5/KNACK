@@ -1,11 +1,20 @@
 export const PRODUCT_FILTER = [
-  { id: 1, name: '카테고리', value: 'category' },
+  { id: 1, name: '카테고리', value: 'categoryId' },
   { id: 2, name: '성별', value: 'gender' },
-  { id: 3, name: '색상', value: 'color' },
+  { id: 3, name: '색상', value: 'keywordColorId' },
   { id: 4, name: '혜택/할인', value: 'discount' },
-  { id: 5, name: '브랜드', value: 'brand' },
+  { id: 5, name: '브랜드', value: 'brandId' },
   { id: 6, name: '사이즈', value: 'size' },
   { id: 7, name: '가격대', value: 'price' },
+] as const;
+
+export const PRODUCT_FILTER_SORT = [
+  { id: 1, name: '최신순', value: 'latest' },
+  { id: 2, name: '인기순', value: 'popular' },
+  { id: 3, name: '가격 높은순', value: 'price_high' },
+  { id: 4, name: '가격 낮은순', value: 'price_low' },
+  { id: 5, name: '관심 많은순', value: 'likes' },
+  { id: 6, name: '리뷰 많은순', value: 'reviews' },
 ] as const;
 
 export const PRODUCT_FILTER_COLOR = [
