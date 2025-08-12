@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import styles from './product_card.module.scss';
+import styles from './productCard.module.scss';
 import bookmark from '@/public/icons/book_mark.svg';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import { ISearchProductList } from '@/types/searchProductList';
