@@ -15,7 +15,7 @@ export interface IAddressList {
   id: number;
   detail: string;
   isDefault: boolean;
-  message: string;
+  message?: string;
   name: string;
   phone: string;
   zipCode: string;

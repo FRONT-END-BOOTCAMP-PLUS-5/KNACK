@@ -6,9 +6,10 @@ import Text from '@/components/common/Text';
 import { useCallback, useEffect, useState } from 'react';
 import AddressModal from '@/components/my/address/AddressModal';
 import { myService } from '@/services/my';
-import { IAddress, IAddressList, IUpdateAddress } from '@/types/address';
+import { IAddress } from '@/types/address';
 import { ADDRESS_INITIAL_VALUE } from '@/constraint/address';
 import { useUserStore } from '@/store/userStore';
+import { addAddressConversion, addressListMapper, updateAddressConversion } from '@/utils/address';
 
 const AddressPage = () => {
   const { getAddress, addAddress, updateAddress, deleteAddress } = myService;
@@ -25,19 +26,8 @@ const AddressPage = () => {
     getAddress()
       .then(async (res) => {
         if (res.result) {
-          const mapper: IAddress[] = await res.result?.map((item: IAddressList) => {
-            return {
-              id: item?.id,
-              detail: item?.detail,
-              isDefault: item?.isDefault,
-              name: item?.name,
-              phone: item?.phone,
-              address: {
-                zipCode: item?.zipCode,
-                main: item?.main,
-              },
-            };
-          });
+          const mapper = await addressListMapper(res.result);
+
           setAddressList(mapper);
           setDefaultAddress(mapper.filter((item: IAddress) => item.isDefault === true)[0]);
           setOpen(false);
@@ -51,16 +41,7 @@ const AddressPage = () => {
 
   const onClickAddressSave = () => {
     if (modalType === 'add') {
-      const data = {
-        userId: user?.id ?? '',
-        detail: addressInfo?.detail,
-        isDefault: addressInfo?.isDefault,
-        message: addressInfo?.message,
-        name: addressInfo?.name,
-        phone: addressInfo?.phone,
-        main: addressInfo?.address?.main,
-        zipCode: addressInfo?.address?.zipCode,
-      };
+      const data = addAddressConversion(addressInfo, user?.id);
 
       data.userId = user?.id ?? '';
 
@@ -86,19 +67,9 @@ const AddressPage = () => {
   };
 
   const handleUpdateAddress = (type: 'default' | 'change', addressInfo: IAddress) => {
-    setModalType(type);
+    const data = updateAddressConversion(addressInfo, user?.id);
 
-    const data: IUpdateAddress = {
-      id: addressInfo?.id,
-      detail: addressInfo?.detail,
-      isDefault: addressInfo?.isDefault,
-      main: addressInfo?.address?.main,
-      zipCode: addressInfo?.address?.zipCode,
-      message: addressInfo?.message,
-      name: addressInfo?.name,
-      phone: addressInfo?.phone,
-      userId: user?.id ?? '',
-    };
+    setModalType(type);
 
     if (type === 'default') {
       data['isDefault'] = true;
@@ -112,17 +83,7 @@ const AddressPage = () => {
   };
 
   const actionUpdateAddress = () => {
-    const data: IUpdateAddress = {
-      id: addressInfo?.id,
-      detail: addressInfo?.detail,
-      isDefault: addressInfo?.isDefault,
-      main: addressInfo?.address?.main,
-      zipCode: addressInfo?.address?.zipCode,
-      message: addressInfo?.message,
-      name: addressInfo?.name,
-      phone: addressInfo?.phone,
-      userId: user?.id ?? '',
-    };
+    const data = updateAddressConversion(addressInfo, user?.id);
 
     updateAddress(data)
       .then((res) => {

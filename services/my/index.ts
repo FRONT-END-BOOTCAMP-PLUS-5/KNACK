@@ -1,4 +1,4 @@
-import { IAddressList, IAddressRef, IUpdateAddress } from '@/types/address';
+import { IAddressRef, IUpdateAddress } from '@/types/address';
 import { IUpdateUserRef } from '@/types/user';
 import requester from '@/utils/requester';
 
