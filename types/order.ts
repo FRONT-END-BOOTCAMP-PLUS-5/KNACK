@@ -94,3 +94,21 @@ export type requestProps = {
     onClose: () => void;
     onApply: (next: string) => void;        // 최종 선택(빈 문자열 = 없음)
 };
+
+export type RepresentativeProduct = {
+    productId: number | null
+    name: string
+    thumbnailUrl: string | null
+    unitPrice: number
+    quantity: number
+    lineTotal: number
+}
+
+export type AvailableCoupon = {
+    mappingId: number
+    couponId: number
+    name: string
+    salePercent: number
+    productId: number
+    expirationAt?: string | null
+}

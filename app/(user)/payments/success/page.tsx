@@ -30,6 +30,7 @@ export default function PaymentSuccess() {
     const [savedOrderIds, setSavedOrderIds] = useState<number[]>([])
     const [paymentId, setPaymentId] = useState<number | null>(null)
     const [repProd, setRepProd] = useState<RepresentativeProduct | null>(null)
+    const [shippingFee, setShippingFee] = useState(0)
     const [otherOrdersCount, setOtherOrdersCount] = useState(0)
 
     // ✅ URL 파라미터를 원시값으로 고정
@@ -40,6 +41,15 @@ export default function PaymentSuccess() {
         const n = raw === null ? NaN : Number(raw)
         return n
     }, [params])
+
+    // 총액(파라미터), 구매가(subtotal), 수수료 계산
+    const totalAmount = useMemo(() => (Number.isFinite(amount) ? Number(amount) : 0), [amount])
+    const subtotal = useMemo(
+        () => orderItems.reduce((s, it) => s + Number(it.price ?? 0) * Number(it.quantity ?? 0), 0),
+        [orderItems]
+    )
+    const fee = useMemo(() => Math.max(0, totalAmount - subtotal - shippingFee), [totalAmount, subtotal, shippingFee])
+
 
     // 1) sessionStorage에서 복구
     useEffect(() => {
@@ -137,107 +147,127 @@ export default function PaymentSuccess() {
 
     // 3) 대표상품 조회 (위에서 저장한 paymentId로 API 호출)
     useEffect(() => {
-        if (!paymentId) return;
+        if (!paymentId) return
 
-        const pickRepFromItems = (items: OrderItem[]) => {
+        const pickRepFromItems = (items: any[]) => {
             const scored = (items ?? []).map((it) => {
                 const unit =
-                    Number.isFinite(it?.price) ? Number(it.price)
+                    Number.isFinite(it?.salePrice) ? Number(it.salePrice)
                         : Number.isFinite(it?.price) ? Number(it.price)
-                            : Number(it?.price ?? 0);
-                const qty = Number(it?.quantity ?? 0);
-                const lineTotal = unit * qty;
+                            : Number(it?.unitPrice ?? 0)
+                const qty = Number(it?.count ?? it?.quantity ?? 0)
                 return {
-                    productId: it.productId ?? null,
-                    name: it.kor_name ?? it.eng_name ?? '',
-                    thumbnailUrl: it.thumbnail_image ?? null,
+                    productId: it.productId ?? it.product?.id ?? null,
+                    name: it.product?.name ?? it.name ?? '',
+                    thumbnailUrl: it.product?.thumbnailUrl ?? it.thumbnailUrl ?? null,
                     unitPrice: unit,
                     quantity: qty,
-                    lineTotal,
-                };
-            });
-            scored.sort((a, b) => (b.lineTotal ?? 0) - (a.lineTotal ?? 0));
-            return scored[0] ?? null;
-        };
-
-        (async () => {
-            try {
-                // 1) 결제 정보에서 첫 주문 ID 얻기
-                const payRes = await requester.get(`/api/payments/${paymentId}`);
-                // 백엔드가 orderIds를 바로 주는 경우 우선 사용
-                let orderIds: number[] = payRes.data?.orderIds ?? [];
-                // 없다면 orders 배열에서 id만 추출 (구조 대비)
-                if ((!orderIds || orderIds.length === 0) && Array.isArray(payRes.data?.orders)) {
-                    orderIds = payRes.data.orders.map((o: { id: number }) => o.id).filter((v: number) => Number.isFinite(v));
+                    lineTotal: unit * qty,
                 }
-                const firstOrderId = orderIds?.[0];
-                setOtherOrdersCount(Math.max(0, orderIds.length - 1))
-                if (!Number.isFinite(firstOrderId)) {
-                    console.warn('첫 주문을 찾을 수 없습니다.', payRes.data);
-                    setRepProd(null);
-                    return;
+            })
+            scored.sort((a, b) => (b.lineTotal ?? 0) - (a.lineTotal ?? 0))
+            return scored[0] ?? null
+        }
+
+            ; (async () => {
+                try {
+                    // 1) 결제 → 첫 주문 ID + ‘외 N건’
+                    const payRes = await requester.get(`/api/payments/${paymentId}`)
+                    let orderIds: number[] = payRes.data?.orderIds ?? []
+                    if ((!orderIds || orderIds.length === 0) && Array.isArray(payRes.data?.orders)) {
+                        orderIds = payRes.data.orders.map((o: any) => o.id).filter((v: any) => Number.isFinite(v))
+                    }
+                    setOtherOrdersCount(Math.max(0, (orderIds?.length ?? 0) - 1))
+
+                    const firstOrderId = orderIds?.[0]
+                    if (!Number.isFinite(firstOrderId)) {
+                        setRepProd(null)
+                        setShippingFee(0)
+                        return
+                    }
+
+                    // 2) 첫 주문 상세 → 대표상품 + 배송비
+                    const ordRes = await requester.get(`/api/orders/${firstOrderId}`)
+                    const order = ordRes.data
+                    const items = order?.items ?? order?.orderItems ?? []
+                    setRepProd(pickRepFromItems(items))
+
+                    const delivery = Number(order?.deliveryFee ?? order?.shippingFee ?? 0)
+                    setShippingFee(Number.isFinite(delivery) ? delivery : 0)
+                } catch (e) {
+                    console.error('❌ 대표상품/주문 로드 실패', e)
+                    setRepProd(null)
+                    setShippingFee(0)
                 }
+            })()
+    }, [paymentId])
 
-                // 2) 첫 주문 상세 조회
-                const ordRes = await requester.get(`/api/orders/${firstOrderId}`);
-                const order = ordRes.data;
-
-                // 3) 대표상품 계산 (items 키 이름 변동 대비)
-                const items =
-                    order?.items ??
-                    order?.orderItems ??
-                    []; // 스키마에 맞게 조정
-                const rep = pickRepFromItems(items);
-                setRepProd(rep);
-
-                console.log('✅ 대표상품 로드 (from order)', rep);
-            } catch (e) {
-                console.error('❌ 대표상품 로드 실패', e);
-                setRepProd(null);
-            }
-        })();
-    }, [paymentId]);
+    const fmt = (n: number) => n.toLocaleString()
 
     return (
-        <div className={styles.success}>
-            <div className={styles.card}>
-                <div className={styles.icon}>✅</div>
-                <h2>결제가 완료되었습니다!</h2>
+        <div className={styles.sheet}>
+            {/* 닫기 아이콘이 필요하면 onClick에 원하는 경로로 */}
+            {/* <button className={styles.close} aria-label="닫기" onClick={() => router.push('/')}>×</button> */}
 
-                {paymentNumber && (
-                    <p className={styles.order_number}>
-                        주문번호 <strong>{paymentNumber}</strong>
-                    </p>
+            <h2 className={styles.title}>구매가 완료되었습니다.</h2>
+            <p className={styles.subtitle}>주문 즉시 출고를 준비하여 안전하게 배송 될 예정입니다.</p>
+
+            <div className={styles.image_wrap}>
+                {repProd?.thumbnailUrl && (
+                    <Image
+                        src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${repProd.thumbnailUrl}`}
+                        alt={repProd.name}
+                        width={160}
+                        height={160}
+                        className={styles.productImage}
+                    />
                 )}
-
-                {/* 대표상품 박스 */}
-                {repProd && (
-                    <div className={styles.repBox}>
-                        {repProd.thumbnailUrl && (
-                            <Image
-                                className={styles.rep_thumb}
-                                src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${repProd.thumbnailUrl}`}
-                                alt={repProd.name}
-                                width={64}
-                                height={64}
-                            />
-                        )}
-                        <div className={styles.rep_info}>
-                            <div className={styles.rep_name}>{repProd.name} {otherOrdersCount > 0 && (
-                                <span className={styles.plus_etc}> 외 {otherOrdersCount}건</span>
-                            )}</div>
-                            <div className={styles.rep_meta}>
-                                수량 {repProd.quantity} · 합계 {repProd.lineTotal.toLocaleString()}원
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                <p className={styles.desc}>주문 내역은 아래 버튼을 눌러 확인할 수 있습니다.</p>
-                <button className={styles.view_btn} onClick={() => router.push('/orders')}>
-                    주문 내역 확인
-                </button>
             </div>
+
+            <button className={styles.primary_btn} onClick={() => router.push('/orders')}>
+                구매 내역 상세보기
+            </button>
+            <p className={styles.notice}>구매 후 15분 이내에 구매 여부를 결정할 수 있습니다.</p>
+
+            {/* 결제 요약 */}
+            <section className={styles.summary_box}>
+                <div className={styles.summary_header}>
+                    <span>총 결제금액</span>
+                    <strong>{fmt(totalAmount)}원</strong>
+                </div>
+
+                <div className={styles.row}>
+                    <div>구매가{otherOrdersCount > 0 && <span className={styles.etc}> 외 {otherOrdersCount}건</span>}</div>
+                    <div>{fmt(subtotal)}원</div>
+                </div>
+
+                <div className={styles.row}>
+                    <div>검수비</div>
+                    <div className={styles.muted}>무료</div>
+                </div>
+
+                <div className={styles.row}>
+                    <div>
+                        수수료 <span className={styles.tooltip} aria-label="수수료 안내">?</span>
+                    </div>
+                    <div className={fee > 0 ? '' : styles.dash}>{fee > 0 ? `${fmt(fee)}원` : '-'}</div>
+                </div>
+
+                <div className={styles.row}>
+                    <div>배송비</div>
+                    <div>{shippingFee > 0 ? `${fmt(shippingFee)}원` : '무료'}</div>
+                </div>
+
+                <div className={styles.row}>
+                    <div>쿠폰 사용</div>
+                    <div>-</div>
+                </div>
+
+                <div className={styles.row}>
+                    <div>포인트 사용</div>
+                    <div>-</div>
+                </div>
+            </section>
         </div>
     )
 }
