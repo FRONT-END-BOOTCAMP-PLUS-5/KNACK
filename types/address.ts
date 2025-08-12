@@ -1,4 +1,4 @@
-export interface IAddressInput {
+export interface IAddress {
   id: number;
   detail: string;
   isDefault: boolean;
@@ -11,7 +11,7 @@ export interface IAddressInput {
   };
 }
 
-export interface IAddress {
+export interface IAddressList {
   id: number;
   detail: string;
   isDefault: boolean;
@@ -24,6 +24,18 @@ export interface IAddress {
 
 export interface IAddressRef {
   userId: string;
+  name: string;
+  phone?: string;
+  detail?: string;
+  message?: string;
+  isDefault?: boolean;
+  zipCode: string;
+  main: string;
+}
+
+export interface IUpdateAddress {
+  userId: string;
+  id: number;
   name: string;
   phone?: string;
   detail?: string;

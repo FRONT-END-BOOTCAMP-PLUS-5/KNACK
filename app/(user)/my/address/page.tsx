@@ -6,26 +6,42 @@ import Text from '@/components/common/Text';
 import { useCallback, useEffect, useState } from 'react';
 import AddressModal from '@/components/my/address/AddressModal';
 import { myService } from '@/services/my';
-import { IAddress, IAddressInput } from '@/types/address';
+import { IAddress, IAddressList, IUpdateAddress } from '@/types/address';
 import { ADDRESS_INITIAL_VALUE } from '@/constraint/address';
 import { useUserStore } from '@/store/userStore';
 
 const AddressPage = () => {
-  const { getAddress, addAddress } = myService;
+  const { getAddress, addAddress, updateAddress, deleteAddress } = myService;
 
   const [open, setOpen] = useState(false);
   const [addressList, setAddressList] = useState<IAddress[]>([]);
-  const [defaultAddress, setDefaultAddress] = useState<IAddressInput>(ADDRESS_INITIAL_VALUE);
-  const [addressInfo, setAddressInfo] = useState<IAddressInput>(ADDRESS_INITIAL_VALUE);
+  const [defaultAddress, setDefaultAddress] = useState<IAddress>(ADDRESS_INITIAL_VALUE);
+  const [addressInfo, setAddressInfo] = useState<IAddress>(ADDRESS_INITIAL_VALUE);
+  const [modalType, setModalType] = useState<'default' | 'change' | 'add'>('add');
 
   const { user } = useUserStore();
 
   const initAddress = useCallback(() => {
     getAddress()
-      .then((res) => {
+      .then(async (res) => {
         if (res.result) {
-          setAddressList(res.result);
-          setDefaultAddress(res?.result.filter((item: IAddress) => item.isDefault === true)[0]);
+          const mapper: IAddress[] = await res.result?.map((item: IAddressList) => {
+            return {
+              id: item?.id,
+              detail: item?.detail,
+              isDefault: item?.isDefault,
+              name: item?.name,
+              phone: item?.phone,
+              address: {
+                zipCode: item?.zipCode,
+                main: item?.main,
+              },
+            };
+          });
+          setAddressList(mapper);
+          setDefaultAddress(mapper.filter((item: IAddress) => item.isDefault === true)[0]);
+          setOpen(false);
+          setAddressInfo(ADDRESS_INITIAL_VALUE);
         }
       })
       .catch((error) => {
@@ -34,34 +50,101 @@ const AddressPage = () => {
   }, [getAddress]);
 
   const onClickAddressSave = () => {
-    console.log('addressInfo', addressInfo);
+    if (modalType === 'add') {
+      const data = {
+        userId: user?.id ?? '',
+        detail: addressInfo?.detail,
+        isDefault: addressInfo?.isDefault,
+        message: addressInfo?.message,
+        name: addressInfo?.name,
+        phone: addressInfo?.phone,
+        main: addressInfo?.address?.main,
+        zipCode: addressInfo?.address?.zipCode,
+      };
 
-    const data = {
-      userId: user?.id ?? '',
+      data.userId = user?.id ?? '';
+
+      addAddress(data)
+        .then((res) => {
+          if (res?.result?.id) {
+            alert('주소록 등록이 완료 되었어요.');
+            initAddress();
+          }
+        })
+        .catch((error) => {
+          console.log('error', error.message);
+        });
+    }
+
+    if (modalType === 'change') {
+      actionUpdateAddress();
+    }
+  };
+
+  const onChangeAddressInfo = <K extends keyof IAddress>(key: K, value: IAddress[K]) => {
+    setAddressInfo({ ...addressInfo, [key]: value });
+  };
+
+  const handleUpdateAddress = (type: 'default' | 'change', addressInfo: IAddress) => {
+    setModalType(type);
+
+    const data: IUpdateAddress = {
+      id: addressInfo?.id,
       detail: addressInfo?.detail,
       isDefault: addressInfo?.isDefault,
+      main: addressInfo?.address?.main,
+      zipCode: addressInfo?.address?.zipCode,
       message: addressInfo?.message,
       name: addressInfo?.name,
       phone: addressInfo?.phone,
-      main: addressInfo?.address?.main,
-      zipCode: addressInfo?.address?.zipCode,
+      userId: user?.id ?? '',
     };
 
-    data.userId = user?.id ?? '';
+    if (type === 'default') {
+      data['isDefault'] = true;
+      actionUpdateAddress();
+    }
 
-    console.log('data', data);
+    if (type === 'change') {
+      setOpen(true);
+      setAddressInfo(addressInfo);
+    }
+  };
 
-    addAddress(data)
+  const actionUpdateAddress = () => {
+    const data: IUpdateAddress = {
+      id: addressInfo?.id,
+      detail: addressInfo?.detail,
+      isDefault: addressInfo?.isDefault,
+      main: addressInfo?.address?.main,
+      zipCode: addressInfo?.address?.zipCode,
+      message: addressInfo?.message,
+      name: addressInfo?.name,
+      phone: addressInfo?.phone,
+      userId: user?.id ?? '',
+    };
+
+    updateAddress(data)
       .then((res) => {
-        console.log('res', res);
+        if (res) {
+          initAddress();
+        }
       })
       .catch((error) => {
         console.log('error', error.message);
       });
   };
 
-  const onChangeAddressInfo = (key: keyof IAddressInput, value: string | boolean | object) => {
-    setAddressInfo({ ...addressInfo, [key]: value });
+  const handleDeleteAddress = (id: number) => {
+    deleteAddress(id)
+      .then((res) => {
+        if (res) {
+          initAddress();
+        }
+      })
+      .catch((error) => {
+        console.log('error', error.message);
+      });
   };
 
   useEffect(() => {
@@ -70,7 +153,14 @@ const AddressPage = () => {
 
   return (
     <section className={styles.container}>
-      <button className={styles.address_add_button} onClick={() => setOpen(true)}>
+      <button
+        className={styles.address_add_button}
+        onClick={() => {
+          setOpen(true);
+          setModalType('add');
+          setAddressInfo(ADDRESS_INITIAL_VALUE);
+        }}
+      >
         <Text size={1.6}>+ 새 주소 추가하기</Text>
       </button>
       {defaultAddress && defaultAddress?.id !== 0 && (
@@ -95,7 +185,7 @@ const AddressPage = () => {
             {defaultAddress?.phone}
           </Text>
           <Text size={1.4} paddingTop={6}>
-            ({defaultAddress?.isDefault}) {defaultAddress?.address?.main} {defaultAddress?.detail}
+            ({defaultAddress?.address?.zipCode}) {defaultAddress?.address?.main} {defaultAddress?.detail}
           </Text>
           <div className={styles.button_wrap}>
             <button className={styles.text_button}>수정</button>
@@ -113,13 +203,25 @@ const AddressPage = () => {
               {item?.phone}
             </Text>
             <Text paddingTop={6} size={1.4}>
-              ({item?.zipCode}) {item?.main} {item?.detail}
+              ({item?.address?.zipCode}) {item?.address?.main} {item?.detail}
             </Text>
           </Flex>
           <div className={styles.border_button_wrap}>
-            <button className={styles.border_button}>기본 배송지</button>
-            <button className={`${styles.border_button} ${styles.border_left}`}>수정</button>
-            <button className={`${styles.border_button} ${styles.border_left}`}>삭제</button>
+            <button className={styles.border_button} onClick={() => handleUpdateAddress('default', item)}>
+              기본 배송지
+            </button>
+            <button
+              className={`${styles.border_button} ${styles.border_left}`}
+              onClick={() => handleUpdateAddress('change', item)}
+            >
+              수정
+            </button>
+            <button
+              className={`${styles.border_button} ${styles.border_left}`}
+              onClick={() => handleDeleteAddress(item?.id)}
+            >
+              삭제
+            </button>
           </div>
         </Flex>
       ))}
@@ -127,6 +229,7 @@ const AddressPage = () => {
       {open && (
         <AddressModal
           addressInfo={addressInfo}
+          modalType={modalType}
           onChangeAddressInfo={onChangeAddressInfo}
           setOpen={setOpen}
           onClickSave={onClickAddressSave}

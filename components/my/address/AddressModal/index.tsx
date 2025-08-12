@@ -7,26 +7,74 @@ import Flex from '@/components/common/Flex';
 import BackArrow from '@/public/icons/back_arrow.svg';
 import Image from 'next/image';
 import Checkbox from '@/components/common/Checkbox';
-import { useState } from 'react';
-import { IAddressInput } from '@/types/address';
+import { useEffect, useState } from 'react';
 import DaumPostcodeEmbed, { Address } from 'react-daum-postcode';
 import CloseLarge from '@/public/icons/close_large.svg';
+import Toast from '@/components/common/Toast';
+import { IAddress } from '@/types/address';
 
 interface IProps {
   open?: boolean;
-  addressInfo?: IAddressInput;
+  addressInfo?: IAddress;
+  modalType?: 'default' | 'change' | 'add';
   setOpen: (status: boolean) => void;
-  onChangeAddressInfo?: (key: keyof IAddressInput, value: string | boolean | { main: string; zipCode: string }) => void;
+  onChangeAddressInfo?: <K extends keyof IAddress>(key: K, value: IAddress[K]) => void;
   onClickSave?: () => void;
 }
 
-const AddressModal = ({ addressInfo, setOpen, onChangeAddressInfo, onClickSave }: IProps) => {
+const AddressModal = ({ addressInfo, modalType, setOpen, onChangeAddressInfo, onClickSave }: IProps) => {
   const [enterCheck, setEnterCheck] = useState(false);
   const [daumOpen, setDaumOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageOpen, setMessageOpen] = useState(false);
 
   const handleComplete = async (data: Address) => {
     onChangeAddressInfo?.('address', { main: data.address, zipCode: data.zonecode });
   };
+
+  const handleSave = () => {
+    if (!addressInfo?.name) {
+      setMessage('받으시는분이 입력되지 않았어요.');
+      setMessageOpen(true);
+      return;
+    }
+
+    if (!addressInfo?.phone) {
+      setMessage('핸드폰 번호가 입력되지 않았어요.');
+      setMessageOpen(true);
+      return;
+    }
+
+    if (!addressInfo?.address?.main) {
+      setMessage('주소가 입력되지 않았어요.');
+      setMessageOpen(true);
+      return;
+    }
+
+    if (!addressInfo?.detail) {
+      setMessage('상세주소가 입력되지 않았어요.');
+      setMessageOpen(true);
+      return;
+    }
+
+    onClickSave?.();
+  };
+
+  useEffect(() => {
+    if (messageOpen) {
+      setTimeout(() => {
+        setMessageOpen(false);
+      }, 2000);
+    }
+  }, [messageOpen]);
+
+  useEffect(() => {
+    if (addressInfo?.address?.main && addressInfo?.name && addressInfo?.phone && addressInfo?.detail) {
+      setEnterCheck(true);
+    } else {
+      setEnterCheck(false);
+    }
+  }, [addressInfo?.address?.main, addressInfo?.name, addressInfo?.phone, addressInfo?.detail]);
 
   return (
     <section className={styles.container}>
@@ -35,7 +83,7 @@ const AddressModal = ({ addressInfo, setOpen, onChangeAddressInfo, onClickSave }
           <Image src={BackArrow} alt="뒤로가기" />
         </button>
         <Text size={2} weight={700} paddingTop={11} paddingBottom={11} lineHeight="28px">
-          주소 추가하기
+          {modalType === 'add' ? '주소 추가하기' : '배송지 수정'}
         </Text>
       </section>
       <Flex paddingHorizontal={20} width="full" direction="column" gap={16}>
@@ -94,10 +142,11 @@ const AddressModal = ({ addressInfo, setOpen, onChangeAddressInfo, onClickSave }
         </label>
       </Flex>
       <Flex paddingHorizontal={20}>
-        <button className={`${styles.address_save_button} ${enterCheck && styles.active}`} onClick={onClickSave}>
+        <button className={`${styles.address_save_button} ${enterCheck && styles.active}`} onClick={handleSave}>
           저장하기
         </button>
       </Flex>
+      {messageOpen && <Toast type="error">{message}</Toast>}
 
       {daumOpen && (
         <div className={styles.daum_style}>
