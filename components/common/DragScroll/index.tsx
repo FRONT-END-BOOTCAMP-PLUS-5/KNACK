@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import styles from './drag_scroll.module.scss';
+import styles from './dragScroll.module.scss';
 
 interface IProps {
   children: React.ReactNode;
@@ -9,6 +9,7 @@ interface IProps {
   showScrollbar?: boolean;
 }
 
+//TODO: pc에서도 터치스크롤 되게 기능 추가해야 됨
 export default function DragScroll({ children, className = '', showScrollbar = false }: IProps) {
   const scrollbarClass = showScrollbar ? styles.show_scrollbar : styles.hide_scrollbar;
 

@@ -1,6 +1,6 @@
 'use client';
 import { GetProductsResponseDto } from '@/backend/search/applications/dtos/GetProductsDto';
-import styles from './search_product_list.module.scss';
+import styles from './searchProductList.module.scss';
 import { ProductCardLarge } from '@/components/common/ProductCard';
 import SearchProductListEmpty from './SearchProductListEmpty';
 

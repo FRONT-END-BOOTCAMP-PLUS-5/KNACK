@@ -2,7 +2,7 @@
 
 import React from 'react';
 import DragScroll from '@/components/common/DragScroll';
-import styles from './search_filter.module.scss';
+import styles from './searchFilter.module.scss';
 import Image from 'next/image';
 import arrowDown from '@/public/icons/arrow_down.svg';
 import { PRODUCT_FILTER } from '@/constraint/product';

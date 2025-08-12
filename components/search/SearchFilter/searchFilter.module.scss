@@ -3,7 +3,7 @@
 .filter_title {
   font-size: 1.4rem;
   font-weight: 600;
-  color: #333;
+  color: $gray03;
   margin-bottom: 12px;
   margin: 0 0 12px 0;
 }
@@ -16,7 +16,7 @@
 .filter_button {
   border: none;
   align-items: center;
-  background-color: #f4f4f4;
+  background-color: $light-gray02;
   border-radius: 30px;
   color: $gray04;
   display: flex;
@@ -31,7 +31,7 @@
   }
 
   &.active {
-    background-color: #333;
+    background-color: $gray03;
     color: #fff;
   }
 }
