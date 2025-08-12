@@ -1,4 +1,4 @@
-import styles from './search_sort.module.scss';
+import styles from './searchSort.module.scss';
 import Image from 'next/image';
 import filterArrow from '@/public/icons/filter_arrow.svg';
 

@@ -6,11 +6,12 @@ interface IProps {
   placeholder?: string;
   value?: string;
   error?: string;
+  disabled?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClear?: () => void;
 }
 
-const Input = ({ label, labelId, value, placeholder, error, onClear, onChange }: IProps) => {
+const Input = ({ label, labelId, value, placeholder, error, disabled = false, onClear, onChange }: IProps) => {
   return (
     <div className={styles.input_group}>
       <label htmlFor={labelId}>{label}</label>
@@ -22,6 +23,7 @@ const Input = ({ label, labelId, value, placeholder, error, onClear, onChange }:
           onChange={onChange}
           placeholder={placeholder}
           className={error ? styles.input_error : ''}
+          disabled={disabled}
         />
         {value && onClear && (
           <button type="button" onClick={onClear} className={styles.clear_button}>
