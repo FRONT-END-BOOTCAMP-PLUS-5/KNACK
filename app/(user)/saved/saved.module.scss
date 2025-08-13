@@ -1,0 +1,29 @@
+.product_image {
+  width: 88px;
+  height: 88px;
+  border-radius: 9px;
+  background: #ededed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 9px;
+  flex: none;
+  position: relative;
+}
+
+.top_content {
+  height: 40px;
+}
+
+.bottom_content {
+  height: 30px;
+}
+
+.save_button {
+  background: #fff;
+  border: none;
+}
+
+.like_item {
+  border-bottom: 1px solid #ebebeb;
+}

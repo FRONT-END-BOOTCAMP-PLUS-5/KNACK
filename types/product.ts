@@ -43,3 +43,16 @@ export interface IOptionType {
   name: string;
   optionValue: IOptionValue[];
 }
+
+export interface IProducts {
+  id: number;
+  thumbnailImage: string;
+  price: number | null;
+  engName: string;
+  korName: string;
+  brand: IBrand;
+  category: ICategory;
+  colorKorName: string;
+  colorEngName: string;
+  productOptionMappings: IProductOptionMapping[];
+}

@@ -42,19 +42,19 @@ export default function LayoutWrapper({ children }: IProps) {
   }, [session, status, fetchUserData]);
 
   // 헤더만 숨길 경로들
-  const hideHeaderPaths = ['/login', '/signup', '/find-email', '/find-password'];
+  const hideHeaderPaths = ['/login', '/signup', '/find-email', '/find-password', '/my/address', '/saved'];
 
   // 푸터만 숨길 경로들
-  const hideFooterPaths = ['/products', '/cart', '/payments', ];
+  const hideFooterPaths = ['/products', '/cart', '/payments'];
 
   // 헤더와 푸터 모두 숨길 경로들
   const hideAllLayoutPaths = ['/login', '/signup', '/find-email', '/find-password'];
-  
-  // nav와 검색버튼을을 숨김 
+
+  // nav와 검색버튼을을 숨김
   const hideHeaderElementsPaths = ['/my', '/cart'];
 
-  // 로고를 숨기고고 뒤로가기 버튼 
-  const showBackButtonPaths = ['/cart','/my/profile', '/my/orders', '/my/address'];
+  // 로고를 숨기고고 뒤로가기 버튼
+  const showBackButtonPaths = ['/cart', '/my/profile', '/my/orders', '/my/address'];
 
   // 홈 버튼을 보여줄 경로들
   const showHomeButtonPaths = ['/cart'];
@@ -80,19 +80,19 @@ export default function LayoutWrapper({ children }: IProps) {
 
   // 헤더 요소들(검색창, 탭 네비게이션)을 숨길지 여부
   const shouldHideHeaderElements = hideHeaderElementsPaths.some((path) => pathname.startsWith(path));
-  
+
   // 액션 버튼들(알림, 장바구니)을 숨길지 여부
   const shouldHideActionButtons = showBackButtonPaths.some((path) => pathname.startsWith(path));
-  
+
   // 뒤로가기 버튼을 보여줄지 여부
   const shouldShowBackButton = showBackButtonPaths.some((path) => pathname.startsWith(path));
-  
+
   // 홈 버튼을 보여줄지 여부
   const shouldShowHomeButton = showHomeButtonPaths.some((path) => pathname.startsWith(path));
-  
+
   // 현재 페이지에 맞는 제목 가져오기
   const pageTitle = getPageTitle(pathname);
-  
+
   // 로고를 보여줄지 여부 (뒤로가기 버튼이 있으면 로고 숨김)
   const shouldShowLogo = !shouldShowBackButton;
 
@@ -117,13 +117,13 @@ export default function LayoutWrapper({ children }: IProps) {
     <QueryClientProvider client={queryClient}>
       {/* 헤더 렌더링: 경로에 따라 다른 헤더 설정 적용 */}
       {!shouldHideHeader && (
-        <Header 
-          hideHeaderElements={shouldHideHeaderElements}  // 검색창, 탭 네비게이션 숨김
-          showBackButton={shouldShowBackButton}         // 뒤로가기 버튼 표시
-          pageTitle={pageTitle}                         // 페이지 제목
-          showLogo={shouldShowLogo}                     // 로고 표시 여부
-          hideActionButtons={shouldHideActionButtons}   // 액션 버튼들 숨김(알림, 장바구니니)
-          showHomeButton={shouldShowHomeButton}         // 홈 버튼 표시 여부
+        <Header
+          hideHeaderElements={shouldHideHeaderElements} // 검색창, 탭 네비게이션 숨김
+          showBackButton={shouldShowBackButton} // 뒤로가기 버튼 표시
+          pageTitle={pageTitle} // 페이지 제목
+          showLogo={shouldShowLogo} // 로고 표시 여부
+          hideActionButtons={shouldHideActionButtons} // 액션 버튼들 숨김(알림, 장바구니니)
+          showHomeButton={shouldShowHomeButton} // 홈 버튼 표시 여부
         />
       )}
       {children}

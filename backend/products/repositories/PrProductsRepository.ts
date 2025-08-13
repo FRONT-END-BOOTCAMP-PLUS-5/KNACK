@@ -1,6 +1,7 @@
 import prisma from '@/backend/utils/prisma';
 import { ProductRepository } from '../domains/repositories/ProductRepository';
 import { IProduct } from '../domains/entities/Product';
+import { IProducts } from '../domains/entities/Products';
 
 export class PrProductRepository implements ProductRepository {
   async find(id: number): Promise<IProduct | null> {
@@ -86,10 +87,53 @@ export class PrProductRepository implements ProductRepository {
     }
   }
 
-  findManyByIds(ids: number[]) {
+  findManyByIds(ids: number[]): Promise<IProducts[]> {
     return prisma.product.findMany({
       where: { id: { in: ids } },
-      select: { id: true, price: true, thumbnailImage: true, korName: true, engName: true },
-    })
+      select: {
+        id: true,
+        thumbnailImage: true,
+        price: true,
+        engName: true,
+        korName: true,
+        colorEngName: true,
+        colorKorName: true,
+        productOptionMappings: {
+          select: {
+            optionType: {
+              select: {
+                id: true,
+                name: true,
+                isPrivate: true,
+                optionValue: true,
+              },
+            },
+          },
+        },
+        brand: {
+          select: {
+            id: true,
+            korName: true,
+            engName: true,
+            logoImage: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            engName: true,
+            korName: true,
+            subCategories: {
+              select: {
+                id: true,
+                engName: true,
+                korName: true,
+                categoryId: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 }
