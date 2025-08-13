@@ -13,7 +13,7 @@ export default function Footer() {
 
   const handleTabClick = (tab: TabId) => {
     setActiveTab(tab);
-    
+
     // 페이지 이동
     switch (tab) {
       case 'HOME':
@@ -23,7 +23,7 @@ export default function Footer() {
         router.push('/search');
         break;
       case 'SAVED':
-        router.push('/cart');
+        router.push('/saved');
         break;
       case 'MY':
         router.push('/my');
@@ -56,4 +56,4 @@ export default function Footer() {
       </nav>
     </footer>
   );
-} 
+}

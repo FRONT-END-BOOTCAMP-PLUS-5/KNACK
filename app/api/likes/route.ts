@@ -1,0 +1,52 @@
+import { CreateLikesUseCase } from '@/backend/likes/applications/usecases/CreateLikesUseCase';
+import { DeleteLikesUseCase } from '@/backend/likes/applications/usecases/DeleteLikesUseCase';
+import { GetLikesUseCase } from '@/backend/likes/applications/usecases/GetLikesUseCase';
+import { PrLikesRepository } from '@/backend/likes/repositories/PrLikesRepository';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    const likeRepository = new PrLikesRepository(body);
+    const likes = new CreateLikesUseCase(likeRepository).insert();
+
+    return NextResponse.json({ result: likes, status: 200 });
+  } catch (err) {
+    if (err instanceof Error) {
+      return NextResponse.json({ message: err.message, status: 503 });
+    }
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    const likeRepository = new PrLikesRepository(body);
+    const likes = new DeleteLikesUseCase(likeRepository).delete(body.id);
+
+    return NextResponse.json({ result: likes, status: 200 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: error.message, status: 503 });
+    }
+  }
+}
+
+export async function GET(request: NextRequest) {
+  const url: URL = new URL(request.url);
+  const params = url.searchParams.getAll('id');
+  const ids = params.map(Number);
+
+  try {
+    const likeRepository = new PrLikesRepository();
+    const likes = await new GetLikesUseCase(likeRepository).findById(ids);
+
+    return NextResponse.json({ result: likes, status: 200 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: error.message, status: 503 });
+    }
+  }
+}

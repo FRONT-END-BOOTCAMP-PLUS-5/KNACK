@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/global.scss";
 import LayoutWrapper from "@/app/(user)/LayoutWrapper";
+import SessionProvider from '@/components/providers/SessionProvider';
 
 export const metadata: Metadata = {
   title: "KNACK",
@@ -15,9 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
-        <LayoutWrapper>
-          {children}
-        </LayoutWrapper>
+        <SessionProvider>
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
+        </SessionProvider>
       </body>
     </html>
   );
