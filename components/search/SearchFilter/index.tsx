@@ -14,7 +14,7 @@ interface IProps {
   handleSelect: (id: number, isOpen: boolean) => void;
 }
 
-const SearchFilter: React.FC<IProps> = ({ filterQuery, handleSelect }) => {
+export default function SearchFilter({ filterQuery, handleSelect }: IProps) {
   return (
     <div className={styles.filter_section}>
       <DragScroll className={styles.filter_scroll} showScrollbar={false}>
@@ -39,6 +39,4 @@ const SearchFilter: React.FC<IProps> = ({ filterQuery, handleSelect }) => {
       </DragScroll>
     </div>
   );
-};
-
-export default SearchFilter;
+}
