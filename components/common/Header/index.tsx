@@ -24,7 +24,7 @@ export default function Header() {
 
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.id) {
-      fetchUserData(session.user.id);
+      fetchUserData();
     }
   }, [session, status, fetchUserData]);
 

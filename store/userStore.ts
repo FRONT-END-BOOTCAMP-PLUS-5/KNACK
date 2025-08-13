@@ -53,12 +53,19 @@ export const useUserStore = create<UserStore>((set) => ({
       const response = await fetch('/api/user/profile');
 
       if (!response.ok) {
-        throw new Error('사용자 정보 조회 실패');
+        // 더 자세한 에러 정보 로깅
+        console.error('API Response Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url
+        });
+        throw new Error(`사용자 정보 조회 실패 (${response.status}: ${response.statusText})`);
       }
 
       const data = await response.json();
       set({ user: data.user, isLoading: false });
     } catch (error) {
+      console.error('Fetch User Data Error:', error);
       set({
         error: error instanceof Error ? error.message : '알 수 없는 오류',
         isLoading: false,
