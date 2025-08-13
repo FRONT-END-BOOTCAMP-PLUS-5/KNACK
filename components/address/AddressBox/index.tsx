@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react'
 import styles from './addressBox.module.scss'
 import { formatPhoneNumber, phonePattern } from '@/utils/openKakaoPostCode'
-import { addressProps } from '@/types/order'
+import { AddressBoxProps } from '@/types/order'
 
 export default function AddressBox({
     selectedAddress,
     onOpenModal,
     onOpenRequestModal,
     onChangeRequest,
-}: addressProps) {
+}: AddressBoxProps) {
     const [request, setRequest] = useState<string>('')
 
     useEffect(() => {

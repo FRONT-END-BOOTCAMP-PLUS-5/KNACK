@@ -1,5 +1,7 @@
+// types/order.ts
 import { AddressDto } from "@/backend/address/applications/dtos/AddressDto"
 
+/* ---------- 장바구니/주문 ---------- */
 export type CheckoutRow = {
     productId: number
     quantity: number
@@ -17,13 +19,14 @@ export type OrderItem = {
     eng_name?: string
 }
 
+/* ---------- 주소 ---------- */
 export type AddressDtoWithPostalFields = AddressDto & {
-    postalCode?: string;
-    postCode?: string;
-    zipcode?: string;
-    zipCode?: string;
-    zonecode?: string;
-};
+    postalCode?: string
+    postCode?: string
+    zipcode?: string
+    zipCode?: string
+    zonecode?: string
+}
 
 export type SelectedAddress = {
     id: number
@@ -33,17 +36,38 @@ export type SelectedAddress = {
     request?: string
 } | null
 
+export type ApiAddress = {
+    id: number
+    name: string
+    phone: string
+    zipCode: string
+    main: string
+    detail: string | null
+    message: string | null
+    isDefault?: boolean
+}
+
+/* AddressBox props */
+export type AddressBoxProps = {
+    selectedAddress: SelectedAddress | null
+    onOpenModal: () => void
+    onOpenRequestModal?: () => void
+    onChangeRequest: (request: string) => void
+}
+
+/* RequestModal props */
+export type RequestModalProps = {
+    open: boolean
+    value: string
+    onClose: () => void
+    onApply: (next: string) => void
+}
+
+/* ---------- 포인트/결제 요약 ---------- */
 export type PointSectionProps = {
     availablePoints: number
     maxUsablePoints: number
     onChange: (value: number) => void
-}
-
-export type Props = {
-    orderItems: OrderItem[]
-    deliveryType: 'FAST' | 'STOCK'
-    onChangeDelivery: (type: 'FAST' | 'STOCK') => void
-    totalPrice: number
 }
 
 export interface PaymentFooterProps {
@@ -60,53 +84,8 @@ export interface FinalOrderSummaryProps {
     pointAmount?: number
 }
 
-export interface AddressAddModalProps {
-    onClose: () => void
-    onSaved?: (addr: SelectedAddress) => void
-    editing?: ApiAddress | null
-    /** 신규 등록 시 카카오 검색에서 넘겨줄 초기값 (선택) */
-    initial?: Partial<Pick<ApiAddress, 'zipCode' | 'main'>>
-}
-
-export type addressProps = {
-    selectedAddress: SelectedAddress | null
-    onOpenModal: () => void
-    onOpenRequestModal?: () => void;
-    onChangeRequest: (request: string) => void
-}
-
-export type ApiAddress = {
-    id: number; name: string; phone: string;
-    zipCode: string; main: string; detail: string | null;
-    message: string | null; isDefault?: boolean
-}
-
-export interface AddressModalProps {
-    onClose: () => void
-    selectedAddress: SelectedAddress | null
-    onChangeSelected: (addr: SelectedAddress) => void
-    onOpenCreate?: (initial?: Partial<ApiAddress>) => void
-}
-
-export type requestProps = {
-    open: boolean;
-    value: string;                          // 현재 저장된 요청사항 (빈 문자열이면 ‘없음’)
-    onClose: () => void;
-    onApply: (next: string) => void;        // 최종 선택(빈 문자열 = 없음)
-};
-
-export type RepresentativeProduct = {
-    productId: number | null
-    name: string
-    thumbnailUrl: string | null
-    unitPrice: number
-    quantity: number
-    lineTotal: number
-}
-
-export type AdjustPointsResult = { availablePoints: number; delta: number }
-
-export type CouponLite = {
+/* ---------- 쿠폰 (단일 표준) ---------- */
+export type Coupon = {
     couponId: number
     name: string
     salePercent: number
@@ -114,18 +93,7 @@ export type CouponLite = {
     expirationAt?: string | null
 }
 
-export type PropsWithCoupon = Props & {
-    coupons?: Coupon[]              // 사용 가능한 쿠폰 목록
-    selectedCouponId?: number | null    // 현재 선택된 쿠폰
-    onSelectCoupon?: (id: number | null) => void
-    couponAmount?: number               // 부모에서 계산한 할인금액(있으면 표시)
-}
-
-export type Coupon = {
-    id: number; name: string; salePercent: number; productId: number; createdAt: string; expirationAt?: string
-}
 export type CouponSelectModalProps = {
-    id: number
     isOpen: boolean
     onClose: () => void
     coupons: Coupon[]
@@ -134,30 +102,26 @@ export type CouponSelectModalProps = {
     onSelectCoupon: (couponId: number | null) => void
 }
 
+/* OrderSummaryCard: 로직 외부 계산/제어 */
 export type OrderSummaryCardProps = {
-    // 데이터
     orderItems: OrderItem[]
-
-    // 배송
     deliveryType: 'FAST' | 'STOCK'
     onChangeDelivery: (t: 'FAST' | 'STOCK') => void
 
-    // 금액(모두 부모에서 계산해서 내려줌)
-    baseSum: number            // 쿠폰 적용 전 상품 총액
-    shippingFee: number        // 배송비
-    couponDiscount: number     // 쿠폰 할인액
-    totalPayable: number       // 최종 결제금액
+    baseSum: number
+    shippingFee: number
+    couponDiscount: number
+    totalPayable: number
 
-    // 쿠폰 표시/행동 (모달은 바깥에서 관리)
     selectedCouponName?: string | null
     applicableCouponCount: number
     onOpenCouponModal: () => void
-    onClearCoupon?: () => void  // 선택 쿠폰 해제 (선택)
+    onClearCoupon?: () => void
 
-    // (선택) 기타 UI 행동들
     onItemMenuClick?: (item: OrderItem) => void
 }
 
+/* ---------- 서버 confirm 입력 (서버 영역으로 옮기는 걸 권장) ---------- */
 export type CouponInput = {
     userId: string
     tossPaymentKey: string
@@ -178,6 +142,8 @@ export type CouponInput = {
         useCardPoint?: boolean
         isInterestFree?: boolean
     }
-    // 선택: 쿠폰 사용
     selectedCouponId?: number | null
 }
+
+/* ---------- (백엔드 전용: 필요 시 위치 이동 권장) ---------- */
+export type AdjustPointsResult = { availablePoints: number; delta: number }

@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './requestModal.module.scss';
 import Image from 'next/image';
-import { requestProps } from '@/types/order';
+import { RequestModalProps } from '@/types/order';
 import { PRESETS } from '@/constraint/order';
 
-export default function RequestModal({ open, value, onClose, onApply }: requestProps) {
+export default function RequestModal({ open, value, onClose, onApply }: RequestModalProps) {
     const [selected, setSelected] = useState<string>('');
     const [custom, setCustom] = useState<string>('');
     const inputRef = useRef<HTMLInputElement>(null);
