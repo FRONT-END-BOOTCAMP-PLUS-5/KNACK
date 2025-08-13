@@ -7,8 +7,8 @@ export class CreateLikesUseCase {
     this.repository = repository;
   }
 
-  async insert(): Promise<number> {
-    const result = await this.repository.insert();
+  async insert(userId: string): Promise<number> {
+    const result = await this.repository.insert(userId);
 
     return result;
   }

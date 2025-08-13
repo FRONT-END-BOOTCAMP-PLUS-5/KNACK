@@ -1,14 +1,13 @@
 'use client';
 
 import { likeService } from '@/services/like';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 const SavedPage = () => {
   const { addLike, deleteLike, getLikes } = likeService;
 
   const handleLikeAdd = useCallback(() => {
     const data = {
-      userId: 'd232a840-098f-4e9a-bf51-b6605e59be0d',
       productId: 5,
       optionValueId: 2,
     };
