@@ -4,11 +4,10 @@
 	top: 0;
 	width: 100%;
 	background-color: #fff;
-	border-bottom: 1px solid #f0f0f0;
 	z-index: 1000;
 }
 
-.header-container {
+.header_container {
 	display: flex;
 	align-items: center;
 	padding: 0.9rem;
@@ -27,13 +26,42 @@
 	white-space: nowrap;
 }
 
-.search-container {
+.back_button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 3rem;
+	height: 3rem;
+	border: none;
+	background: none;
+	cursor: pointer;
+	padding: 0;
+	color: #222;
+}
+
+.back_button svg {
+	width: 2.1rem;
+	height: 2.1rem;
+}
+
+.page_title {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 1.8rem;
+	font-weight: 700;
+	color: #222;
+	margin: 0;
+	white-space: nowrap;
+}
+
+.search_container {
 	position: relative;
 	flex: 1;
 	min-width: 0;
 }
 
-.search-icon {
+.search_icon {
 	position: absolute;
 	left: 1.2rem;
 	top: 50%;
@@ -44,7 +72,7 @@
 	pointer-events: none;
 }
 
-.search-input {
+.search_input {
 	width: 100%;
 	height: 3.6rem;
 	padding: 0 1.2rem 0 3.6rem;
@@ -56,21 +84,22 @@
 	outline: none;
 }
 
-.search-input::placeholder {
+.search_input::placeholder {
 	color: #999;
 }
 
-.search-input:focus {
+.search_input:focus {
   background-color: #f0f0f0;
 }
 
-.header-actions {
+.header_actions {
 	display: flex;
 	align-items: center;
 	gap: 1.2rem;
+	margin-left: auto;
 }
 
-.icon-button {
+.icon_button {
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -83,27 +112,34 @@
 	padding: 0;
 }
 
-.bell-icon,
-.bag-icon {
+.bell_icon,
+.bag_icon {
 	width: 2.1rem;
 	height: 2.1rem;
 	color: #222;
 }
 
-.notification-dot {
+/* 홈 아이콘도 동일한 크기로 통일 */
+.icon_button svg {
+	width: 2.1rem;
+	height: 2.1rem;
+	color: #222;
+}
+
+.notification_dot {
 	display: none;
 }
 
 /* Tab Navigation Styles */
 /* 탭 네비게이션 컨테이너 - 가로 스크롤 가능한 탭 리스트를 감싸는 요소 */
-.tab-navigation {
+.tab_navigation {
 	width: 100%;
 	background-color: #fff;
 	border-bottom: 1px solid #f0f0f0;
 }
 
 /* 탭 리스트 - 가로로 나열된 탭들을 감싸는 ul 요소 */
-.tab-list {
+.tab_list {
 	display: flex;
 	list-style: none;
 	margin: 0;
@@ -114,17 +150,17 @@
 }
 
 /* 탭 리스트의 스크롤바 숨기기 */
-.tab-list::-webkit-scrollbar {
+.tab_list::-webkit-scrollbar {
 	display: none; /* Chrome, Safari, Opera */
 }
 
 /* 개별 탭 아이템 - 각 탭 버튼을 감싸는 li 요소 */
-.tab-item {
+.tab_item {
 	flex-shrink: 0;
 }
 
 /* 탭 버튼 - 클릭 가능한 탭 요소 */
-.tab-button {
+.tab_button {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -141,18 +177,18 @@
 }
 
 /* 탭 버튼 호버 효과 */
-.tab-button:hover {
+.tab_button:hover {
 	color: #222;
 }
 
 /* 활성화된 탭 버튼 스타일 */
-.tab-button.active {
+.tab_button.active {
 	color: #222;
-	font-weight: 600;
+	font-weight: 700;
 }
 
 /* 활성화된 탭 아래의 강조선 */
-.tab-button.active::after {
+.tab_button.active::after {
 	content: '';
 	position: absolute;
 	bottom: 0;
