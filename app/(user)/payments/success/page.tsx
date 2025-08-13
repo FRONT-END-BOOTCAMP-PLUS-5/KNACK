@@ -28,6 +28,7 @@ export default function PaymentSuccess() {
     const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>()
     const [pointsToUse, setPointsToUse] = useState(0)
     const [discountAmount, setDiscountAmount] = useState(0)
+    const [targetSumAfterCoupon, setTargetSumAfterCoupon] = useState(0)
 
     // ✅ URL 파라미터를 원시값으로 고정
     const tossPaymentKey = useMemo(() => params.get('paymentKey') ?? '', [params])
@@ -85,6 +86,12 @@ export default function PaymentSuccess() {
         } catch (e) {
             console.error('❌ shippingfee 파싱 실패:', e)
         }
+        try {
+            const rawTarget = sessionStorage.getItem('targetSumAfterCoupon')
+            if (rawTarget) setTargetSumAfterCoupon(Number(rawTarget))
+        } catch (e) {
+            console.error('❌ targetSumAfterCoupon 파싱 실패:', e)
+        }
     }, [])
 
     const hasRun = useRef(false)
@@ -117,7 +124,7 @@ export default function PaymentSuccess() {
                         items: orderItems.map((item) => ({
                             productId: item.productId,
                             price: item.price,
-                            salePrice: amount,
+                            salePrice: targetSumAfterCoupon,
                             count: item.quantity,
                             addressId: selectedAddress.id,
                             paymentId: null,

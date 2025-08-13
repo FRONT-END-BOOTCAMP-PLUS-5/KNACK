@@ -94,12 +94,15 @@ export default function CheckoutPage() {
         // 6) 쿠폰 적용 후 상품금액
         const productAfterCoupon = Math.max(0, baseSum - couponDiscount)
 
+        const targetSumAfterCoupon = Math.max(0, targetSum - couponDiscount)
+
         // 7) 최종 결제금액
         const totalPayable = Math.max(0, productAfterCoupon + shippingFee)
 
         return {
             baseSum,               // 원래 상품금액(쿠폰 전)
-            couponDiscount,        // 쿠폰 할인
+            couponDiscount,
+            targetSumAfterCoupon,     // 쿠폰 할인
             productAfterCoupon,    // 쿠폰 적용 후 상품금액
             shippingFee,           // 배송비
             totalPayable,          // 최종 결제금액
@@ -189,6 +192,7 @@ export default function CheckoutPage() {
             }
             sessionStorage.setItem('couponDiscountAmount', String(pricing.couponDiscount))
             sessionStorage.setItem('shippingfee', String(pricing.shippingFee))
+            sessionStorage.setItem('targetSumAfterCoupon', String(pricing.targetSumAfterCoupon))
 
             const toss = await loadTossPayments(TOSS_CLIENT_KEY)
             console.log(toss);
