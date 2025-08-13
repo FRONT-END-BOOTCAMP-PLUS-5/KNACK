@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import styles from './couponSelectModal.module.scss'
+import styles from './CouponSelectModal.module.scss'
 import Image from 'next/image'
 import type { CouponSelectModalProps } from '@/types/order'
 import { ddayLabel, formatExpiry } from '@/utils/formatutils'
