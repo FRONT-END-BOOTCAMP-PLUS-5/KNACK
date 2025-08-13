@@ -7,7 +7,7 @@ interface IProps {
   children: React.ReactNode;
   className?: string;
   direction?: 'row' | 'column';
-  align?: 'center' | 'start';
+  align?: 'center' | 'start' | 'end';
   justify?: 'between' | 'center' | 'start';
   width?: 'full' | 'self';
   gap?: number;
