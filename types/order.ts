@@ -19,6 +19,15 @@ export type OrderItem = {
     eng_name?: string
 }
 
+export interface RepresentativeProduct {
+    id: number;
+    korName: string;
+    engName: string;
+    thumbnailUrl: string;
+    name: string;
+    price: number;
+}
+
 /* ---------- 주소 ---------- */
 export type AddressDtoWithPostalFields = AddressDto & {
     postalCode?: string
@@ -47,6 +56,14 @@ export type ApiAddress = {
     isDefault?: boolean
 }
 
+export interface AddressAddModalProps {
+    onClose: () => void
+    onSaved?: (addr: SelectedAddress) => void
+    editing?: ApiAddress | null
+    /** 신규 등록 시 카카오 검색에서 넘겨줄 초기값 (선택) */
+    initial?: Partial<Pick<ApiAddress, 'zipCode' | 'main'>>
+}
+
 /* AddressBox props */
 export type AddressBoxProps = {
     selectedAddress: SelectedAddress | null
@@ -61,6 +78,13 @@ export type RequestModalProps = {
     value: string
     onClose: () => void
     onApply: (next: string) => void
+}
+
+/* AddressModal props */
+export type AddressModalProps = {
+    onClose: () => void
+    selectedAddress: SelectedAddress | null
+    onChangeSelected: (addr: SelectedAddress) => void
 }
 
 /* ---------- 포인트/결제 요약 ---------- */
@@ -148,3 +172,5 @@ export type CouponInput = {
 
 /* ---------- (백엔드 전용: 필요 시 위치 이동 권장) ---------- */
 export type AdjustPointsResult = { availablePoints: number; delta: number }
+
+

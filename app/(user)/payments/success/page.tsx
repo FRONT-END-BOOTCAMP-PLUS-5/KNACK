@@ -163,7 +163,7 @@ export default function PaymentSuccess() {
                     router.replace('/payments/failure')
                 }
             })()
-    }, [status, session, selectedAddress, orderItems, tossPaymentKey, tossOrderId, amount, router, pointsToUse, selectedCoupon?.id])
+    }, [status, session, selectedAddress, orderItems, tossPaymentKey, tossOrderId, amount, router, pointsToUse, selectedCoupon?.id, targetSumAfterCoupon])
 
     // 3) 대표상품 조회 (위에서 저장한 paymentId로 API 호출)
     useEffect(() => {

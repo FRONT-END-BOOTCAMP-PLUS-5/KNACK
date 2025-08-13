@@ -24,7 +24,8 @@ export async function POST(req: NextRequest) {
                 paymentNumber: BigInt(0), // Will be generated in repository
                 tossPaymentKey: '',
                 approvedAt: new Date(),
-                status: 'FAILED' as 'DONE' | 'CANCELED'
+                status: 'FAILED' as 'DONE' | 'CANCELED',
+                salePrice: 0
             }
         })
 

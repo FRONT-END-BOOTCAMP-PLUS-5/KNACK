@@ -97,6 +97,7 @@ video {
   font: inherit;
   vertical-align: baseline;
 }
+
 article,
 aside,
 details,
@@ -123,6 +124,7 @@ dl,
 dd {
   margin-block-end: 0;
 }
+
 article,
 aside,
 details,
@@ -136,10 +138,12 @@ nav,
 section {
   display: block;
 }
+
 ul,
 ol {
   list-style: none;
 }
+
 h1,
 h2,
 h3,
@@ -149,30 +153,36 @@ input,
 label {
   line-height: 1.1;
 }
+
 h1,
 h2,
 h3,
 h4 {
   text-wrap: balance;
 }
+
 a {
   background-color: transparent;
   text-decoration: none;
   color: inherit;
 }
+
 a:not([class]) {
   text-decoration-skip-ink: auto;
   color: currentColor;
 }
+
 a:active,
 a:hover {
   outline: 0;
 }
+
 img,
 picture {
   max-width: 100%;
   display: block;
 }
+
 img,
 picture,
 video,
@@ -182,24 +192,29 @@ svg {
   height: auto;
   vertical-align: top;
 }
+
 button[disabled],
 html input[disabled] {
   cursor: default;
 }
+
 input,
 button,
 textarea,
 select {
   font: inherit;
 }
+
 input[type='checkbox'],
 input[type='radio'] {
   box-sizing: border-box;
   padding: 0;
 }
+
 input {
   line-height: normal;
 }
+
 textarea {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -208,9 +223,11 @@ textarea {
   word-break: keep-all;
   word-wrap: break-word;
 }
+
 textarea:not([rows]) {
   min-height: 10em;
 }
+
 :target {
   scroll-margin-block: 5ex;
 }
@@ -220,8 +237,10 @@ html {
   -webkit-text-size-adjust: none;
   text-size-adjust: none;
   -webkit-overflow-scrolling: touch;
-  -ms-overflow-style: none; /* 인터넷 익스플로러 */
-  scrollbar-width: none; /* 파이어폭스 */
+  -ms-overflow-style: none;
+  /* 인터넷 익스플로러 */
+  scrollbar-width: none;
+  /* 파이어폭스 */
   font-size: 62.5%;
 }
 
@@ -246,4 +265,11 @@ main {
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
+}
+
+:root {
+  --paybar-btn-h: 48px;
+  /* 버튼 높이 */
+  --paybar-vpad: 12px;
+  /* 바의 위/아래 패딩 */
 }

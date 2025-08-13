@@ -14,7 +14,7 @@ import { IProduct } from '@/types/product'
 import AddressModal from '@/components/address/AddressModal'
 import { formatFullAddress } from '@/utils/openKakaoPostCode'
 import RequestModal from '@/components/address/RequestModal'
-import { AddressDtoWithPostalFields, Coupon, CheckoutRow, OrderItem } from '@/types/order'
+import { AddressDtoWithPostalFields, Coupon, CheckoutRow, OrderItem, SelectedAddress } from '@/types/order'
 import CouponSelectModal from '@/components/payments/CouponSelectModal'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
@@ -375,7 +375,7 @@ export default function CheckoutPage() {
                     onSelectCoupon={(id) => {
                         setSelectedCouponId(id) // 선택 반영
                         setOpenCouponModal(false) // 선택 후 모달 닫기(선호)
-                    }} id={0} />
+                    }} />
             )}
 
             <PointSection
@@ -402,7 +402,7 @@ export default function CheckoutPage() {
                         ...selectedAddress,
                         request: selectedAddress.request
                     } : null}
-                    onChangeSelected={(a) => {
+                    onChangeSelected={(a: SelectedAddress) => {
                         const zip =
                             (a as unknown as AddressDtoWithPostalFields).postalCode ??
                             (a as unknown as AddressDtoWithPostalFields).postCode ??
