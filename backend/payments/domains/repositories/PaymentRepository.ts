@@ -14,7 +14,7 @@ export interface PaymentRepository {
     /**
      * Toss 결제 승인 응답에서 받은 고유 TossPaymentKey로 결제 조회
      */
-    findByTossPaymentKey(tossPaymentKey: string): Promise<CreatePaymentDto | null>
+    findByTossPaymentKey(tossPaymentKey: string): Promise<GetPaymentDto | null>
 
     /**
      * 결제와 연결된 주문들의 paymentId 업데이트

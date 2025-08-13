@@ -6,18 +6,11 @@ import styles from './SuccessPage.module.scss'
 import requester from '@/utils/requester'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
-import { Coupon, OrderItem, SelectedAddress } from '@/types/order'
+import { Coupon, OrderItem, RepresentativeProduct, SelectedAddress } from '@/types/order'
 import Image from 'next/image'
 import { STORAGE_PATHS } from '@/constraint/auth'
 
-type RepresentativeProduct = {
-    productId: number | null
-    name: string
-    thumbnailUrl: string | null
-    unitPrice: number
-    quantity: number
-    lineTotal: number
-}
+
 
 export default function PaymentSuccess() {
     const params = useSearchParams()
@@ -124,7 +117,7 @@ export default function PaymentSuccess() {
                         items: orderItems.map((item) => ({
                             productId: item.productId,
                             price: item.price,
-                            salePrice: item.price,
+                            salePrice: amount,
                             count: item.quantity,
                             addressId: selectedAddress.id,
                             paymentId: null,
@@ -163,65 +156,43 @@ export default function PaymentSuccess() {
                     router.replace('/payments/failure')
                 }
             })()
-    }, [status, session, selectedAddress, orderItems, tossPaymentKey, tossOrderId, amount, router, pointsToUse, selectedCoupon?.id, subtotal])
+    }, [status, session, selectedAddress, orderItems, tossPaymentKey, tossOrderId, amount, router, pointsToUse, selectedCoupon?.id])
 
     // 3) 대표상품 조회 (위에서 저장한 paymentId로 API 호출)
     useEffect(() => {
         if (!paymentId) return
 
-        const pickRepFromItems = (items: OrderItem[]) => {
-            const scored = (items ?? []).map((it) => {
-                const unit =
-                    Number.isFinite(it?.price) ? Number(it.price)
-                        : Number.isFinite(it?.price) ? Number(it.price)
-                            : Number(it?.price ?? 0)
-                const qty = Number(it?.quantity ?? 0)
-                return {
-                    productId: it.productId ?? null,
-                    name: it.kor_name ?? it.eng_name ?? '',
-                    thumbnailUrl: it.thumbnail_image ?? null,
-                    unitPrice: unit,
-                    quantity: qty,
-                    lineTotal: unit * qty,
+        (async () => {
+            try {
+                // 1) 결제 → 첫 주문 ID + ‘외 N건’
+                const payRes = await requester.get(`/api/payments/${paymentId}`)
+                let orderIds: number[] = payRes.data?.orderIds ?? []
+                if ((!orderIds || orderIds.length === 0) && Array.isArray(payRes.data?.orders)) {
+                    orderIds = payRes.data.orders.map((o: { id: number }) => o.id).filter((v: number) => Number.isFinite(v))
                 }
-            })
-            scored.sort((a, b) => (b.lineTotal ?? 0) - (a.lineTotal ?? 0))
-            return scored[0] ?? null
-        }
+                setOtherOrdersCount(Math.max(0, (orderIds?.length ?? 0) - 1))
 
-            ; (async () => {
-                try {
-                    // 1) 결제 → 첫 주문 ID + ‘외 N건’
-                    const payRes = await requester.get(`/api/payments/${paymentId}`)
-                    console.log(payRes)
-                    let orderIds: number[] = payRes.data?.orderIds ?? []
-                    if ((!orderIds || orderIds.length === 0) && Array.isArray(payRes.data?.orders)) {
-                        orderIds = payRes.data.orders.map((o: { id: number }) => o.id).filter((v: number) => Number.isFinite(v))
-                    }
-                    setOtherOrdersCount(Math.max(0, (orderIds?.length ?? 0) - 1))
-
-                    const firstOrderId = orderIds?.[0]
-                    if (!Number.isFinite(firstOrderId)) {
-                        setRepProd(null)
-                        setShippingFee(0)
-                        return
-                    }
-
-                    // 2) 첫 주문 상세 → 대표상품 + 배송비
-                    const ordRes = await requester.get(`/api/orders/${firstOrderId}`)
-                    const order = ordRes.data
-                    console.log(order)
-                    const items = order?.items ?? order?.orderItems ?? []
-                    setRepProd(pickRepFromItems(items))
-
-                    const delivery = Number(order?.deliveryFee ?? order?.shippingFee ?? 0)
-                    setShippingFee(Number.isFinite(delivery) ? delivery : 0)
-                } catch (e) {
-                    console.error('❌ 대표상품/주문 로드 실패', e)
+                const firstOrderId = orderIds?.[0]
+                if (!Number.isFinite(firstOrderId)) {
                     setRepProd(null)
                     setShippingFee(0)
+                    return
                 }
-            })()
+
+                // 2) 첫 주문 상세 → 대표상품 + 배송비
+                const ordRes = await requester.get(`/api/orders/${firstOrderId}`)
+                const order = ordRes.data
+                console.log(order)
+                const items = order?.items ?? []
+                setRepProd(items[0])
+                const delivery = Number(order?.deliveryFee ?? order?.shippingFee ?? 0)
+                setShippingFee(Number.isFinite(delivery) ? delivery : 0)
+            } catch (e) {
+                console.error('❌ 대표상품/주문 로드 실패', e)
+                setRepProd(null)
+                setShippingFee(0)
+            }
+        })()
     }, [paymentId])
 
     const fmt = (n: number) => n.toLocaleString()
