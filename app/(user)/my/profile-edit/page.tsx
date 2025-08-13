@@ -32,7 +32,7 @@ const ProfileEditPage = () => {
       .then((res) => {
         setProfileNameOn(false);
         setNameOn(false);
-        fetchUserData(user?.id ?? '');
+        fetchUserData();
       })
       .catch((error) => {
         console.log('error', error.message);
