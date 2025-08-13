@@ -86,7 +86,8 @@ export interface FinalOrderSummaryProps {
 
 /* ---------- 쿠폰 (단일 표준) ---------- */
 export type Coupon = {
-    couponId: number
+    createdAt: string | number | Date | null | undefined
+    id: number
     name: string
     salePercent: number
     productId: number

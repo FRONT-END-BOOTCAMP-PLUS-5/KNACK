@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import styles from './CouponSelectModal.module.scss'
+import styles from './couponSelectModal.module.scss'
 import Image from 'next/image'
 import type { CouponSelectModalProps } from '@/types/order'
+import { ddayLabel, formatExpiry } from '@/utils/formatutils'
 
 export default function CouponSelectModal({
     isOpen,
@@ -52,8 +53,8 @@ export default function CouponSelectModal({
 
                                 <div className={styles.right}>
                                     <div className={styles.dday}>
-                                        <span className={styles.d}>D-5</span>
-                                        <span className={styles.until}>{c.expirationAt ?? ''}</span>
+                                        <span className={styles.d}>{ddayLabel({ start: c.createdAt, end: c.expirationAt })}</span>
+                                        <span className={styles.until}>{formatExpiry(c.expirationAt ?? undefined) ?? ''}</span>
                                     </div>
                                     {selectedCouponId === c.id ? (
                                         <button className={`${styles.btn} ${styles.selected}`} disabled>쿠폰 선택됨</button>
