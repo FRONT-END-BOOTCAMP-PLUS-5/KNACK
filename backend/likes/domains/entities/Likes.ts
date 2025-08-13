@@ -3,5 +3,5 @@ export interface Like {
   userId: string;
   productId: number;
   optionValueId: number;
-  createdAt: Date;
+  createdAt?: Date | null;
 }
