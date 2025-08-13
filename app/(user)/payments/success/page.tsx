@@ -6,7 +6,7 @@ import styles from './SuccessPage.module.scss'
 import requester from '@/utils/requester'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
-import { OrderItem, SelectedAddress } from '@/types/order'
+import { Coupon, OrderItem, SelectedAddress } from '@/types/order'
 import Image from 'next/image'
 import { STORAGE_PATHS } from '@/constraint/auth'
 
@@ -32,6 +32,9 @@ export default function PaymentSuccess() {
     const [repProd, setRepProd] = useState<RepresentativeProduct | null>(null)
     const [shippingFee, setShippingFee] = useState(0)
     const [otherOrdersCount, setOtherOrdersCount] = useState(0)
+    const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>()
+    const [pointsToUse, setPointsToUse] = useState(0)
+    const [discountAmount, setDiscountAmount] = useState(0)
 
     // ✅ URL 파라미터를 원시값으로 고정
     const tossPaymentKey = useMemo(() => params.get('paymentKey') ?? '', [params])
@@ -64,6 +67,30 @@ export default function PaymentSuccess() {
             if (rawAddress) setSelectedAddress(JSON.parse(rawAddress))
         } catch (e) {
             console.error('❌ selectedAddress 파싱 실패:', e)
+        }
+        try {
+            const rawCoupon = sessionStorage.getItem('selectedCoupon')
+            if (rawCoupon) setSelectedCoupon(JSON.parse(rawCoupon))
+        } catch (e) {
+            console.error('❌ selectedCouponId 파싱 실패:', e)
+        }
+        try {
+            const rawPoints = sessionStorage.getItem('pointAmount')
+            if (rawPoints) setPointsToUse(Number(rawPoints))
+        } catch (e) {
+            console.error('❌ pointAmount 파싱 실패:', e)
+        }
+        try {
+            const rawDiscount = sessionStorage.getItem('couponDiscountAmount')
+            if (rawDiscount) setDiscountAmount(Number(rawDiscount))
+        } catch (e) {
+            console.error('❌ couponDiscountAmount 파싱 실패:', e)
+        }
+        try {
+            const rawShipping = sessionStorage.getItem('shippingfee')
+            if (rawShipping) setShippingFee(Number(rawShipping))
+        } catch (e) {
+            console.error('❌ shippingfee 파싱 실패:', e)
         }
     }, [])
 
@@ -114,6 +141,8 @@ export default function PaymentSuccess() {
                         amount,
                         addressId: selectedAddress.id,
                         orderIds: createdOrderIds,
+                        selectedCouponId: selectedCoupon?.id ?? null,
+                        pointsToUse: pointsToUse,
                     })
 
                     // ⚓ paymentId + paymentNumber 확보
@@ -134,32 +163,23 @@ export default function PaymentSuccess() {
                     router.replace('/payments/failure')
                 }
             })()
-    }, [
-        status,
-        session,
-        selectedAddress,
-        orderItems,
-        tossPaymentKey,
-        tossOrderId,
-        amount,
-        router,
-    ])
+    }, [status, session, selectedAddress, orderItems, tossPaymentKey, tossOrderId, amount, router, pointsToUse, selectedCoupon?.id, subtotal])
 
     // 3) 대표상품 조회 (위에서 저장한 paymentId로 API 호출)
     useEffect(() => {
         if (!paymentId) return
 
-        const pickRepFromItems = (items: any[]) => {
+        const pickRepFromItems = (items: OrderItem[]) => {
             const scored = (items ?? []).map((it) => {
                 const unit =
-                    Number.isFinite(it?.salePrice) ? Number(it.salePrice)
+                    Number.isFinite(it?.price) ? Number(it.price)
                         : Number.isFinite(it?.price) ? Number(it.price)
-                            : Number(it?.unitPrice ?? 0)
-                const qty = Number(it?.count ?? it?.quantity ?? 0)
+                            : Number(it?.price ?? 0)
+                const qty = Number(it?.quantity ?? 0)
                 return {
-                    productId: it.productId ?? it.product?.id ?? null,
-                    name: it.product?.name ?? it.name ?? '',
-                    thumbnailUrl: it.product?.thumbnailUrl ?? it.thumbnailUrl ?? null,
+                    productId: it.productId ?? null,
+                    name: it.kor_name ?? it.eng_name ?? '',
+                    thumbnailUrl: it.thumbnail_image ?? null,
                     unitPrice: unit,
                     quantity: qty,
                     lineTotal: unit * qty,
@@ -173,9 +193,10 @@ export default function PaymentSuccess() {
                 try {
                     // 1) 결제 → 첫 주문 ID + ‘외 N건’
                     const payRes = await requester.get(`/api/payments/${paymentId}`)
+                    console.log(payRes)
                     let orderIds: number[] = payRes.data?.orderIds ?? []
                     if ((!orderIds || orderIds.length === 0) && Array.isArray(payRes.data?.orders)) {
-                        orderIds = payRes.data.orders.map((o: any) => o.id).filter((v: any) => Number.isFinite(v))
+                        orderIds = payRes.data.orders.map((o: { id: number }) => o.id).filter((v: number) => Number.isFinite(v))
                     }
                     setOtherOrdersCount(Math.max(0, (orderIds?.length ?? 0) - 1))
 
@@ -189,6 +210,7 @@ export default function PaymentSuccess() {
                     // 2) 첫 주문 상세 → 대표상품 + 배송비
                     const ordRes = await requester.get(`/api/orders/${firstOrderId}`)
                     const order = ordRes.data
+                    console.log(order)
                     const items = order?.items ?? order?.orderItems ?? []
                     setRepProd(pickRepFromItems(items))
 
@@ -242,30 +264,18 @@ export default function PaymentSuccess() {
                 </div>
 
                 <div className={styles.row}>
-                    <div>검수비</div>
-                    <div className={styles.muted}>무료</div>
-                </div>
-
-                <div className={styles.row}>
-                    <div>
-                        수수료 <span className={styles.tooltip} aria-label="수수료 안내">?</span>
-                    </div>
-                    <div className={fee > 0 ? '' : styles.dash}>{fee > 0 ? `${fmt(fee)}원` : '-'}</div>
-                </div>
-
-                <div className={styles.row}>
                     <div>배송비</div>
                     <div>{shippingFee > 0 ? `${fmt(shippingFee)}원` : '무료'}</div>
                 </div>
 
                 <div className={styles.row}>
                     <div>쿠폰 사용</div>
-                    <div>-</div>
+                    <div>{selectedCoupon ? `-${fmt(discountAmount)}원` : '-'}</div>
                 </div>
 
                 <div className={styles.row}>
                     <div>포인트 사용</div>
-                    <div>-</div>
+                    <div>{pointsToUse > 0 ? `-${fmt(pointsToUse)}P` : '-'}</div>
                 </div>
             </section>
         </div>

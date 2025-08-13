@@ -157,3 +157,27 @@ export type OrderSummaryCardProps = {
     // (선택) 기타 UI 행동들
     onItemMenuClick?: (item: OrderItem) => void
 }
+
+export type CouponInput = {
+    userId: string
+    tossPaymentKey: string
+    orderId: string
+    amount: number
+    addressId: number
+    orderIds: string[]
+    method: string
+    status: 'DONE' | 'CANCELED'
+    approvedAt: Date
+    requestedAt: Date
+    card?: {
+        issuerCode?: string
+        acquirerCode?: string
+        number?: string
+        installmentPlanMonths?: number
+        approveNo?: string
+        useCardPoint?: boolean
+        isInterestFree?: boolean
+    }
+    // 선택: 쿠폰 사용
+    selectedCouponId?: number | null
+}

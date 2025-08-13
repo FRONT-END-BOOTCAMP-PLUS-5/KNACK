@@ -8,16 +8,26 @@ import { KnackCardRepository } from '@/backend/payments/repositories/KnackCardRe
 import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto'
 import { CreateCardDto } from '@/backend/payments/applications/dtos/CreateCardDto'
 import { GetPaymentDto } from '@/backend/payments/applications/dtos/GetPaymentDto'
+import { KnackCouponRepository } from '@/backend/coupon/repositories/KnackCouponRepository'
+import { KnackUserPointsRepository } from '@/backend/points/repositories/KnackUserPointsRepository'
 
 export async function POST(req: NextRequest) {
     const repo = new KnackPaymentRepository()
+    const couponRepo = new KnackCouponRepository()
+    const pointsRepo = new KnackUserPointsRepository()
+
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user) {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
         }
+        const userId = session.user.id
 
-        const { tossPaymentKey, orderId, amount, addressId, orderIds } = await req.json()
+        const {
+            tossPaymentKey, orderId, amount, addressId, orderIds,
+            selectedCouponId,            // ← 추가
+            pointsToUse                  // ← 추가 (number)
+        } = await req.json()
 
         const data = await tossPOST('/payments/confirm', { paymentKey: tossPaymentKey, orderId, amount }, 'toss')
         const method = data.method as string
@@ -30,6 +40,7 @@ export async function POST(req: NextRequest) {
             addressId,
             paymentNumber: paymentNumberBig,
             price: amount,
+            salePrice: data.amount,
             approvedAt: data.approvedAt ? new Date(data.approvedAt) : new Date(),
             createdAt: data.requestedAt ? new Date(data.requestedAt) : new Date(),
             method,
@@ -48,6 +59,19 @@ export async function POST(req: NextRequest) {
 
         // ✅ 주문들에 paymentId(시퀀스) 연결
         await paymentRepo.updateOrderPaymentIds(orderIds, createdPayment.id)
+
+        // ✅ 쿠폰 소모 (선택된 경우)
+        if (selectedCouponId) {
+            await couponRepo.consumeByDelete(userId, Number(selectedCouponId))
+        }
+
+        // ✅ 포인트 차감 (요청된 경우)
+        if (pointsToUse && pointsToUse > 0) {
+            await pointsRepo.debit({
+                userId,
+                amount: Number(pointsToUse),
+            })
+        }
 
         // ✅ 카드 저장 시에도 paymentId(시퀀스) 사용
         if (data.method === 'CARD' && data.card) {

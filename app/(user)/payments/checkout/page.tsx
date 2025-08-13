@@ -182,7 +182,13 @@ export default function CheckoutPage() {
             // ✅ 성공 페이지에서 보여주려면 세션에 저장
             sessionStorage.setItem('couponAmount', String(couponAmount))
             sessionStorage.setItem('pointAmount', String(points))
-            sessionStorage.setItem('selectedCouponId', selectedCouponId ? String(selectedCouponId) : '')
+            if (selectedCoupon) {
+                sessionStorage.setItem('selectedCoupon', JSON.stringify(selectedCoupon));
+            } else {
+                sessionStorage.removeItem('selectedCoupon'); // 빈 문자열보다 이게 안전
+            }
+            sessionStorage.setItem('couponDiscountAmount', String(pricing.couponDiscount))
+            sessionStorage.setItem('shippingfee', String(pricing.shippingFee))
 
             const toss = await loadTossPayments(TOSS_CLIENT_KEY)
             console.log(toss);
