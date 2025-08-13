@@ -45,7 +45,7 @@ export default function LayoutWrapper({ children }: IProps) {
   }, []);
 
   // 헤더만 숨길 경로들
-  const hideHeaderPaths = ['/login', '/signup', '/find-email', '/find-password', '/my/address'];
+  const hideHeaderPaths = ['/login', '/signup', '/find-email', '/find-password', '/my/address', '/saved'];
 
   // 푸터만 숨길 경로들
   const hideFooterPaths = ['/products', '/cart', '/payments', '/search'];
