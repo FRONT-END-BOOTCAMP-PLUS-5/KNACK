@@ -1,12 +1,14 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { SessionProvider } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import PaymentHeader from '@/components/payments/PaymentHeader';
+import { useUserStore } from '@/store/userStore';
 
 interface IProps {
   children: React.ReactNode;
@@ -27,7 +29,18 @@ export default function LayoutWrapper({ children }: IProps) {
       })
   );
 
+  // 세션 사용 (NextAuth에서 직접 관리)
+  const { data: session, status } = useSession();
+  const { fetchUserData } = useUserStore();
+
+  // 로그인 체크 → 사용자 정보 가져오기 → userStore에 저장
   useEffect(() => {
+    if (status === 'authenticated' && session?.user?.id) {
+      fetchUserData();
+    }
+  }, [session, status, fetchUserData]);
+
+  React.useEffect(() => {
     setMounted(true);
   }, []);
 
@@ -59,18 +72,16 @@ export default function LayoutWrapper({ children }: IProps) {
     return (
       <QueryClientProvider client={queryClient}>
         <PaymentHeader />
-        <SessionProvider>{children}</SessionProvider>
+        {children}
       </QueryClientProvider>
     );
   }
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        {!shouldHideHeader && <Header />}
-        {children}
-        {!shouldHideFooter && <Footer />}
-      </SessionProvider>
+      {!shouldHideHeader && <Header />}
+      {children}
+      {!shouldHideFooter && <Footer />}
     </QueryClientProvider>
   );
 }
