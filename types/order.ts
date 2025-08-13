@@ -104,15 +104,6 @@ export type RepresentativeProduct = {
     lineTotal: number
 }
 
-export type AvailableCoupon = {
-    mappingId: number
-    couponId: number
-    name: string
-    salePercent: number
-    productId: number
-    expirationAt?: string | null
-}
-
 export type AdjustPointsResult = { availablePoints: number; delta: number }
 
 export type CouponLite = {
@@ -124,8 +115,45 @@ export type CouponLite = {
 }
 
 export type PropsWithCoupon = Props & {
-    coupons?: CouponLite[]              // 사용 가능한 쿠폰 목록
+    coupons?: Coupon[]              // 사용 가능한 쿠폰 목록
     selectedCouponId?: number | null    // 현재 선택된 쿠폰
     onSelectCoupon?: (id: number | null) => void
     couponAmount?: number               // 부모에서 계산한 할인금액(있으면 표시)
+}
+
+export type Coupon = {
+    id: number; name: string; salePercent: number; productId: number; createdAt: string; expirationAt?: string
+}
+export type CouponSelectModalProps = {
+    id: number
+    isOpen: boolean
+    onClose: () => void
+    coupons: Coupon[]
+    orderItems: OrderItem[]
+    selectedCouponId: number | null
+    onSelectCoupon: (couponId: number | null) => void
+}
+
+export type OrderSummaryCardProps = {
+    // 데이터
+    orderItems: OrderItem[]
+
+    // 배송
+    deliveryType: 'FAST' | 'STOCK'
+    onChangeDelivery: (t: 'FAST' | 'STOCK') => void
+
+    // 금액(모두 부모에서 계산해서 내려줌)
+    baseSum: number            // 쿠폰 적용 전 상품 총액
+    shippingFee: number        // 배송비
+    couponDiscount: number     // 쿠폰 할인액
+    totalPayable: number       // 최종 결제금액
+
+    // 쿠폰 표시/행동 (모달은 바깥에서 관리)
+    selectedCouponName?: string | null
+    applicableCouponCount: number
+    onOpenCouponModal: () => void
+    onClearCoupon?: () => void  // 선택 쿠폰 해제 (선택)
+
+    // (선택) 기타 UI 행동들
+    onItemMenuClick?: (item: OrderItem) => void
 }

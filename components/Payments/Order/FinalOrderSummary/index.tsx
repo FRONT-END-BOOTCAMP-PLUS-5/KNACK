@@ -1,14 +1,28 @@
 import { FinalOrderSummaryProps } from '@/types/order'
 import styles from './finalOrderSummary.module.scss'
 
+type Props = FinalOrderSummaryProps & {
+    /** (선택) 선택된 쿠폰명 표시용 */
+    selectedCouponName?: string | null
+}
+
 export default function FinalOrderSummary({
     price,
     fee = 0,
     shippingFee,
     couponAmount = 0,
     pointAmount = 0,
-}: FinalOrderSummaryProps) {
-    const total = price + fee + shippingFee - couponAmount - pointAmount
+    selectedCouponName = null,
+}: Props) {
+    // 1) 상품가+수수료(검수비는 별도 표기만 "무료")
+    const subtotal = Math.max(0, (price || 0) + (fee || 0))
+
+    // 2) 쿠폰/포인트 과할인 방지
+    const couponApplied = Math.min(Math.max(0, couponAmount || 0), subtotal)
+    const pointApplied = Math.min(Math.max(0, pointAmount || 0), Math.max(0, subtotal - couponApplied))
+
+    // 3) 최종 결제금액
+    const total = Math.max(0, subtotal + (shippingFee || 0) - couponApplied - pointApplied)
 
     return (
         <>
@@ -42,24 +56,26 @@ export default function FinalOrderSummary({
                 </div>
 
                 <div className={styles.row}>
-                    <div className={styles.label}>쿠폰 사용</div>
-                    <div className={`${styles.value} ${couponAmount > 0 ? '' : styles.dash}`}>
-                        {couponAmount > 0 ? `-${couponAmount.toLocaleString()}원` : '-'}
+                    <div className={styles.label}>
+                        쿠폰 사용{selectedCouponName ? <span className={styles.subtle}> · {selectedCouponName}</span> : null}
+                    </div>
+                    <div className={`${styles.value} ${couponApplied > 0 ? '' : styles.dash}`}>
+                        {couponApplied > 0 ? `-${couponApplied.toLocaleString()}원` : '-'}
                     </div>
                 </div>
 
                 <div className={styles.row}>
                     <div className={styles.label}>포인트 사용</div>
-                    <div className={`${styles.value} ${pointAmount > 0 ? '' : styles.dash}`}>
-                        {pointAmount > 0 ? `-${pointAmount.toLocaleString()}원` : '-'}
+                    <div className={`${styles.value} ${pointApplied > 0 ? '' : styles.dash}`}>
+                        {pointApplied > 0 ? `-${pointApplied.toLocaleString()}원` : '-'}
                     </div>
                 </div>
             </section>
+
             <div className={styles.total_bar}>
                 <p className={styles.total_label}>총 결제금액</p>
                 <p className={styles.total_price}>{total.toLocaleString()}원</p>
             </div>
-
         </>
     )
 }

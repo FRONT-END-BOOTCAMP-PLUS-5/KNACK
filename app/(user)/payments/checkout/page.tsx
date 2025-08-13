@@ -14,7 +14,8 @@ import { IProduct } from '@/types/product'
 import AddressModal from '@/components/address/AddressModal'
 import { formatFullAddress } from '@/utils/openKakaoPostCode'
 import RequestModal from '@/components/address/RequestModal'
-import { AddressDtoWithPostalFields, AvailableCoupon, CheckoutRow, OrderItem } from '@/types/order'
+import { AddressDtoWithPostalFields, Coupon, CheckoutRow, OrderItem } from '@/types/order'
+import CouponSelectModal from '@/components/payments/CouponSelectModal'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
 
@@ -28,7 +29,7 @@ export default function CheckoutPage() {
     // ✅ 포인트/쿠폰 상태
     const [availablePoints, setAvailablePoints] = useState<number>(0)
     const [points, setPoints] = useState<number>(0) // 사용 포인트
-    const [coupons, setCoupons] = useState<AvailableCoupon[]>([])
+    const [coupons, setCoupons] = useState<Coupon[]>([])
     const [selectedCouponId, setSelectedCouponId] = useState<number | null>(null)
 
     const [selectedAddress, setSelectedAddress] = useState<{
@@ -41,6 +42,86 @@ export default function CheckoutPage() {
     } | null>(null)
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
     const [isReqOpen, setReqOpen] = useState(false);
+    const [isOpenCouponModal, setOpenCouponModal] = useState(false);
+
+
+    // 선택된 쿠폰(표시/계산은 전체 coupons 기준)
+    const effectiveCouponId =
+        typeof selectedCouponId === 'number' || selectedCouponId === null
+            ? selectedCouponId
+            : Number(selectedCouponId)
+
+    const selectedCoupon = useMemo(() => {
+        if (effectiveCouponId == null) return null
+        return (coupons ?? []).find(c => String(c.id) === String(effectiveCouponId)) ?? null
+    }, [coupons, effectiveCouponId])
+
+    // 적용 가능 쿠폰 목록 (필요시 표시용)
+    const applicableCoupons = useMemo(() => {
+        const pset = new Set(orderItems.map(i => i.productId))
+        return (coupons ?? []).filter(c => pset.has(c.productId))
+    }, [coupons, orderItems])
+
+    // 금액 계산 통합
+    const pricing = useMemo(() => {
+        // 1) 원가 기준 합계(상품 총액)
+        const baseSum =
+            orderItems?.reduce((sum, it) => sum + it.price * it.quantity, 0) || 0
+
+        // 2) 선택 쿠폰이 실제로 적용 가능한지
+        const isCouponApplicable =
+            !!selectedCoupon &&
+            orderItems.some(it => it.productId === selectedCoupon.productId)
+
+        // 3) 해당 상품군 합계(쿠폰 타깃 금액)
+        const targetSum = isCouponApplicable
+            ? orderItems
+                .filter(it => it.productId === selectedCoupon!.productId)
+                .reduce((s, it) => s + it.price * it.quantity, 0)
+            : 0
+
+        // 4) 쿠폰 할인금액 (과할인 방지)
+        const couponDiscount = isCouponApplicable
+            ? Math.min(
+                targetSum,
+                Math.max(0, Math.floor(targetSum * ((selectedCoupon!.salePercent ?? 0) / 100)))
+            )
+            : 0
+
+        // 5) 배송비
+        const shippingFee = deliveryType === 'FAST' ? 5000 : 0
+
+        // 6) 쿠폰 적용 후 상품금액
+        const productAfterCoupon = Math.max(0, baseSum - couponDiscount)
+
+        // 7) 최종 결제금액
+        const totalPayable = Math.max(0, productAfterCoupon + shippingFee)
+
+        return {
+            baseSum,               // 원래 상품금액(쿠폰 전)
+            couponDiscount,        // 쿠폰 할인
+            productAfterCoupon,    // 쿠폰 적용 후 상품금액
+            shippingFee,           // 배송비
+            totalPayable,          // 최종 결제금액
+            applicableCount: applicableCoupons.length,
+            isCouponApplicable,
+        }
+    }, [orderItems, selectedCoupon, deliveryType, applicableCoupons.length])
+
+    // ✅ 선택한 쿠폰이 적용 가능한지 별도로 판단
+    const isSelectedApplicable = useMemo(() => {
+        if (!selectedCoupon) return false
+        return orderItems.some(i => i.productId === selectedCoupon.productId)
+    }, [selectedCoupon, orderItems])
+
+    // 선택된 쿠폰의 할인액 프리뷰 (부모가 내려주면 그 값을 우선)
+    const previewCouponAmount = useMemo(() => {
+        if (!selectedCoupon || !isSelectedApplicable) return 0
+        const targetSum = orderItems
+            .filter(it => it.productId === selectedCoupon.productId)
+            .reduce((s, it) => s + it.price * it.quantity, 0)
+        return Math.max(0, Math.floor(targetSum * (selectedCoupon.salePercent / 100)))
+    }, [selectedCoupon, isSelectedApplicable, orderItems])
 
     // ----- delivery controls -----
     const onChangeDelivery = (type: 'FAST' | 'STOCK') => {
@@ -57,7 +138,7 @@ export default function CheckoutPage() {
     // ✅ 쿠폰 할인액 계산 (선택된 1장의 퍼센트 할인)
     const couponAmount = useMemo(() => {
         if (!selectedCouponId) return 0
-        const coupon = coupons.find(c => c.couponId === selectedCouponId)
+        const coupon = coupons.find(c => c.id === selectedCouponId)
         if (!coupon) return 0
         const targetSum = orderItems
             .filter(i => i.productId === coupon.productId)
@@ -169,8 +250,8 @@ export default function CheckoutPage() {
             ; (async () => {
                 try {
                     // 쿠폰
-                    const { data } = await requester.get('/api/coupon')
-                    const fetched: AvailableCoupon[] = data?.items ?? []
+                    const data = await requester.get('/api/coupon')
+                    const fetched = data.data?.result || data.data || []
                     console.log(fetched);
                     setCoupons(fetched)
 
@@ -185,7 +266,7 @@ export default function CheckoutPage() {
                             const disc = Math.floor(target * (c.salePercent / 100))
                             if (disc > bestDiscount) {
                                 bestDiscount = disc
-                                bestId = c.couponId
+                                bestId = c.id
                             }
                         }
                         setSelectedCouponId(bestId)
@@ -260,12 +341,32 @@ export default function CheckoutPage() {
                     setDeliveryType(t)
                     setDeliveryFee(t === 'FAST' ? 5000 : 0)
                 }}
-                totalPrice={totalPrice}
-                coupons={coupons}                        // 서버에서 받아온 전체/보유 쿠폰
-                selectedCouponId={selectedCouponId}      // 선택된 쿠폰 id
-                onSelectCoupon={setSelectedCouponId}     // 선택 핸들러
-                couponAmount={couponAmount}              // 부모에서 계산하면 전달(선택)
+
+                // 💰 금액(전부 부모 계산)
+                baseSum={pricing.baseSum}
+                shippingFee={pricing.shippingFee}
+                couponDiscount={pricing.couponDiscount}
+                totalPayable={pricing.totalPayable}
+
+                // 🎟 쿠폰 표시/행동
+                selectedCouponName={selectedCoupon?.name ?? null}
+                applicableCouponCount={pricing.applicableCount}
+                onOpenCouponModal={() => setOpenCouponModal(true)}   // 모달은 부모에서 관리
+                onClearCoupon={() => setSelectedCouponId(null)}      // 선택 해제
             />
+
+            {isOpenCouponModal && (
+                <CouponSelectModal
+                    isOpen={isOpenCouponModal}
+                    onClose={() => setOpenCouponModal(false)}
+                    coupons={coupons} // 서버에서 받은 쿠폰 목록
+                    orderItems={orderItems} // 장바구니 아이템
+                    selectedCouponId={selectedCouponId}
+                    onSelectCoupon={(id) => {
+                        setSelectedCouponId(id) // 선택 반영
+                        setOpenCouponModal(false) // 선택 후 모달 닫기(선호)
+                    }} id={0} />
+            )}
 
             <PointSection
                 availablePoints={availablePoints}
@@ -274,11 +375,12 @@ export default function CheckoutPage() {
             />
 
             <FinalOrderSummary
-                price={priceWithoutDelivery}
-                fee={0}
-                shippingFee={deliveryFee}
-                couponAmount={0}
-                pointAmount={points}
+                price={pricing.baseSum}                    // 쿠폰 전 상품 총액
+                fee={0}                                    // 수수료 있으면 숫자
+                shippingFee={pricing.shippingFee}          // 배송비
+                couponAmount={pricing.couponDiscount}      // 쿠폰 할인액
+                pointAmount={points}              // 사용 포인트
+                selectedCouponName={selectedCoupon?.name}  // 쿠폰 이름 표시
             />
 
             <PaymentFooter totalPrice={totalPrice} onPay={handlePayment} />

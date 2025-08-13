@@ -1,51 +1,31 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
-import styles from './orderSummaryCard.module.scss'
+import React, { useState } from 'react'
 import Image from 'next/image'
+import styles from './orderSummaryCard.module.scss'
 import { STORAGE_PATHS } from '@/constraint/auth'
 import FastDeliveryModal from '@/components/payments/Modals/FastDeliveryModal'
 import WarehouseStorageModal from '@/components/payments/Modals/WareHouseStorageModal'
-import { Props, PropsWithCoupon } from '@/types/order'
+import { OrderItem, OrderSummaryCardProps } from '@/types/order'
+import CouponSelectModal from '../../CouponSelectModal'
 
 export default function OrderSummaryCard({
     orderItems,
     deliveryType,
     onChangeDelivery,
-    totalPrice,
-    coupons = [],
-    selectedCouponId = null,
-    onSelectCoupon,
-    couponAmount,
-}: PropsWithCoupon) {
+    baseSum,
+    shippingFee,
+    couponDiscount,
+    totalPayable,
+    selectedCouponName = null,
+    applicableCouponCount,
+    onOpenCouponModal,
+    onClearCoupon,
+    onItemMenuClick,
+}: OrderSummaryCardProps) {
     const [openTotal, setOpenTotal] = useState(true)
     const [openFastModal, setOpenFastModal] = useState(false)
     const [openWarehouseModal, setOpenWarehouseModal] = useState(false)
-
-    // 금액 계산 - Hooks must be called before any early returns
-    const productTotal = useMemo(
-        () => orderItems?.reduce((sum, it) => sum + it.price * it.quantity, 0) || 0,
-        [orderItems]
-    )
-    const shippingFee = useMemo(() => (deliveryType === 'FAST' ? 5000 : 0), [deliveryType])
-
-    // 쿠폰 적용 가능한지 판단 (장바구니에 해당 productId 포함)
-    const applicableCoupons = useMemo(() => {
-        const pset = new Set(orderItems.map(i => i.productId))
-        return (coupons ?? []).filter(c => pset.has(c.productId))
-    }, [coupons, orderItems])
-
-    // 선택된 쿠폰의 할인액 프리뷰 (부모가 내려주면 그 값을 우선)
-    const previewCouponAmount = useMemo(() => {
-        if (typeof couponAmount === 'number') return couponAmount
-        if (!selectedCouponId) return 0
-        const c = applicableCoupons.find(x => x.couponId === selectedCouponId)
-        if (!c) return 0
-        const targetSum = orderItems
-            .filter(it => it.productId === c.productId)
-            .reduce((s, it) => s + it.price * it.quantity, 0)
-        return Math.max(0, Math.floor(targetSum * (c.salePercent / 100)))
-    }, [couponAmount, selectedCouponId, applicableCoupons, orderItems])
 
     if (!orderItems?.length) return <div>주문 상품이 없습니다.</div>
 
@@ -60,18 +40,9 @@ export default function OrderSummaryCard({
 
                     <div className={styles.hr} />
 
-                    <div className={styles.coupon_toggle}>
-                        <span>적용할 쿠폰이 없습니다</span>
-                        <label className={styles.switch}>
-                            <input type="checkbox" disabled />
-                            <span className={styles.slider}></span>
-                        </label>
-                    </div>
-
-                    <div className={styles.hr} />
-
+                    {/* 상품 목록 */}
                     <div className={styles.product_list}>
-                        {orderItems.map((item, idx) => (
+                        {orderItems.map((item: OrderItem, idx: number) => (
                             <div className={styles.product_box} key={`${item.productId}-${idx}`}>
                                 <Image
                                     src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${item.thumbnail_image}`}
@@ -87,19 +58,30 @@ export default function OrderSummaryCard({
                                     <div className={styles.meta}>
                                         <span className={styles.size}>240(US 5)</span>
                                         <span className={styles.meta_sep}>/</span>
-                                        <span className={styles.inline_icon}><Image src="/icons/lightning.png" alt="체크" width={12} height={12} />빠른배송</span>
+                                        <span className={styles.inline_icon}>
+                                            <Image src="/icons/lightning.png" alt="체크" width={12} height={12} />
+                                            빠른배송
+                                        </span>
                                     </div>
                                 </div>
                                 <div className={styles.price_wrap}>
                                     <div className={styles.price}>
                                         {(item.price * item.quantity).toLocaleString()}원
                                     </div>
-                                    <button className={styles.kebab} aria-label="메뉴" type="button">⋮</button>
+                                    <button
+                                        className={styles.kebab}
+                                        aria-label="메뉴"
+                                        type="button"
+                                        onClick={() => onItemMenuClick?.(item)}
+                                    >
+                                        ⋮
+                                    </button>
                                 </div>
                             </div>
                         ))}
                     </div>
 
+                    {/* 배송방법 */}
                     <div className={styles.section_title}>배송방법</div>
                     <div className={styles.delivery}>
                         <label className={styles.radio_option}>
@@ -113,7 +95,16 @@ export default function OrderSummaryCard({
                             <span className={styles.custom_radio}></span>
                             <div className={styles.radio_text}>
                                 <div className={styles.main}>빠른배송</div>
-                                <div className={styles.sub}>검수 완료 · 내일 8/11(월) 도착 예정 <Image src="/icons/question_circle.png" alt="체크" width={17} height={17} onClick={() => setOpenFastModal(true)} /></div>
+                                <div className={styles.sub}>
+                                    검수 완료 · 내일 도착 예정{' '}
+                                    <Image
+                                        src="/icons/question_circle.png"
+                                        alt="설명"
+                                        width={17}
+                                        height={17}
+                                        onClick={() => setOpenFastModal(true)}
+                                    />
+                                </div>
                             </div>
                         </label>
 
@@ -128,45 +119,48 @@ export default function OrderSummaryCard({
                             <span className={styles.custom_radio}></span>
                             <div className={styles.radio_text}>
                                 <div className={styles.main}>창고보관</div>
-                                <div className={styles.sub}>배송 없이 빠른 판매 <Image src="/icons/question_circle.png" alt="체크" width={17} height={17} onClick={() => setOpenWarehouseModal(true)} /></div>
+                                <div className={styles.sub}>
+                                    배송 없이 빠른 판매{' '}
+                                    <Image
+                                        src="/icons/question_circle.png"
+                                        alt="설명"
+                                        width={17}
+                                        height={17}
+                                        onClick={() => setOpenWarehouseModal(true)}
+                                    />
+                                </div>
                             </div>
                         </label>
                     </div>
 
+                    {/* 쿠폰 (모달은 바깥에서 열고/닫음) */}
                     <div className={styles.section_title}>할인쿠폰</div>
-                    {applicableCoupons.length > 0 ? (
-                        <div className={styles.coupon_row}>
-                            <select
-                                className={styles.coupon_select}
-                                value={selectedCouponId ?? ''}
-                                onChange={(e) => onSelectCoupon?.(e.target.value ? Number(e.target.value) : null)}
-                            >
-                                <option value="">쿠폰 선택 안 함</option>
-                                {applicableCoupons.map(c => (
-                                    <option key={c.couponId} value={c.couponId}>
-                                        {c.name} · {c.salePercent}% ({c.productId})
-                                    </option>
-                                ))}
-                            </select>
+                    <div className={styles.coupon_row2}>
+                        <button
+                            type="button"
+                            className={`${styles.coupon_box} ${selectedCouponName ? styles.active : ''}`}
+                            onClick={onOpenCouponModal}
+                        >
+                            <span className={styles.coupon_name}>
+                                {selectedCouponName || `쿠폰 선택 (${applicableCouponCount}장)`}
+                            </span>
+                            <span className={styles.right}>
+                                {couponDiscount > 0 ? (
+                                    <span className={styles.discount}>- {couponDiscount.toLocaleString()}원</span>
+                                ) : null}
+                                {/* 우측 꺾쇠는 public/icons/chevron_right.svg 로 두거나 inline svg 사용 */}
+                                <Image src="/icons/chevron_right.svg" alt="" width={16} height={16} />
+                            </span>
+                        </button>
 
-                            {selectedCouponId ? (
-                                <button
-                                    type="button"
-                                    className={styles.coupon_clear}
-                                    onClick={() => onSelectCoupon?.(null)}
-                                >
-                                    해제
-                                </button>
-                            ) : null}
-                        </div>
-                    ) : (
-                        <div className={styles.coupon}>
-                            <input type="text" disabled value="사용 가능한 쿠폰이 없습니다." />
-                            <button disabled>쿠폰 선택</button>
-                        </div>
-                    )}
+                        {selectedCouponName && onClearCoupon ? (
+                            <button type="button" className={styles.cancel_btn} onClick={onClearCoupon}>
+                                사용 취소
+                            </button>
+                        ) : <button className={styles.cancel_btn} onClick={onOpenCouponModal}>쿠폰 선택</button>}
+                    </div>
 
-                    {/* 결제금액 (토글 가능한 요약 + 상세) */}
+                    {/* 결제금액 (토글) */}
                     <button
                         type="button"
                         className={styles.total_bar}
@@ -175,13 +169,13 @@ export default function OrderSummaryCard({
                     >
                         <span>결제금액</span>
                         <div className={styles.total_right}>
-                            <strong>{totalPrice.toLocaleString()}원</strong>
-                            {openTotal ? (
-                                <Image src="/icons/fold_2.svg" alt="펼치기" width={12} height={12} />
-                            ) : (
-                                <Image src="/icons/fold_1.svg" alt="접기" width={12} height={12} />
-                            )
-                            }
+                            <strong>{totalPayable.toLocaleString()}원</strong>
+                            <Image
+                                src={openTotal ? '/icons/fold_2.svg' : '/icons/fold_1.svg'}
+                                alt="접기/펼치기"
+                                width={12}
+                                height={12}
+                            />
                         </div>
                     </button>
 
@@ -189,20 +183,22 @@ export default function OrderSummaryCard({
                         <div className={styles.total_details}>
                             <div className={styles.row}>
                                 <span>상품금액</span>
-                                <span className={styles.price}>{productTotal.toLocaleString()}원</span>
+                                <span className={styles.price}>{baseSum.toLocaleString()}원</span>
                             </div>
                             <div className={styles.row}>
                                 <span>배송비</span>
                                 <span className={styles.price}>{shippingFee.toLocaleString()}원</span>
                             </div>
-                            {previewCouponAmount > 0 && (
+                            {couponDiscount > 0 && (
                                 <div className={styles.row}>
                                     <span>쿠폰 할인</span>
-                                    <span className={styles.price}>- {previewCouponAmount.toLocaleString()}원</span>
+                                    <span className={styles.price}>- {couponDiscount.toLocaleString()}원</span>
                                 </div>
                             )}
                         </div>
                     )}
+
+
 
                     {openFastModal && <FastDeliveryModal onClose={() => setOpenFastModal(false)} />}
                     {openWarehouseModal && <WarehouseStorageModal onClose={() => setOpenWarehouseModal(false)} />}
@@ -214,6 +210,7 @@ export default function OrderSummaryCard({
                     </p>
                 </div>
             </section>
+
             <div className={styles.divider_horizontal}></div>
         </>
     )
