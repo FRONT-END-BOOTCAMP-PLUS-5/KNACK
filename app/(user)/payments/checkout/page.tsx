@@ -15,7 +15,7 @@ import AddressModal from '@/components/address/AddressModal'
 import { formatFullAddress } from '@/utils/openKakaoPostCode'
 import RequestModal from '@/components/address/RequestModal'
 import { AddressDtoWithPostalFields, Coupon, CheckoutRow, OrderItem, SelectedAddress } from '@/types/order'
-import CouponSelectModal from '@/components/payments/CouponSelectModal'
+import CouponSelectModal from '@/components/Payments/CouponSelectModal'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
 
