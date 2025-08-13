@@ -18,8 +18,8 @@ export const likeService = {
     return data;
   },
 
-  getLikes: async (ids: string) => {
-    const { data, error } = await requester.get(`api/likes?${ids}`).catch((error) => error);
+  getLikes: async () => {
+    const { data, error } = await requester.get(`api/likes`).catch((error) => error);
 
     if (error) throw new Error(error.message);
 

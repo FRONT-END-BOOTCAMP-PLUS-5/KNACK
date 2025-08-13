@@ -8,9 +8,9 @@ export class GetLikesUseCase {
     this.repository = repository;
   }
 
-  async findById(ids: number[]): Promise<Like[]> {
+  async findById(userId: string): Promise<Like[]> {
     try {
-      const result = await this.repository.findById(ids);
+      const result = await this.repository.findById(userId);
 
       return result;
     } catch {

@@ -49,13 +49,11 @@ export class PrLikesRepository implements LikesRepository {
     }
   }
 
-  async findById(ids: number[]): Promise<Like[]> {
+  async findById(userId: string): Promise<Like[]> {
     try {
       const result = await prisma.like.findMany({
         where: {
-          id: {
-            in: ids,
-          },
+          userId: userId,
         },
       });
 
