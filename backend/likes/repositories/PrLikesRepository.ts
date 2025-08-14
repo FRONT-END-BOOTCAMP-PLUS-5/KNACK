@@ -18,7 +18,7 @@ export class PrLikesRepository implements LikesRepository {
     const { optionValueId, productId } = this.likeData ?? {};
 
     try {
-      const result = await prisma.like.create({
+      const result = await prisma.productLike.create({
         data: {
           userId: userId ?? '',
           optionValueId: optionValueId ?? 0,
@@ -34,7 +34,7 @@ export class PrLikesRepository implements LikesRepository {
 
   async delete(id: number): Promise<number> {
     try {
-      const result = await prisma.like.delete({
+      const result = await prisma.productLike.delete({
         where: {
           id: id,
         },
@@ -51,7 +51,7 @@ export class PrLikesRepository implements LikesRepository {
 
   async findById(userId: string): Promise<Like[]> {
     try {
-      const result = await prisma.like.findMany({
+      const result = await prisma.productLike.findMany({
         where: {
           userId: userId,
         },
