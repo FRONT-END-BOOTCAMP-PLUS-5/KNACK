@@ -2,8 +2,8 @@ import { ISearchProductListRequest } from '@/types/searchProductList';
 
 export const isActiveFilter = (optionValue: string, filterQuery: ISearchProductListRequest) => {
   switch (optionValue) {
-    case 'categoryId':
-      return !!(filterQuery.categoryId && filterQuery.categoryId.length > 0);
+    case 'subCategoryId':
+      return !!(filterQuery.subCategoryId && filterQuery.subCategoryId.length > 0);
     case 'gender':
       return !!filterQuery.gender;
     case 'keywordColorId':
@@ -23,8 +23,8 @@ export const isActiveFilter = (optionValue: string, filterQuery: ISearchProductL
 
 export const calcFilterValueLength = (optionValue: string, filterQuery: ISearchProductListRequest): number => {
   switch (optionValue) {
-    case 'categoryId':
-      return filterQuery.categoryId?.length || 0;
+    case 'subCategoryId':
+      return filterQuery.subCategoryId?.length || 0;
     case 'gender':
       return filterQuery.gender ? 1 : 0;
     case 'keywordColorId':

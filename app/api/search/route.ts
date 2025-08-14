@@ -3,7 +3,6 @@ import { GetProductsUseCase } from '@/backend/search/applications/usecases/GetPr
 import { PrProductsRepository } from '@/backend/search/infrastructure/repositories/PrProductsRepository';
 import { GetProductsRequestDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import { SortOption } from '@/backend/search/domains/entities/ProductFilters';
-import prisma from '@/backend/utils/prisma';
 import { getBooleanParam, getIntParam, getIntArrayParam, getStringArrayParam } from '@/utils/searchParams';
 
 export async function GET(request: NextRequest) {
@@ -34,7 +33,7 @@ export async function GET(request: NextRequest) {
       page: getIntParam(searchParams, 'page'),
     };
 
-    const repository = new PrProductsRepository(prisma);
+    const repository = new PrProductsRepository();
     const useCase = new GetProductsUseCase(repository);
     const result = await useCase.execute(requestDto);
 
