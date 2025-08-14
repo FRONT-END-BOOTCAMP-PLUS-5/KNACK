@@ -1,5 +1,5 @@
-import { Category } from '../../domains/entities/Category';
 import { CategoryRepository } from '../../domains/repositories/CategoryRepository';
+import { CategoryResponseDto } from '../dtos/CategoryDto';
 
 export class GetCategoryUseCase {
   private repository: CategoryRepository;
@@ -8,9 +8,13 @@ export class GetCategoryUseCase {
     this.repository = repository;
   }
 
-  async execute(): Promise<Category[]> {
-    const result = await this.repository.getCategories();
+  async execute(): Promise<CategoryResponseDto[]> {
+    try {
+      const result = await this.repository.getCategories();
 
-    return result;
+      return result;
+    } catch {
+      throw new Error('error');
+    }
   }
 }

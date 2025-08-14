@@ -1,4 +1,4 @@
-export interface CategoryDto {
+export interface CategoryResponseDto {
   id: number;
   korName: string;
   engName: string;
@@ -9,8 +9,4 @@ export interface SubCategoryDto {
   id: number;
   korName: string;
   engName: string;
-}
-
-export interface CategoryResponseDto {
-  categories: CategoryDto[];
 }
