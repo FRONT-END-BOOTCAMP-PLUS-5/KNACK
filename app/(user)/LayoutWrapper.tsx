@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
-import PaymentHeader from '@/components/Payments/PaymentHeader';
+import PaymentHeader from '@/components/payments/PaymentHeader';
 import { useUserStore } from '@/store/userStore';
 
 interface IProps {
