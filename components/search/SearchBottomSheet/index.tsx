@@ -96,6 +96,26 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
     setSelectedFilter(newSelectedFilter);
   };
 
+  // 브랜드 클릭 핸들러
+  const onClickBrandSelect = (brandId: number) => {
+    const currentBrandIds = selectedFilter.brandId || [];
+    const isSelected = currentBrandIds.includes(brandId);
+
+    let newBrandIds: number[];
+    if (isSelected) {
+      newBrandIds = currentBrandIds.filter((id) => id !== brandId);
+    } else {
+      newBrandIds = [...currentBrandIds, brandId];
+    }
+
+    const newSelectedFilter = {
+      ...selectedFilter,
+      brandId: newBrandIds.length > 0 ? newBrandIds : undefined,
+    };
+    console.log('asddas :', newSelectedFilter);
+    setSelectedFilter(newSelectedFilter);
+  };
+
   return (
     <BottomSheet style={{ padding: 0, position: 'relative' }} title="필터" isCloseButton={false}>
       <div className={styles.bottom_sheet_header}>
@@ -119,7 +139,9 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
         {select === 2 && <SearchGender />}
         {select === 3 && <SearchColor />}
         {select === 4 && <SearchDiscount />}
-        {select === 5 && <SearchBrand selectedFilter={selectedFilter} brands={brands} />}
+        {select === 5 && (
+          <SearchBrand selectedFilter={selectedFilter} brands={brands} onClickBrandSelect={onClickBrandSelect} />
+        )}
         {select === 6 && <SearchSize />}
         {select === 7 && <SearchPrice />}
       </div>
