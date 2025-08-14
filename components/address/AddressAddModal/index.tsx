@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import styles from './addressAddModal.module.scss'
-import KakaoPostCodeLoader from '../../../utils/KakaoPostCodeLoader'
 import requester from '@/utils/requester'
-import { formatAddressDisplay, openKakaoPostcode } from '@/utils/openKakaoPostCode'
+import { formatAddressDisplay } from '@/utils/formatAddressUtils' // 주소 포맷터만 재사용 중이면 그대로 두고, 아니라면 유틸 이름 변경 권장
 import type { ApiAddress, SelectedAddress } from '@/types/order'
 import Image from 'next/image'
 import { AddressAddModalProps } from '@/types/order'
+import DaumPostcodeEmbed, { Address } from 'react-daum-postcode'
+import CloseLarge from '@/public/icons/close_large.svg';
 
 const NAME_MIN = 2
 const NAME_MAX = 50
@@ -23,15 +24,8 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
     const [phone, setPhone] = useState(editing?.phone ?? '')
     const [setAsDefault, setSetAsDefault] = useState(!!editing?.isDefault)
 
-    // editing/initial이 바뀌어도 폼이 갱신되도록
-    useEffect(() => {
-        setZipCode(editing?.zipCode ?? initial?.zipCode ?? '')
-        setMain(editing?.main ?? initial?.main ?? '')
-        setDetail(editing?.detail ?? '')
-        setName(editing?.name ?? '')
-        setPhone(editing?.phone ?? '')
-        setSetAsDefault(!!editing?.isDefault)
-    }, [editing, initial])
+    // ⬇️ 새로 추가: 우편번호 검색 모달 열림 상태
+    const [isPostcodeOpen, setIsPostcodeOpen] = useState(false)
 
     const nameError = useMemo(() => {
         if (!name) return '올바른 이름을 입력해주세요. (2 ~ 50자)'
@@ -40,17 +34,33 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
     }, [name])
 
     const phoneError = useMemo(() => {
-        if (!phone) return '';
-        return phonePattern.test(phone) ? '' : '휴대폰 번호 형식이 올바르지 않습니다.';
-    }, [phone]);
+        if (!phone) return ''
+        return phonePattern.test(phone) ? '' : '휴대폰 번호 형식이 올바르지 않습니다.'
+    }, [phone])
 
     const disabled = !name || !!nameError || !zipCode || !main || !!phoneError
 
+    // ⬇️ 변경: 기존 openKakaoPostcode 대신 모달 오픈 토글
     const handleSearchZip = () => {
-        openKakaoPostcode(({ full, zipCode }) => {
-            setMain(full)
-            setZipCode(zipCode)
-        })
+        setIsPostcodeOpen(true)
+    }
+
+    // ⬇️ 새로 추가: Daum 주소 검색 완료 핸들러
+    const handlePostcodeComplete = (data: Address) => {
+        // 기본 주소: 도로명(R) / 지번(J) 구분
+        const roadAddr = data.roadAddress
+        const jibunAddr = data.jibunAddress
+        let full = data.addressType === 'R' ? roadAddr : jibunAddr
+
+        // 참고항목(법정동/건물명) 조합
+        const extras: string[] = []
+        if (data.bname) extras.push(data.bname)
+        if (data.buildingName) extras.push(data.buildingName)
+        if (extras.length) full += ` (${extras.join(', ')})`
+
+        setZipCode(data.zonecode) // 5자리 우편번호
+        setMain(full)
+        setIsPostcodeOpen(false)
     }
 
     const handleSave = async () => {
@@ -60,7 +70,6 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
             let saved: ApiAddress
             if (isEdit && editing) {
                 const res = await requester.put<ApiAddress>(`/api/addresses/${editing.id}`, payload)
-                console.log(res);
                 saved = { ...res.data, id: editing.id }
             } else {
                 const res = await requester.post<ApiAddress>('/api/addresses', { ...payload })
@@ -77,7 +86,11 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
                 id: saved.id,
                 name: saved.name,
                 phone: saved.phone ?? '',
-                fullAddress: formatAddressDisplay({ zipCode: saved.zipCode, main: saved.main, detail: saved.detail }),
+                fullAddress: formatAddressDisplay({
+                    zipCode: saved.zipCode,
+                    main: saved.main,
+                    detail: saved.detail,
+                }),
                 request: saved.message ?? '',
             }
             sessionStorage.setItem('selectedAddress', JSON.stringify(selected))
@@ -89,12 +102,24 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
         }
     }
 
+    // editing/initial이 바뀌어도 폼이 갱신되도록
+    useEffect(() => {
+        setZipCode(editing?.zipCode ?? initial?.zipCode ?? '')
+        setMain(editing?.main ?? initial?.main ?? '')
+        setDetail(editing?.detail ?? '')
+        setName(editing?.name ?? '')
+        setPhone(editing?.phone ?? '')
+        setSetAsDefault(!!editing?.isDefault)
+    }, [editing, initial])
+
     return (
         <div className={styles.modal_overlay}>
-            <KakaoPostCodeLoader />
+
             <div className={styles.modal} role="dialog" aria-modal="true">
                 <header className={styles.header_bar2}>
-                    <button className={styles.icon_btn} onClick={onClose} aria-label="뒤로"><Image src="/icons/header-back.svg" alt="뒤로가기" width={24} height={24} /></button>
+                    <button className={styles.icon_btn} onClick={onClose} aria-label="뒤로">
+                        <Image src="/icons/header-back.svg" alt="뒤로가기" width={24} height={24} />
+                    </button>
                     <h3 className={styles.title}>{isEdit ? '주소 수정하기' : '주소 추가하기'}</h3>
                     <span />
                 </header>
@@ -106,7 +131,7 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
                             type="text"
                             placeholder="수령인의 이름"
                             value={name}
-                            onChange={e => setName(e.target.value)}
+                            onChange={(e) => setName(e.target.value)}
                             maxLength={NAME_MAX}
                         />
                         {nameError && <p className={styles.error}>{nameError}</p>}
@@ -128,7 +153,9 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
                             <label>우편번호</label>
                             <input type="text" placeholder="우편 번호를 검색하세요" value={zipCode} readOnly />
                         </div>
-                        <button className={styles.ghost_btn} onClick={handleSearchZip}>우편번호</button>
+                        <button className={styles.ghost_btn} onClick={handleSearchZip}>
+                            우편번호
+                        </button>
                     </div>
 
                     <div className={styles.form_row}>
@@ -142,7 +169,7 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
                             type="text"
                             placeholder="건물, 아파트, 동/호수 입력"
                             value={detail ?? ''}
-                            onChange={e => setDetail(e.target.value)}
+                            onChange={(e) => setDetail(e.target.value)}
                         />
                     </div>
 
@@ -150,7 +177,7 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
                         <input
                             type="checkbox"
                             checked={setAsDefault}
-                            onChange={e => setSetAsDefault(e.target.checked)}
+                            onChange={(e) => setSetAsDefault(e.target.checked)}
                         />
                         기본 배송지로 설정
                     </label>
@@ -164,6 +191,28 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
                     </button>
                 </div>
             </div>
+
+            {/* ⬇️ 새로 추가: 우편번호 검색 모달 */}
+            {isPostcodeOpen && (
+                <div
+                    className={styles.daum_style}
+                    role="dialog"
+                    aria-modal="true"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) setIsPostcodeOpen(false) // 바깥 클릭 닫기
+                    }}
+                >
+                    <div className={styles.daum_header}>
+                        <button className={styles.close_button} onClick={() => setIsPostcodeOpen(false)}>
+                            <Image src={CloseLarge} alt="닫기" fill />
+                        </button>
+                    </div>
+                    <DaumPostcodeEmbed
+                        onComplete={handlePostcodeComplete}
+                        style={{ width: '100%', height: 480 }} // 필요시 조정
+                    />
+                </div>
+            )}
         </div>
     )
 }

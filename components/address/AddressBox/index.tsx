@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import styles from './addressBox.module.scss'
-import { formatPhoneNumber, phonePattern } from '@/utils/openKakaoPostCode'
+import { formatPhoneNumber, phonePattern } from '@/utils/formatAddressUtils'
 import { AddressBoxProps } from '@/types/order'
 
 export default function AddressBox({

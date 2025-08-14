@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import styles from './addressModal.module.scss'
-import KakaoPostCodeLoader from '../../../utils/KakaoPostCodeLoader'
 import requester from '@/utils/requester'
-import { formatAddressDisplay, formatPhoneNumber, phonePattern } from '@/utils/openKakaoPostCode'
+import { formatAddressDisplay, formatPhoneNumber, phonePattern } from '@/utils/formatAddressUtils'
 import Image from 'next/image'
 import { AddressAddModal } from '../AddressAddModal'
 import { AddressModalProps, ApiAddress, SelectedAddress } from '@/types/order'
@@ -96,7 +95,6 @@ export default function AddressModal({
 
     return (
         <div className={styles.modal_overlay}>
-            <KakaoPostCodeLoader />
             <div className={styles.modal} role="dialog" aria-modal="true">
                 <header className={styles.header_bar}>
                     <h2 className={styles.title}>주소록</h2>
