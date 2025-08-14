@@ -1,5 +1,5 @@
 export const PRODUCT_FILTER = [
-  { id: 1, name: '카테고리', value: 'categoryId' },
+  { id: 1, name: '카테고리', value: 'subCategoryId' },
   { id: 2, name: '성별', value: 'gender' },
   { id: 3, name: '색상', value: 'keywordColorId' },
   { id: 4, name: '혜택/할인', value: 'discount' },

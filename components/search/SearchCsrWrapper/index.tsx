@@ -63,7 +63,7 @@ export default function SearchCsrWrapper({ queryParams }: IProps) {
     <>
       <SearchFilter filterQuery={filterQuery} handleSelect={handleSelect} />
       <SearchSort filterQuery={filterQuery} />
-      <SearchBottomSheet select={select} handleSelect={handleSelect} />
+      <SearchBottomSheet select={select} handleSelect={handleSelect} filterQuery={filterQuery} />
     </>
   );
 }

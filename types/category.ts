@@ -14,3 +14,17 @@ export interface ISubCategory {
   isPrivate: boolean;
   createdAt: Date;
 }
+
+export interface IPageCategory {
+  id: number;
+  korName: string;
+  engName: string;
+  subCategories: IPageSubCategory[];
+}
+
+export interface IPageSubCategory {
+  id: number;
+  categoryId: number;
+  korName: string;
+  engName: string;
+}
