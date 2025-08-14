@@ -64,4 +64,20 @@ export class PrOrderRepository implements OrderRepository {
         const dto = mapOrderRowToDto(order)
         return dto
     }
+
+    async linkOrdersToPayment(args: {
+        orderIds: number[]
+        paymentId: number
+        userId: string
+    }): Promise<number> {
+        const result = await prisma.order.updateMany({
+            where: {
+                id: { in: args.orderIds },
+                userId: args.userId,
+                paymentId: null, // Only link orders that aren't already linked
+            },
+            data: { paymentId: args.paymentId },
+        })
+        return result.count
+    }
 }

@@ -154,7 +154,6 @@ export default function PaymentSuccess() {
                 const firstOrderId = orderIds?.[0]
                 if (!Number.isFinite(firstOrderId)) {
                     setRepProd(null)
-                    setShippingFee(0)
                     return
                 }
 
@@ -164,8 +163,6 @@ export default function PaymentSuccess() {
                 console.log(order)
                 const items = order?.items ?? []
                 setRepProd(items[0])
-                const delivery = Number(order?.deliveryFee ?? order?.shippingFee ?? 0)
-                setShippingFee(Number.isFinite(delivery) ? delivery : 0)
             } catch (e) {
                 console.error('❌ 대표상품/주문 로드 실패', e)
                 setRepProd(null)

@@ -1,11 +1,33 @@
 // 📁 backend/domain/repositories/PaymentRepository.ts
 
+import { PaymentRecord } from "@/types/payment"
 import { CreatePaymentDto } from "../../applications/dtos/CreatePaymentDto"
 import { GetPaymentDto } from "../../applications/dtos/GetPaymentDto"
 
 export interface PaymentRepository {
     findWithOrdersByNumber(paymentNumber: bigint, userId: string): Promise<GetPaymentDto | null>
     findWithOrdersById(paymentId: number, userId: string): Promise<GetPaymentDto | null>
+
+    // 상태 전이: CONFIRMING -> PAID (동시성 방지: where에 status 포함)
+    markPaid(args: {
+        id: number
+        method: string
+        approvedAt: Date
+        requestedAt?: Date | null
+        tossPaymentKey: string
+    }): Promise<boolean> // true면 내가 성공, false면 이미 누군가 처리함
+
+    /**  
+     *tossPaymentKey로 선점 (있으면 반환, 없으면 CONFIRMING으로 생성)
+     */
+    claimByTossKey(args: {
+        userId: string
+        addressId: number
+        amount: number
+        tossPaymentKey: string
+    }): Promise<PaymentRecord>
+
+
     /**
      * 결제 저장
      */

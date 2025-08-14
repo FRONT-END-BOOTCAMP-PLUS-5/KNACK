@@ -2,6 +2,11 @@ import { CreateOrderEntityDto } from '@/backend/orders/applications/dtos/CreateO
 import { OrderDto } from '../../applications/dtos/GetOrderDto'
 
 export interface OrderRepository {
+    linkOrdersToPayment(args: {
+        orderIds: number[]
+        paymentId: number
+        userId: string
+    }): Promise<number>
     saveMany(orders: CreateOrderEntityDto[]): Promise<number[]>
     updatePaymentId(orderIds: number[], paymentId: number): Promise<void>
     findManyByIdsAndUserId(orderIds: number[], userId: string): Promise<number[]>

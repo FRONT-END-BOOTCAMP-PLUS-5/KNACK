@@ -3,8 +3,47 @@ import prisma from '@/backend/utils/prisma'
 import { PaymentRepository } from '@/backend/payments/domains/repositories/PaymentRepository';
 import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto';
 import { GetPaymentDto } from '@/backend/payments/applications/dtos/GetPaymentDto';
+import { PaymentRecord, PaymentStatus } from '@/types/payment';
 
 export class PrPaymentRepository implements PaymentRepository {
+
+    async claimByTossKey({ userId, addressId, amount, tossPaymentKey }: {
+        userId: string; addressId: number; amount: number; tossPaymentKey: string
+    }): Promise<PaymentRecord> {
+        // tossPaymentKey UNIQUE로 선점(upsert)
+        const row = await prisma.payment.upsert({
+            where: { tossPaymentKey },
+            create: {
+                userId,
+                addressId,
+                price: amount,
+                status: 'CONFIRMING',
+                tossPaymentKey,
+                paymentNumber: await this.generateTodayPaymentNumber(),
+                method: 'CARD',
+            },
+            update: {}, // 존재 판단만
+        })
+        return this.toRecord({
+            ...row,
+            paymentNumber: row.paymentNumber ? Number(row.paymentNumber) : null
+        })
+    }
+
+    async markPaid({ id, method, approvedAt, requestedAt, tossPaymentKey }: {
+        id: number; method: string; approvedAt: Date; requestedAt?: Date | null; tossPaymentKey: string
+    }): Promise<boolean> {
+        const res = await prisma.payment.updateMany({
+            where: { id, status: 'CONFIRMING', tossPaymentKey },
+            data: {
+                status: 'PAID',
+                method,
+                approvedAt,
+                createdAt: requestedAt ?? new Date(),
+            },
+        })
+        return res.count === 1
+    }
 
     async save(payment: CreatePaymentDto): Promise<number | null> {
         console.log(payment)
@@ -185,5 +224,31 @@ export class PrPaymentRepository implements PaymentRepository {
             status: data.status as 'DONE' | 'CANCELED',
             orderIds: data.orders.map(order => order.id),
         };
+    }
+
+    private toRecord(row: {
+        id: number;
+        userId: string;
+        addressId: number;
+        price: number | null;
+        status: string;
+        tossPaymentKey: string | null;
+        paymentNumber: number | null;
+        approvedAt: Date | null;
+        method: string;
+        createdAt: Date | null;
+    }): PaymentRecord {
+        return {
+            id: row.id,
+            userId: row.userId,
+            addressId: row.addressId,
+            amount: row.price ?? 0,
+            status: row.status as PaymentStatus,
+            tossPaymentKey: row.tossPaymentKey,
+            paymentNumber: row.paymentNumber ? BigInt(row.paymentNumber) : null,
+            approvedAt: row.approvedAt,
+            method: row.method,
+            createdAt: row.createdAt,
+        }
     }
 }

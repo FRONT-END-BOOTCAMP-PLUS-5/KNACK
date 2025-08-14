@@ -1,21 +1,19 @@
+// app/api/payments/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { serverPost as tossPOST } from '@/backend/utils/serverRequester'
-import type { AxiosError } from 'axios'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth'
+
 import { PrPaymentRepository } from '@/backend/payments/repositories/PrPaymentRepository'
-import { PrCardRepository } from '@/backend/payments/repositories/PrCardRepository'
-import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto'
-import { CreateCardDto } from '@/backend/payments/applications/dtos/CreateCardDto'
-import { GetPaymentDto } from '@/backend/payments/applications/dtos/GetPaymentDto'
 import { PrCouponRepository } from '@/backend/coupon/repositories/PrCouponRepository'
 import { PrUserPointsRepository } from '@/backend/points/repositories/PrUserPointsRepository'
+import { PrCardRepository } from '@/backend/payments/repositories/PrCardRepository'
+
+import { ConfirmPaymentUseCase } from '@/backend/payments/applications/usecases/ConfirmPaymentUseCase'
+import { TossConfirmResult, TossGateway } from '@/types/payment'
+import { serverPost } from '@/backend/utils/serverRequester'
+import { PrOrderRepository } from '@/backend/orders/repositories/PrOrderRepository'
 
 export async function POST(req: NextRequest) {
-    const repo = new PrPaymentRepository()
-    const couponRepo = new PrCouponRepository()
-    const pointsRepo = new PrUserPointsRepository()
-
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user) {
@@ -25,88 +23,63 @@ export async function POST(req: NextRequest) {
 
         const {
             tossPaymentKey, orderId, amount, addressId, orderIds,
-            selectedCouponId,            // ← 추가
-            pointsToUse                  // ← 추가 (number)
+            selectedCouponId, pointsToUse
         } = await req.json()
 
-        const data = await tossPOST('/payments/confirm', { paymentKey: tossPaymentKey, orderId, amount }, 'toss')
-        const method = data.method as string
-        const status = data.status as string
-        const paymentNumberBig = BigInt(await repo.generateTodayPaymentNumber())
-
-        const paymentDto: CreatePaymentDto = {
-            tossPaymentKey: data.paymentKey,
-            userId: session.user.id,
-            addressId,
-            paymentNumber: paymentNumberBig,
-            price: amount,
-            salePrice: data.amount,
-            approvedAt: data.approvedAt ? new Date(data.approvedAt) : new Date(),
-            createdAt: data.requestedAt ? new Date(data.requestedAt) : new Date(),
-            method,
-            status: status as 'DONE' | 'CANCELED',
-            orderIds,
-        }
-
-        const paymentRepo = new PrPaymentRepository()
-        await paymentRepo.save(paymentDto)
-
-        // ✅ 방금 저장한 결제 다시 조회해서 sequence id 확보
-        const createdPayment: GetPaymentDto | null = await paymentRepo.findByTossPaymentKey(data.paymentKey)
-        if (!createdPayment?.id) {
-            throw new Error('Payment 저장 후 ID를 찾을 수 없습니다.')
-        }
-
-        // ✅ 주문들에 paymentId(시퀀스) 연결
-        await paymentRepo.updateOrderPaymentIds(orderIds, createdPayment.id)
-
-        // ✅ 쿠폰 소모 (선택된 경우)
-        if (selectedCouponId) {
-            await couponRepo.consumeByDelete(userId, Number(selectedCouponId))
-        }
-
-        // ✅ 포인트 차감 (요청된 경우)
-        if (pointsToUse && pointsToUse > 0) {
-            await pointsRepo.debit({
-                userId,
-                amount: Number(pointsToUse),
-            })
-        }
-
-        // ✅ 카드 저장 시에도 paymentId(시퀀스) 사용
-        if (data.method === 'CARD' && data.card) {
-            const cardRepo = new PrCardRepository()
-            const cardDto: CreateCardDto = {
-                paymentId: createdPayment.id, // <-- 기존 paymentNumber 사용하던 부분 교체
-                issuerCode: data.card.issuerCode,
-                acquirerCode: data.card.acquirerCode,
-                number: data.card.number,
-                installmentPlanMonths: data.card.installmentPlanMonths,
-                approveNo: data.card.approveNo,
-                useCardPoint: data.card.useCardPoint,
-                isInterestFree: data.card.isInterestFree,
+        const tossGateway: TossGateway = {
+            async confirmPayment({
+                tossPaymentKey, orderId, amount
+            }: {
+                tossPaymentKey: string; orderId: string; amount: number
+            }): Promise<TossConfirmResult> {
+                const data = await serverPost('/payments/confirm', { paymentKey: tossPaymentKey, orderId, amount }, 'toss')
+                return {
+                    paymentKey: data.paymentKey,
+                    method: data.method,
+                    status: data.status,
+                    approvedAt: data.approvedAt,
+                    requestedAt: data.requestedAt,
+                    amount: data.amount,
+                    // card 등 부가 필드가 있다면 TossConfirmResult에 포함되도록 타입/리턴 확장
+                }
             }
-            await cardRepo.save(cardDto)
         }
 
-        // ✅ 응답에 paymentId 포함
+        const usecase = new ConfirmPaymentUseCase(
+            new PrPaymentRepository(),
+            new PrOrderRepository(),
+            new PrCouponRepository(),
+            new PrUserPointsRepository(),
+            tossGateway,
+            new PrCardRepository(),
+        )
+
+        const result = await usecase.execute({
+            userId,
+            orderId,
+            tossPaymentKey,
+            amount: Number(amount),
+            addressId: Number(addressId),
+            orderIds: (orderIds as number[]) ?? [],
+            selectedCouponId: selectedCouponId ? Number(selectedCouponId) : null,
+            pointsToUse: pointsToUse ? Number(pointsToUse) : 0,
+        })
+
+        // ✅ id를 포함해 응답을 명시적으로 구성
         return NextResponse.json({
-            id: createdPayment.id,                         // sequence id
-            paymentNumber: paymentNumberBig.toString(),    // BigInt → string
+            id: result.id,                                  // payment 테이블 id
+            status: result.status,
+            paymentNumber: result.paymentNumber ?? null,
+            approvedAt: result.approvedAt ?? null,
+            method: result.method ?? null,
             orderIds,
-            status: 'DONE',
-            approvedAt: paymentDto.approvedAt.toISOString(),
-            method: paymentDto.method,
-            amount,
+            amount: Number(amount),
         }, { status: 201 })
-
-    } catch (error) {
-        const errRes =
-            (error as AxiosError)?.isAxiosError
-                ? (error as AxiosError).response?.data
-                : { message: (error as Error).message ?? '결제 승인 실패' }
-
-        return NextResponse.json(errRes, { status: 400 })
+    } catch (e) {
+        console.error('[POST /api/payments] failed:', e)
+        return NextResponse.json(
+            { message: (e as Error).message ?? '결제 승인 실패' },
+            { status: 400 }
+        )
     }
 }
-
