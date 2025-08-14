@@ -1,17 +1,14 @@
 'use client';
 
 import TabMenu from '@/components/common/TabMenu';
-import styles from './saved.module.scss';
 import { likeService } from '@/services/like';
 import { useCallback, useEffect, useState } from 'react';
-import Flex from '@/components/common/Flex';
-import Text from '@/components/common/Text';
-import BookMarkOn from '@/public/icons/book_mark_active.svg';
-import Image from 'next/image';
+
 import { productsService } from '@/services/products';
 import { IProducts } from '@/types/product';
-import { STORAGE_PATHS } from '@/constraint/auth';
-import { ILikeList } from '@/types/like';
+import { IBrandLikeList, ILikeList } from '@/types/like';
+import ProductSave from '@/components/saved/ProductSave';
+import BrandSave from '@/components/saved/BrandSave';
 
 const TABS = [
   { id: 0, name: '상품' },
@@ -22,22 +19,30 @@ const TABS = [
 const SavedPage = () => {
   const { addLike, deleteLike, getLikes, addBrandLike, deleteBrandLike, getBrandLikes } = likeService;
   const { getProductList } = productsService;
-  const [selectTab, setSelectTab] = useState(0);
+  const [selectTab, setSelectTab] = useState(1);
   const [productList, setProductList] = useState<IProducts[]>([]);
   const [likeList, setLikeList] = useState<ILikeList[]>([]);
+  const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
 
   const handleGetBrandLikes = useCallback(() => {
     getBrandLikes()
       .then((res) => {
         console.log('res ', res);
+        if (res.status === 200) {
+          setBrandLikeList(res.result);
+        }
       })
       .catch((error) => {
         console.log('error', error.message);
       });
   }, [getBrandLikes]);
 
+  const initLikeBrand = useCallback(() => {
+    handleGetBrandLikes();
+  }, [handleGetBrandLikes]);
+
   const handleAddBrandLike = useCallback(() => {
-    const brandId = 1;
+    const brandId = 2;
 
     addBrandLike(brandId)
       .then((res) => {
@@ -48,17 +53,19 @@ const SavedPage = () => {
       });
   }, [addBrandLike]);
 
-  const handleDeleteBrandLike = useCallback(() => {
-    const brandId = 6;
-
-    deleteBrandLike(brandId)
-      .then((res) => {
-        console.log('res ', res);
-      })
-      .catch((error) => {
-        console.log('error', error.message);
-      });
-  }, [deleteBrandLike]);
+  const handleDeleteBrandLike = useCallback(
+    (id: number) => {
+      deleteBrandLike(id)
+        .then((res) => {
+          console.log('res ', res);
+          initLikeBrand();
+        })
+        .catch((error) => {
+          console.log('error', error.message);
+        });
+    },
+    [deleteBrandLike, initLikeBrand]
+  );
 
   const handleLikeAdd = useCallback(() => {
     const data = {
@@ -136,50 +143,15 @@ const SavedPage = () => {
     handleGetLikes();
   }, [handleGetLikes]);
 
+  useEffect(() => {
+    handleGetBrandLikes();
+  }, [handleGetBrandLikes]);
+
   return (
     <section>
       <TabMenu tabs={TABS} selectedTab={selectTab} onTabSelect={setSelectTab} />
-      <button onClick={handleAddBrandLike}>브랜드 좋아요 추가 </button>
-      <button onClick={handleDeleteBrandLike}>브랜드 좋아요 삭제 </button>
-      <button onClick={handleGetBrandLikes}>브랜드 좋아요 가져오기 </button>
-      <Flex paddingHorizontal={16} direction="column">
-        {productList?.length > 0 &&
-          productList?.map((item) => {
-            const likeOptionValueId = likeList?.find((likeItem) => likeItem?.productId === item?.id)?.optionValueId;
-            const optionValues = item?.productOptionMappings[0]?.optionType?.optionValue;
-            const findOptionName = optionValues?.find((optionValue) => optionValue?.id === likeOptionValueId)?.name;
-
-            return (
-              <Flex key={item?.id} paddingVertical={16} align="center" className={styles.like_item}>
-                <span className={styles.product_image}>
-                  <Image src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${item?.thumbnailImage}`} alt="상품 이미지" fill />
-                </span>
-                <Flex direction="column">
-                  <Flex className={styles.top_content}>
-                    <Flex direction="column">
-                      <Text size={1.2} weight={700} lineHeight="1.7rem">
-                        {item?.korName}
-                      </Text>
-                      <Text size={1.3}>{item?.engName}</Text>
-                    </Flex>
-                    <button className={styles.save_button} onClick={() => onClickSave(item?.id)}>
-                      <Image src={BookMarkOn} alt="저장" width={18} height={18} />
-                    </button>
-                  </Flex>
-
-                  <Flex className={styles.bottom_content} align="end" justify="between">
-                    <Text size={1.4} weight={700}>
-                      {findOptionName}
-                    </Text>
-                    <Text size={1.4} weight={700}>
-                      {item?.price?.toLocaleString()}원
-                    </Text>
-                  </Flex>
-                </Flex>
-              </Flex>
-            );
-          })}
-      </Flex>
+      {selectTab === 0 && <ProductSave likeList={likeList} productList={productList} onClickSave={onClickSave} />}
+      {selectTab === 1 && <BrandSave brandLikeData={brandLikeList} onClickBookMark={handleDeleteBrandLike} />}
     </section>
   );
 };
