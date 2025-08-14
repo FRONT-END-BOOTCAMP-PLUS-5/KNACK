@@ -3,15 +3,15 @@ import { SortOption } from '@/backend/search/domains/entities/ProductFilters';
 export interface GetProductsRequestDto {
   keyword?: string;
 
-  keywordColorId?: number;
-  brandId?: number;
-  categoryId?: number;
-  subCategoryId?: number;
+  keywordColorId?: number[];
+  brandId?: number[];
+  categoryId?: number[];
+  subCategoryId?: number[];
   priceMin?: number;
   priceMax?: number;
   discountMin?: number;
   discountMax?: number;
-  size?: string;
+  size?: string[];
   benefit?: 'under_price';
   gender?: string;
   soldOutInvisible?: boolean;

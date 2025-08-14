@@ -3,7 +3,6 @@ import { LikesRepository } from '../domains/repositories/LikesRepository';
 import { Like } from '../domains/entities/Likes';
 
 interface IProps {
-  userId: string;
   productId: number;
   optionValueId: number;
 }
@@ -15,11 +14,11 @@ export class PrLikesRepository implements LikesRepository {
     this.likeData = likeData;
   }
 
-  async insert(): Promise<number> {
-    const { optionValueId, productId, userId } = this.likeData ?? {};
+  async insert(userId: string): Promise<number> {
+    const { optionValueId, productId } = this.likeData ?? {};
 
     try {
-      const result = await prisma.like.create({
+      const result = await prisma.productLike.create({
         data: {
           userId: userId ?? '',
           optionValueId: optionValueId ?? 0,
@@ -35,7 +34,7 @@ export class PrLikesRepository implements LikesRepository {
 
   async delete(id: number): Promise<number> {
     try {
-      const result = await prisma.like.delete({
+      const result = await prisma.productLike.delete({
         where: {
           id: id,
         },
@@ -50,13 +49,11 @@ export class PrLikesRepository implements LikesRepository {
     }
   }
 
-  async findById(ids: number[]): Promise<Like[]> {
+  async findById(userId: string): Promise<Like[]> {
     try {
-      const result = await prisma.like.findMany({
+      const result = await prisma.productLike.findMany({
         where: {
-          id: {
-            in: ids,
-          },
+          userId: userId,
         },
       });
 

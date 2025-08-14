@@ -33,6 +33,12 @@
   &.active {
     background-color: $gray03;
     color: #fff;
+    font-weight: 600;
+  }
+
+  .filter_count {
+    color: $light-gray07;
+    margin-left: 2px;
   }
 }
 

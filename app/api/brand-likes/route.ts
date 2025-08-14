@@ -1,10 +1,10 @@
-import { CreateLikesUseCase } from '@/backend/likes/applications/usecases/CreateLikesUseCase';
-import { DeleteLikesUseCase } from '@/backend/likes/applications/usecases/DeleteLikesUseCase';
-import { GetLikesUseCase } from '@/backend/likes/applications/usecases/GetLikesUseCase';
-import { PrLikesRepository } from '@/backend/likes/repositories/PrLikesRepository';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { authOptions } from '../auth/[...nextauth]/auth';
+import { PrBrandLikesRepository } from '@/backend/brand-likes/repositories/PrBrandLikesRepository';
+import { CreateBrandLikesUseCase } from '@/backend/brand-likes/applications/usecases/CreateBrandLikesUseCase';
+import { DeleteBrandLikesUseCase } from '@/backend/brand-likes/applications/usecases/DeleteBrandLikesUseCase';
+import { GetBrandLikesUseCase } from '@/backend/brand-likes/applications/usecases/GetBrandLikesUseCase';
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -16,10 +16,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const likeRepository = new PrLikesRepository(body);
-    const likes = new CreateLikesUseCase(likeRepository).insert(session.user.id);
+    const brandLikesRepository = new PrBrandLikesRepository();
+    const brandLikes = new CreateBrandLikesUseCase(brandLikesRepository).insert(session.user.id, body.id);
 
-    return NextResponse.json({ result: likes, status: 200 });
+    return NextResponse.json({ result: brandLikes, status: 200 });
   } catch (err) {
     if (err instanceof Error) {
       return NextResponse.json({ message: err.message, status: 503 });
@@ -31,10 +31,10 @@ export async function DELETE(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const likeRepository = new PrLikesRepository(body);
-    const likes = new DeleteLikesUseCase(likeRepository).delete(body.id);
+    const brandLikesRepository = new PrBrandLikesRepository();
+    const brandLikes = new DeleteBrandLikesUseCase(brandLikesRepository).delete(body.id);
 
-    return NextResponse.json({ result: likes, status: 200 });
+    return NextResponse.json({ result: brandLikes, status: 200 });
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json({ message: error.message, status: 503 });
@@ -50,10 +50,10 @@ export async function GET() {
   }
 
   try {
-    const likeRepository = new PrLikesRepository();
-    const likes = await new GetLikesUseCase(likeRepository).findById(session.user.id);
+    const brandLikesRepository = new PrBrandLikesRepository();
+    const brandLikes = await new GetBrandLikesUseCase(brandLikesRepository).findById(session.user.id);
 
-    return NextResponse.json({ result: likes, status: 200 });
+    return NextResponse.json({ result: brandLikes, status: 200 });
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json({ message: error.message, status: 503 });

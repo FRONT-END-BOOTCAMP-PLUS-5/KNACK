@@ -1,17 +1,36 @@
 import { GetProductsResponseDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import SearchCsrWrapper from '@/components/search/SearchCsrWrapper';
 import SearchProductList from '@/components/search/SearchProductList';
+import { SortOption } from '@/types/searchProductList';
 
-export default async function Search({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | undefined }>;
-}) {
+export interface IQueryParams {
+  keyword?: string;
+  keywordColorId?: string;
+  brandId?: string;
+  categoryId?: string;
+  subCategoryId?: string;
+  priceMin?: string;
+  priceMax?: string;
+  discountMin?: string;
+  discountMax?: string;
+  size?: string;
+  benefit?: 'under_price';
+  gender?: string;
+  soldOutInvisible?: string;
+  sort?: SortOption;
+  cursor?: string;
+}
+
+interface IProps {
+  searchParams: Promise<IQueryParams>;
+}
+
+export default async function Search({ searchParams }: IProps) {
   const params = await searchParams;
   const basedUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   const url = new URL(`${basedUrl}/api/search`);
 
-  const queryParams = {
+  const queryParams: IQueryParams = {
     keyword: params.keyword,
     keywordColorId: params.keywordColorId,
     brandId: params.brandId,
@@ -26,7 +45,6 @@ export default async function Search({
     gender: params.gender,
     sort: params.sort,
     cursor: params.cursor,
-    limit: params.limit,
     soldOutInvisible: params.soldOutInvisible,
   };
 
@@ -41,7 +59,7 @@ export default async function Search({
 
   return (
     <main>
-      <SearchCsrWrapper />
+      <SearchCsrWrapper queryParams={queryParams} />
       <SearchProductList initialData={initialData} />
     </main>
   );

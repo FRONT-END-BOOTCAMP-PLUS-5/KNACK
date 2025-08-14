@@ -36,14 +36,14 @@ export class PrProductsRepository implements ProductSearchRepository {
         ];
       }
 
-      if (filters.brandId) {
-        whereConditions.brandId = filters.brandId;
+      if (filters.brandId && filters.brandId.length > 0) {
+        whereConditions.brandId = { in: filters.brandId };
       }
-      if (filters.categoryId) {
-        whereConditions.categoryId = filters.categoryId;
+      if (filters.categoryId && filters.categoryId.length > 0) {
+        whereConditions.categoryId = { in: filters.categoryId };
       }
-      if (filters.subCategoryId) {
-        whereConditions.subCategoryId = filters.subCategoryId;
+      if (filters.subCategoryId && filters.subCategoryId.length > 0) {
+        whereConditions.subCategoryId = { in: filters.subCategoryId };
       }
       if (filters.priceMin !== undefined || filters.priceMax !== undefined) {
         whereConditions.price = {};
@@ -67,8 +67,8 @@ export class PrProductsRepository implements ProductSearchRepository {
         whereConditions.discountPercent = { gt: 0 };
       }
 
-      if (filters.keywordColorId) {
-        whereConditions.keywordColorId = filters.keywordColorId;
+      if (filters.keywordColorId && filters.keywordColorId.length > 0) {
+        whereConditions.keywordColorId = { in: filters.keywordColorId };
       }
       if (filters.gender) {
         whereConditions.gender = filters.gender;
@@ -82,11 +82,11 @@ export class PrProductsRepository implements ProductSearchRepository {
           },
         };
       }
-      if (filters.size) {
+      if (filters.size && filters.size.length > 0) {
         whereConditions.productStockMapping = {
           some: {
             optionValue: {
-              name: filters.size,
+              name: { in: filters.size },
             },
           },
         };
@@ -142,7 +142,7 @@ export class PrProductsRepository implements ProductSearchRepository {
         _count: {
           select: {
             reviews: true,
-            likes: true,
+            productLike: true,
           },
         },
       },
@@ -183,7 +183,7 @@ export class PrProductsRepository implements ProductSearchRepository {
             ]
           : [],
         product._count.reviews,
-        product._count.likes,
+        product._count.productLike,
         isSoldOut
       );
     });
