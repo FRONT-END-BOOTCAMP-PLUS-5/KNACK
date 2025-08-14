@@ -1,0 +1,42 @@
+.container {
+  padding: 0 16px 80px;
+}
+
+.logo_image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: $black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.product_image {
+  width: 105px;
+  height: 105px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  background: $light-gray04;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.save_item {
+  border-bottom: 1px solid #ebebeb;
+  padding-bottom: 20px !important;
+}
+
+.book_mark_button {
+  background: none;
+  border: none;
+}
+
+.product_title {
+  width: 105px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
