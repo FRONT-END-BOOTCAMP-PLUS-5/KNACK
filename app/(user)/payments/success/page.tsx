@@ -48,6 +48,9 @@ export default function PaymentSuccess() {
     useEffect(() => {
         const stored = sessionStorage.getItem('paymentData');
         const coupon = sessionStorage.getItem('selectedCoupon');
+        const orderItems = sessionStorage.getItem('orderItems');
+        const address = sessionStorage.getItem('selectedAddress');
+
         if (stored) {
             const paymentData = JSON.parse(stored);
             setDiscountAmount(paymentData.couponDiscountAmount);
@@ -58,6 +61,14 @@ export default function PaymentSuccess() {
         if (coupon) {
             const parsed = JSON.parse(coupon);
             setSelectedCoupon(parsed);
+        }
+        if (orderItems) {
+            const parsed = JSON.parse(orderItems);
+            setOrderItems(parsed);
+        }
+        if (address) {
+            const parsed = JSON.parse(address);
+            setSelectedAddress(parsed);
         }
     }, [])
 
@@ -99,7 +110,7 @@ export default function PaymentSuccess() {
                     const paymentRes = await requester.post('/api/payments', {
                         tossPaymentKey,
                         orderId: tossOrderId,
-                        paymentAmount,
+                        amount: paymentAmount,
                         addressId: selectedAddress.id,
                         orderIds: createdOrderIds,
                         selectedCouponId: selectedCoupon?.id ?? null,

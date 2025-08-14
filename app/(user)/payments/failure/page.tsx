@@ -78,7 +78,7 @@ export default function PaymentFail() {
         }
 
         sendFailLog()
-    }, [orderId, code, message, .user, selectedAddress?.id, orderItems, deliveryFee])
+    }, [orderId, code, message, user, selectedAddress?.id, orderItems, deliveryFee])
 
     return (
         <div className={styles.fail}>

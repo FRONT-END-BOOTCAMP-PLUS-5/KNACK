@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
         if (data.method === 'CARD' && data.card) {
             const cardRepo = new PrCardRepository()
             const cardDto: CreateCardDto = {
-                paymentId: createdPayment.paymentNumber, // <-- 기존 paymentNumber 사용하던 부분 교체
+                paymentId: createdPayment.id, // <-- 기존 paymentNumber 사용하던 부분 교체
                 issuerCode: data.card.issuerCode,
                 acquirerCode: data.card.acquirerCode,
                 number: data.card.number,
