@@ -1,5 +1,5 @@
 import { IBrand } from './brand';
-import { ICategory } from './category';
+import { ICategory, ISubCategory } from './category';
 
 export interface IProduct {
   id: number;
@@ -55,4 +55,20 @@ export interface IProducts {
   colorKorName: string;
   colorEngName: string;
   productOptionMappings: IProductOptionMapping[];
+}
+
+export interface IRecentProduct {
+  id: number;
+  thumbnailImage?: string;
+  price: number | null;
+  hit: number | null;
+  engName: string;
+  korName: string;
+  brand: Pick<IBrand, 'id' | 'korName' | 'engName'>;
+  category: Pick<ICategory, 'id' | 'korName' | 'engName'>;
+  subCategory: Pick<ISubCategory, 'id' | 'engName' | 'korName' | 'categoryId'>;
+  _count: {
+    reviews: number;
+    productLike: number;
+  };
 }
