@@ -10,3 +10,10 @@ export interface ILikeList {
   optionValueId: number;
   createdAt?: Date | null;
 }
+
+export interface IBrandList {
+  id: number;
+  userId: string;
+  BrandId: number;
+  createdAt?: Date | null;
+}

@@ -20,11 +20,45 @@ const TABS = [
 ];
 
 const SavedPage = () => {
-  const { addLike, deleteLike, getLikes } = likeService;
+  const { addLike, deleteLike, getLikes, addBrandLike, deleteBrandLike, getBrandLikes } = likeService;
   const { getProductList } = productsService;
   const [selectTab, setSelectTab] = useState(0);
   const [productList, setProductList] = useState<IProducts[]>([]);
   const [likeList, setLikeList] = useState<ILikeList[]>([]);
+
+  const handleGetBrandLikes = useCallback(() => {
+    getBrandLikes()
+      .then((res) => {
+        console.log('res ', res);
+      })
+      .catch((error) => {
+        console.log('error', error.message);
+      });
+  }, [getBrandLikes]);
+
+  const handleAddBrandLike = useCallback(() => {
+    const brandId = 1;
+
+    addBrandLike(brandId)
+      .then((res) => {
+        console.log('res ', res);
+      })
+      .catch((error) => {
+        console.log('error', error.message);
+      });
+  }, [addBrandLike]);
+
+  const handleDeleteBrandLike = useCallback(() => {
+    const brandId = 6;
+
+    deleteBrandLike(brandId)
+      .then((res) => {
+        console.log('res ', res);
+      })
+      .catch((error) => {
+        console.log('error', error.message);
+      });
+  }, [deleteBrandLike]);
 
   const handleLikeAdd = useCallback(() => {
     const data = {
@@ -105,6 +139,9 @@ const SavedPage = () => {
   return (
     <section>
       <TabMenu tabs={TABS} selectedTab={selectTab} onTabSelect={setSelectTab} />
+      <button onClick={handleAddBrandLike}>브랜드 좋아요 추가 </button>
+      <button onClick={handleDeleteBrandLike}>브랜드 좋아요 삭제 </button>
+      <button onClick={handleGetBrandLikes}>브랜드 좋아요 가져오기 </button>
       <Flex paddingHorizontal={16} direction="column">
         {productList?.length > 0 &&
           productList?.map((item) => {
