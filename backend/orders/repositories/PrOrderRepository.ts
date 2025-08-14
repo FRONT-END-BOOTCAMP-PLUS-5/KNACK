@@ -1,8 +1,8 @@
 import { OrderRepository } from '@/backend/orders/domains/repositories/OrderRepository'
 import { CreateOrderEntityDto } from '@/backend/orders/applications/dtos/CreateOrderEntityDto'
 import prisma from '@/backend/utils/prisma'
-import { OrderItemDto } from '../applications/dtos/GetOrderItemDto'
 import { OrderDto } from '../applications/dtos/GetOrderDto'
+import { mapOrderRowToDto } from '@/utils/orders'
 
 export class PrOrderRepository implements OrderRepository {
 
@@ -61,23 +61,7 @@ export class PrOrderRepository implements OrderRepository {
         })
         if (!order) return null
 
-        const items: OrderItemDto[] = [{
-            id: order.id,
-            productId: order.productId,
-            name: order.product?.korName ?? order.product?.engName ?? '',
-            thumbnailUrl: order.product?.thumbnailImage ?? null,
-            unitPrice: Number(order.salePrice ?? order.price ?? 0),
-            count: order.count ?? 0,
-        }]
-
-        const dto: OrderDto = {
-            id: order.id,
-            userId: order.userId,
-            paymentId: order.paymentId ?? null,
-            addressId: order.payment?.addressId ?? 0,
-            createdAt: order.createdAt?.toISOString() ?? new Date().toISOString(),
-            items,
-        }
+        const dto = mapOrderRowToDto(order)
         return dto
     }
 }
