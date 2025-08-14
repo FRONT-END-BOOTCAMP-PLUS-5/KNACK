@@ -27,7 +27,6 @@ const SavedPage = () => {
   const handleGetBrandLikes = useCallback(() => {
     getBrandLikes()
       .then((res) => {
-        console.log('res ', res);
         if (res.status === 200) {
           setBrandLikeList(res.result);
         }
@@ -57,8 +56,9 @@ const SavedPage = () => {
     (id: number) => {
       deleteBrandLike(id)
         .then((res) => {
-          console.log('res ', res);
-          initLikeBrand();
+          if (res.status === 200) {
+            initLikeBrand();
+          }
         })
         .catch((error) => {
           console.log('error', error.message);
