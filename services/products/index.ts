@@ -3,11 +3,11 @@ import requester from '@/utils/requester';
 
 export const productsService = {
   getProduct: async (id: number) => {
-    const { result, error } = await requester.get<{ result: IProduct }>(`/api/products/${id}`).catch((error) => error);
+    const { data, error } = await requester.get<{ result: IProduct }>(`/api/products/${id}`).catch((error) => error);
 
     if (error) throw new Error(error.message);
 
-    return result;
+    return data.result;
   },
 
   getProductList: async (ids: string) => {

@@ -2,3 +2,9 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+
+.review_link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
