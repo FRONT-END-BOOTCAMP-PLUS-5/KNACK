@@ -1,5 +1,5 @@
 export interface CreateCardDto {
-  paymentId: bigint;
+  paymentId: number;
   issuerCode: string; // 카드 발급사
   acquirerCode: string; // 카드 매입사
   number: string; // 카드 BIN 또는 마스킹 카드번호

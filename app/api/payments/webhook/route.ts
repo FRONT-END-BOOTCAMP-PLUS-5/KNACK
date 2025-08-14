@@ -1,6 +1,6 @@
 // 📁 app/api/payments/webhook/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { KnackPaymentRepository } from '@/backend/payments/repositories/KnackPaymentRepository'
+import { PrPaymentRepository } from '@/backend/payments/repositories/PrPaymentRepository'
 
 export async function POST(req: NextRequest) {
     const body = await req.json()
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized webhook request' }, { status: 401 })
     }
 
-    const repository = new KnackPaymentRepository()
+    const repository = new PrPaymentRepository()
 
     // ✅ 상태 Enum 처리 분기
     switch (status) {

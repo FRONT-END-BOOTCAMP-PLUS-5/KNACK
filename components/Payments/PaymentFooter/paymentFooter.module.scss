@@ -1,35 +1,64 @@
+/* 하단 고정 바 */
 .payment_footer {
-    padding: 12px 16px;
-    z-index: 100;
-    background-color: #fff;
-    border-top: 1px solid #eee;
-
-    // 기본은 static (PC 등)
-    position: static;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
     width: 100%;
+    max-width: 440px;
+    padding: var(--paybar-vpad) 16px calc(var(--paybar-vpad) + env(safe-area-inset-bottom));
+    background: #fff;
+    border-top: 1px solid #eee;
+    box-shadow: 0 -6px 16px rgba(0, 0, 0, .06);
 
-    @media (max-width: 768px) {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
+    display: flex;
+    justify-content: center;
+    /* 가운데 정렬 */
+}
+
+.payment_footer__inner {
+    width: 100%;
+    max-width: 440px;
+    /* PC에서도 중앙 440px */
+}
+
+/* 결제 버튼 */
+.pay_btn {
+    width: 100%;
+    height: var(--paybar-btn-h);
+    background: #EF6253;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    border: 0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color .2s;
+
+    &:hover {
+        background: #e85545;
+    }
+
+    &:disabled {
+        background: #d3d3d3;
+        cursor: not-allowed;
     }
 }
 
-.pay_btn {
-    width: 100%;
-    padding: 14px;
-    background-color: #EF6253;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+/* ✅ 본문이 가려지지 않도록 “정확한” 바 높이만큼만 아래 여백 */
+.page {
+    padding-bottom: calc(var(--paybar-btn-h) + var(--paybar-vpad)*2 + env(safe-area-inset-bottom));
+}
 
-    &:disabled {
-        background-color: #d3d3d3;
-        cursor: not-allowed;
+/* env() 미지원 브라우저용 폴백(선택) */
+@supports not (padding: env(safe-area-inset-bottom)) {
+    .payment_footer {
+        padding-bottom: var(--paybar-vpad);
+    }
+
+    .page {
+        padding-bottom: calc(var(--paybar-btn-h) + var(--paybar-vpad)*2);
     }
 }

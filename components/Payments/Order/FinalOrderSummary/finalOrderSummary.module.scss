@@ -1,0 +1,102 @@
+$bg: #fff;
+$title: #222;
+$muted: #909090;
+$line: #f0f0f0;
+$divider: #f4f4f4;
+
+.summary_box {
+    background: $bg;
+    /* 상단/하단 회색 섹션과 자연스럽게 이어지도록 */
+    padding: 0 16px 12px;
+}
+
+.row_header {
+    font-size: 14px;
+    font-weight: 700;
+    color: $title;
+    padding: 12px 0 8px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+}
+
+.label {
+    font-size: 14px;
+    color: $muted;
+}
+
+.value {
+    font-size: 14px;
+    color: $title;
+    text-align: right;
+}
+
+.emph {
+    /* 구매가 금액만 굵게 */
+    font-weight: 700;
+}
+
+.muted {
+    /* 무료 표시 */
+    color: $muted;
+}
+
+.dash {
+    /* '-'일 때 그레이 */
+    color: $muted;
+}
+
+/* ? 동그라미 */
+.tooltip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+    border: 1px solid #d3d3d3;
+    border-radius: 50%;
+    font-size: 11px;
+    line-height: 16px;
+    color: #4e4e4e;
+}
+
+/* 굵은 회색 섹션 구분선(양옆 꽉) */
+.thick_divider {
+    height: 8px;
+    background: #f4f4f4;
+    /* 부모에 좌우 패딩이 16px이면 패딩을 상쇄해서 꽉 차 보이게 */
+    margin: 0 -16px;
+    /* 필요 없으면 이 줄 제거 */
+}
+
+/* 하단 총 결제금액 박스 */
+.total_bar {
+    border-top: 1px solid $line;
+    border-bottom: 1px solid $line;
+    display: flex;
+    background: #fafafa;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 12px 4px;
+    padding-bottom: 88px;
+}
+
+.total_label {
+    margin-bottom: 60px;
+    font-size: 16px;
+    color: $title;
+    font-weight: 500;
+}
+
+.total_price {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    font-size: 20px;
+    font-weight: 800;
+    color: $title;
+}

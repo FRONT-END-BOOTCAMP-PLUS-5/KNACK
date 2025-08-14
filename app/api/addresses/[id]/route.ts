@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { authOptions } from "../../auth/[...nextauth]/auth"
 import { z } from 'zod'
 import { UpdateAddressUseCase } from "@/backend/address/applications/usecases/UpdateAddressUseCase"
-import { KnackAddressRepository } from "@/backend/address/repositories/KnackAddressRepository"
+import { PrAddressRepository } from "@/backend/address/repositories/PrAddressRepository"
 import { DeleteAddressUseCase } from "@/backend/address/applications/usecases/DeleteAddressUseCase"
 
 export async function PATCH(req: Request | NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -13,7 +13,7 @@ export async function PATCH(req: Request | NextRequest, { params }: { params: Pr
             return NextResponse.json({ message: '로그인이 필요합니다.' }, { status: 401 })
         }
 
-        const repo = new KnackAddressRepository()
+        const repo = new PrAddressRepository()
         const resolvedParams = await params
         const id = parseInt(resolvedParams.id, 10)
 
@@ -62,7 +62,7 @@ export async function PUT(req: Request | NextRequest, { params }: { params: Prom
             )
         }
 
-        const repo = new KnackAddressRepository()
+        const repo = new PrAddressRepository()
         const useCase = new UpdateAddressUseCase(repo)
 
         const existing = await repo.getById(id)
@@ -95,7 +95,7 @@ export async function DELETE(
             return NextResponse.json({ message: '주소 ID가 유효하지 않습니다.' }, { status: 400 })
         }
 
-        const repo = new KnackAddressRepository()
+        const repo = new PrAddressRepository()
         const useCase = new DeleteAddressUseCase(repo)
 
         await useCase.execute(id, session.user.id)
