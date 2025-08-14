@@ -23,11 +23,12 @@ model User {
   addresses      Address[]
   carts          Cart[]
   couponMappings CouponMapping[]
-  likes          Like[]
+  productLike    ProductLike[]
   orders         Order[]
   payments       Payment[]
   reviews        Review[]
   userAuths      UserAuth[]
+  brandLike      BrandLike[]
 
   @@map("users")
 }
@@ -108,7 +109,7 @@ model Product {
 
   coupons                          Coupon[]
   inquires                         Inquiry[]
-  likes                            Like[]
+  productLike                      ProductLike[]
   orders                           Order[]
   productOptionMappings            ProductOptionMapping[]
   brand                            Brand                  @relation(fields: [brandId], references: [id])
@@ -220,7 +221,7 @@ model OptionValue {
   cart                Cart[]
   productStockMapping ProductStockMapping[]
   product             Product[]
-  like                Like[]
+  productLike         ProductLike[]
 
   @@map("option_values")
 }
@@ -242,7 +243,9 @@ model Brand {
   engName   String    @map("eng_name") @db.VarChar
   logoImage String    @map("logo_image") @db.VarChar
   isPrivate Boolean   @default(true) @map("is_private")
+
   products  Product[]
+  brandLike BrandLike[]
 
   @@map("brands")
 }
@@ -272,7 +275,7 @@ model SubCategory {
   @@map("sub_categories")
 }
 
-model Like {
+model ProductLike {
   id            Int            @id @default(autoincrement())
   userId        String         @map("user_id") @db.Uuid
   productId     Int            @map("product_id")
@@ -283,7 +286,20 @@ model Like {
   optionValue   OptionValue    @relation(fields: [optionValueId], references: [id])
 
 
-  @@map("likes")
+  @@map("product_likes")
+}
+
+model BrandLike {
+  id            Int            @id @default(autoincrement())
+  userId        String         @map("user_id") @db.Uuid
+  brandId       Int            @map("brand_id")
+  createdAt     DateTime?      @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user          User           @relation(fields: [userId], references: [id])
+  brand         Brand          @relation(fields: [brandId], references: [id])
+
+  @@map("brand_likes")
+
 }
 
 model Order {
