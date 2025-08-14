@@ -1,12 +1,10 @@
 // 📁 backend/infrastructure/db/PrismaPaymentRepository.ts
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/backend/utils/prisma'
 import { PaymentRepository } from '@/backend/payments/domains/repositories/PaymentRepository';
 import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto';
 import { GetPaymentDto } from '@/backend/payments/applications/dtos/GetPaymentDto';
 
-const prisma = new PrismaClient();
-
-export class KnackPaymentRepository implements PaymentRepository {
+export class PrPaymentRepository implements PaymentRepository {
 
     async save(payment: CreatePaymentDto): Promise<number | null> {
         console.log(payment)

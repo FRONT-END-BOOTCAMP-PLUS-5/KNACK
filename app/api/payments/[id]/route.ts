@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../auth/[...nextauth]/auth'
-import { KnackPaymentRepository } from '@/backend/payments/repositories/KnackPaymentRepository'
+import { PrPaymentRepository } from '@/backend/payments/repositories/PrPaymentRepository'
 import { GetPaymentOrdersUseCase } from '@/backend/payments/applications/usecases/GetPaymentUseCase'
 import { HttpError } from '@/backend/utils/errors'
 
@@ -21,7 +21,7 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
             return NextResponse.json({ error: 'invalid paymentId' }, { status: 400 })
         }
 
-        const usecase = new GetPaymentOrdersUseCase(new KnackPaymentRepository())
+        const usecase = new GetPaymentOrdersUseCase(new PrPaymentRepository())
         const dto = await usecase.byId(id, userId)
         if (!dto) return NextResponse.json({ error: 'not_found' }, { status: 404 })
 

@@ -1,13 +1,11 @@
 
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/backend/utils/prisma'
 import { AddressRepository } from '../domains/repositories/AddressRepository'
 import { CreateAddressDto } from '../applications/dtos/CreateAddressDto'
 import { UpdateAddressDto } from '../applications/dtos/UpdateAddressDto'
 import { AddressDto } from '../applications/dtos/AddressDto'
 
-const prisma = new PrismaClient()
-
-export class KnackAddressRepository implements AddressRepository {
+export class PrAddressRepository implements AddressRepository {
     async save(data: CreateAddressDto): Promise<AddressDto> {
         const existing = await this.findByUserId(data.userId)
         if (existing.length >= 3) {

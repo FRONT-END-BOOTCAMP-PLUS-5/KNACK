@@ -1,6 +1,6 @@
 // 📁 app/api/payments/fail/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { KnackPaymentRepository } from '@/backend/payments/repositories/KnackPaymentRepository'
+import { PrPaymentRepository } from '@/backend/payments/repositories/PrPaymentRepository'
 
 // 클라이언트 실패 리다이렉트에서 보낼 수 있는 최소 파라미터 기준
 export async function POST(req: NextRequest) {
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ ok: false, message: 'userId/addressId required' }, { status: 400 })
         }
 
-        const repo = new KnackPaymentRepository()
+        const repo = new PrPaymentRepository()
 
         await repo.createFailedPayment({
             params: {

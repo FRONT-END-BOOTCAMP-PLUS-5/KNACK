@@ -3,18 +3,18 @@ import { serverPost as tossPOST } from '@/backend/utils/serverRequester'
 import type { AxiosError } from 'axios'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth'
-import { KnackPaymentRepository } from '@/backend/payments/repositories/KnackPaymentRepository'
-import { KnackCardRepository } from '@/backend/payments/repositories/KnackCardRepository'
+import { PrPaymentRepository } from '@/backend/payments/repositories/PrPaymentRepository'
+import { PrCardRepository } from '@/backend/payments/repositories/PrCardRepository'
 import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto'
 import { CreateCardDto } from '@/backend/payments/applications/dtos/CreateCardDto'
 import { GetPaymentDto } from '@/backend/payments/applications/dtos/GetPaymentDto'
-import { KnackCouponRepository } from '@/backend/coupon/repositories/KnackCouponRepository'
-import { KnackUserPointsRepository } from '@/backend/points/repositories/KnackUserPointsRepository'
+import { PrCouponRepository } from '@/backend/coupon/repositories/PrCouponRepository'
+import { PrUserPointsRepository } from '@/backend/points/repositories/PrUserPointsRepository'
 
 export async function POST(req: NextRequest) {
-    const repo = new KnackPaymentRepository()
-    const couponRepo = new KnackCouponRepository()
-    const pointsRepo = new KnackUserPointsRepository()
+    const repo = new PrPaymentRepository()
+    const couponRepo = new PrCouponRepository()
+    const pointsRepo = new PrUserPointsRepository()
 
     try {
         const session = await getServerSession(authOptions)
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
             orderIds,
         }
 
-        const paymentRepo = new KnackPaymentRepository()
+        const paymentRepo = new PrPaymentRepository()
         await paymentRepo.save(paymentDto)
 
         // ✅ 방금 저장한 결제 다시 조회해서 sequence id 확보
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 
         // ✅ 카드 저장 시에도 paymentId(시퀀스) 사용
         if (data.method === 'CARD' && data.card) {
-            const cardRepo = new KnackCardRepository()
+            const cardRepo = new PrCardRepository()
             const cardDto: CreateCardDto = {
                 paymentId: createdPayment.paymentNumber, // <-- 기존 paymentNumber 사용하던 부분 교체
                 issuerCode: data.card.issuerCode,

@@ -5,11 +5,3 @@ export class InsufficientPointsError extends Error {
         this.name = 'InsufficientPointsError';
     }
 }
-
-export class DuplicateOperationError extends Error {
-    status = 409;
-    constructor(message = 'duplicate_operation') {
-        super(message);
-        this.name = 'DuplicateOperationError';
-    }
-}

@@ -14,7 +14,7 @@ import { IProduct } from '@/types/product'
 import AddressModal from '@/components/address/AddressModal'
 import { formatFullAddress } from '@/utils/openKakaoPostCode'
 import RequestModal from '@/components/address/RequestModal'
-import { AddressDtoWithPostalFields, Coupon, CheckoutRow, OrderItem, SelectedAddress } from '@/types/order'
+import { AddressDtoWithPostalFields, Coupon, CheckoutRow, OrderItem, SelectedAddress, BestCoupon } from '@/types/order'
 import CouponSelectModal from '@/components/Payments/CouponSelectModal'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
@@ -111,27 +111,6 @@ export default function CheckoutPage() {
         }
     }, [orderItems, selectedCoupon, deliveryType, applicableCoupons.length])
 
-    // ✅ 선택한 쿠폰이 적용 가능한지 별도로 판단
-    const isSelectedApplicable = useMemo(() => {
-        if (!selectedCoupon) return false
-        return orderItems.some(i => i.productId === selectedCoupon.productId)
-    }, [selectedCoupon, orderItems])
-
-    // 선택된 쿠폰의 할인액 프리뷰 (부모가 내려주면 그 값을 우선)
-    const previewCouponAmount = useMemo(() => {
-        if (!selectedCoupon || !isSelectedApplicable) return 0
-        const targetSum = orderItems
-            .filter(it => it.productId === selectedCoupon.productId)
-            .reduce((s, it) => s + it.price * it.quantity, 0)
-        return Math.max(0, Math.floor(targetSum * (selectedCoupon.salePercent / 100)))
-    }, [selectedCoupon, isSelectedApplicable, orderItems])
-
-    // ----- delivery controls -----
-    const onChangeDelivery = (type: 'FAST' | 'STOCK') => {
-        setDeliveryType(type)
-        setDeliveryFee(type === 'FAST' ? 5000 : 0)
-    }
-
     // ----- totals -----
     const priceWithoutDelivery = useMemo(
         () => orderItems.reduce((sum, it) => sum + it.price * it.quantity, 0),
@@ -183,16 +162,20 @@ export default function CheckoutPage() {
             await handleSaveRequestMessage()
 
             // ✅ 성공 페이지에서 보여주려면 세션에 저장
-            sessionStorage.setItem('couponAmount', String(couponAmount))
-            sessionStorage.setItem('pointAmount', String(points))
+            const paymentData = {
+                pointAmount: points,
+                couponDiscountAmount: pricing.couponDiscount,
+                shippingFee: pricing.shippingFee,
+                targetSumAfterCoupon: pricing.targetSumAfterCoupon,
+            };
+
+            // 문자열로 변환해서 저장
             if (selectedCoupon) {
                 sessionStorage.setItem('selectedCoupon', JSON.stringify(selectedCoupon));
             } else {
                 sessionStorage.removeItem('selectedCoupon'); // 빈 문자열보다 이게 안전
             }
-            sessionStorage.setItem('couponDiscountAmount', String(pricing.couponDiscount))
-            sessionStorage.setItem('shippingfee', String(pricing.shippingFee))
-            sessionStorage.setItem('targetSumAfterCoupon', String(pricing.targetSumAfterCoupon))
+            sessionStorage.setItem('paymentData', JSON.stringify(paymentData));
 
             const toss = await loadTossPayments(TOSS_CLIENT_KEY)
             console.log(toss);
@@ -256,42 +239,41 @@ export default function CheckoutPage() {
     }, [checkout])
 
     useEffect(() => {
-        if (orderItems.length === 0) return
-            ; (async () => {
-                try {
-                    // 쿠폰
-                    const data = await requester.get('/api/coupon')
-                    const fetched = data.data?.result || data.data || []
-                    console.log(fetched);
-                    setCoupons(fetched)
+        if (orderItems.length === 0) return;
 
-                    // “가장 할인 큰 쿠폰” 자동 선택
-                    if (fetched.length > 0) {
-                        let bestId: number | null = null
-                        let bestDiscount = -1
-                        for (const c of fetched) {
-                            const target = orderItems
-                                .filter(i => i.productId === c.productId)
-                                .reduce((s, i) => s + i.price * i.quantity, 0)
-                            const disc = Math.floor(target * (c.salePercent / 100))
-                            if (disc > bestDiscount) {
-                                bestDiscount = disc
-                                bestId = c.id
-                            }
-                        }
-                        setSelectedCouponId(bestId)
-                    } else {
-                        setSelectedCouponId(null)
-                    }
+        (async () => {
+            try {
+                // 쿠폰 조회
+                const { data: couponRes } = await requester.get('/api/coupon');
+                const fetched = couponRes?.result ?? couponRes ?? [];
+                setCoupons(fetched);
 
-                    // 포인트
-                    const { data: pData } = await requester.get('/api/points')
-                    setAvailablePoints(Number(pData?.availablePoints ?? 0))
-                } catch (e) {
-                    console.error('쿠폰/포인트 로드 실패', e)
-                }
-            })()
-    }, [orderItems])
+                // 1) productId별 주문 합계 사전 집계 (최적화)
+                const totalsByProductId = orderItems.reduce<Map<number, number>>((map, it) => {
+                    const sum = (map.get(it.productId) ?? 0) + it.price * it.quantity;
+                    map.set(it.productId, sum);
+                    return map;
+                }, new Map());
+
+                // 2) reduce로 최댓값 선택
+                const initialBest: BestCoupon = { id: null, discount: -1 };
+
+                const best = (fetched as Coupon[]).reduce<BestCoupon>((best: BestCoupon, c) => {
+                    const target = totalsByProductId.get(c.productId) ?? 0;
+                    const disc = Math.floor(target * (c.salePercent / 100));
+                    return disc > best.discount ? { id: c.id, discount: disc } : best;
+                }, initialBest);
+
+                setSelectedCouponId(best.id);
+
+                // 포인트 조회
+                const { data: pData } = await requester.get('/api/points');
+                setAvailablePoints(Number(pData?.availablePoints ?? 0));
+            } catch (e) {
+                console.error('쿠폰/포인트 로드 실패', e);
+            }
+        })();
+    }, [orderItems]);
 
     // ✅ 포인트 사용량 캡 (서버 값/합계 변경될 때 보정)
     useEffect(() => {

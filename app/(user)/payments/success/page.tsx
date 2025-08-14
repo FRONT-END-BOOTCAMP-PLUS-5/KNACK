@@ -4,18 +4,16 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import styles from './SuccessPage.module.scss'
 import requester from '@/utils/requester'
-import { useSession } from 'next-auth/react'
+import { useUserStore } from '@/store/userStore'
 import axios from 'axios'
 import { Coupon, OrderItem, RepresentativeProduct, SelectedAddress } from '@/types/order'
 import Image from 'next/image'
 import { STORAGE_PATHS } from '@/constraint/auth'
 
-
-
 export default function PaymentSuccess() {
     const params = useSearchParams()
     const router = useRouter()
-    const { data: session, status } = useSession()
+    const user = useUserStore(s => s.user)
 
     const [orderItems, setOrderItems] = useState<OrderItem[]>([])
     const [selectedAddress, setSelectedAddress] = useState<SelectedAddress | null>(null)
@@ -33,64 +31,33 @@ export default function PaymentSuccess() {
     // ✅ URL 파라미터를 원시값으로 고정
     const tossPaymentKey = useMemo(() => params.get('paymentKey') ?? '', [params])
     const tossOrderId = useMemo(() => params.get('orderId') ?? '', [params])
-    const amount = useMemo(() => {
-        const raw = params.get('amount')
-        const n = raw === null ? NaN : Number(raw)
-        return n
+    const paymentAmount = useMemo(() => {
+        const amountParam = params.get('amount')
+        const parsedAmount = amountParam === null ? NaN : Number(amountParam)
+        return parsedAmount
     }, [params])
 
     // 총액(파라미터), 구매가(subtotal), 수수료 계산
-    const totalAmount = useMemo(() => (Number.isFinite(amount) ? Number(amount) : 0), [amount])
+    const totalAmount = useMemo(() => (Number.isFinite(paymentAmount) ? Number(paymentAmount) : 0), [paymentAmount])
     const subtotal = useMemo(
         () => orderItems.reduce((s, it) => s + Number(it.price ?? 0) * Number(it.quantity ?? 0), 0),
         [orderItems]
     )
-    const fee = useMemo(() => Math.max(0, totalAmount - subtotal - shippingFee), [totalAmount, subtotal, shippingFee])
-
 
     // 1) sessionStorage에서 복구
     useEffect(() => {
-        try {
-            const rawItems = sessionStorage.getItem('orderItems')
-            if (rawItems) setOrderItems(JSON.parse(rawItems))
-        } catch (e) {
-            console.error('❌ orderItems 파싱 실패:', e)
+        const stored = sessionStorage.getItem('paymentData');
+        const coupon = sessionStorage.getItem('selectedCoupon');
+        if (stored) {
+            const paymentData = JSON.parse(stored);
+            setDiscountAmount(paymentData.couponDiscountAmount);
+            setShippingFee(paymentData.shippingFee);
+            setTargetSumAfterCoupon(paymentData.targetSumAfterCoupon);
+            setPointsToUse(paymentData.pointAmount);
         }
-        try {
-            const rawAddress = sessionStorage.getItem('selectedAddress')
-            if (rawAddress) setSelectedAddress(JSON.parse(rawAddress))
-        } catch (e) {
-            console.error('❌ selectedAddress 파싱 실패:', e)
-        }
-        try {
-            const rawCoupon = sessionStorage.getItem('selectedCoupon')
-            if (rawCoupon) setSelectedCoupon(JSON.parse(rawCoupon))
-        } catch (e) {
-            console.error('❌ selectedCouponId 파싱 실패:', e)
-        }
-        try {
-            const rawPoints = sessionStorage.getItem('pointAmount')
-            if (rawPoints) setPointsToUse(Number(rawPoints))
-        } catch (e) {
-            console.error('❌ pointAmount 파싱 실패:', e)
-        }
-        try {
-            const rawDiscount = sessionStorage.getItem('couponDiscountAmount')
-            if (rawDiscount) setDiscountAmount(Number(rawDiscount))
-        } catch (e) {
-            console.error('❌ couponDiscountAmount 파싱 실패:', e)
-        }
-        try {
-            const rawShipping = sessionStorage.getItem('shippingfee')
-            if (rawShipping) setShippingFee(Number(rawShipping))
-        } catch (e) {
-            console.error('❌ shippingfee 파싱 실패:', e)
-        }
-        try {
-            const rawTarget = sessionStorage.getItem('targetSumAfterCoupon')
-            if (rawTarget) setTargetSumAfterCoupon(Number(rawTarget))
-        } catch (e) {
-            console.error('❌ targetSumAfterCoupon 파싱 실패:', e)
+        if (coupon) {
+            const parsed = JSON.parse(coupon);
+            setSelectedCoupon(parsed);
         }
     }, [])
 
@@ -98,17 +65,11 @@ export default function PaymentSuccess() {
 
     // 2) 결제 및 주문 저장
     useEffect(() => {
-        console.debug('[guard] session.status=', status, 'user=', !!session?.user)
-        console.debug('[guard] selectedAddress.id=', selectedAddress?.id)
-        console.debug('[guard] orderItems.length=', orderItems.length)
-        console.debug('[guard] hasRun=', hasRun.current)
-        console.debug('[guard] paymentKey/orderId/amount=', tossPaymentKey, tossOrderId, amount)
-
-        if (status !== 'authenticated' || !session?.user) return
+        if (!user) return
         if (!selectedAddress?.id) return
         if (orderItems.length === 0) return
         if (hasRun.current) return
-        if (!tossPaymentKey || !tossOrderId || Number.isNaN(amount)) return
+        if (!tossPaymentKey || !tossOrderId || Number.isNaN(paymentAmount)) return
 
         const alreadyProcessed = sessionStorage.getItem('paymentProcessed') === 'true'
         if (alreadyProcessed) return
@@ -120,7 +81,7 @@ export default function PaymentSuccess() {
                 try {
                     console.log('➡️ 주문 저장 요청 /api/orders', { orderItems, addr: selectedAddress.id })
                     const orderRes = await requester.post('/api/orders', {
-                        userId: session.user.id,
+                        userId: user.id,
                         items: orderItems.map((item) => ({
                             productId: item.productId,
                             price: item.price,
@@ -138,7 +99,7 @@ export default function PaymentSuccess() {
                     const paymentRes = await requester.post('/api/payments', {
                         tossPaymentKey,
                         orderId: tossOrderId,
-                        amount,
+                        paymentAmount,
                         addressId: selectedAddress.id,
                         orderIds: createdOrderIds,
                         selectedCouponId: selectedCoupon?.id ?? null,
@@ -163,7 +124,7 @@ export default function PaymentSuccess() {
                     router.replace('/payments/failure')
                 }
             })()
-    }, [status, session, selectedAddress, orderItems, tossPaymentKey, tossOrderId, amount, router, pointsToUse, selectedCoupon?.id, targetSumAfterCoupon])
+    }, [selectedAddress, orderItems, tossPaymentKey, tossOrderId, paymentAmount, router, pointsToUse, selectedCoupon?.id, targetSumAfterCoupon, user])
 
     // 3) 대표상품 조회 (위에서 저장한 paymentId로 API 호출)
     useEffect(() => {

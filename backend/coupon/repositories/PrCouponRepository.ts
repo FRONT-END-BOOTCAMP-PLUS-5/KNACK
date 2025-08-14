@@ -1,10 +1,9 @@
-import { PrismaClient, Prisma } from '@prisma/client'
+import prisma from '@/backend/utils/prisma'
 import { CouponRepository } from '../domains/repositories/CouponRepository'
 import { Coupon, CouponMapping } from '../domains/entities/Coupon'
+import { Prisma } from '@prisma/client'
 
-const prisma = new PrismaClient()
-
-export class KnackCouponRepository implements CouponRepository {
+export class PrCouponRepository implements CouponRepository {
     async findByUserId(userId: string): Promise<(Coupon & { mapping: CouponMapping })[]> {
         const coupons = await prisma.coupon.findMany({
             where: {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { KnackCouponRepository } from '@/backend/coupon/repositories/KnackCouponRepository';
+import { PrCouponRepository } from '@/backend/coupon/repositories/PrCouponRepository';
 import { GetCouponByUserUseCase } from '@/backend/coupon/applications/usecases/GetCouponByUserUseCase';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/auth';
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
         const userId = session.user.id;
 
         // Initialize repository and use case
-        const couponRepository = new KnackCouponRepository();
+        const couponRepository = new PrCouponRepository();
         const getCouponUseCase = new GetCouponByUserUseCase(couponRepository);
         // Execute use case        
         const coupons = await getCouponUseCase.execute(userId);

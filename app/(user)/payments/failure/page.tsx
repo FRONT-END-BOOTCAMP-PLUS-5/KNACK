@@ -1,16 +1,15 @@
 // 📁 app/payments/failure/page.tsx
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { use, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import requester from '@/utils/requester'
 import styles from './FailPage.module.scss'
-import { useSession } from 'next-auth/react'
+import { useUserStore } from '@/store/userStore'
 import { OrderItem, SelectedAddress } from '@/types/order'
 
 export default function PaymentFail() {
     const sp = useSearchParams()
-    const { data: session } = useSession()
 
     const { orderId, code, message } = useMemo(
         () => ({
@@ -24,6 +23,7 @@ export default function PaymentFail() {
     const [orderItems, setOrderItems] = useState<OrderItem[]>([])
     const [selectedAddress, setSelectedAddress] = useState<SelectedAddress>(null)
     const [deliveryFee, setDeliveryFee] = useState<number>(0)
+    const user = useUserStore(s => s.user)
 
     // sessionStorage에서 복구
     useEffect(() => {
@@ -56,7 +56,7 @@ export default function PaymentFail() {
 
     useEffect(() => {
         const sendFailLog = async () => {
-            if (!session?.user || !selectedAddress?.id || hasRun.current) return
+            if (!user || !selectedAddress?.id || hasRun.current) return
             hasRun.current = true
 
             try {
@@ -68,7 +68,7 @@ export default function PaymentFail() {
                     failureCode: code,
                     failureMessage: message,
                     method: 'TOSS',
-                    userId: session.user.id,
+                    userId: user.id,
                     addressId: selectedAddress.id,
                     price: priceSum,
                 })
@@ -78,7 +78,7 @@ export default function PaymentFail() {
         }
 
         sendFailLog()
-    }, [orderId, code, message, session?.user, selectedAddress?.id, orderItems, deliveryFee])
+    }, [orderId, code, message, .user, selectedAddress?.id, orderItems, deliveryFee])
 
     return (
         <div className={styles.fail}>

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/auth';
 import { GetAvailablePointsUseCase } from '@/backend/points/applications/usecases/GetAvailablePointsUseCase';
-import { KnackUserPointsRepository } from '@/backend/points/repositories/KnackUserPointsRepository';
+import { PrUserPointsRepository } from '@/backend/points/repositories/PrUserPointsRepository';
 import { CreditPointsUseCase } from '@/backend/points/applications/usecases/CreditPointsUseCase';
 import { DebitPointsUseCase } from '@/backend/points/applications/usecases/DebitPointsUseCase';
 
@@ -17,7 +17,7 @@ export async function GET(_req: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const usecase = new GetAvailablePointsUseCase(new KnackUserPointsRepository());
+        const usecase = new GetAvailablePointsUseCase(new PrUserPointsRepository());
         const dto = await usecase.execute(userId);
 
         return NextResponse.json(dto, { status: 200 });
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'invalid_amount' }, { status: 400 });
         }
 
-        const repo = new KnackUserPointsRepository();
+        const repo = new PrUserPointsRepository();
 
         if (action === 'credit') {
             const usecase = new CreditPointsUseCase(repo);

@@ -1,12 +1,10 @@
 import { OrderRepository } from '@/backend/orders/domains/repositories/OrderRepository'
 import { CreateOrderEntityDto } from '@/backend/orders/applications/dtos/CreateOrderEntityDto'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/backend/utils/prisma'
 import { OrderItemDto } from '../applications/dtos/GetOrderItemDto'
 import { OrderDto } from '../applications/dtos/GetOrderDto'
 
-const prisma = new PrismaClient()
-
-export class KnackOrderRepository implements OrderRepository {
+export class PrOrderRepository implements OrderRepository {
 
     async saveMany(orders: CreateOrderEntityDto[]): Promise<number[]> {
         const created = await prisma.$transaction(

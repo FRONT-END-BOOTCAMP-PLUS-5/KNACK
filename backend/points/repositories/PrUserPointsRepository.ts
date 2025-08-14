@@ -11,7 +11,7 @@ class InsufficientPointsError extends Error {
     }
 }
 
-export class KnackUserPointsRepository implements UserPointsRepository {
+export class PrUserPointsRepository implements UserPointsRepository {
     async getAvailablePoints(userId: string): Promise<number> {
         const user = await prisma.user.findUnique({
             where: { id: userId },

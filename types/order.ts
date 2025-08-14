@@ -127,6 +127,8 @@ export type CouponSelectModalProps = {
     onSelectCoupon: (couponId: number | null) => void
 }
 
+export type BestCoupon = { id: number | null; discount: number };
+
 /* OrderSummaryCard: 로직 외부 계산/제어 */
 export type OrderSummaryCardProps = {
     orderItems: OrderItem[]
@@ -168,6 +170,10 @@ export type CouponInput = {
         isInterestFree?: boolean
     }
     selectedCouponId?: number | null
+}
+
+export type RouteContext = {
+    params: { id: string } // Promise 아님!
 }
 
 /* ---------- (백엔드 전용: 필요 시 위치 이동 권장) ---------- */

@@ -1,11 +1,9 @@
 // 📁 backend/infrastructure/db/PrismaCardRepository.ts
-import { PrismaClient } from '@prisma/client'
 import { CardRepository } from '@/backend/payments/domains/repositories/CardRepository'
 import { CreateCardDto } from '@/backend/payments/applications/dtos/CreateCardDto'
+import prisma from '@/backend/utils/prisma'
 
-const prisma = new PrismaClient()
-
-export class KnackCardRepository implements CardRepository {
+export class PrCardRepository implements CardRepository {
     async save(card: CreateCardDto): Promise<void> {
         // await prisma.card.create({
         //     data: {
