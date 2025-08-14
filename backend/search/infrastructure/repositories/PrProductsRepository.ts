@@ -140,7 +140,7 @@ export class PrProductsRepository implements ProductSearchRepository {
         _count: {
           select: {
             reviews: true,
-            likes: true,
+            productLike: true,
           },
         },
       },
@@ -181,7 +181,7 @@ export class PrProductsRepository implements ProductSearchRepository {
             ]
           : [],
         product._count.reviews,
-        product._count.likes,
+        product._count.productLike,
         isSoldOut
       );
     });
