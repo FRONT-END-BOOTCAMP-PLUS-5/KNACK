@@ -30,6 +30,7 @@ interface IProps {
 export default function SearchBottomSheet({ select, handleSelect, filterQuery }: IProps) {
   const [selectedFilter, setSelectedFilter] = useState<ISearchProductListRequest>({});
   const [categories, setCategories] = useState<IPageCategory[]>([]);
+
   const { getCategories } = categoryService;
 
   const tabs = useMemo(() => {
@@ -41,10 +42,12 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
   }, [selectedFilter]);
 
   useEffect(() => {
+    // 초기 데이터 저장
     if (!filterQuery) return;
     setSelectedFilter(filterQuery);
   }, [filterQuery]);
 
+  // 카테고리 데이터 호출 로직
   const initCategories = useCallback(async () => {
     await getCategories().then((res) => {
       setCategories(res);
@@ -52,9 +55,11 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
   }, [getCategories]);
 
   useEffect(() => {
+    // 카테고리 데이터 호출
     initCategories();
   }, [initCategories]);
 
+  // 서브카테고리 클릭 핸들러
   const onClickSubCategorySelect = (subCategoryId: number) => {
     const currentSubCategoryIds = selectedFilter.subCategoryId || [];
     const isSelected = currentSubCategoryIds.includes(subCategoryId);
