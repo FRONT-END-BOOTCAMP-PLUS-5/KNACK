@@ -15,18 +15,64 @@ import SearchCategory from './SearchCategory';
 import SearchGender from './SearchGender';
 import SearchBrand from './SearchBrand';
 import SearchSize from './SearchSize';
+import { ISearchProductListRequest } from '@/types/searchProductList';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { categoryService } from '@/services/category';
+import { IPageCategory } from '@/types/category';
+import { getFilterCountById } from '@/utils/search/searchBottomSheetTab';
 
 interface IProps {
   select: number;
   handleSelect: (id: number, isOpen: boolean) => void;
+  filterQuery: ISearchProductListRequest;
 }
 
-export default function SearchBottomSheet({ select, handleSelect }: IProps) {
-  const tabs = PRODUCT_FILTER.map((item) => ({
-    id: item.id,
-    name: item.name,
-    badge: 1, //TODO: url로 계산하는 로직 필요
-  }));
+export default function SearchBottomSheet({ select, handleSelect, filterQuery }: IProps) {
+  const [selectedFilter, setSelectedFilter] = useState<ISearchProductListRequest>({});
+  const [categories, setCategories] = useState<IPageCategory[]>([]);
+  const { getCategories } = categoryService;
+
+  const tabs = useMemo(() => {
+    return PRODUCT_FILTER.map((item) => ({
+      id: item.id,
+      name: item.name,
+      badge: getFilterCountById(selectedFilter, item.id),
+    }));
+  }, [selectedFilter]);
+
+  useEffect(() => {
+    if (!filterQuery) return;
+    setSelectedFilter(filterQuery);
+  }, [filterQuery]);
+
+  const initCategories = useCallback(async () => {
+    await getCategories().then((res) => {
+      setCategories(res);
+    });
+  }, [getCategories]);
+
+  useEffect(() => {
+    initCategories();
+  }, [initCategories]);
+
+  const onClickSubCategorySelect = (subCategoryId: number) => {
+    const currentSubCategoryIds = selectedFilter.subCategoryId || [];
+    const isSelected = currentSubCategoryIds.includes(subCategoryId);
+
+    let newSubCategoryIds: number[];
+    if (isSelected) {
+      newSubCategoryIds = currentSubCategoryIds.filter((id) => id !== subCategoryId);
+    } else {
+      newSubCategoryIds = [...currentSubCategoryIds, subCategoryId];
+    }
+
+    const newSelectedFilter = {
+      ...selectedFilter,
+      subCategoryId: newSubCategoryIds.length > 0 ? newSubCategoryIds : undefined,
+    };
+
+    setSelectedFilter(newSelectedFilter);
+  };
 
   return (
     <BottomSheet style={{ padding: 0, position: 'relative' }} title="필터" isCloseButton={false}>
@@ -41,7 +87,13 @@ export default function SearchBottomSheet({ select, handleSelect }: IProps) {
       </div>
 
       <div className={`${styles.bottom_sheet_content} ${styles.contents_container}`}>
-        {select === 1 && <SearchCategory />}
+        {select === 1 && (
+          <SearchCategory
+            selectedFilter={selectedFilter}
+            categories={categories}
+            onClickSubCategorySelect={onClickSubCategorySelect}
+          />
+        )}
         {select === 2 && <SearchGender />}
         {select === 3 && <SearchColor />}
         {select === 4 && <SearchDiscount />}
@@ -54,8 +106,8 @@ export default function SearchBottomSheet({ select, handleSelect }: IProps) {
         <Divider height={1} />
         <Flex justify="between" align="center" className={styles.bottom_sheet_bottom_selected_filter}>
           <Flex align="center" gap={2}>
-            <Text size={1.3} weight={600} color="gray4">
-              선택필터
+            <Text size={1.3} weight={600} color="gray4" key={'item.id'}>
+              {'item.name'}
             </Text>
             <span>
               <Image src={searchClose} alt="close" width={16} height={16} style={{ opacity: 0.5 }} />
