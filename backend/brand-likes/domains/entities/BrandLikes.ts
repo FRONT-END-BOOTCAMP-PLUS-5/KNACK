@@ -1,6 +1,20 @@
 export interface BrandLike {
   id: number;
-  userId: string;
-  BrandId?: number;
-  createdAt?: Date | null;
+  brand: Brand;
+}
+
+interface Brand {
+  engName: string;
+  korName: string;
+  logoImage: string;
+  id: number;
+  products: Product[];
+}
+
+interface Product {
+  korName: string;
+  engName: string;
+  id: number;
+  thumbnailImage: string;
+  price: number | null;
 }

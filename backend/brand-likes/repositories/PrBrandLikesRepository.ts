@@ -42,6 +42,26 @@ export class PrBrandLikesRepository implements BrandLikesRepository {
         where: {
           userId: userId,
         },
+        select: {
+          id: true,
+          brand: {
+            select: {
+              engName: true,
+              korName: true,
+              logoImage: true,
+              id: true,
+              products: {
+                select: {
+                  korName: true,
+                  engName: true,
+                  thumbnailImage: true,
+                  id: true,
+                  price: true,
+                },
+              },
+            },
+          },
+        },
       });
 
       return result;
