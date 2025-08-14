@@ -7,7 +7,7 @@ import Image from 'next/image';
 import arrowDown from '@/public/icons/arrow_down.svg';
 import { PRODUCT_FILTER } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
-import { calcFilterValueLength, isActiveFilter } from '@/utils/searchFilter';
+import { calcFilterValueLength, isActiveFilter } from '@/utils/search/searchFilter';
 
 interface IProps {
   filterQuery: ISearchProductListRequest;

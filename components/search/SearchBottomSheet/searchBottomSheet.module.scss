@@ -48,6 +48,17 @@
   margin-top: 14px;
 }
 
+// 카테고리 필터
+.search_category_item {
+  padding: 16px 0;
+
+  .active {
+    background-color: $black;
+    color: $white;
+    font-weight: 700;
+  }
+}
+
 // 성별 필터
 .search_gender {
   margin-bottom: 12px;

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/backend/utils/prisma';
 import { ProductSearchRepository } from '@/backend/search/domains/repositories/ProductSearchRepository';
 import { Product, Brand, Category, SubCategory } from '@/backend/search/domains/entities/Product';
 import {
@@ -11,8 +11,6 @@ import {
 } from '@/backend/search/domains/entities/ProductFilters';
 
 export class PrProductsRepository implements ProductSearchRepository {
-  constructor(private prisma: PrismaClient) {}
-
   async getProducts(params: {
     filters?: ProductFilters;
     sort?: SortOption;
@@ -125,7 +123,7 @@ export class PrProductsRepository implements ProductSearchRepository {
     }
 
     // 상품 조회
-    const products = await this.prisma.product.findMany({
+    const products = await prisma.product.findMany({
       where: {
         ...whereConditions,
         ...cursorCondition,
@@ -189,7 +187,7 @@ export class PrProductsRepository implements ProductSearchRepository {
     });
 
     // 페이지네이션 정보 계산
-    const totalCount = await this.prisma.product.count({ where: whereConditions });
+    const totalCount = await prisma.product.count({ where: whereConditions });
     const page = Math.floor(offset / limit) + 1;
 
     const pageInfo: PageInfo = new PageInfo(
