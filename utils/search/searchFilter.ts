@@ -9,13 +9,13 @@ export const isActiveFilter = (optionValue: string, filterQuery: ISearchProductL
     case 'keywordColorId':
       return !!(filterQuery.keywordColorId && filterQuery.keywordColorId.length > 0);
     case 'discount':
-      return !!(filterQuery.discountMin || filterQuery.discountMax);
+      return !!filterQuery.discount;
     case 'brandId':
       return !!(filterQuery.brandId && filterQuery.brandId.length > 0);
     case 'size':
       return !!(filterQuery.size && filterQuery.size.length > 0);
     case 'price':
-      return !!(filterQuery.priceMin || filterQuery.priceMax);
+      return !!filterQuery.price;
     default:
       return false;
   }
@@ -30,17 +30,13 @@ export const calcFilterValueLength = (optionValue: string, filterQuery: ISearchP
     case 'keywordColorId':
       return filterQuery.keywordColorId?.length || 0;
     case 'discount':
-      const discountMin = filterQuery.discountMin;
-      const discountMax = filterQuery.discountMax;
-      return discountMin || discountMax ? 1 : 0;
+      return filterQuery.discount ? 1 : 0;
     case 'brandId':
       return filterQuery.brandId?.length || 0;
     case 'size':
       return filterQuery.size?.length || 0;
     case 'price':
-      const priceMin = filterQuery.priceMin;
-      const priceMax = filterQuery.priceMax;
-      return priceMin || priceMax ? 1 : 0;
+      return filterQuery.price ? 1 : 0;
     default:
       return 0;
   }

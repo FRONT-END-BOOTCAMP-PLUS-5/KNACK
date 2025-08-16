@@ -1,6 +1,7 @@
 import { ProductSearchRepository } from '@/backend/search/domains/repositories/ProductSearchRepository';
 import { GetProductsRequestDto, GetProductsResponseDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import { ProductFilters, PaginationParams } from '@/backend/search/domains/entities/ProductFilters';
+import { PriceParser } from '@/backend/utils/search/priceParcer';
 
 export class GetProductsUseCase {
   constructor(private productSearchRepository: ProductSearchRepository) {}
@@ -18,10 +19,10 @@ export class GetProductsUseCase {
       brandId: request.brandId,
       categoryId: request.categoryId,
       subCategoryId: request.subCategoryId,
-      priceMin: request.priceMin,
-      priceMax: request.priceMax,
-      discountMin: request.discountMin,
-      discountMax: request.discountMax,
+      priceMin: PriceParser.parse(request.price).min,
+      priceMax: PriceParser.parse(request.price).max,
+      discountMin: PriceParser.parse(request.discount).min,
+      discountMax: PriceParser.parse(request.discount).max,
       size: request.size,
       benefit: request.benefit,
       gender: request.gender,

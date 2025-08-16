@@ -30,10 +30,8 @@ export default function SearchCsrWrapper({ queryParams }: IProps) {
     }
     if (queryParams.cursor) convertedQuery.cursor = queryParams.cursor;
     if (queryParams.soldOutInvisible) convertedQuery.soldOutInvisible = queryParams.soldOutInvisible === 'true';
-    if (queryParams.priceMin) convertedQuery.priceMin = parseInt(queryParams.priceMin);
-    if (queryParams.priceMax) convertedQuery.priceMax = parseInt(queryParams.priceMax);
-    if (queryParams.discountMin) convertedQuery.discountMin = parseInt(queryParams.discountMin);
-    if (queryParams.discountMax) convertedQuery.discountMax = parseInt(queryParams.discountMax);
+    if (queryParams.price) convertedQuery.price = queryParams.price;
+    if (queryParams.discount) convertedQuery.discount = queryParams.discount;
 
     if (queryParams.keywordColorId) {
       convertedQuery.keywordColorId = queryParams.keywordColorId.split(',').map((id) => parseInt(id));
