@@ -5,14 +5,16 @@ import check from '@/public/icons/check.svg';
 import { IBrandWithTagList } from '@/types/brand';
 import { ISearchProductListRequest } from '@/types/searchProductList';
 import { Fragment } from 'react';
+import Text from '@/components/common/Text';
 
 interface IProps {
   selectedFilter: ISearchProductListRequest;
   brands: IBrandWithTagList[];
   onClickBrandSelect: (brandId: number) => void;
+  onChangeBrandList: (value: string) => void;
 }
 
-export default function SearchBrand({ selectedFilter, brands, onClickBrandSelect }: IProps) {
+export default function SearchBrand({ selectedFilter, brands, onClickBrandSelect, onChangeBrandList }: IProps) {
   const isBrandSelected = (listBrandId: number): boolean => {
     return selectedFilter.brandId?.includes(listBrandId) || false;
   };
@@ -26,9 +28,9 @@ export default function SearchBrand({ selectedFilter, brands, onClickBrandSelect
   return (
     <div className={styles.search_brand}>
       <div className={styles.search_brand_input_wrap}>
-        <BasicInput placeholder="브랜드를 검색하세요" />
+        <BasicInput placeholder="브랜드를 검색하세요" onChange={onChangeBrandList} />
       </div>
-      {brands &&
+      {brands.length > 0 &&
         brands.map((brand) => {
           return (
             <Fragment key={brand.tag}>
@@ -50,6 +52,11 @@ export default function SearchBrand({ selectedFilter, brands, onClickBrandSelect
             </Fragment>
           );
         })}
+      {brands.length === 0 && (
+        <Text size={1.3} color="gray1" weight={400} paddingTop={100} paddingBottom={100} textAlign="center">
+          검색된 브랜드가 없습니다.
+        </Text>
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import requester from '@/utils/requester';
 
 export const brandService = {
-  getBrands: async (keyword?: string, key?: string) => {
+  getBrands: async ({ keyword, key }: { keyword?: string; key?: string } = {}) => {
     const params = new URLSearchParams();
 
     if (keyword) params.append('keyword', keyword);
