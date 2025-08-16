@@ -11,6 +11,8 @@ export class GetOptionUseCase {
   async execute(): Promise<Option[]> {
     const result = await this.repository.getOptions();
 
-    return result;
+    const filteredOptions = result.filter((option) => option.name !== '색상');
+
+    return filteredOptions;
   }
 }

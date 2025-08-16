@@ -22,6 +22,8 @@ import { IPageCategory } from '@/types/category';
 import { getFilterCountById } from '@/utils/search/searchBottomSheetTab';
 import { brandService } from '@/services/brand';
 import { IBrandWithTagList } from '@/types/brand';
+import { optionsService } from '@/services/options';
+import { IOption } from '@/types/option';
 
 interface IProps {
   select: number;
@@ -33,10 +35,12 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
   const [selectedFilter, setSelectedFilter] = useState<ISearchProductListRequest>({});
   const [categories, setCategories] = useState<IPageCategory[]>([]);
   const [brands, setBrands] = useState<IBrandWithTagList[]>([]);
+  const [sizes, setSizes] = useState<IOption[]>([]);
   // TODO: 조회 안하고 바텀시트 닫으면 filterQuery로 selectedFilter 초기화 해야함
 
   const { getCategories } = categoryService;
   const { getBrands } = brandService;
+  const { getOptions } = optionsService;
 
   const tabs = useMemo(() => {
     return PRODUCT_FILTER.map((item) => ({
@@ -71,6 +75,13 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
     [getBrands]
   );
 
+  // 사이즈 데이터 호출 로직
+  const initSizes = useCallback(async () => {
+    await getOptions().then((res) => {
+      setSizes(res);
+    });
+  }, [getOptions]);
+
   useEffect(() => {
     // 카테고리 데이터 호출
     initCategories();
@@ -80,6 +91,11 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
     // 브랜드 데이터 호출
     initBrands();
   }, [initBrands]);
+
+  useEffect(() => {
+    // 사이즈 데이터 호출
+    initSizes();
+  }, [initSizes]);
 
   // 서브카테고리 클릭 핸들러
   const onClickSubCategorySelect = (subCategoryId: number) => {
@@ -164,6 +180,16 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
     }
   };
 
+  // 사이즈 클릭 핸들러
+  const onClickSizeSelect = (size: string) => {
+    const currentSize = selectedFilter.size || [];
+    if (currentSize.includes(size)) {
+      setSelectedFilter({ ...selectedFilter, size: currentSize.filter((initSize) => initSize !== size) });
+    } else {
+      setSelectedFilter({ ...selectedFilter, size: [...currentSize, size] });
+    }
+  };
+
   return (
     <BottomSheet style={{ padding: 0, position: 'relative' }} title="필터" isCloseButton={false}>
       <div className={styles.bottom_sheet_header}>
@@ -197,7 +223,9 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
             onChangeBrandList={onChangeBrandList}
           />
         )}
-        {select === 6 && <SearchSize />}
+        {select === 6 && (
+          <SearchSize selectedFilter={selectedFilter} sizes={sizes} onClickSizeSelect={onClickSizeSelect} />
+        )}
         {select === 7 && <SearchPrice />}
       </div>
 
