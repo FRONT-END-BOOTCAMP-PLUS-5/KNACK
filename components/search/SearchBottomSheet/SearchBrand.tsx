@@ -19,12 +19,6 @@ export default function SearchBrand({ selectedFilter, brands, onClickBrandSelect
     return selectedFilter.brandId?.includes(listBrandId) || false;
   };
 
-  const handleBrandClick = (brandId: number) => {
-    if (onClickBrandSelect) {
-      onClickBrandSelect(brandId);
-    }
-  };
-
   return (
     <div className={styles.search_brand}>
       <div className={styles.search_brand_input_wrap}>
@@ -41,7 +35,7 @@ export default function SearchBrand({ selectedFilter, brands, onClickBrandSelect
                     <li
                       className={styles.search_brand_list_item}
                       key={brand.id}
-                      onClick={() => handleBrandClick(brand.id)}
+                      onClick={() => onClickBrandSelect(brand.id)}
                     >
                       <span>{brand.engName}</span>
                       {isBrandSelected(brand.id) && <Image src={check} alt="check" width={14} height={1} />}
