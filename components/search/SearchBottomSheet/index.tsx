@@ -1,7 +1,7 @@
 'use client';
 import styles from './searchBottomSheet.module.scss';
 import BottomSheet from '@/components/common/BottomSheet';
-import { PRODUCT_FILTER } from '@/constraint/product';
+import { DiscountValue, PRODUCT_FILTER } from '@/constraint/product';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
 import TabMenu from '@/components/common/TabMenu';
@@ -33,6 +33,7 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
   const [selectedFilter, setSelectedFilter] = useState<ISearchProductListRequest>({});
   const [categories, setCategories] = useState<IPageCategory[]>([]);
   const [brands, setBrands] = useState<IBrandWithTagList[]>([]);
+  // TODO: 조회 안하고 바텀시트 닫으면 filterQuery로 selectedFilter 초기화 해야함
 
   const { getCategories } = categoryService;
   const { getBrands } = brandService;
@@ -124,6 +125,16 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
     initBrands(value);
   };
 
+  // 성별 클릭 핸들러
+  const onClickGenderSelect = (gender: 'm' | 'f' | 'all') => {
+    const currentGender = selectedFilter.gender;
+    if (currentGender === gender) {
+      setSelectedFilter({ ...selectedFilter, gender: undefined });
+    } else {
+      setSelectedFilter({ ...selectedFilter, gender: gender });
+    }
+  };
+
   return (
     <BottomSheet style={{ padding: 0, position: 'relative' }} title="필터" isCloseButton={false}>
       <div className={styles.bottom_sheet_header}>
@@ -144,7 +155,7 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
             onClickSubCategorySelect={onClickSubCategorySelect}
           />
         )}
-        {select === 2 && <SearchGender />}
+        {select === 2 && <SearchGender selectedFilter={selectedFilter} onClickGenderSelect={onClickGenderSelect} />}
         {select === 3 && <SearchColor />}
         {select === 4 && <SearchDiscount />}
         {select === 5 && (
