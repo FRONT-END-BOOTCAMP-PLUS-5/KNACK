@@ -135,6 +135,26 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
     }
   };
 
+  // 색상 클릭 핸들러
+  const onClickColorSelect = (colorId: number) => {
+    const currentColorIds = selectedFilter.keywordColorId || [];
+    const isSelected = currentColorIds.includes(colorId);
+
+    let newColorIds: number[];
+    if (isSelected) {
+      newColorIds = currentColorIds.filter((id) => id !== colorId);
+    } else {
+      newColorIds = [...currentColorIds, colorId];
+    }
+
+    const newSelectedFilter = {
+      ...selectedFilter,
+      keywordColorId: newColorIds.length > 0 ? newColorIds : undefined,
+    };
+
+    setSelectedFilter(newSelectedFilter);
+  };
+
   return (
     <BottomSheet style={{ padding: 0, position: 'relative' }} title="필터" isCloseButton={false}>
       <div className={styles.bottom_sheet_header}>
@@ -156,7 +176,7 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
           />
         )}
         {select === 2 && <SearchGender selectedFilter={selectedFilter} onClickGenderSelect={onClickGenderSelect} />}
-        {select === 3 && <SearchColor />}
+        {select === 3 && <SearchColor selectedFilter={selectedFilter} onClickColorSelect={onClickColorSelect} />}
         {select === 4 && <SearchDiscount />}
         {select === 5 && (
           <SearchBrand
