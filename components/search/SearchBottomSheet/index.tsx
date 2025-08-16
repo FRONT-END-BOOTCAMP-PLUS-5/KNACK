@@ -155,6 +155,15 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
     setSelectedFilter(newSelectedFilter);
   };
 
+  // 할인율 클릭 핸들러
+  const onClickDiscountSelect = (discountValue: DiscountValue) => {
+    if (selectedFilter.discount === discountValue) {
+      setSelectedFilter({ ...selectedFilter, discount: undefined });
+    } else {
+      setSelectedFilter({ ...selectedFilter, discount: discountValue });
+    }
+  };
+
   return (
     <BottomSheet style={{ padding: 0, position: 'relative' }} title="필터" isCloseButton={false}>
       <div className={styles.bottom_sheet_header}>
@@ -177,7 +186,9 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
         )}
         {select === 2 && <SearchGender selectedFilter={selectedFilter} onClickGenderSelect={onClickGenderSelect} />}
         {select === 3 && <SearchColor selectedFilter={selectedFilter} onClickColorSelect={onClickColorSelect} />}
-        {select === 4 && <SearchDiscount />}
+        {select === 4 && (
+          <SearchDiscount selectedFilter={selectedFilter} onClickDiscountSelect={onClickDiscountSelect} />
+        )}
         {select === 5 && (
           <SearchBrand
             selectedFilter={selectedFilter}
