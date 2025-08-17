@@ -9,7 +9,7 @@ export interface IQueryParams {
   price?: string;
   discount?: string;
   size?: string;
-  benefit?: 'under_price';
+  benefit?: boolean;
   gender?: string;
   soldOutInvisible?: string;
   sort?: SortOption;
@@ -21,7 +21,7 @@ const objectToQueryString = (obj: ISearchProductListRequest): string => {
 
   if (obj.keyword) params.set('keyword', obj.keyword);
   if (obj.gender) params.set('gender', obj.gender);
-  if (obj.benefit) params.set('benefit', obj.benefit);
+  if (obj.benefit) params.set('benefit', obj.benefit.toString());
   if (obj.sort) params.set('sort', obj.sort);
   if (obj.cursor) params.set('cursor', obj.cursor);
   if (obj.price) params.set('price', obj.price);
