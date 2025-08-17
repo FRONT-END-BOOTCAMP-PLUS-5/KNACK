@@ -16,8 +16,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const likeRepository = new PrLikesRepository(body);
-    const likes = new CreateLikesUseCase(likeRepository).insert(session.user.id);
+    const likeRepository = new PrLikesRepository();
+    const likes = new CreateLikesUseCase(likeRepository).insert(session.user.id, body.productId);
 
     return NextResponse.json({ result: likes, status: 200 });
   } catch (err) {
@@ -31,7 +31,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const likeRepository = new PrLikesRepository(body);
+    const likeRepository = new PrLikesRepository();
     const likes = new DeleteLikesUseCase(likeRepository).delete(body.id);
 
     return NextResponse.json({ result: likes, status: 200 });
