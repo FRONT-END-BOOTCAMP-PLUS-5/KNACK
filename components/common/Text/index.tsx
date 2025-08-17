@@ -32,6 +32,7 @@ interface IProps {
   paddingBottom?: number;
   paddingLeft?: number;
   paddingRight?: number;
+  textAlign?: 'left' | 'center' | 'right';
 }
 
 const Text = ({
@@ -50,6 +51,7 @@ const Text = ({
   paddingBottom = 0,
   paddingLeft = 0,
   paddingRight = 0,
+  textAlign = 'left',
 }: IProps) => {
   const Tag = tag;
 
@@ -69,6 +71,7 @@ const Text = ({
         paddingLeft: paddingLeft,
         paddingRight: paddingRight,
         lineHeight: lineHeight,
+        textAlign: textAlign,
       }}
     >
       {children}
