@@ -2,7 +2,7 @@ import Text from '@/components/common/Text';
 import styles from './searchBottomSheet.module.scss';
 import Flex from '@/components/common/Flex';
 import Slider from '@mui/material/Slider';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import TagButton from '@/components/common/TagButton';
 import { PRODUCT_FILTER_PRICE } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
