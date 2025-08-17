@@ -13,7 +13,7 @@ interface IProps {
 }
 
 export default function SearchCsrWrapper({ queryParams }: IProps) {
-  const [select, setSelect] = useState(0);
+  const [activeTabId, setActiveTabId] = useState(0);
   const [filterQuery, setFilterQuery] = useState<ISearchProductListRequest>({});
   const { onOpen } = useBottomSheetStore();
 
@@ -51,7 +51,7 @@ export default function SearchCsrWrapper({ queryParams }: IProps) {
   }, [queryParams]);
 
   const handleSelect = (id: number, isOpen: boolean) => {
-    setSelect(id);
+    setActiveTabId(id);
     if (isOpen) {
       onOpen();
     }
@@ -61,7 +61,7 @@ export default function SearchCsrWrapper({ queryParams }: IProps) {
     <>
       <SearchFilter filterQuery={filterQuery} handleSelect={handleSelect} />
       <SearchSort filterQuery={filterQuery} />
-      <SearchBottomSheet select={select} handleSelect={handleSelect} filterQuery={filterQuery} />
+      <SearchBottomSheet activeTabId={activeTabId} handleSelect={handleSelect} filterQuery={filterQuery} />
     </>
   );
 }

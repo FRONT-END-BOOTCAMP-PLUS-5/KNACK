@@ -24,18 +24,21 @@ import { brandService } from '@/services/brand';
 import { IBrandWithTagList } from '@/types/brand';
 import { optionsService } from '@/services/options';
 import { IOption } from '@/types/option';
+import { useBottomSheetStore } from '@/store/bottomSheetStore';
 
 interface IProps {
-  select: number;
+  activeTabId: number;
   handleSelect: (id: number, isOpen: boolean) => void;
   filterQuery: ISearchProductListRequest;
 }
 
-export default function SearchBottomSheet({ select, handleSelect, filterQuery }: IProps) {
+export default function SearchBottomSheet({ activeTabId, handleSelect, filterQuery }: IProps) {
+  const { isOpen } = useBottomSheetStore();
   const [selectedFilter, setSelectedFilter] = useState<ISearchProductListRequest>({});
   const [categories, setCategories] = useState<IPageCategory[]>([]);
   const [brands, setBrands] = useState<IBrandWithTagList[]>([]);
   const [sizes, setSizes] = useState<IOption[]>([]);
+
   // TODO: 조회 안하고 바텀시트 닫으면 filterQuery로 selectedFilter 초기화 해야함
 
   const { getCategories } = categoryService;
@@ -52,9 +55,9 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
 
   useEffect(() => {
     // 초기 데이터 저장
-    if (!filterQuery) return;
     setSelectedFilter(filterQuery);
-  }, [filterQuery]);
+    console.log('@@@@@@@@filterQuery : ', filterQuery);
+  }, [filterQuery, isOpen]);
 
   // 카테고리 데이터 호출 로직
   const initCategories = useCallback(async () => {
@@ -208,12 +211,16 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
     }
   };
 
+  const handleClearFilter = () => {
+    setSelectedFilter({ price: undefined });
+  };
+
   return (
     <BottomSheet style={{ padding: 0, position: 'relative' }} title="필터" isCloseButton={false}>
       <div className={styles.bottom_sheet_header}>
         <TabMenu
           tabs={tabs}
-          selectedTab={select}
+          selectedTab={activeTabId}
           onTabSelect={(tabId) => handleSelect(tabId, false)}
           showScrollbar={false}
           autoScroll={true}
@@ -221,19 +228,21 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
       </div>
 
       <div className={`${styles.bottom_sheet_content} ${styles.contents_container}`}>
-        {select === 1 && (
+        {activeTabId === 1 && (
           <SearchCategory
             selectedFilter={selectedFilter}
             categories={categories}
             onClickSubCategorySelect={onClickSubCategorySelect}
           />
         )}
-        {select === 2 && <SearchGender selectedFilter={selectedFilter} onClickGenderSelect={onClickGenderSelect} />}
-        {select === 3 && <SearchColor selectedFilter={selectedFilter} onClickColorSelect={onClickColorSelect} />}
-        {select === 4 && (
+        {activeTabId === 2 && (
+          <SearchGender selectedFilter={selectedFilter} onClickGenderSelect={onClickGenderSelect} />
+        )}
+        {activeTabId === 3 && <SearchColor selectedFilter={selectedFilter} onClickColorSelect={onClickColorSelect} />}
+        {activeTabId === 4 && (
           <SearchDiscount selectedFilter={selectedFilter} onClickDiscountSelect={onClickDiscountSelect} />
         )}
-        {select === 5 && (
+        {activeTabId === 5 && (
           <SearchBrand
             selectedFilter={selectedFilter}
             brands={brands}
@@ -241,10 +250,10 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
             onChangeBrandList={onChangeBrandList}
           />
         )}
-        {select === 6 && (
+        {activeTabId === 6 && (
           <SearchSize selectedFilter={selectedFilter} sizes={sizes} onClickSizeSelect={onClickSizeSelect} />
         )}
-        {select === 7 && (
+        {activeTabId === 7 && (
           <SearchPrice
             selectedFilter={selectedFilter}
             onClickPriceSelect={onClickPriceSelect}
@@ -266,7 +275,9 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
           </Flex>
         </Flex>
         <Flex className={styles.bottom_sheet_bottom} paddingHorizontal={8} paddingVertical={8} gap={8}>
-          <button className={styles.bottom_sheet_bottom_clear}>초기화</button>
+          <button className={styles.bottom_sheet_bottom_clear} onClick={handleClearFilter}>
+            초기화
+          </button>
           <button className={styles.bottom_sheet_bottom_submit}>상품보기</button>
         </Flex>
       </section>
