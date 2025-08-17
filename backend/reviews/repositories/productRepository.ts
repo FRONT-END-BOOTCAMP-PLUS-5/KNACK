@@ -1,4 +1,4 @@
-import { Product } from '../domains/review';
+import { Product } from '../domains/entities/Product';
 import prisma from '../../utils/prisma';
 
 // 상품 리포지토리 인터페이스
@@ -24,14 +24,14 @@ export class PrismaProductRepository implements ProductRepository {
         return null;
       }
       
-      console.log('✅ 상품 조회 성공:', product.name);
+      console.log('✅ 상품 조회 성공:', product.engName || product.korName);
       
       return {
         id: product.id,
         thumbnailImage: product.thumbnailImage || '/images/default-product.jpg',
-        engName: product.engName || product.name || '상품명 없음',
-        korName: product.korName || product.name || '상품명 없음',
-        size: product.size || '사이즈 정보 없음',
+        engName: product.engName || '상품명 없음',
+        korName: product.korName || '상품명 없음',
+        size: '사이즈 정보 없음', // 현재 DB 스키마에는 size 필드가 없음
         brand: product.brand ? {
           engName: product.brand.engName || '브랜드명 없음',
           korName: product.brand.korName || '브랜드명 없음'

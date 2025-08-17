@@ -1,31 +1,14 @@
 'use client';
 
-import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import ReactStars from 'react-stars';
 import styles from './reviewWrite.module.scss';
 
-// 카테고리별 질문과 답변 옵션
+// 카테고리별 질문과 답변 옵션 (ID 기반)
 const reviewQuestions = {
-  shoes: [
-    {
-      question: '구매하신 신발 사이즈는 어떤가요?',
-      options: ['작게 나왔어요', '정사이즈예요', '크게 나왔어요']
-    },
-    {
-      question: '평소 사이즈에서 얼마나 크게/작게 구매했나요?',
-      options: ['한사이즈 다운', '반사이즈 다운', '정사이즈', '반사이즈 업', '한사이즈 업']
-    },
-    {
-      question: '착화감은 어떤가요?',
-      options: ['불편해요', '보통이에요', '편해요']
-    },
-    {
-      question: '구매한 신발의 발볼은 어떤가요?',
-      options: ['좁아요', '보통이에요', '넓어요']
-    }
-  ],
-  top: [
+  // ID 1: 상의 (top)
+  1: [
     {
       question: '구매하신 상의 사이즈는 어떤가요?',
       options: ['오버핏이에요', '정사이즈예요', '슬림핏이에요']
@@ -39,21 +22,8 @@ const reviewQuestions = {
       options: ['퀄리티가 만족스러워요', '퀄리티가 매우 만족스러워요', '퀄리티가 보통이에요']
     }
   ],
-  bottom: [
-    {
-      question: '구매하신 하의 사이즈는 어떤가요?',
-      options: ['작게 나왔어요', '정사이즈예요', '크게 나왔어요']
-    },
-    {
-      question: '하의 길이는 어떤가요?',
-      options: ['짧아요', '적당해요', '길어요']
-    },
-    {
-      question: '하의 퀄리티는 어떤가요?',
-      options: ['퀄리티가 별로예요', '퀄리티가 보통이에요', '퀄리티가 만족스러워요', '퀄리티가 매우 만족스러워요']
-    }
-  ],
-  outer: [
+  // ID 2: 아우터 (outer)
+  2: [
     {
       question: '구매하신 아우터 사이즈는 어떤가요?',
       options: ['작게 나왔어요', '정사이즈예요', '크게 나왔어요']
@@ -70,24 +40,86 @@ const reviewQuestions = {
       question: '보온성은 어떤가요?',
       options: ['보온성이 부족해요', '보온성이 보통이에요', '보온성이 만족스러워요', '보온성이 매우 만족스러워요']
     }
-  ]
+  ],
+  // ID 3: 하의 (bottom)
+  3: [
+    {
+      question: '구매하신 하의 사이즈는 어떤가요?',
+      options: ['작게 나왔어요', '정사이즈예요', '크게 나왔어요']
+    },
+    {
+      question: '하의 길이는 어떤가요?',
+      options: ['짧아요', '적당해요', '길어요']
+    },
+    {
+      question: '하의 퀄리티는 어떤가요?',
+      options: ['퀄리티가 별로예요', '퀄리티가 보통이에요', '퀄리티가 만족스러워요', '퀄리티가 매우 만족스러워요']
+    }
+  ],
+  // shoes는 일단 주석 처리 (나중에 추가 예정)
+  // shoes: [
+  //   {
+  //     question: '구매하신 신발 사이즈는 어떤가요?',
+  //     options: ['작게 나왔어요', '정사이즈예요', '크게 나왔어요']
+  //   },
+  //   {
+  //     question: '평소 사이즈에서 얼마나 크게/작게 구매했나요?',
+  //     options: ['한사이즈 다운', '반사이즈 다운', '정사이즈', '반사이즈 업', '한사이즈 업']
+  //   },
+  //   {
+  //     question: '착화감은 어떤가요?',
+  //     options: ['불편해요', '보통이에요', '편해요']
+  //   },
+  //   {
+  //     question: '구매한 신발의 발볼은 어떤가요?',
+  //     options: ['좁아요', '보통이에요', '넓어요']
+  //   }
+  // ]
 };
 
 export default function ReviewWritePage() {
   const params = useParams();
+  const router = useRouter();
   const productId = params.productId as string;
   
-  // 상품 카테고리 추정 (URL에서)
-  const getCategoryFromId = (id: string) => {
-    if (id.includes('shoes') || id.includes('신발')) return 'shoes';
-    if (id.includes('top') || id.includes('상의')) return 'top';
-    if (id.includes('bottom') || id.includes('하의')) return 'bottom';
-    if (id.includes('outer') || id.includes('아우터')) return 'outer';
-    return 'outer'; // 기본값
+  // URL에서 orderId 가져오기
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get('orderId');
+  
+  // 상품 정보 상태
+  const [productInfo, setProductInfo] = useState<{
+    id: number;
+    name: string;
+    categoryId: number;
+    categoryName: string;
+  } | null>(null);
+  
+  // 상품 정보 가져오기
+  useEffect(() => {
+    const fetchProductInfo = async () => {
+      try {
+        // TODO: 실제 API 호출로 상품 정보 가져오기
+        // 임시로 하드코딩된 데이터 사용
+        setProductInfo({
+          id: parseInt(productId),
+          name: '상품명',
+          categoryId: 2, // 기본값: 아우터
+          categoryName: '아우터'
+        });
+      } catch (error) {
+        console.error('상품 정보 조회 실패:', error);
+      }
+    };
+    
+    fetchProductInfo();
+  }, [productId]);
+  
+  // 카테고리 ID에 따른 질문지 선택
+  const getQuestionsByCategoryId = (categoryId: number) => {
+    return reviewQuestions[categoryId as keyof typeof reviewQuestions] || reviewQuestions[2]; // 기본값: 아우터
   };
   
-  const category = getCategoryFromId(productId);
-  const questions = reviewQuestions[category as keyof typeof reviewQuestions] || reviewQuestions.shoes;
+  const questions = productInfo ? getQuestionsByCategoryId(productInfo.categoryId) : reviewQuestions[2];
   
   // 답변 상태 관리
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -104,15 +136,58 @@ export default function ReviewWritePage() {
     setRating(newRating);
   };
 
-  const handleSubmit = () => {
-    console.log('별점:', rating);
-    console.log('리뷰 답변:', answers);
-    // TODO: API 호출 로직 추가
+  const handleSubmit = async () => {
+    try {
+      // 모든 질문에 답변했는지 확인
+      if (Object.keys(answers).length < questions.length) {
+        alert('모든 질문에 답변해주세요.');
+        return;
+      }
+
+      // 별점이 선택되었는지 확인
+      if (rating === 0) {
+        alert('별점을 선택해주세요.');
+        return;
+      }
+
+      // 리뷰 데이터 준비
+      const reviewData = {
+        userId: '117b3f7d-ca70-4424-8d3b-5625c994576e', // 실제 존재하는 사용자 ID (Prisma Studio에서 확인)
+        productId: parseInt(productId),
+        orderId: parseInt(orderId || '0'), // orderId 추가!
+        contents: JSON.stringify(answers),
+        rating: Math.round(rating), // 소수점 제거하고 정수로 변환
+        reviewImages: '' // TODO: 이미지 업로드 기능 추가 시 구현
+      };
+
+      // API 호출하여 리뷰 생성
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reviewData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert('리뷰가 성공적으로 작성되었습니다!');
+        
+        // 내 리뷰 탭으로 이동 (orderId도 함께 전달)
+        router.push(`/my/reviews?tab=my&oid=${orderId}`);
+      } else {
+        alert(`리뷰 작성 실패: ${result.error}`);
+      }
+      
+    } catch (error) {
+      console.error('리뷰 제출 실패:', error);
+      alert('리뷰 제출에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   return (
     <main>
-
       <div className={styles.review_form}>
         {/* 별점 평가 섹션 */}
         <div className={styles.question_section}>
