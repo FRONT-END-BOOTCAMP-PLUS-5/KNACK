@@ -199,6 +199,15 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
     }
   };
 
+  // 가격 슬라이드 핸들러
+  const onChangePriceSelect = (newValue: number[]) => {
+    if (newValue[0] === 0 && newValue[1] === 10000000) {
+      setSelectedFilter({ ...selectedFilter, price: undefined });
+    } else {
+      setSelectedFilter({ ...selectedFilter, price: `${newValue[0]}-${newValue[1]}` });
+    }
+  };
+
   return (
     <BottomSheet style={{ padding: 0, position: 'relative' }} title="필터" isCloseButton={false}>
       <div className={styles.bottom_sheet_header}>
@@ -235,7 +244,13 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
         {select === 6 && (
           <SearchSize selectedFilter={selectedFilter} sizes={sizes} onClickSizeSelect={onClickSizeSelect} />
         )}
-        {select === 7 && <SearchPrice selectedFilter={selectedFilter} onClickPriceSelect={onClickPriceSelect} />}
+        {select === 7 && (
+          <SearchPrice
+            selectedFilter={selectedFilter}
+            onClickPriceSelect={onClickPriceSelect}
+            onChangePriceSelect={onChangePriceSelect}
+          />
+        )}
       </div>
 
       <section className={styles.bottom_sheet_bottom_wrap}>

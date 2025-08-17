@@ -2,18 +2,38 @@ import Text from '@/components/common/Text';
 import styles from './searchBottomSheet.module.scss';
 import Flex from '@/components/common/Flex';
 import Slider from '@mui/material/Slider';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import TagButton from '@/components/common/TagButton';
 import { PRODUCT_FILTER_PRICE } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
+import { parseNumberRange } from '@/utils/search/numberRange';
+import useDebounce from '@/hooks/useDebounce';
 
 interface IProps {
   selectedFilter: ISearchProductListRequest;
   onClickPriceSelect: (price: string) => void;
+  onChangePriceSelect: (newValue: number[]) => void;
 }
 
-export default function SearchPrice({ selectedFilter, onClickPriceSelect }: IProps) {
+export default function SearchPrice({ selectedFilter, onClickPriceSelect, onChangePriceSelect }: IProps) {
   const [value, setValue] = useState<number[]>([0, 10000000]);
+  const debouncedValue = useDebounce(value, 300);
+  const isInitialized = useRef(false);
+
+  useEffect(() => {
+    if (!isInitialized.current && selectedFilter.price) {
+      const { min, max } = parseNumberRange(selectedFilter.price);
+      console.log('min, max : ', min, max);
+      setValue([min || 0, max || 10000000]);
+      isInitialized.current = true;
+    }
+  }, [selectedFilter.price]);
+
+  useEffect(() => {
+    onChangePriceSelect(debouncedValue);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedValue]);
 
   const handleChange = (event: Event, newValue: number[]) => {
     setValue(newValue);
@@ -24,8 +44,10 @@ export default function SearchPrice({ selectedFilter, onClickPriceSelect }: IPro
     return `${won}만원`;
   };
 
-  const isPriceSelected = (price: string): boolean => {
-    return selectedFilter.price === price;
+  const handleClickPriceSelect = (price: string) => {
+    const { min, max } = parseNumberRange(price);
+    setValue([min || 0, max || 10000000]);
+    onClickPriceSelect(price);
   };
 
   return (
@@ -40,8 +62,8 @@ export default function SearchPrice({ selectedFilter, onClickPriceSelect }: IPro
           {PRODUCT_FILTER_PRICE.map((item) => (
             <TagButton
               key={item.id}
-              isActive={isPriceSelected(item.value)}
-              onClick={() => onClickPriceSelect(item.value)}
+              isActive={selectedFilter.price === item.value}
+              onClick={() => handleClickPriceSelect(item.value)}
             >
               {item.name}
             </TagButton>

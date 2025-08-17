@@ -63,5 +63,5 @@ export const PRODUCT_FILTER_PRICE = [
   { id: 5, name: '30-50만원', value: '300000-500000' },
   { id: 6, name: '50-100만원', value: '500000-1000000' },
   { id: 7, name: '100-500만원', value: '1000000-5000000' },
-  { id: 8, name: '500만원 이상', value: '5000000-' },
+  { id: 8, name: '500만원 이상', value: '5000000-10000000' },
 ] as const;

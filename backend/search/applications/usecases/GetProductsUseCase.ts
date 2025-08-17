@@ -1,7 +1,7 @@
 import { ProductSearchRepository } from '@/backend/search/domains/repositories/ProductSearchRepository';
 import { GetProductsRequestDto, GetProductsResponseDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import { ProductFilters, PaginationParams } from '@/backend/search/domains/entities/ProductFilters';
-import { PriceParser } from '@/backend/utils/search/priceParcer';
+import { parseNumberRange } from '@/utils/search/numberRange';
 
 export class GetProductsUseCase {
   constructor(private productSearchRepository: ProductSearchRepository) {}
@@ -19,10 +19,10 @@ export class GetProductsUseCase {
       brandId: request.brandId,
       categoryId: request.categoryId,
       subCategoryId: request.subCategoryId,
-      priceMin: PriceParser.parse(request.price).min,
-      priceMax: PriceParser.parse(request.price).max,
-      discountMin: PriceParser.parse(request.discount).min,
-      discountMax: PriceParser.parse(request.discount).max,
+      priceMin: parseNumberRange(request.price).min,
+      priceMax: parseNumberRange(request.price).max === 10000000 ? undefined : parseNumberRange(request.price).max,
+      discountMin: parseNumberRange(request.discount).min,
+      discountMax: parseNumberRange(request.discount).max,
       size: request.size,
       benefit: request.benefit,
       gender: request.gender,
