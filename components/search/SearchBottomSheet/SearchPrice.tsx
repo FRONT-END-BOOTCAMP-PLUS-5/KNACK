@@ -16,18 +16,16 @@ interface IProps {
 }
 
 export default function SearchPrice({ selectedFilter, onClickPriceSelect, onChangePriceSelect }: IProps) {
-  const [value, setValue] = useState<number[]>([0, 10000000]);
-  const debouncedValue = useDebounce(value, 300);
-  const isInitialized = useRef(false);
-
-  useEffect(() => {
-    if (!isInitialized.current && selectedFilter.price) {
+  const getInitialValue = () => {
+    if (selectedFilter.price) {
       const { min, max } = parseNumberRange(selectedFilter.price);
-      console.log('min, max : ', min, max);
-      setValue([min || 0, max || 10000000]);
-      isInitialized.current = true;
+      return [min || 0, max || 10000000];
     }
-  }, [selectedFilter.price]);
+    return [0, 10000000];
+  };
+
+  const [value, setValue] = useState<number[]>(getInitialValue());
+  const debouncedValue = useDebounce(value, 300);
 
   useEffect(() => {
     onChangePriceSelect(debouncedValue);
