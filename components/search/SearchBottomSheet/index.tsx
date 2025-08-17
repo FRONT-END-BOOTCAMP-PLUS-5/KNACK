@@ -34,6 +34,7 @@ import { getFilterCountById } from '@/utils/search/searchBottomSheetTab';
 import { removeFilterValue } from '@/utils/search/removeFilterValue';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import { useSearchBottomSheetInit } from '@/hooks/useSearchBottomSheetInit';
+import { useFilterCounts } from '@/hooks/useFilterCounts';
 import searchClose from '@/public/icons/close_large.svg';
 
 interface IProps {
@@ -57,6 +58,9 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
       sizes,
       isOpen,
     });
+
+  // 상품 개수 조회 커스텀 훅
+  const { isLoadingCount, buttonText } = useFilterCounts(selectedFilter);
 
   const { getCategories } = categoryService;
   const { getBrands } = brandService;
@@ -390,7 +394,9 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
           <button className={styles.bottom_sheet_bottom_clear} onClick={handleClearFilter}>
             초기화
           </button>
-          <button className={styles.bottom_sheet_bottom_submit}>상품보기</button>
+          <button className={styles.bottom_sheet_bottom_submit} disabled={isLoadingCount}>
+            {buttonText()}
+          </button>
         </Flex>
       </section>
     </BottomSheet>
