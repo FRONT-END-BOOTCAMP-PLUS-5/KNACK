@@ -1,4 +1,4 @@
-import { CartRepository } from '../../domains/repositires/CartRepository';
+import { CartRepository } from '../../domains/repositories/CartRepository';
 
 export class DeleteCartUseCase {
   private repository: CartRepository;

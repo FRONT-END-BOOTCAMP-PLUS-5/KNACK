@@ -17,4 +17,12 @@ export const productsService = {
 
     return data;
   },
+
+  getRecentlyProductList: async (id: string) => {
+    const { data, error } = await requester.get(`api/products/recent?${id}`).catch((error) => error);
+
+    if (error) throw new Error(error.message);
+
+    return data;
+  },
 };

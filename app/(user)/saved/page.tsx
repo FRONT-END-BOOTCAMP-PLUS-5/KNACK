@@ -5,10 +5,11 @@ import { likeService } from '@/services/like';
 import { useCallback, useEffect, useState } from 'react';
 
 import { productsService } from '@/services/products';
-import { IProducts } from '@/types/product';
+import { IProducts, IRecentProduct } from '@/types/product';
 import { IBrandLikeList, ILikeList } from '@/types/like';
 import ProductSave from '@/components/saved/ProductSave';
 import BrandSave from '@/components/saved/BrandSave';
+import RecentlySave from '@/components/saved/RecentlySave';
 
 const TABS = [
   { id: 0, name: '상품' },
@@ -16,18 +17,38 @@ const TABS = [
   { id: 2, name: '최근 본 상품' },
 ];
 
+// TODO 상품 리스트 페이지 완성되면 상세 페이지 이동할때
+// localStorage로 주고 받도록 설정 필요
+const RECENT_PRODUCT_IDS = ['5', '6', '7'];
+
 const SavedPage = () => {
   const { addLike, deleteLike, getLikes, addBrandLike, deleteBrandLike, getBrandLikes } = likeService;
-  const { getProductList } = productsService;
+  const { getProductList, getRecentlyProductList } = productsService;
   const [selectTab, setSelectTab] = useState(1);
   const [productList, setProductList] = useState<IProducts[]>([]);
   const [likeList, setLikeList] = useState<ILikeList[]>([]);
   const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
+  const [recentProducts, setRecentProducts] = useState<IRecentProduct[]>([]);
+
+  const handleGetRecentlyProduct = useCallback(() => {
+    const ids = RECENT_PRODUCT_IDS;
+    const params = new URLSearchParams();
+    ids.forEach((id) => params.append('id', id));
+
+    getRecentlyProductList(params.toString())
+      .then((res) => {
+        if (res.status === 200) {
+          setRecentProducts(res.result);
+        }
+      })
+      .catch((error) => {
+        console.log('error', error.message);
+      });
+  }, [getRecentlyProductList]);
 
   const handleGetBrandLikes = useCallback(() => {
     getBrandLikes()
       .then((res) => {
-        console.log('res ', res);
         if (res.status === 200) {
           setBrandLikeList(res.result);
         }
@@ -41,24 +62,26 @@ const SavedPage = () => {
     handleGetBrandLikes();
   }, [handleGetBrandLikes]);
 
-  const handleAddBrandLike = useCallback(() => {
-    const brandId = 2;
-
-    addBrandLike(brandId)
-      .then((res) => {
-        console.log('res ', res);
-      })
-      .catch((error) => {
-        console.log('error', error.message);
-      });
-  }, [addBrandLike]);
+  const handleAddBrandLike = useCallback(
+    (id: number) => {
+      addBrandLike(id)
+        .then((res) => {
+          console.log('res ', res);
+        })
+        .catch((error) => {
+          console.log('error', error.message);
+        });
+    },
+    [addBrandLike]
+  );
 
   const handleDeleteBrandLike = useCallback(
     (id: number) => {
       deleteBrandLike(id)
         .then((res) => {
-          console.log('res ', res);
-          initLikeBrand();
+          if (res.status === 200) {
+            initLikeBrand();
+          }
         })
         .catch((error) => {
           console.log('error', error.message);
@@ -66,21 +89,6 @@ const SavedPage = () => {
     },
     [deleteBrandLike, initLikeBrand]
   );
-
-  const handleLikeAdd = useCallback(() => {
-    const data = {
-      productId: 7,
-      optionValueId: 2,
-    };
-
-    addLike(data)
-      .then((res) => {
-        console.log('res', res);
-      })
-      .catch((error) => {
-        console.log('error', error.message);
-      });
-  }, [addLike]);
 
   const handleGetLikes = useCallback(() => {
     getLikes()
@@ -110,10 +118,6 @@ const SavedPage = () => {
       });
   }, [getProductList, likeList]);
 
-  const onClickSave = (id: number) => {
-    handleDeleteLike(id);
-  };
-
   const initSave = useCallback(() => {
     handleProductList();
     handleGetLikes();
@@ -125,7 +129,6 @@ const SavedPage = () => {
 
       deleteLike(deleteId)
         .then((res) => {
-          console.log('res', res);
           initSave();
         })
         .catch((error) => {
@@ -134,6 +137,33 @@ const SavedPage = () => {
     },
     [deleteLike, initSave, likeList]
   );
+
+  const handleLikeAdd = useCallback(
+    (productId: number) => {
+      const likeCheck = likeList?.find((likeItem) => likeItem?.productId === productId);
+
+      if (likeCheck) {
+        handleDeleteLike(productId);
+        alert('제거완료');
+      } else {
+        addLike(productId)
+          .then((res) => {
+            if (res.status === 200) {
+              alert('잘 담겼어요!');
+              handleGetLikes();
+            }
+          })
+          .catch((error) => {
+            console.log('error', error.message);
+          });
+      }
+    },
+    [addLike, handleDeleteLike, handleGetLikes, likeList]
+  );
+
+  const onClickSave = (id: number) => {
+    handleDeleteLike(id);
+  };
 
   useEffect(() => {
     handleProductList();
@@ -147,11 +177,18 @@ const SavedPage = () => {
     handleGetBrandLikes();
   }, [handleGetBrandLikes]);
 
+  useEffect(() => {
+    handleGetRecentlyProduct();
+  }, [handleGetRecentlyProduct]);
+
   return (
     <section>
       <TabMenu tabs={TABS} selectedTab={selectTab} onTabSelect={setSelectTab} />
       {selectTab === 0 && <ProductSave likeList={likeList} productList={productList} onClickSave={onClickSave} />}
       {selectTab === 1 && <BrandSave brandLikeData={brandLikeList} onClickBookMark={handleDeleteBrandLike} />}
+      {selectTab === 2 && (
+        <RecentlySave recentProducts={recentProducts} likeList={likeList} onClickSaveAdd={handleLikeAdd} />
+      )}
     </section>
   );
 };
