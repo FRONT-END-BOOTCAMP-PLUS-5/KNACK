@@ -32,9 +32,11 @@ import { IBrandWithTagList } from '@/types/brand';
 import { IOption } from '@/types/option';
 import { getFilterCountById } from '@/utils/search/searchBottomSheetTab';
 import { removeFilterValue } from '@/utils/search/removeFilterValue';
+import { objectToQueryString } from '@/utils/queryString';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import { useSearchBottomSheetInit } from '@/hooks/useSearchBottomSheetInit';
 import { useFilterCounts } from '@/hooks/useFilterCounts';
+import { useRouter } from 'next/navigation';
 import searchClose from '@/public/icons/close_large.svg';
 
 interface IProps {
@@ -44,7 +46,8 @@ interface IProps {
 }
 
 export default function SearchBottomSheet({ activeTabId, handleSelect, filterQuery }: IProps) {
-  const { isOpen } = useBottomSheetStore();
+  const { isOpen, onClose } = useBottomSheetStore();
+  const router = useRouter();
   const [selectedFilter, setSelectedFilter] = useState<ISearchProductListRequest>({});
   const [categories, setCategories] = useState<IPageCategory[]>([]);
   const [brands, setBrands] = useState<IBrandWithTagList[]>([]);
@@ -316,6 +319,14 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
     setSelectedFilter(newSelectedFilter);
   };
 
+  // 상품보기 버튼 클릭 핸들러
+  const handleViewProducts = () => {
+    const queryString = objectToQueryString(selectedFilter);
+    const searchUrl = queryString ? `/search?${queryString}` : '/search';
+    onClose();
+    router.push(searchUrl);
+  };
+
   const handleClearFilter = () => {
     setSelectedFilter({});
     clearBottomList();
@@ -394,7 +405,7 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
           <button className={styles.bottom_sheet_bottom_clear} onClick={handleClearFilter}>
             초기화
           </button>
-          <button className={styles.bottom_sheet_bottom_submit} disabled={isLoadingCount}>
+          <button className={styles.bottom_sheet_bottom_submit} disabled={isLoadingCount} onClick={handleViewProducts}>
             {buttonText()}
           </button>
         </Flex>
