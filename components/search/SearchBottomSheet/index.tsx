@@ -1,6 +1,20 @@
 'use client';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './searchBottomSheet.module.scss';
+import Image from 'next/image';
 import BottomSheet from '@/components/common/BottomSheet';
+import Flex from '@/components/common/Flex';
+import Text from '@/components/common/Text';
+import TabMenu from '@/components/common/TabMenu';
+import Divider from '@/components/common/Divider';
+import DragScroll from '@/components/common/DragScroll';
+import SearchPrice from './SearchPrice';
+import SearchColor from './SearchColor';
+import SearchDiscount from './SearchDiscount';
+import SearchCategory from './SearchCategory';
+import SearchGender from './SearchGender';
+import SearchBrand from './SearchBrand';
+import SearchSize from './SearchSize';
 import {
   DiscountValue,
   PRODUCT_FILTER,
@@ -9,32 +23,18 @@ import {
   PRODUCT_FILTER_DISCOUNT,
   PRODUCT_FILTER_PRICE,
 } from '@/constraint/product';
-import Flex from '@/components/common/Flex';
-import Text from '@/components/common/Text';
-import TabMenu from '@/components/common/TabMenu';
-import Divider from '@/components/common/Divider';
-import SearchPrice from './SearchPrice';
-import SearchColor from './SearchColor';
-import SearchDiscount from './SearchDiscount';
-import Image from 'next/image';
-import searchClose from '@/public/icons/close_large.svg';
-import SearchCategory from './SearchCategory';
-import SearchGender from './SearchGender';
-import SearchBrand from './SearchBrand';
-import SearchSize from './SearchSize';
-import { ISearchProductListRequest } from '@/types/searchProductList';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import { categoryService } from '@/services/category';
-import { IPageCategory } from '@/types/category';
-import { getFilterCountById } from '@/utils/search/searchBottomSheetTab';
 import { brandService } from '@/services/brand';
-import { IBrandWithTagList } from '@/types/brand';
 import { optionsService } from '@/services/options';
+import { ISearchProductListRequest } from '@/types/searchProductList';
+import { IPageCategory } from '@/types/category';
+import { IBrandWithTagList } from '@/types/brand';
 import { IOption } from '@/types/option';
-import { useBottomSheetStore } from '@/store/bottomSheetStore';
-import DragScroll from '@/components/common/DragScroll';
-import { useSearchBottomSheetInit } from '@/hooks/useSearchBottomSheetInit';
+import { getFilterCountById } from '@/utils/search/searchBottomSheetTab';
 import { removeFilterValue } from '@/utils/search/removeFilterValue';
+import { useBottomSheetStore } from '@/store/bottomSheetStore';
+import { useSearchBottomSheetInit } from '@/hooks/useSearchBottomSheetInit';
+import searchClose from '@/public/icons/close_large.svg';
 
 interface IProps {
   activeTabId: number;
