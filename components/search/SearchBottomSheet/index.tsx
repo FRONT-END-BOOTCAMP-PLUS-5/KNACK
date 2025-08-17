@@ -25,6 +25,7 @@ import { IBrandWithTagList } from '@/types/brand';
 import { optionsService } from '@/services/options';
 import { IOption } from '@/types/option';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
+import DragScroll from '@/components/common/DragScroll';
 
 interface IProps {
   activeTabId: number;
@@ -32,9 +33,17 @@ interface IProps {
   filterQuery: ISearchProductListRequest;
 }
 
+interface ISelectedBottomList {
+  id: number;
+  type: 'categoryId' | 'subCategoryId' | 'brandId' | 'size' | 'keywordColorId' | 'discount' | 'gender' | 'price';
+  name: string;
+  value: string;
+}
+
 export default function SearchBottomSheet({ activeTabId, handleSelect, filterQuery }: IProps) {
   const { isOpen } = useBottomSheetStore();
   const [selectedFilter, setSelectedFilter] = useState<ISearchProductListRequest>({});
+  const [selectedBottomList, setSelectedBottomList] = useState<ISelectedBottomList[]>([]);
   const [categories, setCategories] = useState<IPageCategory[]>([]);
   const [brands, setBrands] = useState<IBrandWithTagList[]>([]);
   const [sizes, setSizes] = useState<IOption[]>([]);
@@ -265,14 +274,16 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
       <section className={styles.bottom_sheet_bottom_wrap}>
         <Divider height={1} />
         <Flex justify="between" align="center" className={styles.bottom_sheet_bottom_selected_filter}>
-          <Flex align="center" gap={2}>
-            <Text size={1.3} weight={600} color="gray4" key={'item.id'}>
-              {'item.name'}
-            </Text>
-            <span>
-              <Image src={searchClose} alt="close" width={16} height={16} style={{ opacity: 0.5 }} />
-            </span>
-          </Flex>
+          <DragScroll showScrollbar={false}>
+            <Flex align="center" gap={2} width="self" paddingHorizontal={4}>
+              <Text size={1.3} weight={600} color="gray4" key={'item.id'}>
+                {'item.name'}
+              </Text>
+              <span>
+                <Image src={searchClose} alt="close" width={16} height={16} style={{ opacity: 0.5 }} />
+              </span>
+            </Flex>
+          </DragScroll>
         </Flex>
         <Flex className={styles.bottom_sheet_bottom} paddingHorizontal={8} paddingVertical={8} gap={8}>
           <button className={styles.bottom_sheet_bottom_clear} onClick={handleClearFilter}>
