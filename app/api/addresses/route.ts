@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { KnackAddressRepository } from '@/backend/address/repositories/KnackAddressRepository'
+import { PrAddressRepository } from '@/backend/address/repositories/PrAddressRepository'
 import { CreateAddressUseCase } from '@/backend/address/applications/usecases/CreateAddressUseCase'
 
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]/auth'
 import { GetAddressByUserIdUseCase } from '@/backend/address/applications/usecases/GetAddressByUserIdUseCase'
 
-const repo = new KnackAddressRepository()
+const repo = new PrAddressRepository()
 const getAddressByUserIdUseCase = new GetAddressByUserIdUseCase(repo)
 
 export async function GET(req: NextRequest) {

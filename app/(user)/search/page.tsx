@@ -9,10 +9,8 @@ export interface IQueryParams {
   brandId?: string;
   categoryId?: string;
   subCategoryId?: string;
-  priceMin?: string;
-  priceMax?: string;
-  discountMin?: string;
-  discountMax?: string;
+  price?: string;
+  discount?: string;
   size?: string;
   benefit?: 'under_price';
   gender?: string;
@@ -36,11 +34,9 @@ export default async function Search({ searchParams }: IProps) {
     brandId: params.brandId,
     categoryId: params.categoryId,
     subCategoryId: params.subCategoryId,
-    priceMin: params.priceMin,
-    priceMax: params.priceMax,
+    price: params.price,
     size: params.size,
-    discountMin: params.discountMin,
-    discountMax: params.discountMax,
+    discount: params.discount,
     benefit: params.benefit,
     gender: params.gender,
     sort: params.sort,

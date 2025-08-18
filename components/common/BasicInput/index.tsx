@@ -1,18 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './basicInput.module.scss';
 import Image from 'next/image';
 import closeIcon from '@/public/icons/circle_close.svg';
+import useDebounce from '@/hooks/useDebounce';
 
 interface IProps {
   placeholder?: string;
+  onChange?: (value: string) => void;
 }
 
-export default function BasicInput({ placeholder }: IProps) {
+export default function BasicInput({ placeholder, onChange }: IProps) {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
+  const debouncedSearchKeyword = useDebounce(searchKeyword);
 
   const handleSearchKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(e.target.value);
   };
+
+  useEffect(() => {
+    if (onChange) {
+      onChange(debouncedSearchKeyword);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchKeyword]);
 
   const handleDeleteClick = () => {
     setSearchKeyword('');

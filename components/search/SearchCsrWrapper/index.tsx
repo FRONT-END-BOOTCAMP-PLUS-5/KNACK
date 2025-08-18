@@ -13,7 +13,7 @@ interface IProps {
 }
 
 export default function SearchCsrWrapper({ queryParams }: IProps) {
-  const [select, setSelect] = useState(0);
+  const [activeTabId, setActiveTabId] = useState(0);
   const [filterQuery, setFilterQuery] = useState<ISearchProductListRequest>({});
   const { onOpen } = useBottomSheetStore();
 
@@ -30,10 +30,8 @@ export default function SearchCsrWrapper({ queryParams }: IProps) {
     }
     if (queryParams.cursor) convertedQuery.cursor = queryParams.cursor;
     if (queryParams.soldOutInvisible) convertedQuery.soldOutInvisible = queryParams.soldOutInvisible === 'true';
-    if (queryParams.priceMin) convertedQuery.priceMin = parseInt(queryParams.priceMin);
-    if (queryParams.priceMax) convertedQuery.priceMax = parseInt(queryParams.priceMax);
-    if (queryParams.discountMin) convertedQuery.discountMin = parseInt(queryParams.discountMin);
-    if (queryParams.discountMax) convertedQuery.discountMax = parseInt(queryParams.discountMax);
+    if (queryParams.price) convertedQuery.price = queryParams.price;
+    if (queryParams.discount) convertedQuery.discount = queryParams.discount;
 
     if (queryParams.keywordColorId) {
       convertedQuery.keywordColorId = queryParams.keywordColorId.split(',').map((id) => parseInt(id));
@@ -53,7 +51,7 @@ export default function SearchCsrWrapper({ queryParams }: IProps) {
   }, [queryParams]);
 
   const handleSelect = (id: number, isOpen: boolean) => {
-    setSelect(id);
+    setActiveTabId(id);
     if (isOpen) {
       onOpen();
     }
@@ -63,7 +61,7 @@ export default function SearchCsrWrapper({ queryParams }: IProps) {
     <>
       <SearchFilter filterQuery={filterQuery} handleSelect={handleSelect} />
       <SearchSort filterQuery={filterQuery} />
-      <SearchBottomSheet select={select} handleSelect={handleSelect} filterQuery={filterQuery} />
+      <SearchBottomSheet activeTabId={activeTabId} handleSelect={handleSelect} filterQuery={filterQuery} />
     </>
   );
 }
