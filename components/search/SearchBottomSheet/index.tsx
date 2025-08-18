@@ -78,10 +78,6 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   }, [selectedFilter]);
 
   useEffect(() => {
-    console.log('@@@@@@@@selectedFilter : ', selectedFilter);
-  }, [selectedFilter]);
-
-  useEffect(() => {
     // 초기 데이터 저장
     setSelectedFilter(filterQuery);
   }, [filterQuery, isOpen]);
