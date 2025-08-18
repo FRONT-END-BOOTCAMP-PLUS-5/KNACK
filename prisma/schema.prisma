@@ -188,6 +188,7 @@ model Inquiry {
 }
 
 model Review {
+  id           Int       @id @default(autoincrement())
   userId       String    @map("user_id") @db.Uuid
   productId    Int       @map("product_id")
   contents     String    @db.VarChar
@@ -200,7 +201,6 @@ model Review {
   user         User      @relation(fields: [userId], references: [id])
   order        Order     @relation(fields: [orderId], references: [id])
 
-  @@id([userId, productId])
   @@map("reviews")
 }
 
@@ -273,6 +273,8 @@ model SubCategory {
   categoryId Int       @map("category_id")
   createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   isPrivate  Boolean   @default(true) @map("is_private")
+  image      String?   @db.VarChar 
+
   category   Category  @relation(fields: [categoryId], references: [id])
   products   Product[]
 
