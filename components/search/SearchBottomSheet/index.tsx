@@ -20,6 +20,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { categoryService } from '@/services/category';
 import { IPageCategory } from '@/types/category';
 import { getFilterCountById } from '@/utils/search/searchBottomSheetTab';
+import { brandService } from '@/services/brand';
+import { IBrandWithTagList } from '@/types/brand';
 
 interface IProps {
   select: number;
@@ -30,8 +32,10 @@ interface IProps {
 export default function SearchBottomSheet({ select, handleSelect, filterQuery }: IProps) {
   const [selectedFilter, setSelectedFilter] = useState<ISearchProductListRequest>({});
   const [categories, setCategories] = useState<IPageCategory[]>([]);
+  const [brands, setBrands] = useState<IBrandWithTagList[]>([]);
 
   const { getCategories } = categoryService;
+  const { getBrands } = brandService;
 
   const tabs = useMemo(() => {
     return PRODUCT_FILTER.map((item) => ({
@@ -49,15 +53,40 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
 
   // 카테고리 데이터 호출 로직
   const initCategories = useCallback(async () => {
-    await getCategories().then((res) => {
-      setCategories(res);
-    });
+    await getCategories()
+      .then((res) => {
+        if (res.status === 200) {
+          setCategories(res.result);
+        }
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          console.log(error.message);
+        }
+      });
   }, [getCategories]);
+
+  // 브랜드 데이터 호출 로직
+  const initBrands = useCallback(
+    async (keyword?: string) => {
+      await getBrands({ keyword: keyword }).then((res) => {
+        if (res.status === 200) {
+          setBrands(res.result);
+        }
+      });
+    },
+    [getBrands]
+  );
 
   useEffect(() => {
     // 카테고리 데이터 호출
     initCategories();
   }, [initCategories]);
+
+  useEffect(() => {
+    // 브랜드 데이터 호출
+    initBrands();
+  }, [initBrands]);
 
   // 서브카테고리 클릭 핸들러
   const onClickSubCategorySelect = (subCategoryId: number) => {
@@ -77,6 +106,30 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
     };
 
     setSelectedFilter(newSelectedFilter);
+  };
+
+  // 브랜드 클릭 핸들러
+  const onClickBrandSelect = (brandId: number) => {
+    const currentBrandIds = selectedFilter.brandId || [];
+    const isSelected = currentBrandIds.includes(brandId);
+
+    let newBrandIds: number[];
+    if (isSelected) {
+      newBrandIds = currentBrandIds.filter((id) => id !== brandId);
+    } else {
+      newBrandIds = [...currentBrandIds, brandId];
+    }
+
+    const newSelectedFilter = {
+      ...selectedFilter,
+      brandId: newBrandIds.length > 0 ? newBrandIds : undefined,
+    };
+    setSelectedFilter(newSelectedFilter);
+  };
+
+  // 브랜드 키워드 검색
+  const onChangeBrandList = (value: string) => {
+    initBrands(value);
   };
 
   return (
@@ -102,7 +155,14 @@ export default function SearchBottomSheet({ select, handleSelect, filterQuery }:
         {select === 2 && <SearchGender />}
         {select === 3 && <SearchColor />}
         {select === 4 && <SearchDiscount />}
-        {select === 5 && <SearchBrand />}
+        {select === 5 && (
+          <SearchBrand
+            selectedFilter={selectedFilter}
+            brands={brands}
+            onClickBrandSelect={onClickBrandSelect}
+            onChangeBrandList={onChangeBrandList}
+          />
+        )}
         {select === 6 && <SearchSize />}
         {select === 7 && <SearchPrice />}
       </div>

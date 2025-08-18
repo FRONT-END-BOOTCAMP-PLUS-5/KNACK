@@ -1,0 +1,106 @@
+@use '@/styles/mixins';
+
+.search_product_list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 8px;
+  padding: 10px;
+}
+
+.product_card_large {
+  overflow: hidden;
+  width: 100%;
+
+  .thumbnail {
+    border-radius: 10px;
+    background-color: $light-gray02;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    position: relative;
+
+    .image_container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+
+      .product_image {
+        object-fit: cover;
+      }
+    }
+
+    .product_bookmark {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      padding: 8px;
+      background: none;
+      border: none;
+    }
+  }
+
+  .product_info {
+    line-height: 1.2;
+    padding: 12px 4px 0;
+    width: 100%;
+    overflow: hidden;
+
+    .product_name {
+      color: $gray03;
+      font-size: 1.3rem;
+      margin-top: 2px;
+
+      > p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+    }
+
+    .product_name_sub {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $light-gray01;
+      margin-top: 2px;
+
+      > p {
+        @include mixins.text-ellipsis;
+      }
+    }
+
+    .brand_name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      > p {
+        @include mixins.text-ellipsis;
+      }
+    }
+
+    .product_sold_out {
+      display: inline-block;
+      background-color: $white;
+      color: $gray06;
+      border: 1px solid $light-gray03;
+      margin-top: 6px;
+      padding: 3px 4px;
+    }
+
+    .price_info {
+      .price {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: $gray03;
+        margin-top: 10px;
+      }
+    }
+
+    .interest_info {
+      font-size: 1.1rem;
+      color: $light-gray01;
+      margin: 0;
+    }
+  }
+}
