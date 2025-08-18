@@ -30,15 +30,14 @@ export class GetReviewableOrdersUseCase {
           isReviewable: this.isReviewableOrder(order)
         });
         
-        // 리뷰 작성 가능한 주문인지 확인 (배송 완료 등)
         if (this.isReviewableOrder(order)) {
           console.log('✅ 리뷰 가능한 주문:', order.id);
-          const review = await this.reviewRepository.findReviewByOrderId(order.id); // orderId로 리뷰 찾기
           
-          // Order에 포함된 Product 정보 사용
+          // orderId 기준으로만 리뷰 존재 여부 확인
+          const review = await this.reviewRepository.findReviewByOrderId(order.id);
+          const hasReview = !!review;
+          
           if (order.product) {
-            console.log('🔍 상품 정보:', order.product);
-            
             reviewableOrders.push({
               orderId: order.id,
               productId: order.product.id,
@@ -46,8 +45,8 @@ export class GetReviewableOrdersUseCase {
               productEngName: order.product.engName,
               thumbnailImage: order.product.thumbnailImage,
               category: order.product.category,
-              size: order.optionValue?.name || '', // 하드코딩 제거
-              hasReview: !!review,
+              size: order.optionValue?.name || '',
+              hasReview,
               review: review ? {
                 contents: review.contents,
                 rating: review.rating,
@@ -71,9 +70,7 @@ export class GetReviewableOrdersUseCase {
     }
   }
 
-  private isReviewableOrder(order: Order): boolean { // any 타입을 Order로 변경
-    // 테스트를 위해 모든 주문을 리뷰 가능하게 설정
-    // 실제 운영에서는 배송 완료(deliveryStatus === 3) 또는 구매 확정(deliveryStatus === 4)일 때만
-    return true; // 모든 주문을 리뷰 가능하게 설정
+  private isReviewableOrder(order: Order): boolean {
+    return true;
   }
 }

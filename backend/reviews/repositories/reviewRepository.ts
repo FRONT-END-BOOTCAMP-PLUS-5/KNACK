@@ -79,7 +79,7 @@ export class PrismaReviewRepository implements ReviewRepository {
       return {
         userId: review.userId,
         productId: review.productId,
-        orderId: review.orderId, // orderId 추가
+        orderId: review.orderId,
         contents: review.contents,
         rating: review.rating || 0,
         reviewImages: review.reviewImages || undefined,
@@ -123,10 +123,13 @@ export class PrismaReviewRepository implements ReviewRepository {
       console.error('❌ 오류 메시지:', error instanceof Error ? error.message : 'Unknown error');
       console.error('❌ 오류 스택:', error instanceof Error ? error.stack : 'No stack trace');
       
-      // Prisma 오류인 경우 상세 정보 출력
       if (error && typeof error === 'object' && 'code' in error) {
-        console.error('❌ Prisma 오류 코드:', (error as any).code);
-        console.error('❌ Prisma 오류 메타:', (error as any).meta);
+        const prismaError = error as any;
+        console.error('❌ Prisma 오류 코드:', prismaError.code);
+        console.error('❌ Prisma 오류 메타:', prismaError.meta);
+        if (prismaError.code === 'P2002') {
+          throw new Error('이미 해당 상품에 대한 리뷰를 작성했습니다.');
+        }
       }
       
       throw new Error('리뷰를 생성할 수 없습니다.');
