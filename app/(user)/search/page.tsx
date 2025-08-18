@@ -9,7 +9,7 @@ interface IProps {
 
 export default async function Search({ searchParams }: IProps) {
   const params = await searchParams;
-  const basedUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const basedUrl = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:3000';
   const url = new URL(`${basedUrl}/api/search`);
 
   const queryParams: IQueryParams = {
