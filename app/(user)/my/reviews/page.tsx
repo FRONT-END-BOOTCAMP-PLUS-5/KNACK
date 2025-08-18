@@ -84,9 +84,9 @@ export default function ReviewsPage() {
              myReviewsData: myReviews
            });
            
-           // 이미 리뷰가 작성된 상품은 "리뷰 쓰기" 탭에서 제거
+           // 이미 리뷰가 작성된 주문은 "리뷰 쓰기" 탭에서 제거
            const filteredReviewableOrders = reviewableOrders.filter((order: ReviewDto) => {
-             return !myReviews.some((review: MyReviewDto) => review.productId === order.productId);
+             return !myReviews.some((review: MyReviewDto) => review.orderId === order.orderId);
            });
            
            console.log('🔍 필터링 결과:', {
@@ -127,16 +127,8 @@ export default function ReviewsPage() {
       }
     }, [searchParams]);
 
-
-
-           
-
-       
-
   return (
     <main>
-
-
       {/* 탭 버튼 */}
       <div className={styles.tab_container}>
         <button 
@@ -188,30 +180,45 @@ export default function ReviewsPage() {
                          className={styles.product_link}
                        >
                        {/* 상품 정보는 Link로 감싸서 리뷰 작성 페이지로 이동 */}
-                       <Link href={`/my/reviews/${order.productId}?orderId=${order.orderId}`}>
-                         <div className={styles.product_item}>
-                           <div className={styles.product_image}>
-                             <Image 
-                               src={order.thumbnailImage ? `https://d2ubv3uh3d6fx8.cloudfront.net/uploads/product/thumbnail/${order.thumbnailImage}` : '/images/default-product.jpg'} 
-                               alt={order.productName}
-                               width={80}
-                               height={80}
-                               className={styles.image}
-                             />
-                           </div>
-                           <div className={styles.product_info}>
-                             <h3 className={styles.product_eng_name}>{order.productName}</h3>
-                             <p className={styles.product_kor_name}>{order.productEngName}</p>
-                             <p className={styles.product_size}>{order.size}</p>
-                           </div>
-                         </div>
-                       </Link>
+                        <Link href={`/my/reviews/${order.productId}?orderId=${order.orderId}`}>
+                          <div className={styles.product_item}>
+                            <div className={styles.product_image}>
+                              <Image 
+                                src={order.thumbnailImage ? `https://d2ubv3uh3d6fx8.cloudfront.net/uploads/product/thumbnail/${order.thumbnailImage}` : '/images/default-product.jpg'} 
+                                alt={order.productName}
+                                width={80}
+                                height={80}
+                                className={styles.image}
+                              />
+                            </div>
+                            <div className={styles.product_info}>
+                              <h3 className={styles.product_eng_name}>{order.productName}</h3>
+                              <p className={styles.product_kor_name}>{order.productEngName}</p>
+                              <p className={styles.product_size}>
+                                {order.size || '사이즈 정보 없음'}
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
                        
-                                               {/* 별점 표시 (읽기 전용) */}
+                                               {/* 별점 입력 */}
                         <div className={styles.rating_section}>
-                          <p className={styles.rating_text}>
-                            상품을 클릭하여 리뷰를 작성하세요
-                          </p>
+                          <div className={styles.rating_input}>
+                            
+                            <ReactStars
+                              count={5}
+                              value={0}
+                              size={30}
+                              color1="#ddd"
+                              color2="#ddd"
+                              edit={true}
+                              onChange={(rating) => {
+                                // 별점 변경 처리
+                                console.log('별점 변경:', rating);
+                              }}
+                            />
+                            <span className={styles.rating_label}>별점을 선택하세요.</span>
+                          </div>
                         </div>
                      </div>
                    ))}
@@ -243,7 +250,9 @@ export default function ReviewsPage() {
                        <div className={styles.product_info}>
                          <h3 className={styles.product_eng_name}>{order.productName}</h3>
                          <p className={styles.product_kor_name}>{order.productEngName}</p>
-                         <p className={styles.product_size}>{order.size}</p>
+                         <p className={styles.product_size}>
+                           {order.size || '사이즈 정보 없음'}
+                         </p>
                        </div>
                      </div>
                      <div className={styles.rating_section}>

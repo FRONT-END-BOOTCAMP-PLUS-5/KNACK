@@ -28,6 +28,7 @@ export class PrismaReviewRepository implements ReviewRepository {
       return reviews.map(review => ({
         userId: review.userId,
         productId: review.productId,
+        orderId: review.orderId, // orderId 추가
         contents: review.contents,
         rating: review.rating || 0,
         reviewImages: review.reviewImages || undefined,
@@ -55,6 +56,7 @@ export class PrismaReviewRepository implements ReviewRepository {
       return {
         userId: review.userId,
         productId: review.productId,
+        orderId: review.orderId, // orderId 추가
         contents: review.contents,
         rating: review.rating || 0,
         reviewImages: review.reviewImages || undefined,
@@ -68,9 +70,21 @@ export class PrismaReviewRepository implements ReviewRepository {
 
   async findReviewByOrderId(orderId: number): Promise<Review | null> {
     try {
-      // 현재 DB 스키마에는 orderId가 없으므로, 임시로 null 반환
-      // 나중에 DB 스키마가 업데이트되면 실제 구현
-      return null;
+      const review = await prisma.review.findFirst({
+        where: { orderId }
+      });
+      
+      if (!review) return null;
+      
+      return {
+        userId: review.userId,
+        productId: review.productId,
+        orderId: review.orderId, // orderId 추가
+        contents: review.contents,
+        rating: review.rating || 0,
+        reviewImages: review.reviewImages || undefined,
+        createdAt: review.createdAt || new Date()
+      };
     } catch (error) {
       console.error('리뷰 조회 실패:', error);
       throw new Error('리뷰를 조회할 수 없습니다.');
@@ -79,26 +93,42 @@ export class PrismaReviewRepository implements ReviewRepository {
 
   async createReview(review: Omit<Review, 'createdAt'>): Promise<Review> {
     try {
+      console.log('🔍 리뷰 생성 시도:', review); // 디버깅 로그 추가
+      
       const createdReview = await prisma.review.create({
         data: {
           userId: review.userId,
           productId: review.productId,
           contents: review.contents,
           rating: review.rating,
-          reviewImages: review.reviewImages
+          reviewImages: review.reviewImages,
+          orderId: review.orderId // orderId 필수 필드로 변경
         }
       });
+      
+      console.log('✅ 리뷰 생성 성공:', createdReview); // 성공 로그 추가
       
       return {
         userId: createdReview.userId,
         productId: createdReview.productId,
+        orderId: createdReview.orderId, // orderId 추가
         contents: createdReview.contents,
         rating: createdReview.rating || 0,
         reviewImages: createdReview.reviewImages || undefined,
         createdAt: createdReview.createdAt || new Date()
       };
     } catch (error) {
-      console.error('리뷰 생성 실패:', error);
+      console.error('❌ 리뷰 생성 실패 - 상세 오류:', error); // 상세 오류 로그
+      console.error('❌ 오류 타입:', error instanceof Error ? error.constructor.name : typeof error);
+      console.error('❌ 오류 메시지:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('❌ 오류 스택:', error instanceof Error ? error.stack : 'No stack trace');
+      
+      // Prisma 오류인 경우 상세 정보 출력
+      if (error && typeof error === 'object' && 'code' in error) {
+        console.error('❌ Prisma 오류 코드:', (error as any).code);
+        console.error('❌ Prisma 오류 메타:', (error as any).meta);
+      }
+      
       throw new Error('리뷰를 생성할 수 없습니다.');
     }
   }
@@ -106,27 +136,27 @@ export class PrismaReviewRepository implements ReviewRepository {
 
 // Prisma를 사용한 주문 리포지토리 구현
 export class PrismaOrderRepository implements OrderRepository {
-  // 사이즈 정보 추출 헬퍼 함수
-  private extractSizeFromProduct(product: any): string {
-    try {
-      if (!product.productOptionMappings || product.productOptionMappings.length === 0) {
-        return '사이즈 정보 없음';
-      }
+  // 사이즈 정보 추출 헬퍼 함수 - 이제 사용하지 않음
+  // private extractSizeFromProduct(product: any): string {
+  //   try {
+  //     if (!product.productOptionMappings || product.productOptionMappings.length === 0) {
+  //       return '사이즈 정보 없음';
+  //     }
 
-      // 첫 번째 옵션 타입에서 사이즈 정보 찾기
-      const optionMapping = product.productOptionMappings[0];
-      if (optionMapping?.optionType?.optionValue && optionMapping.optionType.optionValue.length > 0) {
-        // 사이즈 관련 옵션 값들 (예: S, M, L, XL, 250, 265 등)
-        const sizeValues = optionMapping.optionType.optionValue;
-        return sizeValues[0].name; // 첫 번째 옵션 값 반환
-      }
+  //     // 첫 번째 옵션 타입에서 사이즈 정보 찾기
+  //     const optionMapping = product.productOptionMappings[0];
+  //     if (optionMapping?.optionType?.optionValue && optionMapping.optionType.optionValue.length > 0) {
+  //       // 사이즈 관련 옵션 값들 (예: S, M, L, 250, 265 등)
+  //       const sizeValues = optionMapping.optionType.optionValue;
+  //       return sizeValues[0].name; // 첫 번째 옵션 값 반환
+  //     }
 
-      return '사이즈 정보 없음';
-    } catch (error) {
-      console.error('사이즈 정보 추출 실패:', error);
-      return '사이즈 정보 없음';
-    }
-  }
+  //     return '사이즈 정보 없음';
+  //   } catch (error) {
+  //     console.error('사이즈 정보 추출 실패:', error);
+  //     return '사이즈 정보 없음';
+  //   }
+  // }
 
   async findOrdersByUserId(userId: string): Promise<Order[]> {
     try {
@@ -138,17 +168,10 @@ export class PrismaOrderRepository implements OrderRepository {
           product: {
             include: {
               category: true,
-              productOptionMappings: {
-                include: {
-                  optionType: {
-                    include: {
-                      optionValue: true,
-                    },
-                  },
-                },
-              },
+              // productOptionMappings 제거 - 더 이상 필요하지 않음
             },
           },
+          optionValue: true, // optionValue 정보 포함
         },
         orderBy: { createdAt: 'desc' }
       });
@@ -163,11 +186,18 @@ export class PrismaOrderRepository implements OrderRepository {
           engName: orders[0].product.engName,
           korName: orders[0].product.korName,
           category: orders[0].product.category,
+          optionValue: orders[0].optionValue, // optionValue 정보 추가
         });
         
-        // 옵션 정보 디버깅 로그 추가
-        if (orders[0].product.productOptionMappings) {
-          console.log('🔍 Product Option Mappings:', JSON.stringify(orders[0].product.productOptionMappings, null, 2));
+        // optionValue 정보 디버깅 로그 추가
+        if (orders[0].optionValue) {
+          console.log('🔍 OptionValue 정보:', {
+            id: orders[0].optionValue.id,
+            name: orders[0].optionValue.name,
+            typeId: orders[0].optionValue.typeId // any 타입 제거
+          });
+        } else {
+          console.log('❌ OptionValue 정보가 없음');
         }
       }
       
@@ -190,8 +220,12 @@ export class PrismaOrderRepository implements OrderRepository {
           category: order.product.category ? {
             engName: order.product.category.engName || '카테고리 없음',
             korName: order.product.category.korName || '카테고리 없음'
-          } : undefined,
-          size: this.extractSizeFromProduct(order.product)
+          } : undefined
+        } : undefined,
+        optionValue: order.optionValue ? {  // optionValue 정보 추가
+          id: order.optionValue.id,
+          name: order.optionValue.name,
+          typeId: order.optionValue.typeId
         } : undefined
       }));
     } catch (error) {
@@ -205,8 +239,6 @@ export class PrismaOrderRepository implements OrderRepository {
     }
   }
 
-
-
   async findOrderWithProduct(orderId: number): Promise<Order | null> {
     try {
       const order = await prisma.order.findUnique({
@@ -215,17 +247,10 @@ export class PrismaOrderRepository implements OrderRepository {
           product: {
             include: {
               category: true,
-              productOptionMappings: {
-                include: {
-                  optionType: {
-                    include: {
-                      optionValue: true,
-                    },
-                  },
-                },
-              },
+              // productOptionMappings 제거
             },
           },
+          optionValue: true, // optionValue 정보 포함
         }
       });
       
@@ -250,8 +275,12 @@ export class PrismaOrderRepository implements OrderRepository {
           category: order.product.category ? {
             engName: order.product.category.engName || '카테고리 없음',
             korName: order.product.category.korName || '카테고리 없음'
-          } : undefined,
-          size: this.extractSizeFromProduct(order.product)
+          } : undefined
+        } : undefined,
+        optionValue: order.optionValue ? {  // optionValue 정보 추가
+          id: order.optionValue.id,
+          name: order.optionValue.name,
+          typeId: order.optionValue.typeId
         } : undefined
       };
     } catch (error) {

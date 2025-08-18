@@ -1,5 +1,6 @@
 import { ReviewDto } from '../dtos/ReviewDto';
 import { ReviewRepository, OrderRepository } from '../../repositories/reviewRepository';
+import { Order } from '../../domains/entities/Order'; // Order 타입 경로 수정
 
 export class GetReviewableOrdersUseCase {
   constructor(
@@ -32,7 +33,7 @@ export class GetReviewableOrdersUseCase {
         // 리뷰 작성 가능한 주문인지 확인 (배송 완료 등)
         if (this.isReviewableOrder(order)) {
           console.log('✅ 리뷰 가능한 주문:', order.id);
-          const review = await this.reviewRepository.findReviewByUserAndProduct(userId, order.productId);
+          const review = await this.reviewRepository.findReviewByOrderId(order.id); // orderId로 리뷰 찾기
           
           // Order에 포함된 Product 정보 사용
           if (order.product) {
@@ -45,7 +46,7 @@ export class GetReviewableOrdersUseCase {
               productEngName: order.product.engName,
               thumbnailImage: order.product.thumbnailImage,
               category: order.product.category,
-              size: order.product.size || '사이즈 정보 없음',
+              size: order.optionValue?.name || '', // 하드코딩 제거
               hasReview: !!review,
               review: review ? {
                 contents: review.contents,
@@ -70,7 +71,7 @@ export class GetReviewableOrdersUseCase {
     }
   }
 
-  private isReviewableOrder(order: any): boolean {
+  private isReviewableOrder(order: Order): boolean { // any 타입을 Order로 변경
     // 테스트를 위해 모든 주문을 리뷰 가능하게 설정
     // 실제 운영에서는 배송 완료(deliveryStatus === 3) 또는 구매 확정(deliveryStatus === 4)일 때만
     return true; // 모든 주문을 리뷰 가능하게 설정

@@ -128,6 +128,13 @@
   margin: 0;
 }
 
+.rating_label{    
+  font-size: 1.2rem;
+  display: block;
+  text-align: left;
+  color: $light-gray01;
+  margin: .5rem 0 0 .5rem;
+}
 .empty_message {
   color: #6c757d;
   font-size: 1.1rem;

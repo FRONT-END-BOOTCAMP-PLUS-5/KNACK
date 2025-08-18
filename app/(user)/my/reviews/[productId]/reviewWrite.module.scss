@@ -141,12 +141,6 @@
     transition: all 0.2s ease;
     width: 100%;
 
-    &:hover:not(:disabled) {
-      background: #0056b3;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-    }
-
     &:disabled {
       background: #ccc;
       cursor: not-allowed;

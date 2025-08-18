@@ -4,6 +4,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import ReactStars from 'react-stars';
 import styles from './reviewWrite.module.scss';
+import { useSession } from 'next-auth/react';
 
 // 카테고리별 질문과 답변 옵션 (ID 기반)
 const reviewQuestions = {
@@ -55,35 +56,18 @@ const reviewQuestions = {
       question: '하의 퀄리티는 어떤가요?',
       options: ['퀄리티가 별로예요', '퀄리티가 보통이에요', '퀄리티가 만족스러워요', '퀄리티가 매우 만족스러워요']
     }
-  ],
-  // shoes는 일단 주석 처리 (나중에 추가 예정)
-  // shoes: [
-  //   {
-  //     question: '구매하신 신발 사이즈는 어떤가요?',
-  //     options: ['작게 나왔어요', '정사이즈예요', '크게 나왔어요']
-  //   },
-  //   {
-  //     question: '평소 사이즈에서 얼마나 크게/작게 구매했나요?',
-  //     options: ['한사이즈 다운', '반사이즈 다운', '정사이즈', '반사이즈 업', '한사이즈 업']
-  //   },
-  //   {
-  //     question: '착화감은 어떤가요?',
-  //     options: ['불편해요', '보통이에요', '편해요']
-  //   },
-  //   {
-  //     question: '구매한 신발의 발볼은 어떤가요?',
-  //     options: ['좁아요', '보통이에요', '넓어요']
-  //   }
-  // ]
+  ]
 };
 
 export default function ReviewWritePage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session } = useSession();
+  
   const productId = params.productId as string;
   
   // URL에서 orderId 가져오기
-  const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
   
   // 상품 정보 상태
@@ -138,6 +122,12 @@ export default function ReviewWritePage() {
 
   const handleSubmit = async () => {
     try {
+      // 세션 확인
+      if (!session?.user?.id) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+
       // 모든 질문에 답변했는지 확인
       if (Object.keys(answers).length < questions.length) {
         alert('모든 질문에 답변해주세요.');
@@ -152,13 +142,15 @@ export default function ReviewWritePage() {
 
       // 리뷰 데이터 준비
       const reviewData = {
-        userId: '117b3f7d-ca70-4424-8d3b-5625c994576e', // 실제 존재하는 사용자 ID (Prisma Studio에서 확인)
+        userId: session.user.id, // 세션에서 실제 사용자 ID 가져오기
         productId: parseInt(productId),
         orderId: parseInt(orderId || '0'), // orderId 추가!
         contents: JSON.stringify(answers),
         rating: Math.round(rating), // 소수점 제거하고 정수로 변환
         reviewImages: '' // TODO: 이미지 업로드 기능 추가 시 구현
       };
+
+      console.log('🔍 리뷰 데이터:', reviewData);
 
       // API 호출하여 리뷰 생성
       const response = await fetch('/api/reviews', {
@@ -204,7 +196,7 @@ export default function ReviewWritePage() {
             />
           </div>
         </div>
-
+        
         {/* 카테고리별 질문들 */}
         {questions.map((question, index) => (
           <div key={index} className={styles.question_section}>
@@ -226,7 +218,7 @@ export default function ReviewWritePage() {
           </div>
         ))}
       </div>
-
+      
       <div className={styles.submit_section}>
         <button 
           className={styles.submit_button}

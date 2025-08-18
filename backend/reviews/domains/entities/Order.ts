@@ -13,4 +13,9 @@ export interface Order {
   count: number;
   paymentId?: number;
   product?: Product;
+  optionValue?: {
+    id: number;
+    name: string;
+    typeId: number; // typeId 추가
+  };
 }
