@@ -9,6 +9,7 @@ import {
   PageInfo,
   PaginationInfo,
 } from '@/backend/search/domains/entities/ProductFilters';
+import { Prisma } from '@prisma/client';
 
 export class PrProductsRepository implements ProductSearchRepository {
   async getProducts(params: {
@@ -20,9 +21,8 @@ export class PrProductsRepository implements ProductSearchRepository {
     const limit = pagination?.limit || 20;
     const offset = pagination?.offset || 0;
 
-    const whereConditions: Record<string, unknown> = {
+    const whereConditions: Prisma.ProductWhereInput = {
       isPrivate: true,
-      //TODO: unknown 수정 필요
     };
 
     if (filters) {
@@ -44,24 +44,26 @@ export class PrProductsRepository implements ProductSearchRepository {
         whereConditions.subCategoryId = { in: filters.subCategoryId };
       }
       if (filters.priceMin !== undefined || filters.priceMax !== undefined) {
-        whereConditions.price = {};
+        const priceFilter: Prisma.IntFilter = {};
         if (filters.priceMin !== undefined) {
-          (whereConditions.price as Record<string, number>).gte = filters.priceMin;
+          priceFilter.gte = filters.priceMin;
         }
         if (filters.priceMax !== undefined) {
-          (whereConditions.price as Record<string, number>).lte = filters.priceMax;
+          priceFilter.lte = filters.priceMax;
         }
+        whereConditions.price = priceFilter;
       }
       if (filters.discountMin !== undefined || filters.discountMax !== undefined) {
-        whereConditions.discountPercent = {};
+        const discountFilter: Prisma.IntFilter = {};
         if (filters.discountMin !== undefined) {
-          (whereConditions.discountPercent as Record<string, number>).gte = filters.discountMin;
+          discountFilter.gte = filters.discountMin;
         }
         if (filters.discountMax !== undefined) {
-          (whereConditions.discountPercent as Record<string, number>).lte = filters.discountMax;
+          discountFilter.lte = filters.discountMax;
         }
+        whereConditions.discountPercent = discountFilter;
       }
-      if (filters.benefit === 'under_price') {
+      if (filters.benefit) {
         whereConditions.discountPercent = { gt: 0 };
       }
 
@@ -92,13 +94,14 @@ export class PrProductsRepository implements ProductSearchRepository {
     }
 
     // ORDER BY 조건 구성
-    const orderBy: Record<string, unknown> = {};
+    const orderBy: Prisma.ProductOrderByWithRelationInput = {};
     switch (sort) {
       case 'latest':
         orderBy.createdAt = 'desc';
         break;
       case 'popular':
-        orderBy.likes = { _count: 'desc' };
+        // TODO: 인기순 기준 확인 필요
+        orderBy.productLike = { _count: 'desc' };
         break;
       case 'price_high':
         orderBy.price = 'desc';
@@ -107,7 +110,7 @@ export class PrProductsRepository implements ProductSearchRepository {
         orderBy.price = 'asc';
         break;
       case 'likes':
-        orderBy.likes = { _count: 'desc' };
+        orderBy.productLike = { _count: 'desc' };
         break;
       case 'reviews':
         orderBy.reviews = { _count: 'desc' };
@@ -117,7 +120,7 @@ export class PrProductsRepository implements ProductSearchRepository {
     }
 
     // 커서 기반 페이지네이션
-    let cursorCondition = {};
+    let cursorCondition: Prisma.ProductWhereInput = {};
     if (pagination?.cursor) {
       cursorCondition = { id: { gt: parseInt(pagination.cursor) } };
     }

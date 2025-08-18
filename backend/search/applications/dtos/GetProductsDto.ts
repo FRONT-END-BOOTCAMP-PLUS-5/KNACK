@@ -10,7 +10,7 @@ export interface GetProductsRequestDto {
   price?: string;
   discount?: string;
   size?: string[];
-  benefit?: 'under_price';
+  benefit?: boolean;
   gender?: string;
   soldOutInvisible?: boolean;
 
