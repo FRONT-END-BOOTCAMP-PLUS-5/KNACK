@@ -8,6 +8,8 @@ export const PRODUCT_FILTER = [
   { id: 7, name: '가격대', value: 'price' },
 ] as const;
 
+export type FilterValueType = (typeof PRODUCT_FILTER)[number]['value'];
+
 export const PRODUCT_FILTER_SORT = [
   { id: 1, name: '최신순', value: 'latest' },
   { id: 2, name: '인기순', value: 'popular' },
@@ -16,6 +18,8 @@ export const PRODUCT_FILTER_SORT = [
   { id: 5, name: '관심 많은순', value: 'likes' },
   { id: 6, name: '리뷰 많은순', value: 'reviews' },
 ] as const;
+
+export type SortValueType = (typeof PRODUCT_FILTER_SORT)[number]['value'];
 
 export const PRODUCT_FILTER_COLOR = [
   { id: 13, engName: 'black', korName: '블랙', color: '#000', image: '' },
@@ -47,13 +51,15 @@ export const PRODUCT_FILTER_GENDER = [
   { id: 3, name: '공용', value: 'all' },
 ] as const;
 
+export type GenderValueType = (typeof PRODUCT_FILTER_GENDER)[number]['value'];
+
 export const PRODUCT_FILTER_DISCOUNT = [
   { id: 1, name: '30% 이하', value: '-30' },
   { id: 2, name: '30%-50%', value: '30-50' },
   { id: 3, name: '50% 이상', value: '50-' },
 ] as const;
 
-export type DiscountValue = (typeof PRODUCT_FILTER_DISCOUNT)[number]['value'];
+export type DiscountValueType = (typeof PRODUCT_FILTER_DISCOUNT)[number]['value'];
 
 export const PRODUCT_FILTER_PRICE = [
   { id: 1, name: '10만원 이하', value: '0-99999' },

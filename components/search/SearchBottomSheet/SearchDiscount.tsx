@@ -2,15 +2,15 @@ import Text from '@/components/common/Text';
 import styles from './searchBottomSheet.module.scss';
 import Flex from '@/components/common/Flex';
 import TagButton from '@/components/common/TagButton';
-import { DiscountValue, PRODUCT_FILTER_DISCOUNT } from '@/constraint/product';
+import { DiscountValueType, PRODUCT_FILTER_DISCOUNT } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
 
 interface IProps {
   selectedFilter: ISearchProductListRequest;
-  onClickDiscountSelect: (discountValue: DiscountValue) => void;
+  onClickDiscountSelect: (discountValue: DiscountValueType) => void;
 }
 export default function SearchDiscount({ selectedFilter, onClickDiscountSelect }: IProps) {
-  const isDiscountSelected = (discountValue: string): boolean => {
+  const isDiscountSelected = (discountValue: DiscountValueType): boolean => {
     return selectedFilter.discount === discountValue;
   };
 

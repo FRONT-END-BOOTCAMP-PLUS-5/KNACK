@@ -4,9 +4,10 @@ import { IPageCategory } from '@/types/category';
 import { IBrandWithTagList } from '@/types/brand';
 import { IOption } from '@/types/option';
 import { convertFilterToBottomList } from '@/utils/search/searchBottomSheetList';
+import { FilterValueType } from '@/constraint/product';
 
 interface ISelectedBottomList {
-  type: 'subCategoryId' | 'brandId' | 'size' | 'keywordColorId' | 'discount' | 'gender' | 'price';
+  type: FilterValueType;
   name: string;
   value: string | number;
 }
