@@ -16,13 +16,15 @@ import SearchGender from './SearchGender';
 import SearchBrand from './SearchBrand';
 import SearchSize from './SearchSize';
 import {
-  DiscountValue,
+  DiscountValueType,
   PRODUCT_FILTER,
   PRODUCT_FILTER_GENDER,
   PRODUCT_FILTER_COLOR,
   PRODUCT_FILTER_DISCOUNT,
   PRODUCT_FILTER_PRICE,
   PRODUCT_FILTER_SORT,
+  GenderValueType,
+  FilterValueType,
 } from '@/constraint/product';
 import { categoryService } from '@/services/category';
 import { brandService } from '@/services/brand';
@@ -206,7 +208,7 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   };
 
   // 성별 클릭 핸들러
-  const onClickGenderSelect = (gender: 'm' | 'f' | 'all') => {
+  const onClickGenderSelect = (gender: GenderValueType) => {
     const currentGender = selectedFilter.gender;
     const isDeselecting = currentGender === gender;
 
@@ -248,7 +250,7 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   };
 
   // 할인율 클릭 핸들러
-  const onClickDiscountSelect = (discountValue: DiscountValue) => {
+  const onClickDiscountSelect = (discountValue: DiscountValueType) => {
     const isDeselecting = selectedFilter.discount === discountValue;
 
     if (isDeselecting) {
@@ -330,10 +332,7 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   };
 
   // selectedBottomList에서 항목 제거 시 selectedFilter도 함께 업데이트
-  const handleRemoveBottomListItem = (
-    type: 'subCategoryId' | 'brandId' | 'size' | 'keywordColorId' | 'discount' | 'gender' | 'price',
-    value: string | number
-  ) => {
+  const handleRemoveBottomListItem = (type: FilterValueType, value: string | number) => {
     removeFromBottomList(type, value);
 
     const newSelectedFilter = removeFilterValue(selectedFilter, type, value);

@@ -1,15 +1,15 @@
 import Text from '@/components/common/Text';
 import TagButton from '@/components/common/TagButton';
 import styles from './searchBottomSheet.module.scss';
-import { PRODUCT_FILTER_GENDER } from '@/constraint/product';
+import { GenderValueType, PRODUCT_FILTER_GENDER } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
 
 interface IProps {
   selectedFilter: ISearchProductListRequest;
-  onClickGenderSelect: (gender: 'm' | 'f' | 'all') => void;
+  onClickGenderSelect: (gender: GenderValueType) => void;
 }
 export default function SearchGender({ selectedFilter, onClickGenderSelect }: IProps) {
-  const isGenderSelected = (gender: 'm' | 'f' | 'all') => {
+  const isGenderSelected = (gender: GenderValueType) => {
     return selectedFilter.gender === gender;
   };
 

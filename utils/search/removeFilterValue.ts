@@ -1,10 +1,9 @@
+import { FilterValueType } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
-
-type FilterType = 'subCategoryId' | 'brandId' | 'size' | 'keywordColorId' | 'discount' | 'gender' | 'price';
 
 export const removeFilterValue = (
   selectedFilter: ISearchProductListRequest,
-  type: FilterType,
+  type: FilterValueType,
   value: string | number
 ): ISearchProductListRequest => {
   switch (type) {

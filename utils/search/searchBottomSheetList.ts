@@ -7,10 +7,11 @@ import {
   PRODUCT_FILTER_GENDER,
   PRODUCT_FILTER_DISCOUNT,
   PRODUCT_FILTER_PRICE,
+  FilterValueType,
 } from '@/constraint/product';
 
 interface ISelectedBottomList {
-  type: 'subCategoryId' | 'brandId' | 'size' | 'keywordColorId' | 'discount' | 'gender' | 'price';
+  type: FilterValueType;
   name: string;
   value: string | number;
 }
