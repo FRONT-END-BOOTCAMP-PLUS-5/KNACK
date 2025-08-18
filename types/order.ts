@@ -25,12 +25,126 @@ export interface RepresentativeProduct {
   id: number;
   korName: string;
   engName: string;
-  thumbnailUrl: string;
+  thumbnailImage: string;
   name: string;
   price: number;
 }
 
-export type OrderPageProps = { params: { orderId: string } };
+export type RepoPayment = {
+  id: number;
+  userId: string;
+  address?: RepoAddress | null;
+  price?: number | bigint | null;
+  createdAt?: Date | null;
+  paymentNumber: bigint;
+  tossPaymentKey?: string | null;
+  approvedAt?: Date | null;
+  method?: string | null;
+  status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
+  orders: Array<{
+    id: number;
+    status: string;
+    orderItems: Array<{
+      optionValue: IOptionValue;
+      id: number;
+      productId: number;
+      quantity: number;
+      price: number | bigint;
+      product?: { korName?: string | null; engName?: string | null; thumbnailImage?: string | null } | null;
+      productName?: string | null;
+    }>;
+  }>;
+};
+
+export type DtoStatus = 'DONE' | 'PENDING' | 'FAILED' | 'CANCELED';
+
+export type OrderPageProps = { params: { id: string } };
+
+const addressSelect = {
+  id: true,
+  name: true,      // or name
+  phone: true,         // or phoneNumber
+  zipCode: true,       // or postalCode
+  main: true,      // or line1 / address
+  detail: true,      // or line2 / detailAddress
+  message: true,       // 배송 요청사항
+} as const
+
+// 기존 아이템 그래프 include (관계명은 스키마에 맞게)
+export const graphInclude = {
+  address: { select: addressSelect },
+  orders: {
+    // 너 스키마가 "orders가 곧 아이템"이면 필요한 필드 select
+    // 만약 orders -> orderItems 구조면 아래처럼 변경:
+    // include: { orderItems: { include: { product: true, optionValue: true } } }
+    select: {
+      id: true,
+      userId: true,
+      productId: true,
+      price: true,
+      salePrice: true,
+      tracking: true,
+      createdAt: true,
+      deliveryStatus: true,
+      count: true,          // or quantity
+      paymentId: true,
+      optionValueId: true,
+      product: {
+        select: {
+          id: true,
+          korName: true,
+          engName: true,
+          thumbnailImage: true,
+          price: true,
+        },
+      },
+      optionValue: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  },
+} as const
+
+export type RepoOrder = {
+  orderItems?: RepoOrderItem[];
+};
+
+export type RepoAddress = {
+  id: number;
+  name: string;
+  phone: string;
+  zipCode: string;
+  main: string;
+  detail: string | null;
+  message: string | null;
+};
+
+export type RepoOrderItem = {
+  id: number;
+  productId: number;
+  price: number | bigint;
+  salePrice?: number | bigint;
+  quantity?: number;
+  count?: number;
+  tracking?: string | null;
+  createdAt?: Date;
+  deliveryStatus?: number;
+  optionValueId?: number;
+  product?: {
+    id: number;
+    korName?: string;
+    engName?: string;
+    thumbnailImage?: string;
+  };
+  optionValue?: {
+    id: number;
+    name: string;
+    value?: string;
+  };
+};
 
 /* ---------- 주소 ---------- */
 export type AddressDtoWithPostalFields = AddressDto & {

@@ -189,8 +189,6 @@ export default function PaymentSuccess() {
 
   return (
     <div className={styles.sheet}>
-      {/* 닫기 아이콘이 필요하면 onClick에 원하는 경로로 */}
-      {/* <button className={styles.close} aria-label="닫기" onClick={() => router.push('/')}>×</button> */}
 
       <h2 className={styles.title}>구매가 완료되었습니다.</h2>
       <p className={styles.subtitle}>주문 즉시 출고를 준비하여 안전하게 배송 될 예정입니다.</p>
@@ -207,7 +205,7 @@ export default function PaymentSuccess() {
         )}
       </div>
 
-      <button className={styles.primary_btn} onClick={() => router.push('/orders')}>
+      <button className={styles.primary_btn} onClick={() => router.push(`/my/buying/${paymentNumber}`)}>
         구매 내역 상세보기
       </button>
       <p className={styles.notice}>구매 후 15분 이내에 구매 여부를 결정할 수 있습니다.</p>

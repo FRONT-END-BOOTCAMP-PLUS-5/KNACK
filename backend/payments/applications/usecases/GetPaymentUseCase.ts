@@ -2,6 +2,7 @@
 
 import { PaymentRepository } from "../../domains/repositories/PaymentRepository"
 import { GetPaymentDto } from "../dtos/GetPaymentDto"
+import { normalizeStatus } from '@/utils/orders'
 
 export class GetPaymentOrdersUseCase {
     constructor(private repo: PaymentRepository) { }
@@ -13,15 +14,17 @@ export class GetPaymentOrdersUseCase {
         return {
             id: payment.id,
             createdAt: payment.createdAt ?? new Date(),
-            addressId: payment.addressId,
+            addressId: payment.address?.id ?? 0,
             paymentNumber: payment.paymentNumber,
-            tossPaymentKey: payment.tossPaymentKey,
-            price: payment.price ?? 0,
+            tossPaymentKey: payment.tossPaymentKey ?? null,
+            price: typeof payment.price === 'bigint' ? Number(payment.price) : (payment.price ?? 0),
             approvedAt: payment.approvedAt ?? new Date(),
-            method: payment.method,
-            status: payment.status,
+            method: payment.method ?? '',
+            status: (['DONE', 'CANCELED'] as const).includes(normalizeStatus(payment.status) as 'DONE' | 'CANCELED')
+                ? normalizeStatus(payment.status) as 'DONE' | 'CANCELED'
+                : 'CANCELED',
             userId: userId,
-            orderIds: payment.orderIds,
+            orderIds: payment.orders.map(order => order.id),
         }
     }
 

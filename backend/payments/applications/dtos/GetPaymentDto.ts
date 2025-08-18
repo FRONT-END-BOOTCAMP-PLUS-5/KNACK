@@ -11,3 +11,4 @@ export interface GetPaymentDto {
     userId: string; // 결제 요청한 유저 ID
     orderIds: number[]; // 결제된 주문 ID 목록
 }
+

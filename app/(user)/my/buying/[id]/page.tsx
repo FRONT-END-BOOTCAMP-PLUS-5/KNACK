@@ -5,7 +5,11 @@ import Image from "next/image";
 import styles from "./buying.module.scss";
 import BuyingFooter from "@/components/my/BuyingFooter";
 import { BuyingHeader } from "@/components/my/BuyingHeader";
-import { OrderPageProps } from "@/types/order";
+import { OrderPageProps, RepoAddress, RepoOrderItem } from "@/types/order";
+import requester from "@/utils/requester";
+import { useState, useEffect, useMemo } from "react";
+import { STORAGE_PATHS } from "@/constraint/auth";
+import { useRouter } from "next/navigation";
 
 const STEPS = ["검수합격", "대기 중", "배송"] as const;
 type Step = typeof STEPS[number];
@@ -15,21 +19,11 @@ function ProgressBar({ current }: { current: Step }) {
     return (
         <div className={styles.progress}>
             {STEPS.map((label, i) => (
-                <div key={label} className={styles.progressStep}>
-                    <div
-                        className={[
-                            styles.dot,
-                            i <= currentIdx ? styles.active : "",
-                        ].join(" ")}
-                    />
-                    <div className={styles.stepLabel}>{label}</div>
+                <div key={label} className={styles.progress_step}>
+                    <div className={[styles.dot, i <= currentIdx ? styles.active : ""].join(" ")} />
+                    <div className={styles.step_label}>{label}</div>
                     {i < STEPS.length - 1 && (
-                        <div
-                            className={[
-                                styles.bar,
-                                i < currentIdx ? styles.active : "",
-                            ].join(" ")}
-                        />
+                        <div className={[styles.bar, i < currentIdx ? styles.active : ""].join(" ")} />
                     )}
                 </div>
             ))}
@@ -37,70 +31,130 @@ function ProgressBar({ current }: { current: Step }) {
     );
 }
 
-export default function OrderPage({ params }: OrderPageProps) {
-    // TODO: 여기에 실제 API 연동
-    const mock = {
-        orderNo: "B-L123280757",
-        title:
-            "Chanel Chance Eau Tendre Eau De Parfum 50ml (국내 정식 발매)",
-        variant: "50ml / 빠른배송",
-        productThumb:
-            "", // 샘플
-        price: 169000,
-        fee: 5500,
-        shipping: 5000,
-        step: "대기 중" as Step,
-        eta: "8/19 ~ 8/20 도착 예정",
-        receiver: "윤다영",
-        phone: "010-9552-5150",
-        address:
-            "(01687) 서울 노원구 동일로221길 22 (상계동, 대림아파트) 2동 503호",
-        request: "문 앞에 놓아주세요",
-    };
+function formatPrice(n?: number) {
+    return (n ?? 0).toLocaleString() + "원";
+}
 
-    const total = mock.price + mock.fee + mock.shipping;
+function statusToStep(status?: string): Step {
+    const s = (status ?? "").toUpperCase();
+    if (s === "DONE" || s === "PAID" || s === "SHIPPED" || s === "DELIVERING") return "배송";
+    return "대기 중";
+}
+
+export default function OrderPage({ params }: OrderPageProps) {
+
+    const paymentDataStr = sessionStorage.getItem('paymentData');
+    const paymentData = paymentDataStr ? JSON.parse(paymentDataStr) : null;
+
+    const router = useRouter();
+    const [items, setItems] = useState<RepoOrderItem[]>([]);
+    const [address, setAddress] = useState<RepoAddress | null>(null);
+    const [meta, setMeta] = useState<{
+        paymentNumber?: string;
+        status?: string;
+        method?: string;
+        createdAt?: string;
+    }>({});
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await requester.get(`/api/payments/${params.id}`);
+                console.log(res.data);
+                const data = res.data ?? {};
+                setItems(data.orders ?? []);
+                setAddress(data.address ?? null);
+                setMeta({
+                    paymentNumber: String(data.paymentNumber ?? ""),
+                    status: data.status,
+                    method: data.method,
+                    createdAt: data.createdAt,
+                });
+            } catch (e) {
+                console.error("Failed to fetch payment data:", e);
+            }
+        })();
+    }, [params.id]);
+
+    // 합계 계산
+    const productTotal = useMemo(
+        () =>
+            items.reduce((sum, item) => {
+                const unit = Number((item).price ?? 0);
+                const qty = Number((item).count ?? 1);
+                return sum + unit * qty;
+            }, 0),
+        [items]
+    );
+    const total = productTotal + paymentData?.shippingFee - paymentData?.couponDiscountAmount - paymentData?.pointAmount;
+
+    const step: Step = statusToStep(meta.status);
+
+    // 주소 안전 매핑
+    const name =
+        (address?.name ?? "") || "-";
+    const phone =
+        (address?.phone ?? "") || "-";
+    const zip =
+        (address?.zipCode ?? "") || "";
+    const main =
+        (address?.main ?? "") || "";
+    const detail =
+        (address?.detail ?? "") || "";
+    const message =
+        (address?.message ?? "") || "";
 
     return (
         <>
-            <BuyingHeader />
-            <main className={styles.page}>
-                {/* Header */}
+            <BuyingHeader /> {/* 타이틀 컴포넌트가 '구매 진행 중'을 보여주도록 되어있다면 OK */}
 
+            <main className={styles.page}>
                 {/* 주문번호 */}
                 <section className={styles.section}>
-                    <div className={styles.orderNo}>주문번호 {mock.orderNo}</div>
+                    <div className={styles.order_no}>주문번호 {meta.paymentNumber || "-"}</div>
                 </section>
 
-                {/* 상품 카드 */}
-                <section className={`${styles.section} ${styles.productCard}`}>
-                    <div className={styles.thumbWrap}>
-                        <Image
-                            src={mock.productThumb}
-                            alt=""
-                            fill
-                            sizes="96px"
-                            className={styles.thumb}
-                        />
+                {/* 상품 카드들 */}
+                {items.map((item) => {
+                    const thumb =
+                        (item.product)?.thumbnailImage ??
+                        "/placeholder.png";
+                    const korname = (item.product)?.korName ?? "";
+                    const engname = (item.product)?.engName ?? "";
+                    const variant = (item.optionValue)?.name ?? (item.optionValue)?.value ?? "";
+                    return (
+                        <><section key={item.id} className={`${styles.section} ${styles.product_card}`}>
+                            <div className={styles.thumb_wrap}>
+                                <Image
+                                    src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${thumb}`}
+                                    alt={korname}
+                                    width={72}
+                                    height={72}
+                                    className={styles.thumb} />
+                            </div>
+                            <div className={styles.prod_info}>
+                                <div className={styles.k_title}>{korname}</div>
+                                <div className={styles.sub_title}>{engname}</div>
+                                {variant && <div className={styles.variant}>{variant}</div>}
+                            </div>
+                        </section><button className={styles.detail_btn} onClick={() => router.push(`/products/${item.product?.id}`)}>상품 상세</button></>
+                    );
+                })}
+
+                {/* 진행 상황 */}
+                <section className={styles.section_pink}>
+                    <div className={styles.block_title}>진행 상황</div>
+                    <ProgressBar current={step} />
+                    <div className={styles.step_desc}>
+                        {step === "대기 중" ? "구매 결정대기" : "배송 준비/진행 중"}
                     </div>
-                    <div className={styles.prodInfo}>
-                        <div className={styles.title}>{mock.title}</div>
-                        <div className={styles.variant}>{mock.variant}</div>
-                        <button className={styles.linkBtn}>상품 상세</button>
-                    </div>
                 </section>
 
-                {/* 진행 상태 */}
+                {/* 도착 예정 (원하면 서버 값으로 바꿔 연결) */}
                 <section className={styles.section}>
-                    <div className={styles.blockTitle}>진행 상황</div>
-                    <ProgressBar current={mock.step} />
-                    <div className={styles.stepDesc}>구매 결정대기</div>
-                </section>
-
-                {/* ETA */}
-                <section className={styles.section}>
-                    <div className={styles.etaCard}>
-                        <div className={styles.etaTitle}>{mock.eta}</div>
-                        <div className={styles.etaSub}>
+                    <div className={styles.eta_card}>
+                        <div className={styles.eta_title}>8/19 ~ 8/20 도착 예정</div>
+                        <div className={styles.eta_sub}>
                             거래 데이터를 통해 예측한 일정이며, 상황에 따라 변경될 수 있습니다.
                         </div>
                     </div>
@@ -108,81 +162,76 @@ export default function OrderPage({ params }: OrderPageProps) {
 
                 {/* 결제 내역 */}
                 <section className={styles.section}>
-                    <div className={styles.blockTitle}>결제 내역</div>
+                    <div className={styles.block_title}>결제 내역</div>
 
-                    <div className={styles.listRow}>
+                    <div className={styles.list_row}>
                         <div className={styles.label}>구매가</div>
-                        <div className={styles.valueEmph}>
-                            {mock.price.toLocaleString()}원
-                        </div>
+                        <div className={styles.value_emph}>{formatPrice(productTotal)}</div>
                     </div>
 
-                    <div className={styles.listRow}>
-                        <div className={styles.label}>검수비</div>
-                        <div className={styles.valueMuted}>무료</div>
-                    </div>
-
-                    <div className={styles.listRow}>
-                        <div className={styles.label}>
-                            수수료 <span className={styles.tip} aria-label="수수료 안내">?</span>
-                        </div>
-                        <div className={styles.value}>
-                            {mock.fee > 0 ? `${mock.fee.toLocaleString()}원` : "-"}
-                        </div>
-                    </div>
-
-                    <div className={styles.listRow}>
+                    <div className={styles.list_row}>
                         <div className={styles.label}>배송비</div>
-                        <div className={styles.value}>
-                            {mock.shipping.toLocaleString()}원
-                        </div>
+                        <div className={styles.value}>{formatPrice(paymentData?.shippingFee)}</div>
                     </div>
 
-                    <div className={`${styles.listRow} ${styles.totalRow}`}>
+                    <div className={styles.list_row}>
+                        <div className={styles.label}>쿠폰 적용가</div>
+                        <div className={styles.value}>{formatPrice(paymentData.couponDiscountAmount)}</div>
+                    </div>
+
+                    <div className={styles.list_row}>
+                        <div className={styles.label}>포인트 사용</div>
+                        <div className={styles.value}>{formatPrice(paymentData.pointAmount)}</div>
+                    </div>
+
+                    <div className={`${styles.list_row} ${styles.total_row}`}>
                         <div className={styles.label}>총 결제 예정</div>
-                        <div className={styles.valueStrong}>
-                            {total.toLocaleString()}원
-                        </div>
+                        <div className={styles.value_strong}>{formatPrice(total)}</div>
                     </div>
 
-                    <button className={styles.subtleBtn}>결제 내역 상세보기</button>
+                    <button className={styles.subtle_btn}>결제 내역 상세보기</button>
                 </section>
 
                 {/* 배송 주소 */}
                 <section className={styles.section}>
-                    <div className={styles.blockTitleRow}>
-                        <div className={styles.blockTitle}>배송 주소</div>
-                        <button className={styles.linkBtn}>배송지 변경</button>
+                    <div className={styles.block_title_row}>
+                        <div className={styles.block_title}>배송 주소</div>
+                        <button className={styles.link_btn}>배송지 변경</button>
                     </div>
 
-                    <div className={styles.addrCard}>
-                        <div className={styles.addrRow}>
-                            <div className={styles.addrLabel}>받는 사람</div>
-                            <div className={styles.addrValue}>{mock.receiver}</div>
+                    <div className={styles.addr_card}>
+                        <div className={styles.addr_row}>
+                            <div className={styles.addr_label}>받는 사람</div>
+                            <div className={styles.addr_value}>{name}</div>
                         </div>
-                        <div className={styles.addrRow}>
-                            <div className={styles.addrLabel}>휴대폰 번호</div>
-                            <div className={styles.addrValue}>{mock.phone}</div>
+                        <div className={styles.addr_row}>
+                            <div className={styles.addr_label}>휴대폰 번호</div>
+                            <div className={styles.addr_value}>{phone}</div>
                         </div>
-                        <div className={styles.addrRow}>
+                        <div className={styles.addr_row}>
                             <div className={styles.addrLabel}>주소</div>
-                            <div className={styles.addrValue}>{mock.address}</div>
+                            <div className={styles.addrValue}>
+                                {zip ? `(${zip}) ` : ""}
+                                {main} {detail}
+                            </div>
                         </div>
                     </div>
 
-                    <div className={styles.blockTitleRow}>
-                        <div className={styles.blockTitle}>배송 요청사항</div>
-                        <button className={styles.linkBtn}>요청사항 변경</button>
+                    <div className={styles.block_title_row_2}>
+                        <div className={styles.block_title}>배송 요청사항</div>
+                        <button className={styles.link_btn}>요청사항 변경</button>
                     </div>
 
-                    <div className={styles.addrCard}>
-                        <div className={styles.addrRow}>
-                            <div className={styles.addrLabel}>요청 사항</div>
-                            <div className={styles.addrValue}>{mock.request}</div>
+                    <div className={styles.addr_card}>
+                        <div className={styles.addr_row}>
+                            <div className={styles.addr_label}>요청 사항</div>
+                            <div className={styles.addr_value}>{message || "-"}</div>
                         </div>
                     </div>
                 </section>
             </main>
+
+            {/* 하단 CTA(디자인에 따라 BuyingFooter가 fixed 버튼을 포함할 수도 있음) */}
             <BuyingFooter />
         </>
     );

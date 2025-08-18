@@ -4,12 +4,10 @@ import { OrderRepository } from '../../domains/repositories/OrderRepository';
 import { CreateOrderItemDto } from '../dtos/CreateOrderItemDto';
 
 export class CreateOrderUseCase {
-  constructor(private repo: OrderRepository) {}
+  constructor(private repo: OrderRepository) { }
 
   async execute(input: { userId: string; items: CreateOrderItemDto[] }): Promise<number[]> {
     const now = new Date();
-
-    console.log('wepifjwpfwjefpiewjfpiwfjpiitems', input.items);
 
     const orders = input.items.map((item) => ({
       userId: input.userId,
