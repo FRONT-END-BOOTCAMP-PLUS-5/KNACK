@@ -194,8 +194,11 @@ model Review {
   rating       Int?      @default(0)
   reviewImages String?   @map("review_images") @db.VarChar
   createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  orderId      Int       @map("order_id")
+
   product      Product   @relation(fields: [productId], references: [id])
   user         User      @relation(fields: [userId], references: [id])
+  order        Order     @relation(fields: [orderId], references: [id])
 
   @@id([userId, productId])
   @@map("reviews")
@@ -217,10 +220,12 @@ model OptionValue {
   isPrivate           Boolean               @default(true) @map("is_private")
   name                String                @db.VarChar
   typeId              Int                   @map("type_id")
+
   optionTypes         OptionType            @relation(fields: [typeId], references: [id])
   cart                Cart[]
   productStockMapping ProductStockMapping[]
   product             Product[]
+  order               Order[]
 
   @@map("option_values")
 }
@@ -310,9 +315,15 @@ model Order {
   deliveryStatus Int?      @map("delivery_status")
   count          Int?      @default(0)
   paymentId      Int?      @map("payment_id")
-  payment        Payment?  @relation(fields: [paymentId], references: [id])
-  product        Product   @relation(fields: [productId], references: [id])
-  user           User      @relation(fields: [userId], references: [id])
+  optionValueId  Int       @map("option_value_id")
+  
+
+  payment        Payment?    @relation(fields: [paymentId], references: [id])
+  product        Product     @relation(fields: [productId], references: [id])
+  user           User        @relation(fields: [userId], references: [id])
+  optionValue    OptionValue @relation(fields: [optionValueId], references: [id])
+  review         Review[]      
+  
 
   @@map("orders")
 }
