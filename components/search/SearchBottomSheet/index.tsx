@@ -22,11 +22,12 @@ import {
   PRODUCT_FILTER_COLOR,
   PRODUCT_FILTER_DISCOUNT,
   PRODUCT_FILTER_PRICE,
+  PRODUCT_FILTER_SORT,
 } from '@/constraint/product';
 import { categoryService } from '@/services/category';
 import { brandService } from '@/services/brand';
 import { optionsService } from '@/services/options';
-import { ISearchProductListRequest } from '@/types/searchProductList';
+import { ISearchProductListRequest, SortOption } from '@/types/searchProductList';
 import { IPageCategory } from '@/types/category';
 import { IBrandWithTagList } from '@/types/brand';
 import { IOption } from '@/types/option';
@@ -352,7 +353,20 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   };
 
   const handleClearFilter = () => {
-    setSelectedFilter({});
+    const searchParams = new URLSearchParams(window.location.search);
+    const sort = searchParams.get('sort');
+
+    const isValidSortOption = (value: string | null): value is SortOption => {
+      if (!value) return false;
+      return PRODUCT_FILTER_SORT.some((item) => item.value === value);
+    };
+
+    if (isValidSortOption(sort)) {
+      setSelectedFilter({ sort: sort });
+    } else {
+      setSelectedFilter({});
+    }
+
     clearBottomList();
   };
 
