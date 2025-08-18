@@ -273,6 +273,8 @@ model SubCategory {
   categoryId Int       @map("category_id")
   createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   isPrivate  Boolean   @default(true) @map("is_private")
+  image      String?   @db.VarChar 
+
   category   Category  @relation(fields: [categoryId], references: [id])
   products   Product[]
 
