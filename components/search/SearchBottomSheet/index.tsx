@@ -88,9 +88,17 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
 
   // 카테고리 데이터 호출 로직
   const initCategories = useCallback(async () => {
-    await getCategories().then((res) => {
-      setCategories(res);
-    });
+    await getCategories()
+      .then((res) => {
+        if (res.status === 200) {
+          setCategories(res.result);
+        }
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          console.log(error.message);
+        }
+      });
   }, [getCategories]);
 
   // 브랜드 데이터 호출 로직
