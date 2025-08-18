@@ -6,8 +6,6 @@ import { mapOrderRowToDto } from '@/utils/orders';
 
 export class PrOrderRepository implements OrderRepository {
   async saveMany(orders: CreateOrderEntityDto[]): Promise<number[]> {
-    console.log('=================saveMany', orders);
-
     const created = await prisma.$transaction(
       orders.map((o) =>
         prisma.order.create({

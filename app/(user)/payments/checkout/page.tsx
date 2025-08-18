@@ -224,8 +224,6 @@ export default function CheckoutPage() {
             : []
         );
 
-        console.log(';items', items);
-
         setOrderItems(items);
         // 필요 시 성공 페이지용으로 보존
         sessionStorage.setItem('orderItems', JSON.stringify(items));

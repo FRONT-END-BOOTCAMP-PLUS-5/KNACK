@@ -64,7 +64,6 @@ export default function PaymentSuccess() {
     }
     if (orderItems) {
       const parsed = JSON.parse(orderItems);
-      console.log('parsed', parsed);
 
       setOrderItems(parsed);
     }
@@ -91,7 +90,6 @@ export default function PaymentSuccess() {
     hasRun.current = true;
 
     (async () => {
-      console.log('start');
       try {
         console.log('➡️ 주문 저장 요청 /api/orders', { orderItems, addr: selectedAddress.id });
         const orderRes = await requester.post('/api/orders', {
