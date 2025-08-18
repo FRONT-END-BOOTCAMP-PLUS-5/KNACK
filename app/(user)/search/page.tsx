@@ -1,23 +1,7 @@
 import { GetProductsResponseDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import SearchCsrWrapper from '@/components/search/SearchCsrWrapper';
 import SearchProductList from '@/components/search/SearchProductList';
-import { SortOption } from '@/types/searchProductList';
-
-export interface IQueryParams {
-  keyword?: string;
-  keywordColorId?: string;
-  brandId?: string;
-  categoryId?: string;
-  subCategoryId?: string;
-  price?: string;
-  discount?: string;
-  size?: string;
-  benefit?: 'under_price';
-  gender?: string;
-  soldOutInvisible?: string;
-  sort?: SortOption;
-  cursor?: string;
-}
+import { IQueryParams } from '@/utils/queryString';
 
 interface IProps {
   searchParams: Promise<IQueryParams>;

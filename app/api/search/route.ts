@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       price: searchParams.get('price') || undefined,
       discount: searchParams.get('discount') || undefined,
       size: getStringArrayParam(searchParams, 'size'),
-      benefit: (searchParams.get('benefit') as 'under_price') || undefined,
+      benefit: getBooleanParam(searchParams, 'benefit'),
       gender: searchParams.get('gender') || undefined,
       soldOutInvisible: getBooleanParam(searchParams, 'soldOutInvisible'),
 
