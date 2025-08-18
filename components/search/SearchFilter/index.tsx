@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import DragScroll from '@/components/common/DragScroll';
 import styles from './searchFilter.module.scss';
 import Image from 'next/image';
 import arrowDown from '@/public/icons/arrow_down.svg';
-import { PRODUCT_FILTER } from '@/constraint/product';
+import { FILTER_TAB_KEY, PRODUCT_FILTER } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
 import { calcFilterValueLength, isActiveFilter } from '@/utils/search/searchFilter';
 import resetIcon from '@/public/icons/reset.svg';
@@ -23,10 +23,14 @@ export default function SearchFilter({ filterQuery, handleSelect }: IProps) {
     clearFilters();
   };
 
+  const isActiveResetButton = useMemo(() => {
+    return FILTER_TAB_KEY.some((key) => filterQuery[key]);
+  }, [filterQuery]);
+
   return (
     <div className={styles.filter_section}>
       <DragScroll className={styles.filter_scroll} showScrollbar={false}>
-        {Object.keys(filterQuery).length > 0 && (
+        {isActiveResetButton && (
           <button type="button" className={styles.filter_reset_button} onClick={handleReset}>
             <Image src={resetIcon} alt="초기화 아이콘" width={16} height={16} />
           </button>
