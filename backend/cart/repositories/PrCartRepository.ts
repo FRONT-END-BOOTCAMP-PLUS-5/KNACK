@@ -1,5 +1,5 @@
 import prisma from '@/backend/utils/prisma';
-import { CartRepository } from '../domains/repositires/CartRepository';
+import { CartRepository } from '../domains/repositories/CartRepository';
 import { Cart } from '../domains/entities/Cart';
 
 interface IProps {

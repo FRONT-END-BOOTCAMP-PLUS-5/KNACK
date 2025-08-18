@@ -3,18 +3,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadTossPayments } from '@tosspayments/payment-sdk'
 import styles from './CheckoutPage.module.scss'
-import AddressBox from '@/components/Address/AddressBox'
+import AddressBox from '@/components/address/AddressBox'
 import requester from '@/utils/requester'
-import PaymentFooter from '@/components/Payments/PaymentFooter/PaymentFooter'
+import PaymentFooter from '@/components/Payments/PaymentFooter'
 import OrderSummaryCard from '@/components/Payments/Order/OrderSummaryCard'
-import PointSection from '@/components/Payments/Points/PointSection'
-import FinalOrderSummary from '@/components/Payments/Order/FInalOrderSummary'
+import PointSection from '@/components/Payments/Points'
+import FinalOrderSummary from '@/components/Payments/Order/FinalOrderSummary'
 import { AddressDto } from '@/backend/address/applications/dtos/AddressDto'
 import { IProduct } from '@/types/product'
-import AddressModal from '@/components/Address/AddressModal'
-import { formatFullAddress } from '@/utils/openKakaoPostCode'
-import RequestModal from '@/components/Address/RequestModal'
-import { AddressDtoWithPostalFields, CheckoutRow, OrderItem } from '@/types/order'
+import AddressModal from '@/components/address/AddressModal'
+import { formatFullAddress } from '@/utils/formatAddressUtils'
+import RequestModal from '@/components/address/RequestModal'
+import { AddressDtoWithPostalFields, Coupon, CheckoutRow, OrderItem, SelectedAddress, BestCoupon } from '@/types/order'
+import CouponSelectModal from '@/components/Payments/CouponSelectModal'
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
 
@@ -24,7 +25,13 @@ export default function CheckoutPage() {
     const [orderItems, setOrderItems] = useState<OrderItem[]>([])
     const [deliveryType, setDeliveryType] = useState<'FAST' | 'STOCK'>('FAST')
     const [deliveryFee, setDeliveryFee] = useState<number>(5000)
+
+    // ✅ 포인트/쿠폰 상태
+    const [availablePoints, setAvailablePoints] = useState<number>(0)
     const [points, setPoints] = useState<number>(0) // 사용 포인트
+    const [coupons, setCoupons] = useState<Coupon[]>([])
+    const [selectedCouponId, setSelectedCouponId] = useState<number | null>(null)
+
     const [selectedAddress, setSelectedAddress] = useState<{
         id: number
         name: string
@@ -35,19 +42,92 @@ export default function CheckoutPage() {
     } | null>(null)
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
     const [isReqOpen, setReqOpen] = useState(false);
+    const [isOpenCouponModal, setOpenCouponModal] = useState(false);
 
-    // ----- delivery controls -----
-    const onChangeDelivery = (type: 'FAST' | 'STOCK') => {
-        setDeliveryType(type)
-        setDeliveryFee(type === 'FAST' ? 5000 : 0)
-    }
+
+    // 선택된 쿠폰(표시/계산은 전체 coupons 기준)
+    const effectiveCouponId =
+        typeof selectedCouponId === 'number' || selectedCouponId === null
+            ? selectedCouponId
+            : Number(selectedCouponId)
+
+    const selectedCoupon = useMemo(() => {
+        if (effectiveCouponId == null) return null
+        return (coupons ?? []).find(c => String(c.id) === String(effectiveCouponId)) ?? null
+    }, [coupons, effectiveCouponId])
+
+    // 적용 가능 쿠폰 목록 (필요시 표시용)
+    const applicableCoupons = useMemo(() => {
+        const pset = new Set(orderItems.map(i => i.productId))
+        return (coupons ?? []).filter(c => pset.has(c.productId))
+    }, [coupons, orderItems])
+
+    // 금액 계산 통합
+    const pricing = useMemo(() => {
+        // 1) 원가 기준 합계(상품 총액)
+        const baseSum =
+            orderItems?.reduce((sum, it) => sum + it.price * it.quantity, 0) || 0
+
+        // 2) 선택 쿠폰이 실제로 적용 가능한지
+        const isCouponApplicable =
+            !!selectedCoupon &&
+            orderItems.some(it => it.productId === selectedCoupon.productId)
+
+        // 3) 해당 상품군 합계(쿠폰 타깃 금액)
+        const targetSum = isCouponApplicable
+            ? orderItems
+                .filter(it => it.productId === selectedCoupon!.productId)
+                .reduce((s, it) => s + it.price * it.quantity, 0)
+            : 0
+
+        // 4) 쿠폰 할인금액 (과할인 방지)
+        const couponDiscount = isCouponApplicable
+            ? Math.min(
+                targetSum,
+                Math.max(0, Math.floor(targetSum * ((selectedCoupon!.salePercent ?? 0) / 100)))
+            )
+            : 0
+
+        // 5) 배송비
+        const shippingFee = deliveryType === 'FAST' ? 5000 : 0
+
+        // 6) 쿠폰 적용 후 상품금액
+        const productAfterCoupon = Math.max(0, baseSum - couponDiscount)
+
+        const targetSumAfterCoupon = Math.max(0, targetSum - couponDiscount)
+
+        // 7) 최종 결제금액
+        const totalPayable = Math.max(0, productAfterCoupon + shippingFee)
+
+        return {
+            baseSum,               // 원래 상품금액(쿠폰 전)
+            couponDiscount,
+            targetSumAfterCoupon,     // 쿠폰 할인
+            productAfterCoupon,    // 쿠폰 적용 후 상품금액
+            shippingFee,           // 배송비
+            totalPayable,          // 최종 결제금액
+            applicableCount: applicableCoupons.length,
+            isCouponApplicable,
+        }
+    }, [orderItems, selectedCoupon, deliveryType, applicableCoupons.length])
 
     // ----- totals -----
     const priceWithoutDelivery = useMemo(
         () => orderItems.reduce((sum, it) => sum + it.price * it.quantity, 0),
         [orderItems]
     )
-    const couponAmount = 0 // 쿠폰 도입 시 교체
+
+    // ✅ 쿠폰 할인액 계산 (선택된 1장의 퍼센트 할인)
+    const couponAmount = useMemo(() => {
+        if (!selectedCouponId) return 0
+        const coupon = coupons.find(c => c.id === selectedCouponId)
+        if (!coupon) return 0
+        const targetSum = orderItems
+            .filter(i => i.productId === coupon.productId)
+            .reduce((s, i) => s + i.price * i.quantity, 0)
+        return Math.max(0, Math.floor(targetSum * (coupon.salePercent / 100)))
+    }, [selectedCouponId, coupons, orderItems])
+
     const totalBeforePoints = useMemo(
         () => Math.max(0, priceWithoutDelivery + deliveryFee - couponAmount),
         [priceWithoutDelivery, deliveryFee, couponAmount]
@@ -80,6 +160,22 @@ export default function CheckoutPage() {
 
         try {
             await handleSaveRequestMessage()
+
+            // ✅ 성공 페이지에서 보여주려면 세션에 저장
+            const paymentData = {
+                pointAmount: points,
+                couponDiscountAmount: pricing.couponDiscount,
+                shippingFee: pricing.shippingFee,
+                targetSumAfterCoupon: pricing.targetSumAfterCoupon,
+            };
+
+            // 문자열로 변환해서 저장
+            if (selectedCoupon) {
+                sessionStorage.setItem('selectedCoupon', JSON.stringify(selectedCoupon));
+            } else {
+                sessionStorage.removeItem('selectedCoupon'); // 빈 문자열보다 이게 안전
+            }
+            sessionStorage.setItem('paymentData', JSON.stringify(paymentData));
 
             const toss = await loadTossPayments(TOSS_CLIENT_KEY)
             console.log(toss);
@@ -142,6 +238,49 @@ export default function CheckoutPage() {
             })()
     }, [checkout])
 
+    useEffect(() => {
+        if (orderItems.length === 0) return;
+
+        (async () => {
+            try {
+                // 쿠폰 조회
+                const { data: couponRes } = await requester.get('/api/coupon');
+                const fetched = couponRes?.result ?? couponRes ?? [];
+                setCoupons(fetched);
+
+                // 1) productId별 주문 합계 사전 집계 (최적화)
+                const totalsByProductId = orderItems.reduce<Map<number, number>>((map, it) => {
+                    const sum = (map.get(it.productId) ?? 0) + it.price * it.quantity;
+                    map.set(it.productId, sum);
+                    return map;
+                }, new Map());
+
+                // 2) reduce로 최댓값 선택
+                const initialBest: BestCoupon = { id: null, discount: -1 };
+
+                const best = (fetched as Coupon[]).reduce<BestCoupon>((best: BestCoupon, c) => {
+                    const target = totalsByProductId.get(c.productId) ?? 0;
+                    const disc = Math.floor(target * (c.salePercent / 100));
+                    return disc > best.discount ? { id: c.id, discount: disc } : best;
+                }, initialBest);
+
+                setSelectedCouponId(best.id);
+
+                // 포인트 조회
+                const { data: pData } = await requester.get('/api/points');
+                setAvailablePoints(Number(pData?.availablePoints ?? 0));
+            } catch (e) {
+                console.error('쿠폰/포인트 로드 실패', e);
+            }
+        })();
+    }, [orderItems]);
+
+    // ✅ 포인트 사용량 캡 (서버 값/합계 변경될 때 보정)
+    useEffect(() => {
+        const cap = Math.min(totalBeforePoints, availablePoints)
+        if (points > cap) setPoints(cap)
+    }, [totalBeforePoints, availablePoints, points])
+
     // ----- fetch default address -----
     useEffect(() => {
         (async () => {
@@ -194,21 +333,46 @@ export default function CheckoutPage() {
                     setDeliveryType(t)
                     setDeliveryFee(t === 'FAST' ? 5000 : 0)
                 }}
-                totalPrice={totalPrice}
+
+                // 💰 금액(전부 부모 계산)
+                baseSum={pricing.baseSum}
+                shippingFee={pricing.shippingFee}
+                couponDiscount={pricing.couponDiscount}
+                totalPayable={pricing.totalPayable}
+
+                // 🎟 쿠폰 표시/행동
+                selectedCouponName={selectedCoupon?.name ?? null}
+                applicableCouponCount={pricing.applicableCount}
+                onOpenCouponModal={() => setOpenCouponModal(true)}   // 모달은 부모에서 관리
+                onClearCoupon={() => setSelectedCouponId(null)}      // 선택 해제
             />
 
+            {isOpenCouponModal && (
+                <CouponSelectModal
+                    isOpen={isOpenCouponModal}
+                    onClose={() => setOpenCouponModal(false)}
+                    coupons={coupons} // 서버에서 받은 쿠폰 목록
+                    orderItems={orderItems} // 장바구니 아이템
+                    selectedCouponId={selectedCouponId}
+                    onSelectCoupon={(id) => {
+                        setSelectedCouponId(id) // 선택 반영
+                        setOpenCouponModal(false) // 선택 후 모달 닫기(선호)
+                    }} />
+            )}
+
             <PointSection
-                availablePoints={100000 /* 보유 포인트 */}
+                availablePoints={availablePoints}
                 maxUsablePoints={totalBeforePoints}              // 🔥 추가
                 onChange={(p) => setPoints(Math.max(0, Math.min(p, totalBeforePoints)))} // 🔥 캡 적용
             />
 
             <FinalOrderSummary
-                price={priceWithoutDelivery}
-                fee={0}
-                shippingFee={deliveryFee}
-                couponAmount={0}
-                pointAmount={points}
+                price={pricing.baseSum}                    // 쿠폰 전 상품 총액
+                fee={0}                                    // 수수료 있으면 숫자
+                shippingFee={pricing.shippingFee}          // 배송비
+                couponAmount={pricing.couponDiscount}      // 쿠폰 할인액
+                pointAmount={points}              // 사용 포인트
+                selectedCouponName={selectedCoupon?.name}  // 쿠폰 이름 표시
             />
 
             <PaymentFooter totalPrice={totalPrice} onPay={handlePayment} />
@@ -218,9 +382,9 @@ export default function CheckoutPage() {
                     onClose={() => setIsAddressModalOpen(false)}
                     selectedAddress={selectedAddress ? {
                         ...selectedAddress,
-                        message: selectedAddress.request
+                        request: selectedAddress.request
                     } : null}
-                    onChangeSelected={(a) => {
+                    onChangeSelected={(a: SelectedAddress) => {
                         const zip =
                             (a as unknown as AddressDtoWithPostalFields).postalCode ??
                             (a as unknown as AddressDtoWithPostalFields).postCode ??
@@ -228,12 +392,14 @@ export default function CheckoutPage() {
                             (a as unknown as AddressDtoWithPostalFields).zipCode ??
                             (a as unknown as AddressDtoWithPostalFields).zonecode ?? '';
 
+                        if (!a?.id) return; // Early return if no valid address
+
                         const mapped = {
                             id: a.id,
-                            name: a.name,
+                            name: a.name ?? '',
                             phone: a.phone ?? '',
-                            fullAddress: a.fullAddress,   // ✅ Use existing fullAddress property
-                            request: a.message ?? '',
+                            fullAddress: a.fullAddress ?? '',
+                            request: a.request ?? '',
                             postalCode: zip || undefined,
                         };
                         setSelectedAddress(mapped);

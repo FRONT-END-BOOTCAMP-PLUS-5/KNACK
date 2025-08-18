@@ -2,26 +2,12 @@ import prisma from '@/backend/utils/prisma';
 import { LikesRepository } from '../domains/repositories/LikesRepository';
 import { Like } from '../domains/entities/Likes';
 
-interface IProps {
-  productId: number;
-  optionValueId: number;
-}
-
 export class PrLikesRepository implements LikesRepository {
-  private likeData;
-
-  constructor(likeData?: IProps) {
-    this.likeData = likeData;
-  }
-
-  async insert(userId: string): Promise<number> {
-    const { optionValueId, productId } = this.likeData ?? {};
-
+  async insert(userId: string, productId: number): Promise<number> {
     try {
       const result = await prisma.productLike.create({
         data: {
           userId: userId ?? '',
-          optionValueId: optionValueId ?? 0,
           productId: productId ?? 0,
         },
       });
