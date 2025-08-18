@@ -15,10 +15,8 @@ export default function SearchSort({ filterQuery }: IProps) {
     <section className={styles.sort_section}>
       <div className={styles.sort_left}>
         <div className={styles.sort_left_item}>
-          {filterQuery?.benefit === 'under_price' && (
-            <Image src={checkCircle} alt={'체크 아이콘'} width={16} height={16} />
-          )}
-          {filterQuery?.benefit !== 'under_price' && <span />}
+          {filterQuery?.benefit && <Image src={checkCircle} alt={'체크 아이콘'} width={16} height={16} />}
+          {!filterQuery?.benefit && <span />}
           <p>정가이하</p>
         </div>
         <div className={styles.sort_left_item}>

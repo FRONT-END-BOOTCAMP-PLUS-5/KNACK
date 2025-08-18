@@ -1,31 +1,43 @@
 'use client';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './searchBottomSheet.module.scss';
+import Image from 'next/image';
 import BottomSheet from '@/components/common/BottomSheet';
-import { DiscountValue, PRODUCT_FILTER } from '@/constraint/product';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
 import TabMenu from '@/components/common/TabMenu';
 import Divider from '@/components/common/Divider';
+import DragScroll from '@/components/common/DragScroll';
 import SearchPrice from './SearchPrice';
 import SearchColor from './SearchColor';
 import SearchDiscount from './SearchDiscount';
-import Image from 'next/image';
-import searchClose from '@/public/icons/close_large.svg';
 import SearchCategory from './SearchCategory';
 import SearchGender from './SearchGender';
 import SearchBrand from './SearchBrand';
 import SearchSize from './SearchSize';
-import { ISearchProductListRequest } from '@/types/searchProductList';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  DiscountValue,
+  PRODUCT_FILTER,
+  PRODUCT_FILTER_GENDER,
+  PRODUCT_FILTER_COLOR,
+  PRODUCT_FILTER_DISCOUNT,
+  PRODUCT_FILTER_PRICE,
+} from '@/constraint/product';
 import { categoryService } from '@/services/category';
-import { IPageCategory } from '@/types/category';
-import { getFilterCountById } from '@/utils/search/searchBottomSheetTab';
 import { brandService } from '@/services/brand';
-import { IBrandWithTagList } from '@/types/brand';
 import { optionsService } from '@/services/options';
+import { ISearchProductListRequest } from '@/types/searchProductList';
+import { IPageCategory } from '@/types/category';
+import { IBrandWithTagList } from '@/types/brand';
 import { IOption } from '@/types/option';
+import { getFilterCountById } from '@/utils/search/searchBottomSheetTab';
+import { removeFilterValue } from '@/utils/search/removeFilterValue';
+import { objectToQueryString } from '@/utils/queryString';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
-import DragScroll from '@/components/common/DragScroll';
+import { useSearchBottomSheetInit } from '@/hooks/useSearchBottomSheetInit';
+import { useFilterCounts } from '@/hooks/useFilterCounts';
+import { useRouter } from 'next/navigation';
+import searchClose from '@/public/icons/close_large.svg';
 
 interface IProps {
   activeTabId: number;
@@ -33,22 +45,25 @@ interface IProps {
   filterQuery: ISearchProductListRequest;
 }
 
-interface ISelectedBottomList {
-  id: number;
-  type: 'categoryId' | 'subCategoryId' | 'brandId' | 'size' | 'keywordColorId' | 'discount' | 'gender' | 'price';
-  name: string;
-  value: string;
-}
-
 export default function SearchBottomSheet({ activeTabId, handleSelect, filterQuery }: IProps) {
-  const { isOpen } = useBottomSheetStore();
+  const { isOpen, onClose } = useBottomSheetStore();
+  const router = useRouter();
   const [selectedFilter, setSelectedFilter] = useState<ISearchProductListRequest>({});
-  const [selectedBottomList, setSelectedBottomList] = useState<ISelectedBottomList[]>([]);
   const [categories, setCategories] = useState<IPageCategory[]>([]);
   const [brands, setBrands] = useState<IBrandWithTagList[]>([]);
   const [sizes, setSizes] = useState<IOption[]>([]);
 
-  // TODO: 조회 안하고 바텀시트 닫으면 filterQuery로 selectedFilter 초기화 해야함
+  const { selectedBottomList, isDataReady, removeFromBottomList, clearBottomList, updateBottomList, initialBrands } =
+    useSearchBottomSheetInit({
+      filterQuery,
+      categories,
+      brands,
+      sizes,
+      isOpen,
+    });
+
+  // 상품 개수 조회 커스텀 훅
+  const { isLoadingCount, buttonText } = useFilterCounts(selectedFilter);
 
   const { getCategories } = categoryService;
   const { getBrands } = brandService;
@@ -63,9 +78,12 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   }, [selectedFilter]);
 
   useEffect(() => {
+    console.log('@@@@@@@@selectedFilter : ', selectedFilter);
+  }, [selectedFilter]);
+
+  useEffect(() => {
     // 초기 데이터 저장
     setSelectedFilter(filterQuery);
-    console.log('@@@@@@@@filterQuery : ', filterQuery);
   }, [filterQuery, isOpen]);
 
   // 카테고리 데이터 호출 로직
@@ -135,6 +153,16 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
     };
 
     setSelectedFilter(newSelectedFilter);
+
+    if (isDataReady) {
+      const category = categories
+        .flatMap((category) => category.subCategories || [])
+        .find((subCategory) => subCategory.id === subCategoryId);
+
+      if (category) {
+        updateBottomList('subCategoryId', subCategoryId, category.korName, !isSelected);
+      }
+    }
   };
 
   // 브랜드 클릭 핸들러
@@ -154,6 +182,25 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
       brandId: newBrandIds.length > 0 ? newBrandIds : undefined,
     };
     setSelectedFilter(newSelectedFilter);
+
+    if (isDataReady) {
+      // 현재 브랜드 목록에서 찾기
+      let brand = brands.flatMap((brandGroup) => brandGroup.brandList).find((brandItem) => brandItem.id === brandId);
+
+      // 현재 목록에서 찾지 못하면 초기 브랜드 목록에서 찾기
+      if (!brand && initialBrands.length > 0) {
+        brand = initialBrands
+          .flatMap((brandGroup) => brandGroup.brandList)
+          .find((brandItem) => brandItem.id === brandId);
+      }
+
+      if (brand) {
+        updateBottomList('brandId', brandId, brand.korName, !isSelected);
+      } else {
+        // 제거하는 경우는 항상 처리
+        updateBottomList('brandId', brandId, '', false);
+      }
+    }
   };
 
   // 브랜드 키워드 검색
@@ -164,10 +211,17 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   // 성별 클릭 핸들러
   const onClickGenderSelect = (gender: 'm' | 'f' | 'all') => {
     const currentGender = selectedFilter.gender;
-    if (currentGender === gender) {
+    const isDeselecting = currentGender === gender;
+
+    if (isDeselecting) {
       setSelectedFilter({ ...selectedFilter, gender: undefined });
     } else {
       setSelectedFilter({ ...selectedFilter, gender: gender });
+    }
+
+    const genderFilter = PRODUCT_FILTER_GENDER.find((genderItem) => genderItem.value === gender);
+    if (genderFilter) {
+      updateBottomList('gender', gender, genderFilter.name, !isDeselecting);
     }
   };
 
@@ -189,47 +243,117 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
     };
 
     setSelectedFilter(newSelectedFilter);
+
+    const color = PRODUCT_FILTER_COLOR.find((colorItem) => colorItem.id === colorId);
+    if (color) {
+      updateBottomList('keywordColorId', colorId, color.korName, !isSelected);
+    }
   };
 
   // 할인율 클릭 핸들러
   const onClickDiscountSelect = (discountValue: DiscountValue) => {
-    if (selectedFilter.discount === discountValue) {
+    const isDeselecting = selectedFilter.discount === discountValue;
+
+    if (isDeselecting) {
       setSelectedFilter({ ...selectedFilter, discount: undefined });
     } else {
       setSelectedFilter({ ...selectedFilter, discount: discountValue });
+    }
+
+    const discount = PRODUCT_FILTER_DISCOUNT.find((discountItem) => discountItem.value === discountValue);
+    if (discount) {
+      updateBottomList('discount', discountValue, discount.name, !isDeselecting);
     }
   };
 
   // 사이즈 클릭 핸들러
   const onClickSizeSelect = (size: string) => {
     const currentSize = selectedFilter.size || [];
-    if (currentSize.includes(size)) {
+    const isSelected = currentSize.includes(size);
+
+    if (isSelected) {
       setSelectedFilter({ ...selectedFilter, size: currentSize.filter((initSize) => initSize !== size) });
     } else {
       setSelectedFilter({ ...selectedFilter, size: [...currentSize, size] });
+    }
+
+    if (isDataReady) {
+      const sizeOption = sizes
+        .flatMap((option) => option.optionValues)
+        .find((optionValue) => optionValue.name === size);
+      if (sizeOption) {
+        updateBottomList('size', size, sizeOption.name, !isSelected);
+      }
     }
   };
 
   // 가격 클릭 핸들러
   const onClickPriceSelect = (price: string) => {
-    if (selectedFilter.price === '0-10000000') {
+    const isDeselecting = selectedFilter.price === price;
+
+    if (isDeselecting) {
       setSelectedFilter({ ...selectedFilter, price: undefined });
+      updateBottomList('price', price, '', false);
     } else {
       setSelectedFilter({ ...selectedFilter, price: price });
+
+      const priceFilter = PRODUCT_FILTER_PRICE.find((priceItem) => priceItem.value === price);
+      if (priceFilter) {
+        updateBottomList('price', price, priceFilter.name, true);
+      }
     }
   };
 
   // 가격 슬라이드 핸들러
   const onChangePriceSelect = (newValue: number[]) => {
-    if (newValue[0] === 0 && newValue[1] === 10000000) {
+    const priceValue = `${newValue[0]}-${newValue[1]}`;
+    const isDefaultRange = newValue[0] === 0 && newValue[1] === 10000000;
+
+    if (isDefaultRange) {
       setSelectedFilter({ ...selectedFilter, price: undefined });
+      updateBottomList('price', priceValue, '', false);
     } else {
-      setSelectedFilter({ ...selectedFilter, price: `${newValue[0]}-${newValue[1]}` });
+      setSelectedFilter({ ...selectedFilter, price: priceValue });
+
+      const priceFilter = PRODUCT_FILTER_PRICE.find((priceItem) => priceItem.value === priceValue);
+
+      let displayName: string;
+      if (priceFilter) {
+        displayName = priceFilter.name;
+      } else {
+        const formatPrice = (value: number) => {
+          const won = Math.floor(value / 10000);
+          return `${won}만원`;
+        };
+        displayName = `${formatPrice(newValue[0])}-${formatPrice(newValue[1])}`;
+      }
+
+      updateBottomList('price', priceValue, displayName, true);
     }
   };
 
+  // selectedBottomList에서 항목 제거 시 selectedFilter도 함께 업데이트
+  const handleRemoveBottomListItem = (
+    type: 'subCategoryId' | 'brandId' | 'size' | 'keywordColorId' | 'discount' | 'gender' | 'price',
+    value: string | number
+  ) => {
+    removeFromBottomList(type, value);
+
+    const newSelectedFilter = removeFilterValue(selectedFilter, type, value);
+    setSelectedFilter(newSelectedFilter);
+  };
+
+  // 상품보기 버튼 클릭 핸들러
+  const handleViewProducts = () => {
+    const queryString = objectToQueryString(selectedFilter);
+    const searchUrl = queryString ? `/search?${queryString}` : '/search';
+    onClose();
+    router.push(searchUrl);
+  };
+
   const handleClearFilter = () => {
-    setSelectedFilter({ price: undefined });
+    setSelectedFilter({});
+    clearBottomList();
   };
 
   return (
@@ -283,21 +407,31 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
         <Divider height={1} />
         <Flex justify="between" align="center" className={styles.bottom_sheet_bottom_selected_filter}>
           <DragScroll showScrollbar={false}>
-            <Flex align="center" gap={2} width="self" paddingHorizontal={4}>
-              <Text size={1.3} weight={600} color="gray4" key={'item.id'}>
-                {'item.name'}
-              </Text>
-              <span>
-                <Image src={searchClose} alt="close" width={16} height={16} style={{ opacity: 0.5 }} />
-              </span>
-            </Flex>
+            {selectedBottomList.map((item, index) => (
+              <Flex
+                align="center"
+                gap={2}
+                width="self"
+                paddingHorizontal={4}
+                key={`${item.type}-${item.value}-${index}`}
+              >
+                <Text size={1.3} weight={600} color="gray4">
+                  {item.name}
+                </Text>
+                <span onClick={() => handleRemoveBottomListItem(item.type, item.value)} style={{ cursor: 'pointer' }}>
+                  <Image src={searchClose} alt="close" width={16} height={16} style={{ opacity: 0.5 }} />
+                </span>
+              </Flex>
+            ))}
           </DragScroll>
         </Flex>
         <Flex className={styles.bottom_sheet_bottom} paddingHorizontal={8} paddingVertical={8} gap={8}>
           <button className={styles.bottom_sheet_bottom_clear} onClick={handleClearFilter}>
             초기화
           </button>
-          <button className={styles.bottom_sheet_bottom_submit}>상품보기</button>
+          <button className={styles.bottom_sheet_bottom_submit} disabled={isLoadingCount} onClick={handleViewProducts}>
+            {buttonText()}
+          </button>
         </Flex>
       </section>
     </BottomSheet>
