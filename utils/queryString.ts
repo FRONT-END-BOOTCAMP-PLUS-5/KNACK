@@ -1,4 +1,5 @@
-import { ISearchProductListRequest, SortOption } from '@/types/searchProductList';
+import { SortValueType } from '@/constraint/product';
+import { ISearchProductListRequest } from '@/types/searchProductList';
 
 export interface IQueryParams {
   keyword?: string;
@@ -12,7 +13,7 @@ export interface IQueryParams {
   benefit?: boolean;
   gender?: string;
   soldOutInvisible?: string;
-  sort?: SortOption;
+  sort?: SortValueType;
   cursor?: string;
 }
 

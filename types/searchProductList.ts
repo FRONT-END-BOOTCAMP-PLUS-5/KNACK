@@ -1,3 +1,4 @@
+import { SortValueType } from '@/constraint/product';
 import { IBrand } from './brand';
 import { ICategory, ISubCategory } from './category';
 
@@ -18,14 +19,6 @@ export interface ISearchProductList {
   isSoldOut: boolean;
 }
 
-export type SortOption =
-  | 'latest' // 최신순 (기본값)
-  | 'popular' // 인기순
-  | 'price_high' // 가격 높은순
-  | 'price_low' // 가격 낮은순
-  | 'likes' // 관심 많은순
-  | 'reviews'; // 리뷰 많은순
-
 export interface ISearchProductListRequest {
   keyword?: string;
   keywordColorId?: number[];
@@ -39,7 +32,7 @@ export interface ISearchProductListRequest {
   gender?: string;
   soldOutInvisible?: boolean;
 
-  sort?: SortOption;
+  sort?: SortValueType;
 
   cursor?: string;
   offset?: number;

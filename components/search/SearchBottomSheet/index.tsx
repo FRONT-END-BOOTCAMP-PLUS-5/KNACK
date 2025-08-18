@@ -25,11 +25,12 @@ import {
   PRODUCT_FILTER_SORT,
   GenderValueType,
   FilterValueType,
+  SortValueType,
 } from '@/constraint/product';
 import { categoryService } from '@/services/category';
 import { brandService } from '@/services/brand';
 import { optionsService } from '@/services/options';
-import { ISearchProductListRequest, SortOption } from '@/types/searchProductList';
+import { ISearchProductListRequest } from '@/types/searchProductList';
 import { IPageCategory } from '@/types/category';
 import { IBrandWithTagList } from '@/types/brand';
 import { IOption } from '@/types/option';
@@ -353,7 +354,7 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
     const keyword = searchParams.get('keyword');
     const categoryId = searchParams.get('categoryId');
 
-    const isValidSortOption = (value: string | null): value is SortOption => {
+    const isValidSortOption = (value: string | null): value is SortValueType => {
       if (!value) return false;
       return PRODUCT_FILTER_SORT.some((item) => item.value === value);
     };
