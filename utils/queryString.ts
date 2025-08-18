@@ -1,4 +1,4 @@
-import { SortValueType } from '@/constraint/product';
+import { SORT_VALUE_KEY, SortValueType } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
 
 export interface IQueryParams {
@@ -34,7 +34,6 @@ const objectToQueryString = (obj: ISearchProductListRequest): string => {
 };
 
 const queryStringToObject = (queryParams: IQueryParams): ISearchProductListRequest => {
-  const validSortOptions = ['latest', 'popular', 'price_high', 'price_low', 'likes', 'reviews'] as const;
   const convertedQuery: ISearchProductListRequest = {};
 
   const parseNumberArray = (value?: string) => {
@@ -50,7 +49,7 @@ const queryStringToObject = (queryParams: IQueryParams): ISearchProductListReque
   if (queryParams.keyword) convertedQuery.keyword = queryParams.keyword;
   if (queryParams.gender) convertedQuery.gender = queryParams.gender;
   if (queryParams.benefit) convertedQuery.benefit = queryParams.benefit;
-  if (queryParams.sort && validSortOptions.includes(queryParams.sort)) convertedQuery.sort = queryParams.sort;
+  if (queryParams.sort && SORT_VALUE_KEY.includes(queryParams.sort)) convertedQuery.sort = queryParams.sort;
 
   if (queryParams.cursor) convertedQuery.cursor = queryParams.cursor;
   if (queryParams.soldOutInvisible) convertedQuery.soldOutInvisible = queryParams.soldOutInvisible === 'true';
