@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth'
-import { KnackAddressRepository } from '@/backend/address/repositories/KnackAddressRepository'
+import { PrAddressRepository } from '@/backend/address/repositories/PrAddressRepository'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -10,7 +10,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             return NextResponse.json({ message: '로그인이 필요합니다.' }, { status: 401 })
         }
 
-        const repo = new KnackAddressRepository()
+        const repo = new PrAddressRepository()
         const resolvedParams = await params
         const id = parseInt(resolvedParams.id, 10)
 
