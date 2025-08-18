@@ -2,12 +2,36 @@ import Text from '@/components/common/Text';
 import styles from './searchBottomSheet.module.scss';
 import Flex from '@/components/common/Flex';
 import Slider from '@mui/material/Slider';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TagButton from '@/components/common/TagButton';
 import { PRODUCT_FILTER_PRICE } from '@/constraint/product';
+import { ISearchProductListRequest } from '@/types/searchProductList';
+import { parseNumberRange } from '@/utils/search/numberRange';
+import useDebounce from '@/hooks/useDebounce';
 
-export default function SearchPrice() {
-  const [value, setValue] = useState<number[]>([0, 10000000]);
+interface IProps {
+  selectedFilter: ISearchProductListRequest;
+  onClickPriceSelect: (price: string) => void;
+  onChangePriceSelect: (newValue: number[]) => void;
+}
+
+export default function SearchPrice({ selectedFilter, onClickPriceSelect, onChangePriceSelect }: IProps) {
+  const getInitialValue = () => {
+    if (selectedFilter.price) {
+      const { min, max } = parseNumberRange(selectedFilter.price);
+      return [min || 0, max || 10000000];
+    }
+    return [0, 10000000];
+  };
+
+  const [value, setValue] = useState<number[]>(getInitialValue());
+  const debouncedValue = useDebounce(value, 300);
+
+  useEffect(() => {
+    onChangePriceSelect(debouncedValue);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedValue]);
 
   const handleChange = (event: Event, newValue: number[]) => {
     setValue(newValue);
@@ -16,6 +40,12 @@ export default function SearchPrice() {
   const formatValue = (value: number) => {
     const won = Math.floor(value / 10000);
     return `${won}만원`;
+  };
+
+  const handleClickPriceSelect = (price: string) => {
+    const { min, max } = parseNumberRange(price);
+    setValue([min || 0, max || 10000000]);
+    onClickPriceSelect(price);
   };
 
   return (
@@ -28,7 +58,11 @@ export default function SearchPrice() {
         </Flex>
         <Flex direction="row" gap={8} paddingHorizontal={16} className={styles.search_price_button_wrap}>
           {PRODUCT_FILTER_PRICE.map((item) => (
-            <TagButton key={item.id} isActive={false}>
+            <TagButton
+              key={item.id}
+              isActive={selectedFilter.price === item.value}
+              onClick={() => handleClickPriceSelect(item.value)}
+            >
               {item.name}
             </TagButton>
           ))}

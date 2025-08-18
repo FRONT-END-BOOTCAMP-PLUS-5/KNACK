@@ -53,6 +53,8 @@ export const PRODUCT_FILTER_DISCOUNT = [
   { id: 3, name: '50% 이상', value: '50-' },
 ] as const;
 
+export type DiscountValue = (typeof PRODUCT_FILTER_DISCOUNT)[number]['value'];
+
 export const PRODUCT_FILTER_PRICE = [
   { id: 1, name: '10만원 이하', value: '0-99999' },
   { id: 2, name: '10만원대', value: '100000-199999' },
@@ -61,5 +63,5 @@ export const PRODUCT_FILTER_PRICE = [
   { id: 5, name: '30-50만원', value: '300000-500000' },
   { id: 6, name: '50-100만원', value: '500000-1000000' },
   { id: 7, name: '100-500만원', value: '1000000-5000000' },
-  { id: 8, name: '500만원 이상', value: '5000000-' },
+  { id: 8, name: '500만원 이상', value: '5000000-10000000' },
 ] as const;
