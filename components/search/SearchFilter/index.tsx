@@ -8,6 +8,8 @@ import arrowDown from '@/public/icons/arrow_down.svg';
 import { PRODUCT_FILTER } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
 import { calcFilterValueLength, isActiveFilter } from '@/utils/search/searchFilter';
+import resetIcon from '@/public/icons/reset.svg';
+import { useRouter } from 'next/navigation';
 
 interface IProps {
   filterQuery: ISearchProductListRequest;
@@ -15,9 +17,20 @@ interface IProps {
 }
 
 export default function SearchFilter({ filterQuery, handleSelect }: IProps) {
+  const router = useRouter();
+
+  const handleReset = () => {
+    router.push('/search');
+  };
+
   return (
     <div className={styles.filter_section}>
       <DragScroll className={styles.filter_scroll} showScrollbar={false}>
+        {Object.keys(filterQuery).length > 0 && (
+          <button type="button" className={styles.filter_reset_button} onClick={handleReset}>
+            <Image src={resetIcon} alt="초기화 아이콘" width={16} height={16} />
+          </button>
+        )}
         {PRODUCT_FILTER.map((option) => {
           const isActive = isActiveFilter(option.value, filterQuery);
           const count = calcFilterValueLength(option.value, filterQuery);
