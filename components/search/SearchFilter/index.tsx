@@ -9,7 +9,7 @@ import { PRODUCT_FILTER } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
 import { calcFilterValueLength, isActiveFilter } from '@/utils/search/searchFilter';
 import resetIcon from '@/public/icons/reset.svg';
-import { useRouter } from 'next/navigation';
+import { useClearProductFilter } from '@/hooks/useClearProductFilter';
 
 interface IProps {
   filterQuery: ISearchProductListRequest;
@@ -17,10 +17,10 @@ interface IProps {
 }
 
 export default function SearchFilter({ filterQuery, handleSelect }: IProps) {
-  const router = useRouter();
+  const { clearFilters } = useClearProductFilter();
 
   const handleReset = () => {
-    router.push('/search');
+    clearFilters();
   };
 
   return (

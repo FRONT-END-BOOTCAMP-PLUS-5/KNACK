@@ -79,10 +79,6 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   }, [selectedFilter]);
 
   useEffect(() => {
-    console.log('@@@@@@@@selectedFilter : ', selectedFilter);
-  }, [selectedFilter]);
-
-  useEffect(() => {
     // 초기 데이터 저장
     setSelectedFilter(filterQuery);
   }, [filterQuery, isOpen]);
@@ -355,18 +351,21 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   const handleClearFilter = () => {
     const searchParams = new URLSearchParams(window.location.search);
     const sort = searchParams.get('sort');
+    const keyword = searchParams.get('keyword');
+    const categoryId = searchParams.get('categoryId');
 
     const isValidSortOption = (value: string | null): value is SortOption => {
       if (!value) return false;
       return PRODUCT_FILTER_SORT.some((item) => item.value === value);
     };
 
-    if (isValidSortOption(sort)) {
-      setSelectedFilter({ sort: sort });
-    } else {
-      setSelectedFilter({});
-    }
+    const preservedFilter: ISearchProductListRequest = {};
 
+    if (isValidSortOption(sort)) preservedFilter.sort = sort;
+    if (keyword) preservedFilter.keyword = keyword;
+    if (categoryId) preservedFilter.categoryId = [parseInt(categoryId)];
+
+    setSelectedFilter(preservedFilter);
     clearBottomList();
   };
 
