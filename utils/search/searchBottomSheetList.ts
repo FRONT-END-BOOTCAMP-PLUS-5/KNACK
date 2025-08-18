@@ -47,7 +47,7 @@ export const convertFilterToBottomList = (
   // 브랜드
   if (filterQuery.brandId?.length) {
     filterQuery.brandId.forEach((brandId) => {
-      const brand = data.brands.flatMap((brandGroup) => brandGroup.brandList).find((b) => b.id === brandId);
+      const brand = data.brands.flatMap((brandGroup) => brandGroup.brandList).find((brand) => brand.id === brandId);
       if (brand) {
         result.push({
           type: 'brandId',
@@ -121,6 +121,37 @@ export const convertFilterToBottomList = (
         name: price.name,
         value: filterQuery.price,
       });
+    } else {
+      // 커스텀 가격 범위인 경우
+      const isValidPriceRange = (priceRange: string): boolean => {
+        // "숫자-숫자"
+        const pricePattern = /^\d+-\d+$/;
+        if (!pricePattern.test(priceRange)) {
+          return false;
+        }
+
+        const [min, max] = priceRange.split('-').map(Number);
+        return !isNaN(min) && !isNaN(max) && min >= 0 && max >= 0 && min <= max;
+      };
+
+      const formatCustomPriceRange = (priceRange: string): string => {
+        const [min, max] = priceRange.split('-').map(Number);
+        const formatPrice = (price: number): string => {
+          if (price >= 10000) {
+            return `${Math.floor(price / 10000)}만원`;
+          }
+          return `${price.toLocaleString()}원`;
+        };
+        return `${formatPrice(min)}-${formatPrice(max)}`;
+      };
+
+      if (isValidPriceRange(filterQuery.price)) {
+        result.push({
+          type: 'price',
+          name: formatCustomPriceRange(filterQuery.price),
+          value: filterQuery.price,
+        });
+      }
     }
   }
 

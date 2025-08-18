@@ -28,27 +28,33 @@ export const useSearchBottomSheetInit = ({
 }: UseSearchBottomSheetInitProps) => {
   const [selectedBottomList, setSelectedBottomList] = useState<ISelectedBottomList[]>([]);
   const [isDataReady, setIsDataReady] = useState(false);
+  const [initialBrands, setInitialBrands] = useState<IBrandWithTagList[]>([]);
 
   useEffect(() => {
     const hasCategories = categories.length > 0;
     const hasBrands = brands.length > 0;
     const hasSizes = sizes.length > 0;
 
+    if (hasBrands && initialBrands.length === 0) {
+      setInitialBrands(brands);
+    }
+
     setIsDataReady(hasCategories && hasBrands && hasSizes);
-  }, [categories, brands, sizes]);
+  }, [categories, brands, sizes, initialBrands.length]);
 
   // filterQuery와 데이터가 준비되었을 때 selectedBottomList 초기화
+  // 브랜드 검색 시에는 인한 브랜드 목록 변경 x
   useEffect(() => {
-    if (!isDataReady || !isOpen) return;
+    if (!isDataReady || !isOpen || initialBrands.length === 0) return;
 
     const initialBottomList = convertFilterToBottomList(filterQuery, {
       categories,
-      brands,
+      brands: initialBrands,
       sizes,
     });
 
     setSelectedBottomList(initialBottomList);
-  }, [filterQuery, categories, brands, sizes, isDataReady, isOpen]);
+  }, [filterQuery, categories, sizes, isDataReady, isOpen, initialBrands]);
 
   const removeFromBottomList = (type: ISelectedBottomList['type'], value: string | number) => {
     setSelectedBottomList((prev) => prev.filter((item) => !(item.type === type && item.value === value)));
@@ -103,5 +109,6 @@ export const useSearchBottomSheetInit = ({
     clearBottomList,
     updateBottomList,
     setSelectedBottomList,
+    initialBrands,
   };
 };

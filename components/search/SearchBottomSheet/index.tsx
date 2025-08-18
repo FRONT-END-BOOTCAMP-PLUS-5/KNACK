@@ -53,7 +53,7 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   const [brands, setBrands] = useState<IBrandWithTagList[]>([]);
   const [sizes, setSizes] = useState<IOption[]>([]);
 
-  const { selectedBottomList, isDataReady, removeFromBottomList, clearBottomList, updateBottomList } =
+  const { selectedBottomList, isDataReady, removeFromBottomList, clearBottomList, updateBottomList, initialBrands } =
     useSearchBottomSheetInit({
       filterQuery,
       categories,
@@ -75,6 +75,10 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
       name: item.name,
       badge: getFilterCountById(selectedFilter, item.id),
     }));
+  }, [selectedFilter]);
+
+  useEffect(() => {
+    console.log('@@@@@@@@selectedFilter : ', selectedFilter);
   }, [selectedFilter]);
 
   useEffect(() => {
@@ -172,9 +176,21 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
     setSelectedFilter(newSelectedFilter);
 
     if (isDataReady) {
-      const brand = brands.flatMap((brandGroup) => brandGroup.brandList).find((brandItem) => brandItem.id === brandId);
+      // 현재 브랜드 목록에서 찾기
+      let brand = brands.flatMap((brandGroup) => brandGroup.brandList).find((brandItem) => brandItem.id === brandId);
+
+      // 현재 목록에서 찾지 못하면 초기 브랜드 목록에서 찾기
+      if (!brand && initialBrands.length > 0) {
+        brand = initialBrands
+          .flatMap((brandGroup) => brandGroup.brandList)
+          .find((brandItem) => brandItem.id === brandId);
+      }
+
       if (brand) {
         updateBottomList('brandId', brandId, brand.korName, !isSelected);
+      } else {
+        // 제거하는 경우는 항상 처리
+        updateBottomList('brandId', brandId, '', false);
       }
     }
   };
