@@ -9,6 +9,7 @@ import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import PaymentHeader from '@/components/Payments/PaymentHeader';
 import { useUserStore } from '@/store/userStore';
+import { BuyingHeader } from '@/components/my/BuyingHeader';
 
 interface IProps {
   children: React.ReactNode;
@@ -42,19 +43,19 @@ export default function LayoutWrapper({ children }: IProps) {
   }, [session, status, fetchUserData]);
 
   // 헤더만 숨길 경로들
-  const hideHeaderPaths = ['/login', '/signup', '/find-email', '/find-password', '/my/address', '/saved'];
+  const hideHeaderPaths = ['/login', '/signup', '/find-email', '/find-password', '/my/address', '/saved', '/payments/checkout'];
 
   // 푸터만 숨길 경로들
   const hideFooterPaths = ['/products', '/cart', '/payments'];
 
   // 헤더와 푸터 모두 숨길 경로들
-  const hideAllLayoutPaths = ['/login', '/signup', '/find-email', '/find-password'];
+  const hideAllLayoutPaths = ['/login', '/signup', '/my/buying', '/find-email', '/find-password'];
 
   // nav와 검색버튼을을 숨김
   const hideHeaderElementsPaths = ['/my', '/cart'];
 
   // 로고를 숨기고고 뒤로가기 버튼
-  const showBackButtonPaths = ['/cart', '/my/profile', '/my/orders', '/my/address'];
+  const showBackButtonPaths = ['/cart', '/my/profile', '/my/address'];
 
   // 홈 버튼을 보여줄 경로들
   const showHomeButtonPaths = ['/cart'];
@@ -65,6 +66,8 @@ export default function LayoutWrapper({ children }: IProps) {
     if (pathname.startsWith('/my/orders')) return '주문내역';
     if (pathname.startsWith('/my/address')) return '주소록';
     if (pathname.startsWith('/cart')) return '장바구니';
+    if (pathname.startsWith('/my/buying')) return '구매 진행 중';
+    if (pathname.startsWith('/payments/checkout')) return '배송/결제';
     return undefined;
   };
 

@@ -28,6 +28,8 @@ export interface RepresentativeProduct {
     price: number;
 }
 
+export type OrderPageProps = { params: { orderId: string } };
+
 /* ---------- 주소 ---------- */
 export type AddressDtoWithPostalFields = AddressDto & {
     postalCode?: string
