@@ -61,7 +61,7 @@ const BrandSave = ({ brandLikeData, onClickBookMark }: IProps) => {
                       {brandProduct?.engName}
                     </Text>
                     <Text size={1.2} weight={700}>
-                      {brandProduct?.price.toLocaleString()}원
+                      {brandProduct?.price && brandProduct?.price?.toLocaleString()}원
                     </Text>
                   </Flex>
                 ))}
