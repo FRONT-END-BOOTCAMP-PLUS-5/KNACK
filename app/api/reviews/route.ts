@@ -15,44 +15,13 @@ export async function POST(request: NextRequest) {
                   );
                 }
 
-    // orderId 유효성 검사
+    // orderId 파싱 및 기본 유효성 검사
     const parsedOrderId = parseInt(orderId);
     if (isNaN(parsedOrderId) || parsedOrderId <= 0) {
-
       return NextResponse.json(
         { success: false, error: '유효하지 않은 orderId입니다.' },
         { status: 400 }
       );
-    }
-
-
-
-    // orderId가 실제로 존재하는지 확인 (선택사항)
-    try {
-      const { PrismaClient } = require('@prisma/client');
-      const prisma = new PrismaClient();
-      
-      const order = await prisma.order.findUnique({
-        where: { id: parsedOrderId }
-      });
-      
-      if (!order) {
-        return NextResponse.json(
-          { success: false, error: `주문 ID ${parsedOrderId}가 존재하지 않습니다.` },
-          { status: 400 }
-        );
-      }
-      
-      if (order.userId !== userId) {
-        return NextResponse.json(
-          { success: false, error: '해당 주문에 대한 권한이 없습니다.' },
-          { status: 403 }
-        );
-      }
-      
-      await prisma.$disconnect();
-    } catch (dbError) {
-      console.error('orderId 유효성 확인 실패:', dbError);
     }
 
     // 백엔드 로직 사용
@@ -90,8 +59,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 예상치 못한 에러
     return NextResponse.json(
-      { success: false, error: '리뷰 생성에 실패했습니다.' },
+      { success: false, error: '리뷰 생성에 실패했습니다. 다시 시도해주세요.' },
       { status: 500 }
     );
   }

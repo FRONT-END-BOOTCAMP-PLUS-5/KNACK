@@ -7,64 +7,24 @@ import ReactStars from 'react-stars';
 import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './review.module.scss';
 
-// DTO에 맞는 데이터 타입 정의
-interface ReviewDto {
-  orderId: number;
-  productId: number;
-  productName: string;
-  productEngName: string;
-  thumbnailImage: string;
-  category: {
-    engName: string;
-    korName: string;
-  } | undefined;
-  optionValue?: {
-    id: number;
-    name: string;
-    typeId: number;
-  };
-  size?: string; // 사이즈 정보 추가
-  hasReview: boolean;
-  review?: {
-    contents: string;
-    rating: number;
-    reviewImages?: string;
-    createdAt: Date;
-  };
-}
-
-interface MyReviewDto {
-  orderId: number;
-  productId: number;
-  productName: string;
-  productEngName: string;
-  thumbnailImage: string;
-  category: {
-    engName: string;
-    korName: string;
-  } | undefined;
-  optionValue?: {
-    id: number;
-    name: string;
-    typeId: number;
-  };
-  size?: string; // 사이즈 정보 추가
-  review: {
-    contents: string;
-    rating: number;
-    reviewImages?: string;
-    createdAt: Date;
-  };
-}
+import { ReviewOrderDto } from '@/types/review';
+import { useReview } from '@/hooks/useReview';
+import { REVIEW_INCENTIVE_MESSAGE, ERROR_MESSAGES } from '@/utils/review';
 
 export default function ReviewPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'write' | 'my'>('write');
-  const [reviewableOrders, setReviewableOrders] = useState<ReviewDto[]>([]);
-  const [myreview, setMyreview] = useState<MyReviewDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  
+  // 커스텀 훅 사용
+  const { 
+    reviewableOrders, 
+    myreview, 
+    loading, 
+    error, 
+    fetchReviewData, 
+    removeOrderFromReviewable 
+  } = useReview();
 
   // 리뷰 클릭 시 상품 상세페이지로 이동
   const handleReviewClick = (productId: number) => {
@@ -81,33 +41,7 @@ export default function ReviewPage() {
 
   // API에서 데이터 가져오기
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/reviews/orders');
-        const data = await response.json();
-        
-        if (data.success) {
-          const reviewableOrders = data.data.reviewableOrders || [];
-          const myreview = data.data.myReviews || []; // myReviews로 수정
-          // 이미 리뷰가 작성된 주문은 "리뷰 쓰기" 탭에서 제거
-          const filteredReviewableOrders = reviewableOrders.filter((order: ReviewDto) => {
-            return !myreview.some((review: MyReviewDto) => review.orderId === order.orderId);
-          });
-          
-          setReviewableOrders(filteredReviewableOrders);
-          setMyreview(myreview);
-        } else {
-          setError(data.error || '데이터를 가져올 수 없습니다.');
-        }
-      } catch (error) {
-        console.error('데이터 조회 실패:', error);
-        setError('데이터를 가져올 수 없습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    fetchReviewData();
   }, []);
 
   // URL 쿼리 파라미터에서 탭 정보와 orderId 확인 (API 재호출 방지)
@@ -120,12 +54,10 @@ export default function ReviewPage() {
       
       // orderId가 있으면 해당 주문을 reviewableOrders에서 제거 (리뷰 작성 완료 후)
       if (oid) {
-        setReviewableOrders(prev => 
-          prev.filter(order => order.orderId !== parseInt(oid))
-        );
+        removeOrderFromReviewable(parseInt(oid));
       }
     }
-  }, [searchParams]);
+  }, [searchParams, removeOrderFromReviewable]);
 
   return (
     <main>
@@ -149,20 +81,20 @@ export default function ReviewPage() {
       <div className={styles.tab_content}>
         {activeTab === 'write' ? (
           <div className={styles.write_content}>
-            {/* 인센티브 메시지 */}
-            <div className={styles.incentive_message}>
-              <span>리뷰 작성하고 최대 500P 적립 받으세요.</span>
-              <span className={styles.arrow}>→</span>
-            </div>
+                         {/* 인센티브 메시지 */}
+             <div className={styles.incentive_message}>
+               <span>{REVIEW_INCENTIVE_MESSAGE}</span>
+               <span className={styles.arrow}>→</span>
+             </div>
             
             {/* 상품 목록 */}
             {loading ? (
               <div className={styles.loading}>데이터를 불러오는 중...</div>
             ) : error ? (
               <div className={styles.error}>{error}</div>
-            ) : reviewableOrders.length === 0 ? (
-              <div className={styles.empty_message}>리뷰 작성 가능한 주문이 없습니다.</div>
-            ) : (
+                         ) : reviewableOrders.length === 0 ? (
+               <div className={styles.empty_message}>{ERROR_MESSAGES.NO_REVIEWABLE_ORDERS}</div>
+             ) : (
               <div className={styles.product_list}>
                 {reviewableOrders.map((order) => (
                   <div 
@@ -218,9 +150,9 @@ export default function ReviewPage() {
               <div className={styles.loading}>데이터를 불러오는 중...</div>
             ) : error ? (
               <div className={styles.error}>{error}</div>
-            ) : myreview.length === 0 ? (
-              <p className={styles.empty_message}>아직 내 리뷰가 없어요</p>
-            ) : (
+                         ) : myreview.length === 0 ? (
+               <p className={styles.empty_message}>{ERROR_MESSAGES.NO_MY_REVIEWS}</p>
+             ) : (
               <div className={styles.product_list}>
                 {myreview.map((order) => (
                   <div key={`my-${order.orderId}`} className={styles.product_link} onClick={() => handleReviewClick(order.productId)}>
@@ -245,7 +177,7 @@ export default function ReviewPage() {
                     <div className={styles.rating_section}>
                       <ReactStars
                         count={5}
-                        value={order.review.rating}
+                        value={order.review?.rating || 0}
                         size={40}
                         color1="#ddd"
                         color2="#222"
@@ -254,15 +186,15 @@ export default function ReviewPage() {
                       
                       {/* 리뷰 작성 일시 */}
                       <p className={styles.review_date}>
-                        {new Date(order.review.createdAt).toLocaleDateString('ko-KR', {
+                        {order.review?.createdAt ? new Date(order.review.createdAt).toLocaleDateString('ko-KR', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric'
-                        })}
+                        }) : ''}
                       </p>
                       
                       {/* 카테고리별 맞춤형 태그들 */}
-                      {order.review.contents && (
+                      {order.review?.contents && (
                         <div className={styles.review_tags}>
                           {(() => {
                             try {

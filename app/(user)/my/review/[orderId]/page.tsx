@@ -7,55 +7,8 @@ import styles from './reviewWrite.module.scss';
 import { useUserStore } from '@/store/userStore';
 import Toast from '@/components/common/Toast';
 
-// 카테고리별 질문과 답변 옵션 (ID 기반)
-const reviewQuestions = {
-  1: [
-    {
-      question: '구매하신 상의 사이즈는 어떤가요?',
-      options: ['오버핏이에요', '정사이즈예요', '슬림핏이에요']
-    },
-    {
-      question: '두께감은 어떤가요?',
-      options: ['두께감이 보통이에요', '두께감이 두꺼워요', '두께감이 얇아요']
-    },
-    {
-      question: '퀄리티는 어떤가요?',
-      options: ['퀄리티가 만족스러워요', '퀄리티가 매우 만족스러워요', '퀄리티가 보통이에요']
-    }
-  ],
-  2: [
-    {
-      question: '구매하신 아우터 사이즈는 어떤가요?',
-      options: ['작게 나왔어요', '정사이즈예요', '크게 나왔어요']
-    },
-    {
-      question: '아우터 길이는 어떤가요?',
-      options: ['짧아요', '적당해요', '길어요']
-    },
-    {
-      question: '착용감은 어떤가요?',
-      options: ['불편해요', '보통이에요', '편해요']
-    },
-    {
-      question: '보온성은 어떤가요?',
-      options: ['보온성이 부족해요', '보온성이 보통이에요', '보온성이 만족스러워요', '보온성이 매우 만족스러워요']
-    }
-  ],
-  3: [
-    {
-      question: '구매하신 하의 사이즈는 어떤가요?',
-      options: ['작게 나왔어요', '정사이즈예요', '크게 나왔어요']
-    },
-    {
-      question: '하의 길이는 어떤가요?',
-      options: ['짧아요', '적당해요', '길어요']
-    },
-    {
-      question: '하의 퀄리티는 어떤가요?',
-      options: ['퀄리티가 별로예요', '퀄리티가 보통이에요', '퀄리티가 만족스러워요', '퀄리티가 매우 만족스러워요']
-    }
-  ]
-};
+import { REVIEW_QUESTIONS, DEFAULT_CATEGORY_ID } from '@/utils/review';
+import { reviewService } from '@/services/review';
 
 export default function ReviewWritePage() {
   const params = useParams();
@@ -96,16 +49,15 @@ export default function ReviewWritePage() {
     const fetchProductInfo = async () => {
       if (!productId) return;
         try {
-          // 실제 API 호출로 상품 정보 가져오기
-          const response = await fetch(`/api/products/${productId}`);
-          const data = await response.json();
+          // reviewService를 사용하여 상품 정보 가져오기
+          const data = await reviewService.getProduct(productId);
           
-          if (data.status === 200 && data.result) { // ← 수정
+          if (data.status === 200 && data.result) {
             setProductInfo({
               id: parseInt(productId),
-              name: data.result.korName, // ← korName 사용
-              categoryId: data.result.category.id, // ← category.id 사용
-              categoryName: data.result.category.korName // ← category.korName 사용
+              name: data.result.korName,
+              categoryId: data.result.category.id,
+              categoryName: data.result.category.korName
             });
           }
         } catch (error) {
@@ -118,11 +70,11 @@ export default function ReviewWritePage() {
   
   // 카테고리 ID에 따른 질문지 선택
   const getQuestionsByCategoryId = (categoryId: number) => {
-    const result = reviewQuestions[categoryId as keyof typeof reviewQuestions] || reviewQuestions[2];
+    const result = REVIEW_QUESTIONS[categoryId] || REVIEW_QUESTIONS[DEFAULT_CATEGORY_ID];
     return result;
   };
   
-  const questions = productInfo ? getQuestionsByCategoryId(productInfo.categoryId) : reviewQuestions[2];
+  const questions = productInfo ? getQuestionsByCategoryId(productInfo.categoryId) : REVIEW_QUESTIONS[DEFAULT_CATEGORY_ID];
 
   const handleAnswerChange = (questionId: string, answer: string) => {
     setAnswers(prev => ({
@@ -163,14 +115,8 @@ export default function ReviewWritePage() {
         reviewImages: ''
       };
 
-      // API 호출
-      const response = await fetch('/api/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reviewData),
-      });
-
-      const result = await response.json();
+      // reviewService를 사용하여 리뷰 생성
+      const result = await reviewService.createReview(reviewData);
 
       if (result.success) {
         showToast('success', '리뷰가 성공적으로 작성되었습니다!');
@@ -203,7 +149,7 @@ export default function ReviewWritePage() {
               color1="#ddd"
               color2="#222"
               edit={true}
-              half={false}        // 반별점 비활성화
+              half={false}
             />
           </div>
         </div>
