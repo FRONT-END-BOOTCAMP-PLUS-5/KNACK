@@ -42,7 +42,7 @@ export default function LayoutWrapper({ children }: IProps) {
   }, [session, status, fetchUserData]);
 
   // 헤더만 숨길 경로들
-  const hideHeaderPaths = ['/login', '/signup', '/find-email', '/find-password', '/my/address', '/saved'];
+  const hideHeaderPaths = ['/login', '/signup', '/find-email', '/find-password', '/my/address'];
 
   // 푸터만 숨길 경로들
   const hideFooterPaths = ['/products', '/cart', '/payments'];
@@ -51,7 +51,7 @@ export default function LayoutWrapper({ children }: IProps) {
   const hideAllLayoutPaths = ['/login', '/signup', '/find-email', '/find-password'];
 
   // nav와 검색버튼을을 숨김
-  const hideHeaderElementsPaths = ['/my', '/cart'];
+  const hideHeaderElementsPaths = ['/my', '/cart', '/saved'];
 
   // 로고를 숨기고고 뒤로가기 버튼
   const showBackButtonPaths = ['/cart', '/my/profile', '/my/orders', '/my/address'];
