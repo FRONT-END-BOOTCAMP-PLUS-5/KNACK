@@ -22,6 +22,9 @@ const SavedPage = () => {
   const handleGetRecentlyProduct = useCallback(
     (ids: string[]) => {
       const params = new URLSearchParams();
+
+      if (!ids) return;
+
       ids.forEach((id) => params.append('id', id));
 
       getRecentlyProductList(params.toString())
