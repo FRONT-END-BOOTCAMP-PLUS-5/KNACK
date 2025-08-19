@@ -17,6 +17,15 @@ interface IProps {
 const ProductSave = ({ likeList, onClickSave }: IProps) => {
   return (
     <Flex paddingHorizontal={16} direction="column">
+      {likeList?.length === 0 && (
+        <EmptyText
+          mainText="저장한 상품이 없어요."
+          subText="요즘 많이 찾는 아이템을 구경해보세요."
+          buttonText="인기 상품 보기"
+          url="search"
+        />
+      )}
+
       {likeList?.length > 0 &&
         likeList?.map(({ product: item }) => {
           return (
@@ -47,15 +56,6 @@ const ProductSave = ({ likeList, onClickSave }: IProps) => {
             </Flex>
           );
         })}
-
-      {likeList?.length === 0 && (
-        <EmptyText
-          mainText="저장한 상품이 없어요."
-          subText="요즘 많이 찾는 아이템을 구경해보세요."
-          buttonText="인기 상품 보기"
-          url="search"
-        />
-      )}
     </Flex>
   );
 };
