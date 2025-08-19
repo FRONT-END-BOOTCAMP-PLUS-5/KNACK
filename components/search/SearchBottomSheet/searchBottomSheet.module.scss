@@ -1,9 +1,20 @@
 // 바텀시트
+.bottom_sheet_layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .bottom_sheet_header {
   position: sticky;
   top: 0;
   background-color: #fff;
   z-index: 100;
+}
+
+.bottom_sheet_content {
+  flex: 1;
+  overflow-y: auto;
 }
 
 .bottom_sheet_bottom_wrap {
@@ -73,7 +84,7 @@
 
 // 색상 필터
 .search_color {
-  padding: 18px 16px;
+  padding: 0 16px;
   display: grid;
   column-gap: 8px;
   grid-template-columns: repeat(5, 1fr);

@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import styles from './searchBottomSheet.module.scss';
 import Image from 'next/image';
 import BottomSheet from '@/components/common/BottomSheet';
@@ -22,8 +22,10 @@ import {
   PRODUCT_FILTER_COLOR,
   PRODUCT_FILTER_DISCOUNT,
   PRODUCT_FILTER_PRICE,
+  PRODUCT_FILTER_SORT,
   GenderValueType,
   FilterValueType,
+  SortValueType,
 } from '@/constraint/product';
 import { categoryService } from '@/services/category';
 import { brandService } from '@/services/brand';
@@ -54,6 +56,7 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   const [categories, setCategories] = useState<IPageCategory[]>([]);
   const [brands, setBrands] = useState<IBrandWithTagList[]>([]);
   const [sizes, setSizes] = useState<IOption[]>([]);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const { selectedBottomList, isDataReady, removeFromBottomList, clearBottomList, updateBottomList, initialBrands } =
     useSearchBottomSheetInit({
@@ -63,6 +66,12 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
       sizes,
       isOpen,
     });
+
+  // 필터 탭 클릭 핸들러
+  const onClickFilterTab = (tabId: number) => {
+    handleSelect(tabId, false);
+    contentRef.current?.scrollTo({ top: 0 });
+  };
 
   // 상품 개수 조회 커스텀 훅
   const { isLoadingCount, buttonText } = useFilterCounts(selectedFilter);
@@ -347,88 +356,110 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   };
 
   const handleClearFilter = () => {
-    setSelectedFilter({});
+    const searchParams = new URLSearchParams(window.location.search);
+    const sort = searchParams.get('sort');
+    const keyword = searchParams.get('keyword');
+    const categoryId = searchParams.get('categoryId');
+
+    const isValidSortOption = (value: string | null): value is SortValueType => {
+      if (!value) return false;
+      return PRODUCT_FILTER_SORT.some((item) => item.value === value);
+    };
+
+    const preservedFilter: ISearchProductListRequest = {};
+
+    if (isValidSortOption(sort)) preservedFilter.sort = sort;
+    if (keyword) preservedFilter.keyword = keyword;
+    if (categoryId) preservedFilter.categoryId = [parseInt(categoryId)];
+
+    setSelectedFilter(preservedFilter);
     clearBottomList();
   };
 
   return (
-    <BottomSheet style={{ padding: 0, position: 'relative' }} title="필터" isCloseButton={false}>
-      <div className={styles.bottom_sheet_header}>
-        <TabMenu
-          tabs={tabs}
-          selectedTab={activeTabId}
-          onTabSelect={(tabId) => handleSelect(tabId, false)}
-          showScrollbar={false}
-          autoScroll={true}
-        />
-      </div>
+    <BottomSheet style={{ padding: 0, position: 'relative', overflow: 'hidden' }} title="필터" isCloseButton={false}>
+      <div className={styles.bottom_sheet_layout}>
+        <div className={styles.bottom_sheet_header}>
+          <TabMenu
+            tabs={tabs}
+            selectedTab={activeTabId}
+            onTabSelect={(tabId) => onClickFilterTab(tabId)}
+            showScrollbar={false}
+            autoScroll={true}
+          />
+        </div>
 
-      <div className={`${styles.bottom_sheet_content} ${styles.contents_container}`}>
-        {activeTabId === 1 && (
-          <SearchCategory
-            selectedFilter={selectedFilter}
-            categories={categories}
-            onClickSubCategorySelect={onClickSubCategorySelect}
-          />
-        )}
-        {activeTabId === 2 && (
-          <SearchGender selectedFilter={selectedFilter} onClickGenderSelect={onClickGenderSelect} />
-        )}
-        {activeTabId === 3 && <SearchColor selectedFilter={selectedFilter} onClickColorSelect={onClickColorSelect} />}
-        {activeTabId === 4 && (
-          <SearchDiscount selectedFilter={selectedFilter} onClickDiscountSelect={onClickDiscountSelect} />
-        )}
-        {activeTabId === 5 && (
-          <SearchBrand
-            selectedFilter={selectedFilter}
-            brands={brands}
-            onClickBrandSelect={onClickBrandSelect}
-            onChangeBrandList={onChangeBrandList}
-          />
-        )}
-        {activeTabId === 6 && (
-          <SearchSize selectedFilter={selectedFilter} sizes={sizes} onClickSizeSelect={onClickSizeSelect} />
-        )}
-        {activeTabId === 7 && (
-          <SearchPrice
-            selectedFilter={selectedFilter}
-            onClickPriceSelect={onClickPriceSelect}
-            onChangePriceSelect={onChangePriceSelect}
-          />
-        )}
-      </div>
+        <div ref={contentRef} className={`${styles.bottom_sheet_content} ${styles.contents_container}`}>
+          {activeTabId === 1 && (
+            <SearchCategory
+              selectedFilter={selectedFilter}
+              categories={categories}
+              onClickSubCategorySelect={onClickSubCategorySelect}
+            />
+          )}
+          {activeTabId === 2 && (
+            <SearchGender selectedFilter={selectedFilter} onClickGenderSelect={onClickGenderSelect} />
+          )}
+          {activeTabId === 3 && <SearchColor selectedFilter={selectedFilter} onClickColorSelect={onClickColorSelect} />}
+          {activeTabId === 4 && (
+            <SearchDiscount selectedFilter={selectedFilter} onClickDiscountSelect={onClickDiscountSelect} />
+          )}
+          {activeTabId === 5 && (
+            <SearchBrand
+              selectedFilter={selectedFilter}
+              brands={brands}
+              onClickBrandSelect={onClickBrandSelect}
+              onChangeBrandList={onChangeBrandList}
+            />
+          )}
+          {activeTabId === 6 && (
+            <SearchSize selectedFilter={selectedFilter} sizes={sizes} onClickSizeSelect={onClickSizeSelect} />
+          )}
+          {activeTabId === 7 && (
+            <SearchPrice
+              selectedFilter={selectedFilter}
+              onClickPriceSelect={onClickPriceSelect}
+              onChangePriceSelect={onChangePriceSelect}
+            />
+          )}
+        </div>
 
-      <section className={styles.bottom_sheet_bottom_wrap}>
-        <Divider height={1} />
-        <Flex justify="between" align="center" className={styles.bottom_sheet_bottom_selected_filter}>
-          <DragScroll showScrollbar={false}>
-            {selectedBottomList.map((item, index) => (
-              <Flex
-                align="center"
-                gap={2}
-                width="self"
-                paddingHorizontal={4}
-                key={`${item.type}-${item.value}-${index}`}
-              >
-                <Text size={1.3} weight={600} color="gray4">
-                  {item.name}
-                </Text>
-                <span onClick={() => handleRemoveBottomListItem(item.type, item.value)} style={{ cursor: 'pointer' }}>
-                  <Image src={searchClose} alt="close" width={16} height={16} style={{ opacity: 0.5 }} />
-                </span>
-              </Flex>
-            ))}
-          </DragScroll>
-        </Flex>
-        <Flex className={styles.bottom_sheet_bottom} paddingHorizontal={8} paddingVertical={8} gap={8}>
-          <button className={styles.bottom_sheet_bottom_clear} onClick={handleClearFilter}>
-            초기화
-          </button>
-          <button className={styles.bottom_sheet_bottom_submit} disabled={isLoadingCount} onClick={handleViewProducts}>
-            {buttonText()}
-          </button>
-        </Flex>
-      </section>
+        <section className={styles.bottom_sheet_bottom_wrap}>
+          <Divider height={1} />
+          <Flex justify="between" align="center" className={styles.bottom_sheet_bottom_selected_filter}>
+            <DragScroll showScrollbar={false}>
+              {selectedBottomList.map((item, index) => (
+                <Flex
+                  align="center"
+                  gap={2}
+                  width="self"
+                  paddingHorizontal={4}
+                  key={`${item.type}-${item.value}-${index}`}
+                >
+                  <Text size={1.3} weight={600} color="gray4">
+                    {item.name}
+                  </Text>
+                  <span onClick={() => handleRemoveBottomListItem(item.type, item.value)} style={{ cursor: 'pointer' }}>
+                    <Image src={searchClose} alt="close" width={16} height={16} style={{ opacity: 0.5 }} />
+                  </span>
+                </Flex>
+              ))}
+            </DragScroll>
+          </Flex>
+          <Flex className={styles.bottom_sheet_bottom} paddingHorizontal={8} paddingVertical={8} gap={8}>
+            <button className={styles.bottom_sheet_bottom_clear} onClick={handleClearFilter}>
+              초기화
+            </button>
+            <button
+              className={styles.bottom_sheet_bottom_submit}
+              disabled={isLoadingCount}
+              onClick={handleViewProducts}
+            >
+              {buttonText()}
+            </button>
+          </Flex>
+        </section>
+      </div>
     </BottomSheet>
   );
 }

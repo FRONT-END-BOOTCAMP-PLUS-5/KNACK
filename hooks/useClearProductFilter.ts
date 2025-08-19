@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 
-const FILTER_KEYS = ['categoryId', 'subCategoryId', 'keyword'];
+const FILTER_KEYS = ['categoryId', 'keyword', 'sort'];
 
 export const useClearProductFilter = () => {
   const router = useRouter();

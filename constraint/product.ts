@@ -9,6 +9,7 @@ export const PRODUCT_FILTER = [
 ] as const;
 
 export type FilterValueType = (typeof PRODUCT_FILTER)[number]['value'];
+export const FILTER_TAB_KEY: FilterValueType[] = PRODUCT_FILTER.map((item) => item.value);
 
 export const PRODUCT_FILTER_SORT = [
   { id: 1, name: '최신순', value: 'latest' },
@@ -20,6 +21,7 @@ export const PRODUCT_FILTER_SORT = [
 ] as const;
 
 export type SortValueType = (typeof PRODUCT_FILTER_SORT)[number]['value'];
+export const SORT_VALUE_KEY: SortValueType[] = PRODUCT_FILTER_SORT.map((item) => item.value);
 
 export const PRODUCT_FILTER_COLOR = [
   { id: 13, engName: 'black', korName: '블랙', color: '#000', image: '' },
