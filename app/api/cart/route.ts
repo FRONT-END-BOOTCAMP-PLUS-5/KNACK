@@ -7,11 +7,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authOptions } from '../auth/[...nextauth]/auth';
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return Response.json({ error: '로그인이 필요합니다.' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
 
     const cartRepository = new PrCartRepository(body);
-    const cart = new CreateCartUseCase(cartRepository).create(body.id);
+    const cart = new CreateCartUseCase(cartRepository).create(body.id, session?.user?.id);
 
     return NextResponse.json({ result: cart, status: 200 });
   } catch (err) {

@@ -16,8 +16,8 @@ export class PrCartRepository implements CartRepository {
     this.cartData = cartData;
   }
 
-  async upsertCart(id: number): Promise<number> {
-    const { count, optionValueId, productId, userId } = this.cartData ?? {};
+  async upsertCart(id: number, userId: string): Promise<number> {
+    const { count, optionValueId, productId } = this.cartData ?? {};
 
     const result = await prisma.cart.upsert({
       where: {
@@ -31,7 +31,7 @@ export class PrCartRepository implements CartRepository {
         productId: productId ?? 0,
         count: count ?? 0,
         optionValueId: optionValueId ?? 0,
-        userId: userId ?? '',
+        userId: userId,
       },
     });
 

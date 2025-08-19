@@ -44,7 +44,6 @@ const BottomFixButton = ({ productData }: IProps) => {
       count: 1,
       optionValueId: selectOptionId,
       productId: productData?.id,
-      userId: '7571e92b-f38b-4878-959c-f76ab9290ed8',
       id: 0, // upsert 이므로 없는 아이디를 넣어서 insert
     };
 
