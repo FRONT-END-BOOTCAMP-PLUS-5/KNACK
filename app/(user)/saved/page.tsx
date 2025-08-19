@@ -10,16 +10,7 @@ import { IBrandLikeList, ILikeList } from '@/types/like';
 import ProductSave from '@/components/saved/ProductSave';
 import BrandSave from '@/components/saved/BrandSave';
 import RecentlySave from '@/components/saved/RecentlySave';
-
-const TABS = [
-  { id: 0, name: '상품' },
-  { id: 1, name: '브랜드' },
-  { id: 2, name: '최근 본 상품' },
-];
-
-// TODO 상품 리스트 페이지 완성되면 상세 페이지 이동할때
-// localStorage로 주고 받도록 설정 필요
-const RECENT_PRODUCT_IDS = ['5', '6', '7'];
+import { TABS } from '@/constraint/saved';
 
 const SavedPage = () => {
   const { addLike, deleteLike, getLikes, addBrandLike, deleteBrandLike, getBrandLikes } = likeService;
@@ -30,21 +21,23 @@ const SavedPage = () => {
   const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
   const [recentProducts, setRecentProducts] = useState<IRecentProduct[]>([]);
 
-  const handleGetRecentlyProduct = useCallback(() => {
-    const ids = RECENT_PRODUCT_IDS;
-    const params = new URLSearchParams();
-    ids.forEach((id) => params.append('id', id));
+  const handleGetRecentlyProduct = useCallback(
+    (ids: string[]) => {
+      const params = new URLSearchParams();
+      ids.forEach((id) => params.append('id', id));
 
-    getRecentlyProductList(params.toString())
-      .then((res) => {
-        if (res.status === 200) {
-          setRecentProducts(res.result);
-        }
-      })
-      .catch((error) => {
-        console.log('error', error.message);
-      });
-  }, [getRecentlyProductList]);
+      getRecentlyProductList(params.toString())
+        .then((res) => {
+          if (res.status === 200) {
+            setRecentProducts(res.result);
+          }
+        })
+        .catch((error) => {
+          console.log('error', error.message);
+        });
+    },
+    [getRecentlyProductList]
+  );
 
   const handleGetBrandLikes = useCallback(() => {
     getBrandLikes()
@@ -178,8 +171,12 @@ const SavedPage = () => {
   }, [handleGetBrandLikes]);
 
   useEffect(() => {
-    handleGetRecentlyProduct();
+    const storage = localStorage.getItem('recent') && JSON.parse(localStorage.getItem('recent') ?? '');
+
+    handleGetRecentlyProduct(storage);
   }, [handleGetRecentlyProduct]);
+
+  useEffect(() => {}, []);
 
   return (
     <section>

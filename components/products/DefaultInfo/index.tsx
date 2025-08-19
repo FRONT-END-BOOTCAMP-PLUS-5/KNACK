@@ -5,6 +5,7 @@ import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import { IProduct } from '@/types/productDetail';
+import { useEffect } from 'react';
 
 interface IProps {
   data?: IProduct;
@@ -12,6 +13,26 @@ interface IProps {
 
 const DefaultInfo = ({ data }: IProps) => {
   const { onOpen } = useBottomSheetStore();
+
+  const localStorageSet = (value: number[] | number) => {
+    localStorage.setItem('recent', JSON.stringify(value));
+  };
+
+  useEffect(() => {
+    const getRecent = localStorage.getItem('recent') && JSON.parse(localStorage.getItem('recent') ?? '');
+
+    if (getRecent) {
+      const duplicateCheck = getRecent?.some((item: number) => item === data?.id);
+
+      if (!duplicateCheck) {
+        getRecent.push(data?.id);
+
+        localStorageSet(getRecent);
+      }
+    } else {
+      localStorageSet([data?.id ?? 0]);
+    }
+  }, [data?.id]);
 
   return (
     <article className={styles.default_info}>
