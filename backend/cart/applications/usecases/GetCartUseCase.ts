@@ -8,8 +8,8 @@ export class GetCartUseCase {
     this.repository = repository;
   }
 
-  async execute(): Promise<Cart[]> {
-    const result = await this.repository.getCart();
+  async execute(userId: string): Promise<Cart[]> {
+    const result = await this.repository.getCart(userId);
 
     return result;
   }
