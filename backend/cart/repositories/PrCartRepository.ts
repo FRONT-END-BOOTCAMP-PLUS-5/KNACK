@@ -38,9 +38,9 @@ export class PrCartRepository implements CartRepository {
     return result.id;
   }
 
-  async getCart(): Promise<Cart[]> {
+  async getCart(userId: string): Promise<Cart[]> {
     const result = await prisma.cart.findMany({
-      where: { userId: '7571e92b-f38b-4878-959c-f76ab9290ed8' },
+      where: { userId: userId },
       include: {
         product: {
           include: {
