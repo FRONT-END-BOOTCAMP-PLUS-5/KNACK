@@ -70,8 +70,8 @@ export default function CheckoutPage() {
     // 3) 해당 상품군 합계(쿠폰 타깃 금액)
     const targetSum = isCouponApplicable
       ? orderItems
-          .filter((it) => it.productId === selectedCoupon!.productId)
-          .reduce((s, it) => s + it.price * it.quantity, 0)
+        .filter((it) => it.productId === selectedCoupon!.productId)
+        .reduce((s, it) => s + it.price * it.quantity, 0)
       : 0;
 
     // 4) 쿠폰 할인금액 (과할인 방지)
@@ -170,9 +170,8 @@ export default function CheckoutPage() {
       await toss.requestPayment('카드', {
         amount: totalPrice,
         orderId: `order_${Date.now()}`, // 권장: 서버에서 선발급한 orderNumber 사용
-        orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${
-          orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''
-        } 주문`,
+        orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''
+          } 주문`,
         customerName: selectedAddress.name || '홍길동',
         successUrl: `${window.location.origin}/payments/success`,
         failUrl: `${window.location.origin}/payments/failure`,
@@ -208,19 +207,19 @@ export default function CheckoutPage() {
         const items: OrderItem[] = results.flatMap((p, i) =>
           p
             ? [
-                {
-                  productId: p.id,
-                  price: p.price,
-                  quantity: checkout[i].quantity,
-                  thumbnail_image: p.thumbnailImage,
-                  deliveryType: checkout[i].deliveryMethod,
-                  kor_name: p.korName,
-                  eng_name: p.engName,
-                  optionValue: p?.productOptionMappings[0]?.optionType?.optionValue?.find(
-                    (item) => item?.id === checkout[i]?.optionValueId
-                  ),
-                },
-              ]
+              {
+                productId: p.id,
+                price: p.price,
+                quantity: checkout[i].quantity,
+                thumbnail_image: p.thumbnailImage,
+                deliveryType: checkout[i].deliveryMethod,
+                kor_name: p.korName,
+                eng_name: p.engName,
+                optionValue: p?.productOptionMappings[0]?.optionType?.optionValue?.find(
+                  (item) => item?.id === checkout[i]?.optionValueId
+                ),
+              },
+            ]
             : []
         );
 
@@ -418,9 +417,9 @@ export default function CheckoutPage() {
           selectedAddress={
             selectedAddress
               ? {
-                  ...selectedAddress,
-                  request: selectedAddress.request,
-                }
+                ...selectedAddress,
+                request: selectedAddress.request,
+              }
               : null
           }
           onChangeSelected={(a: SelectedAddress) => {

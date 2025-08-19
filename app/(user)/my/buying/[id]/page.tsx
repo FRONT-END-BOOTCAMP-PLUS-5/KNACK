@@ -11,7 +11,7 @@ import { useState, useEffect, useMemo } from "react";
 import { STORAGE_PATHS } from "@/constraint/auth";
 import { useRouter } from "next/navigation";
 
-const STEPS = ["검수합격", "대기 중", "배송"] as const;
+const STEPS = ["구매 확정", "배송 대기", "배송 중", "배송 완료"] as const;
 type Step = typeof STEPS[number];
 
 function ProgressBar({ current }: { current: Step }) {
@@ -37,8 +37,11 @@ function formatPrice(n?: number) {
 
 function statusToStep(status?: string): Step {
     const s = (status ?? "").toUpperCase();
-    if (s === "DONE" || s === "PAID" || s === "SHIPPED" || s === "DELIVERING") return "배송";
-    return "대기 중";
+    if (s === "PAID") return "구매 확정";
+    if (s === "CONFIRMED") return "배송 대기";
+    if (s === "DELIVERING") return "배송 중";
+    if (s === "COMPLETED") return "배송 완료";
+    return "구매 확정";
 }
 
 export default function OrderPage({ params }: OrderPageProps) {
@@ -47,7 +50,7 @@ export default function OrderPage({ params }: OrderPageProps) {
     const paymentData = paymentDataStr ? JSON.parse(paymentDataStr) : null;
 
     const router = useRouter();
-    const [items, setItems] = useState<RepoOrderItem[]>([]);
+    const [item, setItem] = useState<RepoOrderItem[]>([]);
     const [address, setAddress] = useState<RepoAddress | null>(null);
     const [meta, setMeta] = useState<{
         paymentNumber?: string;
@@ -59,13 +62,13 @@ export default function OrderPage({ params }: OrderPageProps) {
     useEffect(() => {
         (async () => {
             try {
-                const res = await requester.get(`/api/payments/${params.id}`);
+                const res = await requester.get(`/api/orders/${params.id}`);
                 console.log(res.data);
                 const data = res.data ?? {};
-                setItems(data.orders ?? []);
-                setAddress(data.address ?? null);
+                setItem(data ?? null);
+                setAddress(data.payment.address ?? null);
                 setMeta({
-                    paymentNumber: String(data.paymentNumber ?? ""),
+                    paymentNumber: String(data.paymentId ?? ""),
                     status: data.status,
                     method: data.method,
                     createdAt: data.createdAt,
@@ -77,15 +80,7 @@ export default function OrderPage({ params }: OrderPageProps) {
     }, [params.id]);
 
     // 합계 계산
-    const productTotal = useMemo(
-        () =>
-            items.reduce((sum, item) => {
-                const unit = Number((item).price ?? 0);
-                const qty = Number((item).count ?? 1);
-                return sum + unit * qty;
-            }, 0),
-        [items]
-    );
+    const productTotal = 0;
     const total = productTotal + paymentData?.shippingFee - paymentData?.couponDiscountAmount - paymentData?.pointAmount;
 
     const step: Step = statusToStep(meta.status);
@@ -104,6 +99,13 @@ export default function OrderPage({ params }: OrderPageProps) {
     const message =
         (address?.message ?? "") || "";
 
+    const thumb =
+        (item.product)?.thumbnailImage ??
+        "/placeholder.png";
+    const korname = (item.product)?.korName ?? "";
+    const engname = (item.product)?.engName ?? "";
+    const variant = (item.optionValue)?.name ?? (item.optionValue)?.value ?? "";
+
     return (
         <>
             <BuyingHeader /> {/* 타이틀 컴포넌트가 '구매 진행 중'을 보여주도록 되어있다면 OK */}
@@ -114,40 +116,27 @@ export default function OrderPage({ params }: OrderPageProps) {
                     <div className={styles.order_no}>주문번호 {meta.paymentNumber || "-"}</div>
                 </section>
 
-                {/* 상품 카드들 */}
-                {items.map((item) => {
-                    const thumb =
-                        (item.product)?.thumbnailImage ??
-                        "/placeholder.png";
-                    const korname = (item.product)?.korName ?? "";
-                    const engname = (item.product)?.engName ?? "";
-                    const variant = (item.optionValue)?.name ?? (item.optionValue)?.value ?? "";
-                    return (
-                        <><section key={item.id} className={`${styles.section} ${styles.product_card}`}>
-                            <div className={styles.thumb_wrap}>
-                                <Image
-                                    src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${thumb}`}
-                                    alt={korname}
-                                    width={72}
-                                    height={72}
-                                    className={styles.thumb} />
-                            </div>
-                            <div className={styles.prod_info}>
-                                <div className={styles.k_title}>{korname}</div>
-                                <div className={styles.sub_title}>{engname}</div>
-                                {variant && <div className={styles.variant}>{variant}</div>}
-                            </div>
-                        </section><button className={styles.detail_btn} onClick={() => router.push(`/products/${item.product?.id}`)}>상품 상세</button></>
-                    );
-                })}
+                {/* 상품 카드 */}
+                <section key={item.id} className={`${styles.section} ${styles.product_card}`}>
+                    <div className={styles.thumb_wrap}>
+                        <Image
+                            src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${thumb}`}
+                            alt={korname}
+                            width={80}
+                            height={80}
+                            className={styles.thumb} />
+                    </div>
+                    <div className={styles.prod_info}>
+                        <div className={styles.k_title}>{korname}</div>
+                        <div className={styles.sub_title}>{engname}</div>
+                        {variant && <div className={styles.variant}>{variant}</div>}
+                    </div>
+                </section><button className={styles.detail_btn} onClick={() => router.push(`/products/${item.product?.id}`)}>상품 상세</button>
 
                 {/* 진행 상황 */}
                 <section className={styles.section_pink}>
                     <div className={styles.block_title}>진행 상황</div>
                     <ProgressBar current={step} />
-                    <div className={styles.step_desc}>
-                        {step === "대기 중" ? "구매 결정대기" : "배송 준비/진행 중"}
-                    </div>
                 </section>
 
                 {/* 도착 예정 (원하면 서버 값으로 바꿔 연결) */}

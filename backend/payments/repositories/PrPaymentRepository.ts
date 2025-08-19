@@ -73,7 +73,6 @@ export class PrPaymentRepository implements PaymentRepository {
 
     }
 
-
     async updateOrderPaymentIds(orderIds: number[], paymentId: number): Promise<void> {
         await prisma.order.updateMany({
             where: { id: { in: orderIds } },

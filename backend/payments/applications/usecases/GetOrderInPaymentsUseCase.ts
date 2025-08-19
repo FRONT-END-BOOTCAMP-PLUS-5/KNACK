@@ -51,7 +51,7 @@ export class GetOrderInPaymentsUseCase {
                     korName: item.product?.korName ?? '',
                     engName: item.product?.engName ?? '',
                     thumbnailImage: item.product?.thumbnailImage ?? '',
-                    thumbnailUrl: item.product?.thumbnailImage ?? null,
+                    thumbnailImage: item.product?.thumbnailImage ?? null,
                 },
                 optionValue: {
                     id: item.optionValue?.id ?? 0,

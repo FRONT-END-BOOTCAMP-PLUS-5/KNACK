@@ -13,7 +13,7 @@ export function mapOrderRowToDto(row: OrderRow): OrderDto {
         id: row.id,
         productId: row.productId,
         name: row.product?.korName ?? row.product?.engName ?? "",
-        thumbnailUrl: row.product?.thumbnailImage ?? null,
+        thumbnailImage: row.product?.thumbnailImage ?? null,
         unitPrice: Number(row.salePrice ?? row.price ?? 0),
         count: row.count ?? 0,
     }]
@@ -35,4 +35,11 @@ export function normalizeStatus(s: string): DtoStatus {
     if (u === 'FAILED') return 'FAILED';
     if (u === 'CANCELED' || u === 'CANCELLED') return 'CANCELED';
     return 'FAILED'; // 알 수 없는 값은 실패로 폴백(또는 throw)
+}
+
+// 공용 유틸: 객체 전체에서 bigint를 문자열로 바꿔줌
+export function serializeBigInt<T>(value: T): T {
+    return JSON.parse(
+        JSON.stringify(value, (_k, v) => (typeof v === 'bigint' ? v.toString() : v))
+    )
 }

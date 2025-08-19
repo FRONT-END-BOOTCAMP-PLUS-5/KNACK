@@ -40,7 +40,7 @@ export type RepoPayment = {
   tossPaymentKey?: string | null;
   approvedAt?: Date | null;
   method?: string | null;
-  status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
+  status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | 'CONFIRMED' | 'DELIVERING' | 'COMPLETED' | string;
   orders: Array<{
     id: number;
     status: string;
@@ -56,7 +56,25 @@ export type RepoPayment = {
   }>;
 };
 
-export type DtoStatus = 'DONE' | 'PENDING' | 'FAILED' | 'CANCELED';
+export type RepoIndependentOrder = {
+  id: number;
+  userId: string;
+  productId: number;
+  price: number | bigint;
+  salePrice?: number | bigint;
+  tracking?: string | null;
+  createdAt?: Date | null;
+  deliveryStatus?: number;
+  count?: number;
+  paymentId?: number;
+  optionValueId?: number;
+  quantity?: number;
+  product?: { korName?: string | null; engName?: string | null; thumbnailImage?: string | null } | null;
+  optionValue?: { id: number; name: string; value?: string } | null;
+  address?: RepoAddress | null;
+}
+
+export type DtoStatus = 'DONE' | 'PENDING' | 'FAILED' | 'CANCELED' | 'CONFIRMED' | 'DELIVERING' | 'COMPLETED' | string;
 
 export type OrderPageProps = { params: { id: string } };
 
@@ -144,6 +162,11 @@ export type RepoOrderItem = {
     name: string;
     value?: string;
   };
+};
+
+export type ProcessedPayment = {
+  orderId: string;
+  paymentKey: string;
 };
 
 /* ---------- 주소 ---------- */

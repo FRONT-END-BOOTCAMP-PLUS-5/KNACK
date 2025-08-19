@@ -1,9 +1,11 @@
 import { OrderRepository } from "../../domains/repositories/OrderRepository";
-import { OrderDto } from "../dtos/GetOrderDto";
+import { RepoIndependentOrder } from "@/types/order";
 
 export class GetOrderByIdUseCase {
     constructor(private readonly repo: OrderRepository) { }
-    execute(id: number, userId: string): Promise<OrderDto | null> {
-        return this.repo.findById(id, userId)
+    async execute(id: number, userId: string): Promise<RepoIndependentOrder | null> {
+        const row = await this.repo.findByIdWithAddress(id, userId);
+        if (!row) return null;
+        return row;
     }
 }

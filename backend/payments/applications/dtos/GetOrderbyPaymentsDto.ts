@@ -26,7 +26,7 @@ export interface GetOrderbyPaymentsDto {
             id: number;
             korName: string;
             engName: string;
-            thumbnailUrl: string | null;
+            thumbnailImage: string | null;
         };
         optionValue: {
             id: number;

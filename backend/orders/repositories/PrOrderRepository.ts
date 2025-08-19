@@ -3,6 +3,7 @@ import { CreateOrderEntityDto } from '@/backend/orders/applications/dtos/CreateO
 import prisma from '@/backend/utils/prisma';
 import { OrderDto } from '../applications/dtos/GetOrderDto';
 import { mapOrderRowToDto } from '@/utils/orders';
+import { RepoIndependentOrder } from '@/types/order';
 
 export class PrOrderRepository implements OrderRepository {
   async saveMany(orders: CreateOrderEntityDto[]): Promise<number[]> {
@@ -30,6 +31,13 @@ export class PrOrderRepository implements OrderRepository {
     await prisma.order.updateMany({
       where: { id: { in: orderIds } },
       data: { paymentId },
+    });
+  }
+
+  async updateDeliveryStatus(orderId: number, deliveryStatus: number): Promise<void> {
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { deliveryStatus },
     });
   }
 
@@ -63,6 +71,23 @@ export class PrOrderRepository implements OrderRepository {
 
     const dto = mapOrderRowToDto(order);
     return dto;
+  }
+
+  async findByIdWithAddress(id: number, userId: string): Promise<RepoIndependentOrder | null> {
+    const order = await prisma.order.findFirst({
+      where: { id, userId },
+      include: {
+        product: true,
+        payment: {
+          include: {
+            address: true,
+          },
+        },
+      },
+    });
+    if (!order) return null;
+
+    return order as RepoIndependentOrder;
   }
 
   async linkOrdersToPayment(args: { orderIds: number[]; paymentId: number; userId: string }): Promise<number> {
