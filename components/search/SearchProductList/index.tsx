@@ -2,6 +2,7 @@
 import { GetProductsResponseDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import styles from './searchProductList.module.scss';
 import { ProductCardLarge } from '@/components/common/ProductCard';
+import SearchProductListEmpty from './SearchProductListEmpty';
 
 interface IProps {
   initialData: GetProductsResponseDto;
@@ -17,6 +18,7 @@ export default function SearchProductList({ initialData }: IProps) {
           ))}
         </div>
       )}
+      {!initialData || (initialData.products.length === 0 && <SearchProductListEmpty />)}
     </>
   );
 }
