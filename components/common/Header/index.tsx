@@ -6,18 +6,22 @@ import styles from './header.module.scss';
 import { HEADER_TABS, DEFAULT_ACTIVE_TAB, HeaderTab } from '@/constraint/header';
 import { useRouter } from 'next/navigation';
 import { IProps } from '@/types/header';
+import Image from 'next/image';
+import BellIcon from '@/public/icons/bell.svg';
+import CartIcon from '@/public/icons/cart.svg';
+import HomeIcon from '@/public/icons/home.svg';
 
-export default function Header({ 
-  hideHeaderElements = false, 
-  showBackButton = false, 
-  pageTitle, 
+export default function Header({
+  hideHeaderElements = false,
+  showBackButton = false,
+  pageTitle,
   showLogo = true,
   hideActionButtons = false,
-  showHomeButton = false
+  showHomeButton = false,
 }: IProps) {
   // 현재 활성화된 탭 상태 관리
   const [activeTab, setActiveTab] = useState<HeaderTab>(DEFAULT_ACTIVE_TAB);
-  
+
   // Next.js 라우터 (뒤로가기 기능용)
   const router = useRouter();
 
@@ -61,7 +65,6 @@ export default function Header({
               <path d="m21 21-4.35-4.35" />
             </svg>
             <input type="text" placeholder="브랜드, 상품, 태그 등" className={styles.search_input} />
-          
           </div>
         ) : pageTitle ? (
           <h2 className={styles.page_title}>{pageTitle}</h2>
@@ -72,18 +75,11 @@ export default function Header({
         {!hideActionButtons && (
           <div className={styles.header_actions}>
             <button className={styles.icon_button}>
-              <svg className={styles.bell_icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-              </svg>
-              <span className={styles.notification_dot}></span>
+              <Image src={BellIcon} width={24} height={24} alt="알림" />
             </button>
-            
+
             <button className={styles.icon_button} onClick={handleCartClick}>
-              <svg className={styles.bag_icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-              </svg>
+              <Image src={CartIcon} width={24} height={24} alt="장바구니" />
             </button>
           </div>
         )}
@@ -92,10 +88,7 @@ export default function Header({
         {showHomeButton && (
           <div className={styles.header_actions}>
             <button className={styles.icon_button} onClick={handleCartMain}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                <polyline points="9,22 9,12 15,12 15,22"/>
-              </svg>
+              <Image src={HomeIcon} width={24} height={24} alt="홈" />
             </button>
           </div>
         )}

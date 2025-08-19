@@ -1,91 +1,91 @@
 /* Header Styles */
 .header {
-	position: sticky;
-	top: 0;
-	width: 100%;
-	background-color: #fff;
-	z-index: 1000;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: #fff;
+  z-index: 1000;
 }
 
 .header_container {
-	display: flex;
-	align-items: center;
-	padding: 0.9rem;
-	gap: 1.2rem;
+  display: flex;
+  align-items: center;
+  padding: 0.9rem;
+  gap: 1.2rem;
 }
 
 .logo {
-	text-decoration: none;
+  text-decoration: none;
 }
 
 .logo h1 {
-	font-size: 2.1rem;
-	font-weight: 700;
-	color: #222;
-	margin: 0;
-	white-space: nowrap;
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+  white-space: nowrap;
 }
 
 .back_button {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 3rem;
-	height: 3rem;
-	border: none;
-	background: none;
-	cursor: pointer;
-	padding: 0;
-	color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  color: #222;
 }
 
 .back_button svg {
-	width: 2.1rem;
-	height: 2.1rem;
+  width: 2.1rem;
+  height: 2.1rem;
 }
 
 .page_title {
-	position: absolute;
-	left: 50%;
-	transform: translateX(-50%);
-	font-size: 1.8rem;
-	font-weight: 700;
-	color: #222;
-	margin: 0;
-	white-space: nowrap;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+  white-space: nowrap;
 }
 
 .search_container {
-	position: relative;
-	flex: 1;
-	min-width: 0;
+  position: relative;
+  flex: 1;
+  min-width: 0;
 }
 
 .search_icon {
-	position: absolute;
-	left: 1.2rem;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 1.8rem;
-	height: 1.8rem;
-	color: #999;
-	pointer-events: none;
+  position: absolute;
+  left: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.8rem;
+  height: 1.8rem;
+  color: #999;
+  pointer-events: none;
 }
 
 .search_input {
-	width: 100%;
-	height: 3.6rem;
-	padding: 0 1.2rem 0 3.6rem;
-	border: none;
-	border-radius: 1.8rem;
-	background-color: #f8f8f8;
-	font-size: 1.35rem;
-	color: #222;
-	outline: none;
+  width: 100%;
+  height: 3.6rem;
+  padding: 0 1.2rem 0 3.6rem;
+  border: none;
+  border-radius: 1.8rem;
+  background-color: #f8f8f8;
+  font-size: 1.35rem;
+  color: #222;
+  outline: none;
 }
 
 .search_input::placeholder {
-	color: #999;
+  color: #999;
 }
 
 .search_input:focus {
@@ -93,109 +93,98 @@
 }
 
 .header_actions {
-	display: flex;
-	align-items: center;
-	gap: 1.2rem;
-	margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-left: auto;
 }
 
 .icon_button {
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 3rem;
-	height: 3rem;
-	border: none;
-	background: none;
-	cursor: pointer;
-	padding: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
 }
 
 .bell_icon,
 .bag_icon {
-	width: 2.1rem;
-	height: 2.1rem;
-	color: #222;
-}
-
-/* 홈 아이콘도 동일한 크기로 통일 */
-.icon_button svg {
-	width: 2.1rem;
-	height: 2.1rem;
-	color: #222;
-}
-
-.notification_dot {
-	display: none;
+  width: 2.1rem;
+  height: 2.1rem;
+  color: #222;
 }
 
 /* Tab Navigation Styles */
 /* 탭 네비게이션 컨테이너 - 가로 스크롤 가능한 탭 리스트를 감싸는 요소 */
 .tab_navigation {
-	width: 100%;
-	background-color: #fff;
-	border-bottom: 1px solid #f0f0f0;
+  width: 100%;
+  background-color: #fff;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 /* 탭 리스트 - 가로로 나열된 탭들을 감싸는 ul 요소 */
 .tab_list {
-	display: flex;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	overflow-x: auto;
-	scrollbar-width: none; /* Firefox */
-	-ms-overflow-style: none; /* IE and Edge */
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
 
 /* 탭 리스트의 스크롤바 숨기기 */
 .tab_list::-webkit-scrollbar {
-	display: none; /* Chrome, Safari, Opera */
+  display: none; /* Chrome, Safari, Opera */
 }
 
 /* 개별 탭 아이템 - 각 탭 버튼을 감싸는 li 요소 */
 .tab_item {
-	flex-shrink: 0;
+  flex-shrink: 0;
 }
 
 /* 탭 버튼 - 클릭 가능한 탭 요소 */
 .tab_button {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 1.2rem 1rem;
-	border: none;
-	background: none;
-	cursor: pointer;
-	font-size: 1.4rem;
-	color: #666;
-	font-weight: 400;
-	position: relative;
-	white-space: nowrap;
-	transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem 1rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.4rem;
+  color: #666;
+  font-weight: 400;
+  position: relative;
+  white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
 /* 탭 버튼 호버 효과 */
 .tab_button:hover {
-	color: #222;
+  color: #222;
 }
 
 /* 활성화된 탭 버튼 스타일 */
 .tab_button.active {
-	color: #222;
-	font-weight: 700;
+  color: #222;
+  font-weight: 700;
 }
 
 /* 활성화된 탭 아래의 강조선 */
 .tab_button.active::after {
-	content: '';
-	position: absolute;
-	bottom: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 3rem;
-	height: 0.2rem;
-	background-color: #222;
-	border-radius: 0.1rem;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3rem;
+  height: 0.2rem;
+  background-color: #222;
+  border-radius: 0.1rem;
 }
