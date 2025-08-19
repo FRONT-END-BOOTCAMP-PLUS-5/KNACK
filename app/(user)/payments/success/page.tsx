@@ -105,7 +105,7 @@ export default function PaymentSuccess() {
 
     (async () => {
       try {
-        console.log('➡️ 주문 저장 요청 /api/orders', { orderItems, addr: selectedAddress.id });
+        console.log('➡️ 주문 저장 요청 /api/orders', { orderItems, targetSumAfterCoupon, discountAmount, pointsToUse });
         const orderRes = await requester.post('/api/orders', {
           userId: user.id,
           items: orderItems.map((item) => ({
@@ -116,6 +116,8 @@ export default function PaymentSuccess() {
             addressId: selectedAddress.id,
             paymentId: null,
             optionValueId: item?.optionValue?.id,
+            couponPrice: discountAmount,
+            point: pointsToUse,
           })),
         });
 
@@ -155,7 +157,7 @@ export default function PaymentSuccess() {
         sessionStorage.removeItem('processingOrderId');
       }
     })();
-  }, [selectedAddress, orderItems, tossPaymentKey, tossOrderId, paymentAmount, router, pointsToUse, selectedCoupon?.id, targetSumAfterCoupon, user]);
+  }, [selectedAddress, orderItems, tossPaymentKey, tossOrderId, paymentAmount, router, pointsToUse, selectedCoupon?.id, targetSumAfterCoupon, user, discountAmount]);
 
   // 3) 대표상품 조회 (위에서 저장한 paymentId로 API 호출)
   useEffect(() => {

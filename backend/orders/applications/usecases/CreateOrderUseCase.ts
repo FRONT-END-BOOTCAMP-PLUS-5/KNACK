@@ -18,6 +18,8 @@ export class CreateOrderUseCase {
       deliveryStatus: 1, // Convert string to number based on schema
       createdAt: now,
       optionValueId: item.optionValueId,
+      couponPrice: item.couponPrice ?? 0,
+      point: item.point ?? 0,
     }));
 
     return this.repo.saveMany(orders);
