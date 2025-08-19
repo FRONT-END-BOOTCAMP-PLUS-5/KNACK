@@ -4,7 +4,8 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import ReactStars from 'react-stars';
 import styles from './reviewWrite.module.scss';
-import { useSession } from 'next-auth/react';
+import { useUserStore } from '@/store/userStore';
+import Toast from '@/components/common/Toast';
 
 // 카테고리별 질문과 답변 옵션 (ID 기반)
 const reviewQuestions = {
@@ -63,12 +64,12 @@ export default function ReviewWritePage() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session } = useSession();
+  const { user } = useUserStore();
   
-  const productId = params.productId as string;
+  const orderId = params.orderId as string;
   
-  // URL에서 orderId 가져오기
-  const orderId = searchParams.get('orderId');
+  // URL에서 productId 가져오기
+  const productId = searchParams.get('productId');
   
   // 상품 정보 상태
   const [productInfo, setProductInfo] = useState<{
@@ -78,9 +79,26 @@ export default function ReviewWritePage() {
     categoryName: string;
   } | null>(null);
   
+  // 답변 상태 관리
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [rating, setRating] = useState(5);
+  
+  // 토스트 상태 관리
+  const [toast, setToast] = useState<{
+    show: boolean;
+    type: 'success' | 'error' | 'warning' | 'info';
+    message: string;
+  }>({
+    show: false,
+    type: 'success',
+    message: ''
+  });
+
   // 상품 정보 가져오기
   useEffect(() => {
     const fetchProductInfo = async () => {
+      if (!productId) return;
+      
       try {
         // TODO: 실제 API 호출로 상품 정보 가져오기
         // 임시로 하드코딩된 데이터 사용
@@ -104,10 +122,6 @@ export default function ReviewWritePage() {
   };
   
   const questions = productInfo ? getQuestionsByCategoryId(productInfo.categoryId) : reviewQuestions[2];
-  
-  // 답변 상태 관리
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [rating, setRating] = useState(5);
 
   const handleAnswerChange = (questionId: string, answer: string) => {
     setAnswers(prev => ({
@@ -117,64 +131,59 @@ export default function ReviewWritePage() {
   };
 
   const handleRatingChange = (newRating: number) => {
-    setRating(newRating);
+    // 소수점을 정수로 변환하여 저장
+    const roundedRating = Math.round(newRating);
+    setRating(roundedRating);
+  };
+
+  // 토스트 표시 함수
+  const showToast = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
+    setToast({ show: true, type, message });
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, show: false }));
+    }, 1500);
   };
 
   const handleSubmit = async () => {
     try {
-      // 세션 확인
-      if (!session?.user?.id) {
-        alert('로그인이 필요합니다.');
+      // 필수 파라미터 검증
+      if (!productId || !orderId) {
+        showToast('error', '상품 정보 또는 주문 정보를 찾을 수 없습니다.');
         return;
       }
 
-      // 모든 질문에 답변했는지 확인
-      if (Object.keys(answers).length < questions.length) {
-        alert('모든 질문에 답변해주세요.');
-        return;
-      }
-
-      // 별점이 선택되었는지 확인
-      if (rating === 0) {
-        alert('별점을 선택해주세요.');
-        return;
-      }
-
-      // 리뷰 데이터 준비
+      // 리뷰 데이터 준비 (전역에서 이미 세션 보호됨)
       const reviewData = {
-        userId: session.user.id, // 세션에서 실제 사용자 ID 가져오기
+        userId: user!.id,
         productId: parseInt(productId),
-        orderId: parseInt(orderId || '0'), // orderId 추가!
+        orderId: parseInt(orderId),
         contents: JSON.stringify(answers),
-        rating: Math.round(rating), // 소수점 제거하고 정수로 변환
-        reviewImages: '' // TODO: 이미지 업로드 기능 추가 시 구현
+        rating: Math.round(rating),
+        reviewImages: ''
       };
 
-      console.log('🔍 리뷰 데이터:', reviewData);
-
-      // API 호출하여 리뷰 생성
+      // API 호출
       const response = await fetch('/api/reviews', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reviewData),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        alert('리뷰가 성공적으로 작성되었습니다!');
-        
-        // 내 리뷰 탭으로 이동 (orderId도 함께 전달)
-        router.push(`/my/reviews?tab=my&oid=${orderId}`);
+        showToast('success', '리뷰가 성공적으로 작성되었습니다!');
+        // 토스트가 끝난 후 페이지 이동
+        setTimeout(() => {
+          router.push(`/my/review?tab=my&oid=${orderId}`);
+        }, 1500);
       } else {
-        alert(`리뷰 작성 실패: ${result.error}`);
+        showToast('error', `리뷰 작성 실패: ${result.error}`);
       }
       
     } catch (error) {
       console.error('리뷰 제출 실패:', error);
-      alert('리뷰 제출에 실패했습니다. 다시 시도해주세요.');
+      showToast('error', '리뷰 제출에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -193,6 +202,7 @@ export default function ReviewWritePage() {
               color1="#ddd"
               color2="#222"
               edit={true}
+              half={false}        // 반별점 비활성화
             />
           </div>
         </div>
@@ -228,6 +238,13 @@ export default function ReviewWritePage() {
           리뷰 작성 완료
         </button>
       </div>
+
+      {/* 토스트 팝업 */}
+      {toast.show && (
+        <Toast type={toast.type}>
+          {toast.message}
+        </Toast>
+      )}
     </main>
   );
 }

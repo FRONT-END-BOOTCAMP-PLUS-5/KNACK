@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     // orderId 유효성 검사
     const parsedOrderId = parseInt(orderId);
     if (isNaN(parsedOrderId) || parsedOrderId <= 0) {
-      console.log('❌ 유효하지 않은 orderId:', orderId);
+
       return NextResponse.json(
         { success: false, error: '유효하지 않은 orderId입니다.' },
         { status: 400 }
@@ -40,7 +40,6 @@ export async function POST(request: NextRequest) {
       });
       
       if (!order) {
-        console.log('❌ orderId가 존재하지 않음:', parsedOrderId);
         return NextResponse.json(
           { success: false, error: `주문 ID ${parsedOrderId}가 존재하지 않습니다.` },
           { status: 400 }
@@ -48,17 +47,15 @@ export async function POST(request: NextRequest) {
       }
       
       if (order.userId !== userId) {
-        console.log('❌ 주문의 사용자와 요청한 사용자가 다름:', { orderUserId: order.userId, requestUserId: userId });
         return NextResponse.json(
           { success: false, error: '해당 주문에 대한 권한이 없습니다.' },
           { status: 403 }
         );
       }
       
-      console.log('✅ orderId 유효성 확인 완료');
       await prisma.$disconnect();
     } catch (dbError) {
-      console.log('⚠️ orderId 유효성 확인 실패, 계속 진행:', dbError);
+      console.error('orderId 유효성 확인 실패:', dbError);
     }
 
     // 백엔드 로직 사용
@@ -77,16 +74,14 @@ export async function POST(request: NextRequest) {
     const review = await createReviewUseCase.execute(
       userId,
       parseInt(productId),
-      parsedOrderId, // Used validated orderId
+      parsedOrderId,
       {
-        orderId: parsedOrderId, // orderId를 reviewData에 포함
+        orderId: parsedOrderId,
         contents,
         rating: parseInt(rating),
         reviewImages: reviewImages || '',
       }
     );
-
-    console.log('✅ UseCase 실행 완료, 결과:', review);
 
     return NextResponse.json({
       success: true,

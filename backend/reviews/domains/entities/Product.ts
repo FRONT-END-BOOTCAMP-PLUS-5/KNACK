@@ -4,6 +4,7 @@ export interface Product {
   thumbnailImage: string;
   engName: string;
   korName: string;
+  size: string;
   category?: {
     engName: string;
     korName: string;
