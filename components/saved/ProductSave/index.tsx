@@ -7,6 +7,7 @@ import Text from '@/components/common/Text';
 import { ILikeList } from '@/types/like';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import BookMarkOn from '@/public/icons/book_mark_active.svg';
+import EmptyText from '../EmptyText';
 
 interface IProps {
   likeList: ILikeList[];
@@ -46,6 +47,15 @@ const ProductSave = ({ likeList, onClickSave }: IProps) => {
             </Flex>
           );
         })}
+
+      {likeList?.length === 0 && (
+        <EmptyText
+          mainText="저장한 상품이 없어요."
+          subText="요즘 많이 찾는 아이템을 구경해보세요."
+          buttonText="인기 상품 보기"
+          url="search"
+        />
+      )}
     </Flex>
   );
 };
