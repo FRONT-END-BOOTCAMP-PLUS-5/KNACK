@@ -1,7 +1,10 @@
 import { ISearchProductListResponse } from '@/types/searchProductList';
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { searchProductService } from '@/services/search';
 
 export const useInfiniteScroll = (initialData: ISearchProductListResponse) => {
+  const searchParams = useSearchParams();
   const [items, setItems] = useState(initialData.products);
   const [nextCursor, setNextCursor] = useState(initialData.pageInfo.nextCursor);
   const [hasNext, setHasNext] = useState(initialData.pageInfo.hasNext);
@@ -18,15 +21,21 @@ export const useInfiniteScroll = (initialData: ISearchProductListResponse) => {
   const fetchMore = async () => {
     if (loading || !hasNext || !nextCursor) return;
     setLoading(true);
-    const queryString = new URLSearchParams(window.location.search);
-    queryString.set('cursor', nextCursor);
-    const res = await fetch(`/api/search?${queryString.toString()}`, { cache: 'no-store' });
-    setLoading(false);
-    if (!res.ok) return;
-    const data: ISearchProductListResponse = await res.json();
-    setItems((prev) => prev.concat(data.products));
-    setNextCursor(data.pageInfo.nextCursor);
-    setHasNext(data.pageInfo.hasNext);
+
+    try {
+      const queryString = new URLSearchParams(searchParams.toString());
+      queryString.set('cursor', nextCursor);
+
+      const data = await searchProductService.getSearchProductList(queryString.toString());
+
+      setItems((prev) => prev.concat(data.products));
+      setNextCursor(data.pageInfo.nextCursor);
+      setHasNext(data.pageInfo.hasNext);
+    } catch (error) {
+      console.error('상품 리스트 조회 실패 : ', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
