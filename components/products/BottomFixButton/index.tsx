@@ -48,6 +48,8 @@ const BottomFixButton = ({ productData }: IProps) => {
   };
 
   const onClickCart = () => {
+    if (selectOptionId === 0) return alert('옵션을 선택해주세요.');
+
     const cardData = {
       count: 1,
       optionValueId: selectOptionId,
