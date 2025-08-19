@@ -69,7 +69,7 @@ const BottomFixButton = ({ productData }: IProps) => {
     getLikes()
       .then((res) => {
         if (res.status === 200) {
-          const check = res.result.some((item: ILikeList) => item?.productId === productData?.id);
+          const check = res.result.some((item: ILikeList) => item?.product?.id === productData?.id);
 
           setLikeList(res.result);
           setLikedCheck(check);
@@ -84,7 +84,9 @@ const BottomFixButton = ({ productData }: IProps) => {
     (id: number) => {
       deleteLike(id)
         .then((res) => {
-          handleGetLikes();
+          if (res.status === 200) {
+            handleGetLikes();
+          }
         })
         .catch((error) => {
           console.log('error', error.message);
@@ -96,7 +98,7 @@ const BottomFixButton = ({ productData }: IProps) => {
   const handleLikeAdd = useCallback(
     (productId: number) => {
       if (likedCheck) {
-        const deleteId = likeList?.find((item) => item?.productId === productId)?.id ?? 0;
+        const deleteId = likeList?.find((item) => item?.product?.id === productId)?.id ?? 0;
 
         handleDeleteLike(deleteId);
         alert('취소완료!');
