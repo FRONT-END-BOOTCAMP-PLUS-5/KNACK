@@ -19,7 +19,7 @@ const RecentlySave = ({ recentProducts, likeList, onClickSaveAdd }: IProps) => {
   return (
     <section className={styles.search_product_list}>
       {recentProducts?.map((item) => {
-        const bookMarkOn = likeList?.find((likeItem) => likeItem?.productId === item?.id);
+        const bookMarkOn = likeList?.find((likeItem) => likeItem?.product?.id === item?.id);
 
         return (
           <Link key={item?.id} href={`/saved`} className={styles.product_card_large}>
