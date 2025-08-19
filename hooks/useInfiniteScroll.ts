@@ -31,12 +31,11 @@ export const useInfiniteScroll = (initialData: ISearchProductListResponse) => {
 
   useEffect(() => {
     if (!sentinelRef.current || !hasNext) return;
-    console.log('sentinelRef.current@@@@@');
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) fetchMore();
       },
-      { rootMargin: '0px' }
+      { rootMargin: '200px 0px' }
     );
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
