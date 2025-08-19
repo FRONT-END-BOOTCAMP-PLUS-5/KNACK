@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styles from './header.module.scss';
 import { HEADER_TABS, DEFAULT_ACTIVE_TAB, HeaderTab } from '@/constraint/header';
 import { useRouter } from 'next/navigation';
@@ -10,6 +10,8 @@ import Image from 'next/image';
 import BellIcon from '@/public/icons/bell.svg';
 import CartIcon from '@/public/icons/cart.svg';
 import HomeIcon from '@/public/icons/home.svg';
+import { cartService } from '@/services/cart';
+import { ICart } from '@/types/cart';
 
 export default function Header({
   hideHeaderElements = false,
@@ -21,6 +23,9 @@ export default function Header({
 }: IProps) {
   // 현재 활성화된 탭 상태 관리
   const [activeTab, setActiveTab] = useState<HeaderTab>(DEFAULT_ACTIVE_TAB);
+  const [carts, setCarts] = useState<ICart[]>([]);
+
+  const { getCart } = cartService;
 
   // Next.js 라우터 (뒤로가기 기능용)
   const router = useRouter();
@@ -40,6 +45,22 @@ export default function Header({
   const handleBackClick = () => {
     router.back();
   };
+
+  const handleGetCart = useCallback(() => {
+    getCart()
+      .then((res) => {
+        if (res.status === 200) {
+          setCarts(res.result);
+        }
+      })
+      .catch((error) => {
+        console.log('handleGetCart-error', error.message);
+      });
+  }, [getCart]);
+
+  useEffect(() => {
+    handleGetCart();
+  }, [handleGetCart]);
 
   return (
     <header className={styles.header}>
@@ -80,6 +101,7 @@ export default function Header({
 
             <button className={styles.icon_button} onClick={handleCartClick}>
               <Image src={CartIcon} width={24} height={24} alt="장바구니" />
+              <span className={styles.cart_count}>{carts?.length}</span>
             </button>
           </div>
         )}

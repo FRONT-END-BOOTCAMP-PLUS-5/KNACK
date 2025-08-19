@@ -188,3 +188,20 @@
   background-color: #222;
   border-radius: 0.1rem;
 }
+
+.cart_count {
+  align-items: center;
+  background-color: #ef6253;
+  border-radius: 8px;
+  color: #fff;
+  display: flex;
+  font-size: 1.1rem;
+  font-weight: 700;
+  height: 16px;
+  justify-content: center;
+  min-width: 16px;
+  padding: 0 4px;
+  position: absolute;
+  right: -5px;
+  top: 0;
+}
