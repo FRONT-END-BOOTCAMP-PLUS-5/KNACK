@@ -13,12 +13,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ICart } from '@/types/cart';
 import { CART_INITIAL_VALUE, DELIVERY_DESCRIPTION_TEXT } from '@/constraint/cart';
 import ConfirmModal from '@/components/common/ConfirmModal';
-import BottomSheet from '@/components/common/BottomSheet';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
-import { STORAGE_PATHS } from '@/constraint/auth';
-import Image from 'next/image';
-import Button from '@/components/common/Button';
 import { useRouter } from 'next/navigation';
+import OptionBottomSheet from '@/components/cart/OptionBottomSheet';
+import SelectOrderInfo from '@/components/cart/SelectOrderInfo';
+import EmptyText from '@/components/saved/EmptyText';
 
 const CartPage = () => {
   const { getCart, removeCart, removesCart, upsertCart } = cartService;
@@ -102,6 +101,8 @@ const CartPage = () => {
   };
 
   const onClickPayment = () => {
+    if (selectCarts?.length === 0) return alert('상품을 선택해주세요!');
+
     const checkoutData = selectCarts?.map((item) => {
       return {
         productId: item?.product?.id,
@@ -149,76 +150,62 @@ const CartPage = () => {
 
   return (
     <article className={styles.cart_wrap}>
-      <section className={styles.all_select_bar}>
-        <div className={styles.select_input_box}>
-          <Checkbox id="allSelect" checked={allChecked} onChangeCheckbox={(status) => handleAllCheckbox(status)} />
-          <label htmlFor="allSelect">전체 선택</label>
-        </div>
-        <ChipButton text="선택 삭제" onClick={onClickMultiRemoveCart} />
-      </section>
-      <Divider />
-      <section>
-        {carts?.length > 0 &&
-          carts?.map((item, index) => (
-            <React.Fragment key={item?.id + '_' + index}>
-              <CartProduct
-                cartData={item}
-                selectCarts={selectCarts}
-                optionOpen={onClickOptionChange}
-                addSelectCart={addSelectCart}
-                onClickDelete={onClickRemoveCart}
-              />
-              <Divider />
-            </React.Fragment>
-          ))}
+      {carts?.length === 0 && (
+        <EmptyText
+          mainText="장바구니에 담긴 상품이 없습니다."
+          subText="원하는 상품을 장바구니에 담아보세요!"
+          buttonText="SHOP 바로가기"
+          url="search"
+        />
+      )}
 
-        <section className={styles.select_order_info_wrap}>
-          <h2 className={styles.select_order_title}>선택 주문정보</h2>
-          <Divider height={1} paddingHorizontal={16} />
-          <Flex paddingHorizontal={16} paddingVertical={12} gap={4} direction="column">
-            <Flex justify="between" paddingVertical={3}>
-              <Text size={1.4} color="gray1">
-                총 상품금액
-              </Text>
-              <Text size={1.4} color="black1">
-                {selectCarts?.reduce((acc, cur) => acc + (cur?.product?.price ?? 0), 0).toLocaleString()}원
-              </Text>
-            </Flex>
-            <Flex justify="between" paddingVertical={3}>
-              <Text size={1.4} color="gray1">
-                총 배송비
-              </Text>
-              <Text size={1.4} color="black1">
-                무료
-              </Text>
-            </Flex>
-          </Flex>
-          <Divider height={1} paddingHorizontal={16} />
-          <Flex justify="between" paddingVertical={15} paddingHorizontal={16} align="center">
-            <Text size={1.4} color="black1" weight={600}>
-              총 예상 결제금액
-            </Text>
-            <Text size={1.6} color="black1" weight={700}>
-              {selectCarts?.reduce((acc, cur) => acc + (cur?.product?.price ?? 0), 0).toLocaleString()}
-            </Text>
-          </Flex>
-        </section>
-        <Divider />
-        <section className={styles.delivery_description_text}>
-          {DELIVERY_DESCRIPTION_TEXT?.map((item) => (
-            <Flex gap={6} key={item}>
-              <Text size={1.3} color="black1">
-                ㆍ
-              </Text>
-              <Text size={1.3} color="gray2">
-                {item}
-              </Text>
-            </Flex>
-          ))}
-        </section>
-        <Divider />
-      </section>
-      <PaymentButton selectCarts={selectCarts} onClickPayment={onClickPayment} />
+      {carts?.length > 0 && (
+        <>
+          <section className={styles.all_select_bar}>
+            <div className={styles.select_input_box}>
+              <Checkbox id="allSelect" checked={allChecked} onChangeCheckbox={(status) => handleAllCheckbox(status)} />
+              <label htmlFor="allSelect">전체 선택</label>
+            </div>
+            <ChipButton text="선택 삭제" onClick={onClickMultiRemoveCart} />
+          </section>
+          <Divider />
+          <section>
+            {carts?.map((item, index) => (
+              <React.Fragment key={item?.id + '_' + index}>
+                <CartProduct
+                  cartData={item}
+                  selectCarts={selectCarts}
+                  optionOpen={onClickOptionChange}
+                  addSelectCart={addSelectCart}
+                  onClickDelete={onClickRemoveCart}
+                />
+                <Divider />
+              </React.Fragment>
+            ))}
+
+            <SelectOrderInfo selectCarts={selectCarts} />
+
+            <Divider />
+
+            <section className={styles.delivery_description_text}>
+              {DELIVERY_DESCRIPTION_TEXT?.map((item) => (
+                <Flex gap={6} key={item}>
+                  <Text size={1.3} color="black1">
+                    ㆍ
+                  </Text>
+                  <Text size={1.3} color="gray2">
+                    {item}
+                  </Text>
+                </Flex>
+              ))}
+            </section>
+            <Divider />
+          </section>
+        </>
+      )}
+
+      {carts?.length > 0 && <PaymentButton selectCarts={selectCarts} onClickPayment={onClickPayment} />}
+
       <ConfirmModal open={deleteOpen} onClose={() => setDeleteOpen(false)} onConfirm={() => handleRemoveCart()}>
         <Flex direction="column" align="center" gap={16}>
           <Text tag="h2" weight={700} size={1.8} color="black1">
@@ -241,46 +228,12 @@ const CartPage = () => {
         </Flex>
       </ConfirmModal>
 
-      <BottomSheet>
-        <Flex justify="center" paddingVertical={16}>
-          <Text tag="h2" size={1.8} weight={600}>
-            옵션 변경
-          </Text>
-        </Flex>
-        <section className={styles.option_sheet_product}>
-          <span className={styles.image}>
-            <Image
-              src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${selectedCart?.product?.thumbnailImage}`}
-              width={56}
-              height={56}
-              alt="썸네일"
-            />
-          </span>
-          <Flex direction="column" width="self" gap={2}>
-            <Text size={1.4} color="black1">
-              {selectedCart?.product?.korName}
-            </Text>
-            <Text size={1.3} color="gray1">
-              {selectedCart?.product?.engName}
-            </Text>
-          </Flex>
-        </section>
-        <Divider height={1} />
-        <section className={styles.option_flex_wrap}>
-          {selectedCart?.product?.productOptionMappings[0]?.optionType?.optionValue?.map((item, index) => (
-            <button
-              key={index}
-              className={`${styles.option_button} ${selectOptionId === item?.id && styles.active}`}
-              onClick={() => setSelectOptionId(item?.id)}
-            >
-              {item?.name}
-            </button>
-          ))}
-        </section>
-        <div className={styles.option_change_button_wrap}>
-          <Button size="large" style="black" text="확인" onClick={handleOptionChange} />
-        </div>
-      </BottomSheet>
+      <OptionBottomSheet
+        selectOptionId={selectOptionId}
+        selectedCart={selectedCart}
+        setSelectOptionId={setSelectOptionId}
+        handleOptionChange={handleOptionChange}
+      />
     </article>
   );
 };
