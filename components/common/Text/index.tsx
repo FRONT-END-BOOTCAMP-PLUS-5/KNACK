@@ -51,7 +51,7 @@ const Text = ({
   paddingBottom = 0,
   paddingLeft = 0,
   paddingRight = 0,
-  textAlign = 'left',
+  textAlign,
 }: IProps) => {
   const Tag = tag;
 

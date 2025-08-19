@@ -1,0 +1,18 @@
+.select_order_info_wrap {
+  & .select_order_title {
+    padding: 15px 16px;
+    font-size: 1.6rem;
+    color: #222;
+    font-weight: 700;
+  }
+
+  & .title {
+    font-size: 1.4rem;
+    color: #909090;
+  }
+
+  & .price {
+    font-size: 1.4rem;
+    color: #222;
+  }
+}
