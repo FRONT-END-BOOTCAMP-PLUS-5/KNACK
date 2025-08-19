@@ -19,6 +19,20 @@ export interface ISearchProductList {
   isSoldOut: boolean;
 }
 
+export interface ISearchProductListResponse {
+  products: ISearchProductList[];
+  pageInfo: {
+    nextCursor?: string;
+    hasNext: boolean;
+  };
+  pagination: {
+    offset: number;
+    limit: number;
+    page: number;
+    totalCount: number;
+  };
+}
+
 export interface ISearchProductListRequest {
   keyword?: string;
   keywordColorId?: number[];

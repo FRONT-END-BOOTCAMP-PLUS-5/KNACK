@@ -17,7 +17,7 @@ export interface IQueryParams {
   cursor?: string;
 }
 
-const objectToQueryString = (obj: ISearchProductListRequest): string => {
+const objectToQueryString = (obj: ISearchProductListRequest | IQueryParams): string => {
   const params = new URLSearchParams();
 
   Object.entries(obj).forEach(([key, value]) => {
