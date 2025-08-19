@@ -27,10 +27,9 @@ export default async function Search({ searchParams }: IProps) {
     soldOutInvisible: params.soldOutInvisible,
   };
 
-  const qs = objectToQueryString(queryParams);
+  const queryString = objectToQueryString(queryParams);
 
-  const initialData: ISearchProductListResponse = await getSearchProductList(qs);
-
+  const initialData: ISearchProductListResponse = await getSearchProductList(queryString);
   return (
     <main>
       <SearchCsrWrapper queryParams={queryParams} />

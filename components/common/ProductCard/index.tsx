@@ -51,6 +51,7 @@ const ProductCardLarge = ({ product }: { product: ISearchProductList }) => {
             src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${product.thumbnailImage}`}
             alt="상품이미지"
             fill
+            sizes="100"
             className={styles.product_image}
           />
         </div>

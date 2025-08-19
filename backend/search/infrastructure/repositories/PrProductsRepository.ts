@@ -107,30 +107,25 @@ export class PrProductsRepository implements ProductSearchRepository {
     }
 
     // ORDER BY 조건 구성
-    const orderBy: Prisma.ProductOrderByWithRelationInput = {};
-    switch (sort) {
-      case 'latest':
-        orderBy.createdAt = 'desc';
-        break;
-      case 'popular':
-        // TODO: 인기순 기준 확인 필요
-        orderBy.productLike = { _count: 'desc' };
-        break;
-      case 'price_high':
-        orderBy.price = 'desc';
-        break;
-      case 'price_low':
-        orderBy.price = 'asc';
-        break;
-      case 'likes':
-        orderBy.productLike = { _count: 'desc' };
-        break;
-      case 'reviews':
-        orderBy.reviews = { _count: 'desc' };
-        break;
-      default:
-        orderBy.createdAt = 'desc';
-    }
+    const orderBy: Prisma.ProductOrderByWithRelationInput | Prisma.ProductOrderByWithRelationInput[] = (() => {
+      switch (sort) {
+        case 'latest':
+          return [{ createdAt: 'desc' }, { createdAt: 'desc' }];
+        //TODO: 인기순 기준 확인 필요
+        case 'popular':
+          return [{ productLike: { _count: 'desc' } }, { createdAt: 'desc' }];
+        case 'likes':
+          return [{ productLike: { _count: 'desc' } }, { createdAt: 'desc' }];
+        case 'price_high':
+          return [{ price: 'desc' }, { createdAt: 'desc' }];
+        case 'price_low':
+          return [{ price: 'asc' }, { createdAt: 'asc' }];
+        case 'reviews':
+          return [{ reviews: { _count: 'desc' } }, { createdAt: 'desc' }];
+        default:
+          return [{ createdAt: 'desc' }, { id: 'desc' }];
+      }
+    })();
 
     // 커서 기반 페이지네이션
     let cursorCondition: Prisma.ProductWhereInput = {};
