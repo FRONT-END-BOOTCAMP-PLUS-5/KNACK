@@ -129,7 +129,7 @@ const BottomFixButton = ({ productData }: IProps) => {
               <Image src={likedCheck ? SaveOnIcon : SaveIcon} width={18} height={18} alt="좋아요 아이콘" />
             </button>
             <Text size={1.3} color="gray3" weight={600}>
-              {0}
+              {productData?._count?.productLike}
             </Text>
           </div>
           <button className={styles.buy_button} onClick={onOpen}>

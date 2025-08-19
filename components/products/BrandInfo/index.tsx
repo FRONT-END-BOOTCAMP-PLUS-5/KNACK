@@ -98,7 +98,7 @@ const BrandInfo = ({ brandData }: IProps) => {
             {brandData?.engName}
           </Text>
           <Text size={1.2} color="gray2">
-            {brandData?.korName} ㆍ 관심 {0}
+            {brandData?.korName} ㆍ 관심 {brandData?._count?.brandLike}
           </Text>
         </Flex>
       </Flex>
