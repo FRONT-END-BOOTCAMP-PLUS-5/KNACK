@@ -15,7 +15,7 @@ import { TABS } from '@/constraint/saved';
 const SavedPage = () => {
   const { addLike, deleteLike, getLikes, deleteBrandLike, getBrandLikes } = likeService;
   const { getProductList, getRecentlyProductList } = productsService;
-  const [selectTab, setSelectTab] = useState(1);
+  const [selectTab, setSelectTab] = useState(0);
   const [productList, setProductList] = useState<IProducts[]>([]);
   const [likeList, setLikeList] = useState<ILikeList[]>([]);
   const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
