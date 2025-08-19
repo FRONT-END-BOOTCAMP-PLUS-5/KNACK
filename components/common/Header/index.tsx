@@ -12,6 +12,7 @@ import CartIcon from '@/public/icons/cart.svg';
 import HomeIcon from '@/public/icons/home.svg';
 import { cartService } from '@/services/cart';
 import { ICart } from '@/types/cart';
+import { useCartStore } from '@/store/cartStore';
 
 export default function Header({
   hideHeaderElements = false,
@@ -25,6 +26,7 @@ export default function Header({
   const [activeTab, setActiveTab] = useState<HeaderTab>(DEFAULT_ACTIVE_TAB);
   const [carts, setCarts] = useState<ICart[]>([]);
 
+  const { cartCount, setCartCount } = useCartStore();
   const { getCart } = cartService;
 
   // Next.js 라우터 (뒤로가기 기능용)
@@ -61,6 +63,10 @@ export default function Header({
   useEffect(() => {
     handleGetCart();
   }, [handleGetCart]);
+
+  useEffect(() => {
+    setCartCount(carts.length);
+  }, [carts.length, setCartCount]);
 
   return (
     <header className={styles.header}>
@@ -101,7 +107,7 @@ export default function Header({
 
             <button className={styles.icon_button} onClick={handleCartClick}>
               <Image src={CartIcon} width={24} height={24} alt="장바구니" />
-              <span className={styles.cart_count}>{carts?.length}</span>
+              <span className={styles.cart_count}>{cartCount}</span>
             </button>
           </div>
         )}

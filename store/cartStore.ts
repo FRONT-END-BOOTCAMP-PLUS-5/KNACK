@@ -1,23 +1,13 @@
-import { ICart } from '@/types/cart';
 import { create } from 'zustand';
 
 interface CartStore {
-  cart: ICart[];
+  cartCount: number;
 
-  setCart: (cart: ICart) => void;
-  updateCart: (updates: ICart) => void;
+  setCartCount: (num: number) => void;
 }
 
 export const useCartStore = create<CartStore>((set) => ({
-  cart: [],
+  cartCount: 0,
 
-  setCart: (newCart) =>
-    set((state) => {
-      cart: [...state.cart, newCart];
-    }),
-
-  updateCart: (updates) =>
-    set((state) => ({
-      cart: state.cart ? { ...state.cart, ...updates } : [],
-    })),
+  setCartCount: (count) => set({ cartCount: count }),
 }));
