@@ -318,6 +318,8 @@ model Order {
   count          Int?      @default(0)
   paymentId      Int?      @map("payment_id")
   optionValueId  Int       @map("option_value_id")
+  point          Int       @default(0)
+  couponPrice    Int       @map("coupon_price") @default(0)
   
 
   payment        Payment?    @relation(fields: [paymentId], references: [id])
