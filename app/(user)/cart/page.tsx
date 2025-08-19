@@ -164,7 +164,9 @@ const CartPage = () => {
           <section className={styles.all_select_bar}>
             <div className={styles.select_input_box}>
               <Checkbox id="allSelect" checked={allChecked} onChangeCheckbox={(status) => handleAllCheckbox(status)} />
-              <label htmlFor="allSelect">전체 선택</label>
+              <label className={styles.all_checkbox_label} htmlFor="allSelect">
+                전체 선택
+              </label>
             </div>
             <ChipButton text="선택 삭제" onClick={onClickMultiRemoveCart} />
           </section>
