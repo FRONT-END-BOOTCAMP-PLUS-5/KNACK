@@ -2,7 +2,7 @@ import Text from '@/components/common/Text';
 import styles from './searchBottomSheet.module.scss';
 import Flex from '@/components/common/Flex';
 import Slider from '@mui/material/Slider';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import TagButton from '@/components/common/TagButton';
 import { PRODUCT_FILTER_PRICE } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
@@ -26,12 +26,27 @@ export default function SearchPrice({ selectedFilter, onClickPriceSelect, onChan
 
   const [value, setValue] = useState<number[]>(getInitialValue());
   const debouncedValue = useDebounce(value, 300);
+  const isInternalUpdate = useRef(false);
 
   useEffect(() => {
-    onChangePriceSelect(debouncedValue);
+    if (!isInternalUpdate.current) {
+      onChangePriceSelect(debouncedValue);
+    }
+    isInternalUpdate.current = false;
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue]);
+
+  useEffect(() => {
+    isInternalUpdate.current = true;
+
+    if (selectedFilter.price) {
+      const { min, max } = parseNumberRange(selectedFilter.price);
+      setValue([min || 0, max || 10000000]);
+    } else {
+      setValue([0, 10000000]);
+    }
+  }, [selectedFilter.price]);
 
   const handleChange = (event: Event, newValue: number[]) => {
     setValue(newValue);
@@ -43,9 +58,16 @@ export default function SearchPrice({ selectedFilter, onClickPriceSelect, onChan
   };
 
   const handleClickPriceSelect = (price: string) => {
-    const { min, max } = parseNumberRange(price);
-    setValue([min || 0, max || 10000000]);
-    onClickPriceSelect(price);
+    if (selectedFilter.price === price) {
+      isInternalUpdate.current = true;
+      setValue([0, 10000000]);
+      onClickPriceSelect(price);
+    } else {
+      isInternalUpdate.current = true;
+      const { min, max } = parseNumberRange(price);
+      setValue([min || 0, max || 10000000]);
+      onClickPriceSelect(price);
+    }
   };
 
   return (

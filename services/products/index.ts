@@ -7,7 +7,7 @@ export const productsService = {
 
     if (error) throw new Error(error.message);
 
-    return data.result;
+    return data;
   },
 
   getProductList: async (ids: string) => {
