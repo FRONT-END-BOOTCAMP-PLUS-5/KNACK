@@ -1,6 +1,5 @@
 import SearchCsrWrapper from '@/components/search/SearchCsrWrapper';
 import SearchProductList from '@/components/search/SearchProductList';
-import SearchProductListEmpty from '@/components/search/SearchProductList/SearchProductListEmpty';
 import { searchProductService } from '@/services/search';
 import { ISearchProductListResponse } from '@/types/searchProductList';
 import { IQueryParams, objectToQueryString } from '@/utils/queryString';
@@ -31,10 +30,6 @@ export default async function Search({ searchParams }: IProps) {
   const qs = objectToQueryString(queryParams);
 
   const initialData: ISearchProductListResponse = await getSearchProductList(qs);
-
-  if (!initialData || initialData.products.length === 0) {
-    return <SearchProductListEmpty />;
-  }
 
   return (
     <main>

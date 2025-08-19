@@ -69,7 +69,7 @@ const ProductCardLarge = ({ product }: { product: ISearchProductList }) => {
         <div className={styles.product_name_sub}>
           <p>{product.korName}</p>
         </div>
-        {!product.isSoldOut && (
+        {product.isSoldOut && (
           <div className={styles.product_sold_out}>
             <span>품절</span>
           </div>

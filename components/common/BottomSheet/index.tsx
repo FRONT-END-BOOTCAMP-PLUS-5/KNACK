@@ -76,6 +76,10 @@ export default function BottomSheet({
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    return () => onClose();
+  }, []);
+
   return (
     <AnimatePresence>
       {isOpen && (
