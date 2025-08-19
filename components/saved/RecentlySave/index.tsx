@@ -9,11 +9,12 @@ import bookmark from '@/public/icons/book_mark.svg';
 import onBookMark from '@/public/icons/book_mark_active.svg';
 import { ILikeList } from '@/types/like';
 import EmptyText from '../EmptyText';
+import { MouseEvent } from 'react';
 
 interface IProps {
   recentProducts: IRecentProduct[];
   likeList: ILikeList[];
-  onClickSaveAdd: (productId: number) => void;
+  onClickSaveAdd: (e: MouseEvent<HTMLButtonElement>, productId: number) => void;
 }
 
 const RecentlySave = ({ recentProducts, likeList, onClickSaveAdd }: IProps) => {
@@ -34,7 +35,7 @@ const RecentlySave = ({ recentProducts, likeList, onClickSaveAdd }: IProps) => {
             const bookMarkOn = likeList?.find((likeItem) => likeItem?.product?.id === item?.id);
 
             return (
-              <Link key={item?.id} href={`/saved`} className={styles.product_card_large}>
+              <Link key={item?.id} href={`/products/${item?.id}`} className={styles.product_card_large}>
                 <figure className={styles.thumbnail}>
                   <div className={styles.image_container}>
                     <Image
@@ -45,7 +46,7 @@ const RecentlySave = ({ recentProducts, likeList, onClickSaveAdd }: IProps) => {
                     />
                   </div>
 
-                  <button className={styles.product_bookmark} onClick={() => onClickSaveAdd(item?.id)}>
+                  <button className={styles.product_bookmark} onClick={(e) => onClickSaveAdd(e, item?.id)}>
                     <Image src={bookMarkOn ? onBookMark : bookmark} alt="관심" width={24} height={24} />
                   </button>
                 </figure>

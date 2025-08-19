@@ -8,6 +8,7 @@ import BookMarkOn from '@/public/icons/book_mark_active.svg';
 import { IBrandLikeList } from '@/types/like';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import EmptyText from '../EmptyText';
+import Link from 'next/link';
 
 interface IProps {
   brandLikeData: IBrandLikeList[];
@@ -60,14 +61,14 @@ const BrandSave = ({ brandLikeData, onClickBookMark }: IProps) => {
                 <Flex gap={8}>
                   {item?.brand?.products?.map((brandProduct) => (
                     <Flex key={brandProduct?.id + '_' + brandProduct?.engName} direction="column" width="self">
-                      <span className={styles.product_image}>
+                      <Link href={`/products/${brandProduct?.id}`} className={styles.product_image}>
                         <Image
                           src={`${STORAGE_PATHS?.PRODUCT?.THUMBNAIL}/${brandProduct?.thumbnailImage}`}
                           alt="thumbnail"
                           width={105}
                           height={105}
                         />
-                      </span>
+                      </Link>
                       <Text className={styles.product_title} size={1.2} marginBottom={5}>
                         {brandProduct?.engName}
                       </Text>
