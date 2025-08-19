@@ -172,8 +172,8 @@ export class PrProductsRepository implements ProductSearchRepository {
     // 응답 데이터 구성
     const mappedProducts: Product[] = actualProducts.map((product) => {
       // isSoldOut 계산: 모든 재고가 0이면 true
-      const isSoldOut =
-        product.productStockMapping.length > 0 && product.productStockMapping.every((stock) => stock.stock === 0);
+      const hasStockMappings = product.productStockMapping.length > 0;
+      const isSoldOut = hasStockMappings ? product.productStockMapping.every((stock) => stock.stock === 0) : true;
 
       return new Product(
         product.id,
