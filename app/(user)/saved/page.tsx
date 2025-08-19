@@ -13,7 +13,7 @@ import RecentlySave from '@/components/saved/RecentlySave';
 import { TABS } from '@/constraint/saved';
 
 const SavedPage = () => {
-  const { addLike, deleteLike, getLikes, addBrandLike, deleteBrandLike, getBrandLikes } = likeService;
+  const { addLike, deleteLike, getLikes, deleteBrandLike, getBrandLikes } = likeService;
   const { getProductList, getRecentlyProductList } = productsService;
   const [selectTab, setSelectTab] = useState(1);
   const [productList, setProductList] = useState<IProducts[]>([]);
@@ -54,19 +54,6 @@ const SavedPage = () => {
   const initLikeBrand = useCallback(() => {
     handleGetBrandLikes();
   }, [handleGetBrandLikes]);
-
-  const handleAddBrandLike = useCallback(
-    (id: number) => {
-      addBrandLike(id)
-        .then((res) => {
-          console.log('res ', res);
-        })
-        .catch((error) => {
-          console.log('error', error.message);
-        });
-    },
-    [addBrandLike]
-  );
 
   const handleDeleteBrandLike = useCallback(
     (id: number) => {

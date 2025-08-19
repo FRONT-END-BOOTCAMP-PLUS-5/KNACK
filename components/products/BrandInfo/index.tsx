@@ -36,21 +36,6 @@ const BrandInfo = ({ brandData }: IProps) => {
       });
   }, [brandData, getBrandLikes]);
 
-  const handleAddBrandLike = useCallback(
-    (id: number) => {
-      addBrandLike(id)
-        .then((res) => {
-          if (res.status === 200) {
-            handleGetBrandLikes();
-          }
-        })
-        .catch((error) => {
-          console.log('error', error.message);
-        });
-    },
-    [addBrandLike, handleGetBrandLikes]
-  );
-
   const initLikeBrand = useCallback(() => {
     handleGetBrandLikes();
   }, [handleGetBrandLikes]);
@@ -60,6 +45,7 @@ const BrandInfo = ({ brandData }: IProps) => {
       deleteBrandLike(id)
         .then((res) => {
           if (res.status === 200) {
+            alert('취소완료!');
             initLikeBrand();
           }
         })
@@ -68,6 +54,28 @@ const BrandInfo = ({ brandData }: IProps) => {
         });
     },
     [deleteBrandLike, initLikeBrand]
+  );
+
+  const handleAddBrandLike = useCallback(
+    (id: number) => {
+      if (likedCheck) {
+        const deleteId = brandLikeList?.find((item) => item?.brand?.id === id)?.id ?? 0;
+
+        handleDeleteBrandLike(deleteId);
+      } else {
+        addBrandLike(id)
+          .then((res) => {
+            if (res.status === 200) {
+              handleGetBrandLikes();
+              alert('잘 담겼어요!');
+            }
+          })
+          .catch((error) => {
+            console.log('error', error.message);
+          });
+      }
+    },
+    [addBrandLike, brandLikeList, handleDeleteBrandLike, handleGetBrandLikes, likedCheck]
   );
 
   useEffect(() => {
@@ -94,21 +102,10 @@ const BrandInfo = ({ brandData }: IProps) => {
           </Text>
         </Flex>
       </Flex>
-      {likedCheck && (
-        <button
-          className={styles.brand_like_button}
-          onClick={() =>
-            handleDeleteBrandLike(brandLikeList?.find((item) => item?.brand?.id === brandData?.id)?.id ?? 0)
-          }
-        >
-          <Image src={onBookMark} alt="좋아요" width={22} height={22} />
-        </button>
-      )}
-      {!likedCheck && (
-        <button className={styles.brand_like_button} onClick={() => handleAddBrandLike(brandData?.id ?? 0)}>
-          <Image src={bookmark} alt="좋아요" width={22} height={22} />
-        </button>
-      )}
+
+      <button className={styles.brand_like_button} onClick={() => handleAddBrandLike(brandData?.id ?? 0)}>
+        <Image src={likedCheck ? onBookMark : bookmark} alt="좋아요" width={22} height={22} />
+      </button>
     </article>
   );
 };
