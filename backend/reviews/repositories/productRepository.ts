@@ -26,7 +26,7 @@ export class PrismaProductRepository implements ProductRepository {
         thumbnailImage: product.thumbnailImage || '/images/default-product.jpg',
         engName: product.engName || '상품명 없음',
         korName: product.korName || '상품명 없음',
-        size: '사이즈 정보 없음', // 현재 DB 스키마에는 size 필드가 없음
+
         brand: product.brand ? {
           engName: product.brand.engName || '브랜드명 없음',
           korName: product.brand.korName || '브랜드명 없음'

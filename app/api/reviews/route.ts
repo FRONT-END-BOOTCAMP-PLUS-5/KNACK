@@ -7,16 +7,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, productId, orderId, contents, rating, reviewImages } = body;
 
-    console.log('🔍 리뷰 생성 요청 데이터:', { userId, productId, orderId, contents, rating, reviewImages });
-
-    // 필수 필드 검증
-    if (!userId || !productId || !contents || !rating || !orderId) {
-      console.log('❌ 필수 필드 누락:', { userId, productId, contents, rating, orderId });
-      return NextResponse.json(
-        { success: false, error: '필수 필드가 누락되었습니다. (userId, productId, orderId, contents, rating)' },
-        { status: 400 }
-      );
-    }
+                    // 필수 필드 검증
+                if (!userId || !productId || !contents || !rating || !orderId) {
+                  return NextResponse.json(
+                    { success: false, error: '필수 필드가 누락되었습니다. (userId, productId, orderId, contents, rating)' },
+                    { status: 400 }
+                  );
+                }
 
     // orderId 유효성 검사
     const parsedOrderId = parseInt(orderId);
@@ -28,7 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ 데이터 유효성 검사 통과');
+
 
     // orderId가 실제로 존재하는지 확인 (선택사항)
     try {
@@ -62,14 +59,7 @@ export async function POST(request: NextRequest) {
     const reviewRepository = new PrismaReviewRepository();
     const createReviewUseCase = new CreateReviewUseCase(reviewRepository);
 
-    console.log('🔍 UseCase 호출 전 reviewData:', {
-      userId,
-      productId: parseInt(productId),
-      orderId: parsedOrderId,
-      contents,
-      rating: parseInt(rating),
-      reviewImages: reviewImages || ''
-    });
+    
 
     const review = await createReviewUseCase.execute(
       userId,

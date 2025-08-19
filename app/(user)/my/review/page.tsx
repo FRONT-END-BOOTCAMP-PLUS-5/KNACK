@@ -18,7 +18,12 @@ interface ReviewDto {
     engName: string;
     korName: string;
   } | undefined;
-  size: string;
+  optionValue?: {
+    id: number;
+    name: string;
+    typeId: number;
+  };
+  size?: string; // 사이즈 정보 추가
   hasReview: boolean;
   review?: {
     contents: string;
@@ -38,7 +43,12 @@ interface MyReviewDto {
     engName: string;
     korName: string;
   } | undefined;
-  size: string;
+  optionValue?: {
+    id: number;
+    name: string;
+    typeId: number;
+  };
+  size?: string; // 사이즈 정보 추가
   review: {
     contents: string;
     rating: number;
@@ -47,7 +57,7 @@ interface MyReviewDto {
   };
 }
 
-export default function reviewPage() {
+export default function ReviewPage() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<'write' | 'my'>('write');
   const [reviewableOrders, setReviewableOrders] = useState<ReviewDto[]>([]);
@@ -74,6 +84,11 @@ export default function reviewPage() {
         if (data.success) {
           const reviewableOrders = data.data.reviewableOrders || [];
           const myreview = data.data.myReviews || []; // myReviews로 수정
+          
+          // 디버깅: optionValue 데이터 확인
+          console.log('🔍 API 응답 데이터:', data);
+          console.log('🔍 reviewableOrders:', reviewableOrders);
+          console.log('🔍 첫 번째 주문의 optionValue:', reviewableOrders[0]?.optionValue);
           
           // 이미 리뷰가 작성된 주문은 "리뷰 쓰기" 탭에서 제거
           const filteredReviewableOrders = reviewableOrders.filter((order: ReviewDto) => {
@@ -169,13 +184,12 @@ export default function reviewPage() {
                         <div className={styles.product_info}>
                           <h3 className={styles.product_eng_name}>{order.productName}</h3>
                           <p className={styles.product_kor_name}>{order.productEngName}</p>
-                          <p className={styles.product_size}>
-                            {order.size || '사이즈 정보 없음'}
-                          </p>
+                        <p className={styles.product_size}>
+                          {order.size || '사이즈 정보 없음'}
+                        </p>
                         </div>
                       </div>
-                    </Link>
-                    {/* 별점 입력 */}
+                      {/* 별점 입력 */}
                     <div className={styles.rating_section}>
                       <div className={styles.rating_input}>
                         <ReactStars
@@ -192,6 +206,7 @@ export default function reviewPage() {
                         <span className={styles.rating_label}>별점을 선택하세요.</span>
                       </div>
                     </div>
+                    </Link>
                   </div>
                 ))}
               </div>

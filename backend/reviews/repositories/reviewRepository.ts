@@ -123,7 +123,6 @@ export class PrismaReviewRepository implements ReviewRepository {
     }
   }
 }
-
 // Prisma를 사용한 주문 리포지토리 구현
 export class PrismaOrderRepository implements OrderRepository {
   async findOrdersByUserId(userId: string): Promise<Order[]> {
@@ -224,3 +223,4 @@ export class PrismaOrderRepository implements OrderRepository {
     }
   }
 }
+

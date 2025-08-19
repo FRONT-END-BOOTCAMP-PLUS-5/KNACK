@@ -9,7 +9,6 @@ import Toast from '@/components/common/Toast';
 
 // 카테고리별 질문과 답변 옵션 (ID 기반)
 const reviewQuestions = {
-  // ID 1: 상의 (top)
   1: [
     {
       question: '구매하신 상의 사이즈는 어떤가요?',
@@ -24,7 +23,6 @@ const reviewQuestions = {
       options: ['퀄리티가 만족스러워요', '퀄리티가 매우 만족스러워요', '퀄리티가 보통이에요']
     }
   ],
-  // ID 2: 아우터 (outer)
   2: [
     {
       question: '구매하신 아우터 사이즈는 어떤가요?',
@@ -43,7 +41,6 @@ const reviewQuestions = {
       options: ['보온성이 부족해요', '보온성이 보통이에요', '보온성이 만족스러워요', '보온성이 매우 만족스러워요']
     }
   ],
-  // ID 3: 하의 (bottom)
   3: [
     {
       question: '구매하신 하의 사이즈는 어떤가요?',
@@ -100,16 +97,36 @@ export default function ReviewWritePage() {
       if (!productId) return;
       
       try {
-        // TODO: 실제 API 호출로 상품 정보 가져오기
-        // 임시로 하드코딩된 데이터 사용
+        // 실제 API 호출로 상품 정보 가져오기
+        const response = await fetch(`/api/products/${productId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          console.log(data, 'asdasd')
+          setProductInfo({
+            id: parseInt(productId),
+            name: data.name || '상품명',
+            categoryId: data.categoryId || 2, // 실제 카테고리 ID
+            categoryName: data.categoryName || '아우터'
+          });
+        } else {
+          // API 실패 시 기본값 사용
+          setProductInfo({
+            id: parseInt(productId),
+            name: '상품명',
+            categoryId: 2, // 기본값: 아우터
+            categoryName: '아우터'
+          });
+        }
+      } catch (error) {
+        console.error('상품 정보 조회 실패:', error);
+        // 에러 시 기본값 사용
         setProductInfo({
           id: parseInt(productId),
           name: '상품명',
           categoryId: 2, // 기본값: 아우터
           categoryName: '아우터'
         });
-      } catch (error) {
-        console.error('상품 정보 조회 실패:', error);
       }
     };
     
@@ -118,7 +135,8 @@ export default function ReviewWritePage() {
   
   // 카테고리 ID에 따른 질문지 선택
   const getQuestionsByCategoryId = (categoryId: number) => {
-    return reviewQuestions[categoryId as keyof typeof reviewQuestions] || reviewQuestions[2]; // 기본값: 아우터
+    const result = reviewQuestions[categoryId as keyof typeof reviewQuestions] || reviewQuestions[2];
+    return result;
   };
   
   const questions = productInfo ? getQuestionsByCategoryId(productInfo.categoryId) : reviewQuestions[2];
