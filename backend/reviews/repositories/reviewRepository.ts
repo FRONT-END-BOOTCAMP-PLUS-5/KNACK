@@ -206,6 +206,7 @@ export class PrismaOrderRepository implements OrderRepository {
           thumbnailImage: order.product.thumbnailImage,
           engName: order.product.engName,
           korName: order.product.korName,
+
           category: order.product.category ? {
             engName: order.product.category.engName || '카테고리 없음',
             korName: order.product.category.korName || '카테고리 없음'
