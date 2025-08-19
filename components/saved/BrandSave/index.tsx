@@ -38,7 +38,7 @@ const BrandSave = ({ brandLikeData, onClickBookMark }: IProps) => {
                       {item?.brand?.engName}
                     </Text>
                     <Text size={1.2} color="gray2" marginTop={4}>
-                      리복ㆍ관심 2235
+                      리복ㆍ관심 {item?.brand?._count?.brandLike}
                     </Text>
                   </Flex>
                 </Flex>

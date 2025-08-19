@@ -28,6 +28,9 @@ interface Brand {
   korName: string;
   logoImage: string;
   id: number;
+  _count: {
+    brandLike: number;
+  };
   products: Product[];
 }
 

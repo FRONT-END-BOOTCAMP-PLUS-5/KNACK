@@ -48,6 +48,11 @@ export class PrProductRepository implements ProductRepository {
               korName: true,
               engName: true,
               logoImage: true,
+              _count: {
+                select: {
+                  brandLike: true,
+                },
+              },
             },
           },
           category: {
@@ -76,6 +81,11 @@ export class PrProductRepository implements ProductRepository {
           _count: {
             select: {
               reviews: true,
+              productLike: {
+                where: {
+                  productId: id,
+                },
+              },
             },
           },
         },

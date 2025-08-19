@@ -1,7 +1,6 @@
 import { IProduct } from './product';
 
 export interface CartRef {
-  userId: string;
   productId: number;
   optionValueId: number;
   count: number;
@@ -14,5 +13,4 @@ export interface ICart {
   createdAt?: Date;
   optionValueId: number;
   product?: IProduct;
-  userId?: string;
 }
