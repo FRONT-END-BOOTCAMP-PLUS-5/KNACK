@@ -3,9 +3,8 @@
 import TabMenu from '@/components/common/TabMenu';
 import { likeService } from '@/services/like';
 import { useCallback, useEffect, useState } from 'react';
-
 import { productsService } from '@/services/products';
-import { IProducts, IRecentProduct } from '@/types/product';
+import { IRecentProduct } from '@/types/product';
 import { IBrandLikeList, ILikeList } from '@/types/like';
 import ProductSave from '@/components/saved/ProductSave';
 import BrandSave from '@/components/saved/BrandSave';
@@ -14,9 +13,8 @@ import { TABS } from '@/constraint/saved';
 
 const SavedPage = () => {
   const { addLike, deleteLike, getLikes, deleteBrandLike, getBrandLikes } = likeService;
-  const { getProductList, getRecentlyProductList } = productsService;
+  const { getRecentlyProductList } = productsService;
   const [selectTab, setSelectTab] = useState(0);
-  const [productList, setProductList] = useState<IProducts[]>([]);
   const [likeList, setLikeList] = useState<ILikeList[]>([]);
   const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
   const [recentProducts, setRecentProducts] = useState<IRecentProduct[]>([]);
@@ -82,34 +80,19 @@ const SavedPage = () => {
       });
   }, [getLikes]);
 
-  const handleProductList = useCallback(() => {
-    const ids = likeList?.map((item) => item?.productId).map(String);
-    const params = new URLSearchParams();
-    ids.forEach((id) => params.append('id', id));
-
-    getProductList(params.toString())
-      .then((res) => {
-        if (res.status === 200) {
-          setProductList(res.result);
-        }
-      })
-      .catch((error) => {
-        console.log('error', error.message);
-      });
-  }, [getProductList, likeList]);
-
   const initSave = useCallback(() => {
-    handleProductList();
     handleGetLikes();
-  }, [handleGetLikes, handleProductList]);
+  }, [handleGetLikes]);
 
   const handleDeleteLike = useCallback(
     (id: number) => {
-      const deleteId = likeList?.find((item) => item?.productId === id)?.id ?? 0;
+      const deleteId = likeList?.find((item) => item?.product?.id === id)?.id ?? 0;
 
       deleteLike(deleteId)
         .then((res) => {
-          initSave();
+          if (res.status === 200) {
+            initSave();
+          }
         })
         .catch((error) => {
           console.log('error', error.message);
@@ -120,7 +103,7 @@ const SavedPage = () => {
 
   const handleLikeAdd = useCallback(
     (productId: number) => {
-      const likeCheck = likeList?.find((likeItem) => likeItem?.productId === productId);
+      const likeCheck = likeList?.find((likeItem) => likeItem?.product?.id === productId);
 
       if (likeCheck) {
         handleDeleteLike(productId);
@@ -146,10 +129,6 @@ const SavedPage = () => {
   };
 
   useEffect(() => {
-    handleProductList();
-  }, [handleProductList]);
-
-  useEffect(() => {
     handleGetLikes();
   }, [handleGetLikes]);
 
@@ -168,7 +147,7 @@ const SavedPage = () => {
   return (
     <section>
       <TabMenu tabs={TABS} selectedTab={selectTab} onTabSelect={setSelectTab} />
-      {selectTab === 0 && <ProductSave likeList={likeList} productList={productList} onClickSave={onClickSave} />}
+      {selectTab === 0 && <ProductSave likeList={likeList} onClickSave={onClickSave} />}
       {selectTab === 1 && <BrandSave brandLikeData={brandLikeList} onClickBookMark={handleDeleteBrandLike} />}
       {selectTab === 2 && (
         <RecentlySave recentProducts={recentProducts} likeList={likeList} onClickSaveAdd={handleLikeAdd} />
