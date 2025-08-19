@@ -1,3 +1,4 @@
+import Flex from '@/components/common/Flex';
 import styles from './productDetailImage.module.scss';
 import Text from '@/components/common/Text';
 import { STORAGE_PATHS } from '@/constraint/auth';
@@ -15,11 +16,14 @@ const ProductDetailImage = ({ detailImage }: IProps) => {
       <Text tag="h2" size={1.7} weight={600} marginLeft={16} marginRight={16} paddingTop={24} marginBottom={16}>
         상세 정보
       </Text>
-      <div className={styles.image_box}>
+
+      <Flex direction="column" gap={40}>
         {detailImages?.map((item) => (
-          <Image key={item} src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${item}`} fill alt="상품 이미지" />
+          <div className={styles.image_box} key={item}>
+            <Image src={`${STORAGE_PATHS.PRODUCT.DETAIL}/${item}`} fill alt="상품 이미지" />
+          </div>
         ))}
-      </div>
+      </Flex>
     </section>
   );
 };
