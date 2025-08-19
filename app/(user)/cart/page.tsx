@@ -101,6 +101,8 @@ const CartPage = () => {
   };
 
   const onClickPayment = () => {
+    if (selectCarts?.length === 0) return alert('상품을 선택해주세요!');
+
     const checkoutData = selectCarts?.map((item) => {
       return {
         productId: item?.product?.id,
