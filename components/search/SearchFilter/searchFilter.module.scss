@@ -42,6 +42,17 @@
   }
 }
 
+.filter_reset_button {
+  border: none;
+  background-color: $light-gray02;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 7px;
+  > img {
+    transform: rotateY(180deg);
+  }
+}
+
 .selected_filters {
   display: flex;
   gap: 8px;

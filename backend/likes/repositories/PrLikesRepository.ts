@@ -41,6 +41,35 @@ export class PrLikesRepository implements LikesRepository {
         where: {
           userId: userId,
         },
+        select: {
+          id: true,
+          createdAt: true,
+          product: {
+            select: {
+              thumbnailImage: true,
+              korName: true,
+              engName: true,
+              id: true,
+              price: true,
+              productOptionMappings: {
+                select: {
+                  optionType: {
+                    select: {
+                      optionValue: {
+                        select: {
+                          id: true,
+                          isPrivate: true,
+                          name: true,
+                          typeId: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       });
 
       return result;

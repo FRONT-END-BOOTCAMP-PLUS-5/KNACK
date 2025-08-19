@@ -18,6 +18,10 @@ interface IBrand {
   id: number;
   korName: string;
   engName: string;
+  logoImage?: string;
+  _count?: {
+    brandLike: number;
+  };
 }
 
 interface ICategory {

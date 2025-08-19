@@ -1,9 +1,18 @@
 import Text from '@/components/common/Text';
 import TagButton from '@/components/common/TagButton';
 import styles from './searchBottomSheet.module.scss';
-import { PRODUCT_FILTER_GENDER } from '@/constraint/product';
+import { GenderValueType, PRODUCT_FILTER_GENDER } from '@/constraint/product';
+import { ISearchProductListRequest } from '@/types/searchProductList';
 
-export default function SearchGender() {
+interface IProps {
+  selectedFilter: ISearchProductListRequest;
+  onClickGenderSelect: (gender: GenderValueType) => void;
+}
+export default function SearchGender({ selectedFilter, onClickGenderSelect }: IProps) {
+  const isGenderSelected = (gender: GenderValueType) => {
+    return selectedFilter.gender === gender;
+  };
+
   return (
     <section className={styles.search_gender}>
       <Text
@@ -19,7 +28,11 @@ export default function SearchGender() {
       </Text>
       <div className={styles.search_gender_button_wrap}>
         {PRODUCT_FILTER_GENDER.map((item) => (
-          <TagButton key={item.id} isActive={false}>
+          <TagButton
+            key={item.id}
+            isActive={isGenderSelected(item.value)}
+            onClick={() => onClickGenderSelect(item.value)}
+          >
             {item.name}
           </TagButton>
         ))}

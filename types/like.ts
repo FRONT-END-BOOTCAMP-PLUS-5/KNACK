@@ -5,9 +5,7 @@ export interface ILikeRef {
 
 export interface ILikeList {
   id: number;
-  userId: string;
-  productId: number;
-  optionValueId: number;
+  product: Product;
   createdAt?: Date | null;
 }
 
@@ -28,13 +26,28 @@ interface Brand {
   korName: string;
   logoImage: string;
   id: number;
+  _count: {
+    brandLike: number;
+  };
   products: Product[];
 }
 
 interface Product {
+  thumbnailImage: string;
   korName: string;
   engName: string;
   id: number;
-  thumbnailImage: string;
-  price: number;
+  price: number | null;
+  productOptionMappings: OptionMappings[];
+}
+
+interface OptionMappings {
+  optionType: {
+    optionValue: {
+      id: number;
+      isPrivate: boolean;
+      name: string;
+      typeId: number;
+    }[];
+  };
 }

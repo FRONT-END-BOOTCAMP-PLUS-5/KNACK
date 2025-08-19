@@ -2,9 +2,18 @@ import Text from '@/components/common/Text';
 import styles from './searchBottomSheet.module.scss';
 import Flex from '@/components/common/Flex';
 import TagButton from '@/components/common/TagButton';
-import { PRODUCT_FILTER_DISCOUNT } from '@/constraint/product';
+import { DiscountValueType, PRODUCT_FILTER_DISCOUNT } from '@/constraint/product';
+import { ISearchProductListRequest } from '@/types/searchProductList';
 
-export default function SearchDiscount() {
+interface IProps {
+  selectedFilter: ISearchProductListRequest;
+  onClickDiscountSelect: (discountValue: DiscountValueType) => void;
+}
+export default function SearchDiscount({ selectedFilter, onClickDiscountSelect }: IProps) {
+  const isDiscountSelected = (discountValue: DiscountValueType): boolean => {
+    return selectedFilter.discount === discountValue;
+  };
+
   return (
     <article className={styles.search_discount}>
       <div>
@@ -16,7 +25,11 @@ export default function SearchDiscount() {
         </Flex>
         <div className={styles.search_gender_button_wrap}>
           {PRODUCT_FILTER_DISCOUNT.map((item) => (
-            <TagButton key={item.id} isActive={false}>
+            <TagButton
+              key={item.id}
+              isActive={isDiscountSelected(item.value)}
+              onClick={() => onClickDiscountSelect(item.value)}
+            >
               {item.name}
             </TagButton>
           ))}

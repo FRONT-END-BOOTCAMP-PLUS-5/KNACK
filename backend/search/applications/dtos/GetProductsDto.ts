@@ -7,12 +7,10 @@ export interface GetProductsRequestDto {
   brandId?: number[];
   categoryId?: number[];
   subCategoryId?: number[];
-  priceMin?: number;
-  priceMax?: number;
-  discountMin?: number;
-  discountMax?: number;
+  price?: string;
+  discount?: string;
   size?: string[];
-  benefit?: 'under_price';
+  benefit?: boolean;
   gender?: string;
   soldOutInvisible?: boolean;
 

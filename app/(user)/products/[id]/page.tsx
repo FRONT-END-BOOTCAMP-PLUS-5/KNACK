@@ -41,7 +41,7 @@ const ProductDetail = async ({ params }: IProps) => {
   const { getProduct } = productsService;
 
   const productData: IProduct = await getProduct(Number(id)).then((res) => {
-    return res;
+    return res.result;
   });
 
   if (!productData) {

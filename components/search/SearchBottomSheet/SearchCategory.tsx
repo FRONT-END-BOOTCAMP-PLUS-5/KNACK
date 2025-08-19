@@ -16,13 +16,6 @@ export default function SearchCategory({ categories, selectedFilter, onClickSubC
     return selectedFilter.subCategoryId?.includes(subCategoryId) || false;
   };
 
-  // 서브카테고리 클릭 핸들러
-  const handleSubCategoryClick = (subCategoryId: number) => {
-    if (onClickSubCategorySelect) {
-      onClickSubCategorySelect(subCategoryId);
-    }
-  };
-
   return (
     <section className={styles.search_category}>
       {categories &&
@@ -47,7 +40,7 @@ export default function SearchCategory({ categories, selectedFilter, onClickSubC
                     <TagButton
                       key={subCategory.id}
                       isActive={isSubCategorySelected(subCategory.id)}
-                      onClick={() => handleSubCategoryClick(subCategory.id)}
+                      onClick={() => onClickSubCategorySelect(subCategory.id)}
                     >
                       {subCategory.korName}
                     </TagButton>
