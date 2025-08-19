@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ReactStars from 'react-stars';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './review.module.scss';
 
 // DTO에 맞는 데이터 타입 정의
@@ -59,11 +59,17 @@ interface MyReviewDto {
 
 export default function ReviewPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'write' | 'my'>('write');
   const [reviewableOrders, setReviewableOrders] = useState<ReviewDto[]>([]);
   const [myreview, setMyreview] = useState<MyReviewDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 리뷰 클릭 시 상품 상세페이지로 이동
+  const handleReviewClick = (productId: number) => {
+    router.push(`/products/${productId}`);
+  };
 
   // URL 쿼리 파라미터에서 탭 정보 가져오기
   useEffect(() => {
@@ -84,12 +90,6 @@ export default function ReviewPage() {
         if (data.success) {
           const reviewableOrders = data.data.reviewableOrders || [];
           const myreview = data.data.myReviews || []; // myReviews로 수정
-          
-          // 디버깅: optionValue 데이터 확인
-          console.log('🔍 API 응답 데이터:', data);
-          console.log('🔍 reviewableOrders:', reviewableOrders);
-          console.log('🔍 첫 번째 주문의 optionValue:', reviewableOrders[0]?.optionValue);
-          
           // 이미 리뷰가 작성된 주문은 "리뷰 쓰기" 탭에서 제거
           const filteredReviewableOrders = reviewableOrders.filter((order: ReviewDto) => {
             return !myreview.some((review: MyReviewDto) => review.orderId === order.orderId);
@@ -223,7 +223,7 @@ export default function ReviewPage() {
             ) : (
               <div className={styles.product_list}>
                 {myreview.map((order) => (
-                  <div key={`my-${order.orderId}`} className={styles.product_link}>
+                  <div key={`my-${order.orderId}`} className={styles.product_link} onClick={() => handleReviewClick(order.productId)}>
                     <div className={styles.product_item}>
                       <div className={styles.product_image}>
                         <Image 

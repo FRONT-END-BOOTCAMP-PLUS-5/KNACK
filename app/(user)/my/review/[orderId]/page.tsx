@@ -95,39 +95,22 @@ export default function ReviewWritePage() {
   useEffect(() => {
     const fetchProductInfo = async () => {
       if (!productId) return;
-      
-      try {
-        // 실제 API 호출로 상품 정보 가져오기
-        const response = await fetch(`/api/products/${productId}`);
-        const data = await response.json();
-        
-        if (data.success) {
-          console.log(data, 'asdasd')
-          setProductInfo({
-            id: parseInt(productId),
-            name: data.name || '상품명',
-            categoryId: data.categoryId || 2, // 실제 카테고리 ID
-            categoryName: data.categoryName || '아우터'
-          });
-        } else {
-          // API 실패 시 기본값 사용
-          setProductInfo({
-            id: parseInt(productId),
-            name: '상품명',
-            categoryId: 2, // 기본값: 아우터
-            categoryName: '아우터'
-          });
+        try {
+          // 실제 API 호출로 상품 정보 가져오기
+          const response = await fetch(`/api/products/${productId}`);
+          const data = await response.json();
+          
+          if (data.status === 200 && data.result) { // ← 수정
+            setProductInfo({
+              id: parseInt(productId),
+              name: data.result.korName, // ← korName 사용
+              categoryId: data.result.category.id, // ← category.id 사용
+              categoryName: data.result.category.korName // ← category.korName 사용
+            });
+          }
+        } catch (error) {
+          console.error('상품 정보 조회 실패:', error);
         }
-      } catch (error) {
-        console.error('상품 정보 조회 실패:', error);
-        // 에러 시 기본값 사용
-        setProductInfo({
-          id: parseInt(productId),
-          name: '상품명',
-          categoryId: 2, // 기본값: 아우터
-          categoryName: '아우터'
-        });
-      }
     };
     
     fetchProductInfo();
