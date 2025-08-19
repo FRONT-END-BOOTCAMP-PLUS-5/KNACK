@@ -7,8 +7,8 @@ export class CreateCartUseCase {
     this.repository = repository;
   }
 
-  async create(id: number): Promise<{ result: string }> {
-    const result = await this.repository.upsertCart(id);
+  async create(id: number, userId: string): Promise<{ result: string }> {
+    const result = await this.repository.upsertCart(id, userId);
 
     const message = result ? 'success' : 'fail';
 

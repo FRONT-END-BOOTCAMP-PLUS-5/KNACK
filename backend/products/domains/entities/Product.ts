@@ -23,6 +23,7 @@ export interface IProduct {
   productOptionMappings: IProductOptionMapping[];
   _count: {
     reviews: number;
+    productLike: number;
   };
 }
 
@@ -31,6 +32,9 @@ interface IBrand {
   korName: string;
   engName: string;
   logoImage: string;
+  _count: {
+    brandLike: number;
+  };
 }
 
 interface ICategory {

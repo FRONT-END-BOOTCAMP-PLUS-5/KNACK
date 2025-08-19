@@ -53,18 +53,31 @@ export class PrProductsRepository implements ProductSearchRepository {
         }
         whereConditions.price = priceFilter;
       }
+
+      const discountFilter: Prisma.IntFilter = {};
+      let hasDiscountCondition = false;
+
       if (filters.discountMin !== undefined || filters.discountMax !== undefined) {
-        const discountFilter: Prisma.IntFilter = {};
         if (filters.discountMin !== undefined) {
           discountFilter.gte = filters.discountMin;
         }
         if (filters.discountMax !== undefined) {
           discountFilter.lte = filters.discountMax;
         }
-        whereConditions.discountPercent = discountFilter;
+        hasDiscountCondition = true;
       }
+
       if (filters.benefit) {
-        whereConditions.discountPercent = { gt: 0 };
+        if (hasDiscountCondition) {
+          discountFilter.gte = Math.max(discountFilter.gte || 0, 1);
+        } else {
+          discountFilter.gt = 0;
+        }
+        hasDiscountCondition = true;
+      }
+
+      if (hasDiscountCondition) {
+        whereConditions.discountPercent = discountFilter;
       }
 
       if (filters.keywordColorId && filters.keywordColorId.length > 0) {

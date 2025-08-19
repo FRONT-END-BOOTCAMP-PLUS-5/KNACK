@@ -9,8 +9,6 @@ export class CreateOrderUseCase {
   async execute(input: { userId: string; items: CreateOrderItemDto[] }): Promise<number[]> {
     const now = new Date();
 
-    console.log('wepifjwpfwjefpiewjfpiwfjpiitems', input.items);
-
     const orders = input.items.map((item) => ({
       userId: input.userId,
       productId: item.productId,

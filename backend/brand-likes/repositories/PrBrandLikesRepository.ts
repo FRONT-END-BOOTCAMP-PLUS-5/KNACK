@@ -59,6 +59,11 @@ export class PrBrandLikesRepository implements BrandLikesRepository {
                   price: true,
                 },
               },
+              _count: {
+                select: {
+                  brandLike: true,
+                },
+              },
             },
           },
         },
