@@ -25,7 +25,7 @@ export default function CheckoutPage() {
   const [checkout, setCheckout] = useState<CheckoutRow[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [deliveryType, setDeliveryType] = useState<'FAST' | 'STOCK'>('FAST');
-  const [deliveryFee, setDeliveryFee] = useState<number>(5000);
+  const [deliveryFee, setDeliveryFee] = useState<number>(0);
 
   // ✅ 포인트/쿠폰 상태
   const [availablePoints, setAvailablePoints] = useState<number>(0);
@@ -323,7 +323,7 @@ export default function CheckoutPage() {
         deliveryType={deliveryType}
         onChangeDelivery={(t) => {
           setDeliveryType(t);
-          setDeliveryFee(t === 'FAST' ? 5000 : 0);
+          setDeliveryFee(0);
         }}
         // 💰 금액(전부 부모 계산)
         baseSum={pricing.baseSum}
@@ -409,7 +409,7 @@ export default function CheckoutPage() {
         onClose={() => setReqOpen(false)}
         onApply={(next) => {
           if (!selectedAddress) return;
-          const updated = { ...selectedAddress, request: next };
+          const updated = { ...selectedAddress, message: next }; // ← 여기!
           setSelectedAddress(updated);
           sessionStorage.setItem('selectedAddress', JSON.stringify(updated));
         }}
