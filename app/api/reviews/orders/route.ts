@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth';
-import { PrismaReviewRepository } from '@/backend/reviews/repositories/ReviewRepository';
-import { PrismaOrderRepository } from '@/backend/reviews/repositories/OrderRepository';
+
 import { GetReviewableOrdersUseCase } from '@/backend/reviews/applications/usecases/GetReviewableOrdersUseCase';
 import { GetMyReviewsUseCase } from '@/backend/reviews/applications/usecases/GetMyReviewsUseCase';
+import { PrReviewRepository } from '@/backend/reviews/repositories/PrReviewRepository';
+import { PrOrderRepository } from '@/backend/reviews/repositories/PrOrderRepository';
 
 export async function GET() {
   try {
@@ -15,8 +16,8 @@ export async function GET() {
     }
 
     const userId = session.user.id;
-    const reviewRepository = new PrismaReviewRepository();
-    const orderRepository = new PrismaOrderRepository();
+    const reviewRepository = new PrReviewRepository();
+    const orderRepository = new PrOrderRepository();
     
     const getReviewableOrdersUseCase = new GetReviewableOrdersUseCase(reviewRepository, orderRepository);
     const getMyReviewsUseCase = new GetMyReviewsUseCase(reviewRepository); // OrderRepository 의존성 제거

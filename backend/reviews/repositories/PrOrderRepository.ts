@@ -5,7 +5,7 @@ export interface OrderRepository {
   findOrdersWithReviewStatus(userId: string): Promise<Order[]>;
 }
 
-export class PrismaOrderRepository implements OrderRepository {
+export class PrOrderRepository implements OrderRepository {
   async findOrdersWithReviewStatus(userId: string): Promise<Order[]> {
     try {
       const orders = await prisma.order.findMany({

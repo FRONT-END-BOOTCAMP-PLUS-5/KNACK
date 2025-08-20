@@ -1,12 +1,13 @@
-import { ReviewRepository } from '../../repositories/ReviewRepository';
-import { OrderRepository } from '../../repositories/OrderRepository';
+
 import { ReviewDto } from '../dtos/ReviewDto';
 import { Order } from '../../domains/entities/Order';
+import { PrReviewRepository } from '../../repositories/PrReviewRepository';
+import { PrOrderRepository } from '../../repositories/PrOrderRepository';
 
 export class GetReviewableOrdersUseCase {
   constructor(
-    private reviewRepository: ReviewRepository,
-    private orderRepository: OrderRepository
+    private reviewRepository: PrReviewRepository,
+    private orderRepository: PrOrderRepository
   ) {}
 
   async execute(userId: string): Promise<ReviewDto[]> {

@@ -10,7 +10,7 @@ export interface ReviewRepository {
   findReviewsWithRelations(userId: string): Promise<ReviewWithRelations[]>;
 }
 
-export class PrismaReviewRepository implements ReviewRepository {
+export class PrReviewRepository implements ReviewRepository {
   async findReviewsByUserId(userId: string): Promise<Review[]> {
     try {
       const reviews = await prisma.review.findMany({
