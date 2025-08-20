@@ -7,6 +7,7 @@ import SearchSort from '../SearchSort';
 import { useLayoutEffect, useState } from 'react';
 import { ISearchProductListRequest } from '@/types/searchProductList';
 import { IQueryParams, queryStringToObject } from '@/utils/queryString';
+import SearchCategory from '../SearchCategory';
 
 interface IProps {
   queryParams: IQueryParams;
@@ -31,6 +32,7 @@ export default function SearchCsrWrapper({ queryParams }: IProps) {
 
   return (
     <>
+      <SearchCategory />
       <SearchFilter filterQuery={filterQuery} handleSelect={handleSelect} />
       <SearchSort filterQuery={filterQuery} />
       <SearchBottomSheet activeTabId={activeTabId} handleSelect={handleSelect} filterQuery={filterQuery} />

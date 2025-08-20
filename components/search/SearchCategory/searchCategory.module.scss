@@ -1,0 +1,37 @@
+.subCategory_list {
+  //   width: 387px;
+  grid-template-columns: repeat(5, 1fr);
+  column-gap: 0;
+  display: grid;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  &_item {
+    height: 84px;
+    justify-content: center;
+    margin-bottom: 16px;
+    margin-top: 3px;
+    display: inline-flex;
+
+    &_link {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      cursor: pointer;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 2px;
+      justify-content: center;
+
+      &_image {
+        // object-fit: cover;
+      }
+      &_text {
+        color: $black;
+        font-size: 1.2rem;
+        white-space: nowrap;
+      }
+    }
+  }
+}
