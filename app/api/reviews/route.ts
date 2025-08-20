@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CreateReviewUseCase } from '@/backend/reviews/applications/usecases/CreateReviewUseCase';
-import { PrismaReviewRepository } from '@/backend/reviews/repositories/ReviewRepository';
+import { PrReviewRepository } from '@/backend/reviews/repositories/PrReviewRepository';
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 백엔드 로직 사용
-    const reviewRepository = new PrismaReviewRepository();
+    const reviewRepository = new PrReviewRepository();
     const createReviewUseCase = new CreateReviewUseCase(reviewRepository);
 
     

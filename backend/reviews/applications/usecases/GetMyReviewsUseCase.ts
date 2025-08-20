@@ -1,8 +1,9 @@
-import { ReviewRepository } from '../../repositories/ReviewRepository';
+
+import { PrReviewRepository } from '../../repositories/PrReviewRepository';
 import { MyReviewDto } from '../dtos/ReviewDto';
 
 export class GetMyReviewsUseCase {
-  constructor(private reviewRepository: ReviewRepository) {}
+  constructor(private reviewRepository: PrReviewRepository) {}
 
   async execute(userId: string): Promise<MyReviewDto[]> {
     try {

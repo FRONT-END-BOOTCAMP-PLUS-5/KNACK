@@ -1,8 +1,9 @@
-import { ReviewRepository } from '../../repositories/ReviewRepository';
+
 import { Review } from '../../domains/entities/Review';
+import { PrReviewRepository } from '../../repositories/PrReviewRepository';
 
 export class CreateReviewUseCase {
-  constructor(private reviewRepository: ReviewRepository) {}
+  constructor(private reviewRepository: PrReviewRepository) {}
 
   async execute(
     userId: string, 
