@@ -12,9 +12,23 @@
   gap: 8px;
   padding: 0 16px;
   padding-top: 20px;
+  position: relative;
 
   & .slide_image_box {
     background: $light-gray02;
     border: 1px solid #ebebeb;
   }
+}
+
+.scrollbar {
+  height: 1px !important;
+  bottom: 20px !important;
+  width: 90% !important;
+  left: 50% !important;
+  transform: translate(-50%, 0) !important;
+}
+
+.drag {
+  height: 1px;
+  background: #222;
 }
