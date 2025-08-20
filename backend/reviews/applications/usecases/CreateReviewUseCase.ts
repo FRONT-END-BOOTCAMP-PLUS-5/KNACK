@@ -1,4 +1,4 @@
-import { ReviewRepository } from '../../repositories/reviewRepository';
+import { ReviewRepository } from '../../repositories/ReviewRepository';
 import { Review } from '../../domains/entities/Review';
 
 export class CreateReviewUseCase {
