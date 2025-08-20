@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth';
-import { PrismaReviewRepository } from '@/backend/reviews/repositories/ReviewRepository';
-import { PrismaOrderRepository } from '@/backend/reviews/repositories/OrderRepository';
-import { GetReviewableOrdersUseCase } from '@/backend/reviews/applications/usecases/GetReviewableOrdersUseCase';
-import { GetMyReviewsUseCase } from '@/backend/reviews/applications/usecases/GetMyReviewsUseCase';
+import { PrismaReviewRepository } from '../../../../backend/reviews/repositories/ReviewRepository';
+import { PrismaOrderRepository } from '../../../../backend/reviews/repositories/OrderRepository';
+import { GetReviewableOrdersUseCase } from '../../../../backend/reviews/applications/usecases/GetReviewableOrdersUseCase';
+import { GetMyReviewsUseCase } from '../../../../backend/reviews/applications/usecases/GetMyReviewsUseCase';
 
 export async function GET() {
   try {
