@@ -36,7 +36,7 @@ const ProductSave = ({ likeList, onClickSave }: IProps) => {
                 <Image src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${item?.thumbnailImage}`} alt="상품 이미지" fill />
               </Link>
               <Flex direction="column">
-                <Flex className={styles.top_content}>
+                <Flex className={styles.top_content} justify="between">
                   <Link href={`/products/${item?.id}`}>
                     <Flex direction="column">
                       <Text size={1.2} weight={700} lineHeight="1.7rem">
