@@ -51,6 +51,7 @@ const ProductCardLarge = ({ product }: { product: ISearchProductList }) => {
             src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${product.thumbnailImage}`}
             alt="상품이미지"
             fill
+            sizes="100"
             className={styles.product_image}
           />
         </div>
@@ -69,7 +70,7 @@ const ProductCardLarge = ({ product }: { product: ISearchProductList }) => {
         <div className={styles.product_name_sub}>
           <p>{product.korName}</p>
         </div>
-        {!product.isSoldOut && (
+        {product.isSoldOut && (
           <div className={styles.product_sold_out}>
             <span>품절</span>
           </div>

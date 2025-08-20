@@ -52,7 +52,7 @@ export default function LayoutWrapper({ children }: IProps) {
   const hideAllLayoutPaths = ['/login', '/signup', '/my/buying', '/find-email', '/find-password', '/my/buying', '/my/order'];
 
   // nav와 검색버튼을을 숨김
-  const hideHeaderElementsPaths = ['/my', '/cart'];
+  const hideHeaderElementsPaths = ['/my', '/cart', '/saved'];
 
   // 로고를 숨기고고 뒤로가기 버튼
   const showBackButtonPaths = ['/cart', '/my/profile', '/my/address'];

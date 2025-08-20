@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { cartService } from '@/services/cart';
 import { likeService } from '@/services/like';
 import { ILikeList } from '@/types/like';
+import { useCartStore } from '@/store/cartStore';
 
 interface IProps {
   productData?: IProduct;
@@ -24,6 +25,7 @@ const BottomFixButton = ({ productData }: IProps) => {
   const { onOpen, onClose } = useBottomSheetStore();
   const { upsertCart } = cartService;
   const { addLike, deleteLike, getLikes } = likeService;
+  const { cartCount, setCartCount } = useCartStore();
 
   const [selectOptionId, setSelectOptionId] = useState(0);
   const [deliveryOptionId, setDeliveryOption] = useState(0);
@@ -46,6 +48,8 @@ const BottomFixButton = ({ productData }: IProps) => {
   };
 
   const onClickCart = () => {
+    if (selectOptionId === 0) return alert('옵션을 선택해주세요.');
+
     const cardData = {
       count: 1,
       optionValueId: selectOptionId,
@@ -57,6 +61,7 @@ const BottomFixButton = ({ productData }: IProps) => {
       .then((res) => {
         if (res.status === 200) {
           alert('장바구니에 담았어요.');
+          setCartCount(cartCount + 1);
           onClose();
         }
       })

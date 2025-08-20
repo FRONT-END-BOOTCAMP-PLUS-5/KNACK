@@ -107,42 +107,34 @@ export class PrProductsRepository implements ProductSearchRepository {
     }
 
     // ORDER BY 조건 구성
-    const orderBy: Prisma.ProductOrderByWithRelationInput = {};
-    switch (sort) {
-      case 'latest':
-        orderBy.createdAt = 'desc';
-        break;
-      case 'popular':
-        // TODO: 인기순 기준 확인 필요
-        orderBy.productLike = { _count: 'desc' };
-        break;
-      case 'price_high':
-        orderBy.price = 'desc';
-        break;
-      case 'price_low':
-        orderBy.price = 'asc';
-        break;
-      case 'likes':
-        orderBy.productLike = { _count: 'desc' };
-        break;
-      case 'reviews':
-        orderBy.reviews = { _count: 'desc' };
-        break;
-      default:
-        orderBy.createdAt = 'desc';
-    }
+    const orderBy: Prisma.ProductOrderByWithRelationInput | Prisma.ProductOrderByWithRelationInput[] = (() => {
+      switch (sort) {
+        case 'latest':
+          return [{ createdAt: 'desc' }, { id: 'desc' }];
+        //TODO: 인기순 기준 추후 수정 필요
+        case 'popular':
+          return [{ productLike: { _count: 'desc' } }, { createdAt: 'desc' }, { id: 'desc' }];
+        case 'likes':
+          return [{ productLike: { _count: 'desc' } }, { createdAt: 'desc' }, { id: 'desc' }];
+        case 'price_high':
+          return [{ price: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }];
+        case 'price_low':
+          return [{ price: 'asc' }, { createdAt: 'asc' }, { id: 'asc' }];
+        case 'reviews':
+          return [{ reviews: { _count: 'desc' } }, { createdAt: 'desc' }, { id: 'desc' }];
+        default:
+          return [{ createdAt: 'desc' }, { id: 'desc' }];
+      }
+    })();
 
-    // 커서 기반 페이지네이션
-    let cursorCondition: Prisma.ProductWhereInput = {};
-    if (pagination?.cursor) {
-      cursorCondition = { id: { gt: parseInt(pagination.cursor) } };
-    }
+    const prismaCursor: Prisma.ProductWhereUniqueInput | undefined = pagination?.cursor
+      ? { id: parseInt(pagination.cursor) }
+      : undefined;
 
     // 상품 조회
     const products = await prisma.product.findMany({
       where: {
         ...whereConditions,
-        ...cursorCondition,
       },
       include: {
         brand: true,
@@ -161,6 +153,7 @@ export class PrProductsRepository implements ProductSearchRepository {
         },
       },
       orderBy,
+      cursor: prismaCursor,
       take: limit + 1, // 다음 페이지 존재 여부 확인용
       skip: pagination?.cursor ? 1 : offset, // 커서 사용시 skip 1
     });
@@ -172,8 +165,8 @@ export class PrProductsRepository implements ProductSearchRepository {
     // 응답 데이터 구성
     const mappedProducts: Product[] = actualProducts.map((product) => {
       // isSoldOut 계산: 모든 재고가 0이면 true
-      const isSoldOut =
-        product.productStockMapping.length > 0 && product.productStockMapping.every((stock) => stock.stock === 0);
+      const hasStockMappings = product.productStockMapping.length > 0;
+      const isSoldOut = hasStockMappings ? product.productStockMapping.every((stock) => stock.stock === 0) : true;
 
       return new Product(
         product.id,

@@ -2,7 +2,7 @@
 
 import TabMenu from '@/components/common/TabMenu';
 import { likeService } from '@/services/like';
-import { useCallback, useEffect, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useState } from 'react';
 import { productsService } from '@/services/products';
 import { IRecentProduct } from '@/types/product';
 import { IBrandLikeList, ILikeList } from '@/types/like';
@@ -105,7 +105,9 @@ const SavedPage = () => {
   );
 
   const handleLikeAdd = useCallback(
-    (productId: number) => {
+    (e: MouseEvent<HTMLButtonElement>, productId: number) => {
+      e.preventDefault();
+
       const likeCheck = likeList?.find((likeItem) => likeItem?.product?.id === productId);
 
       if (likeCheck) {
@@ -127,7 +129,9 @@ const SavedPage = () => {
     [addLike, handleDeleteLike, handleGetLikes, likeList]
   );
 
-  const onClickSave = (id: number) => {
+  const onClickSave = (e: MouseEvent<HTMLButtonElement>, id: number) => {
+    e.preventDefault();
+
     handleDeleteLike(id);
   };
 
