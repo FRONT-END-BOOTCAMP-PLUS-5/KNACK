@@ -78,7 +78,8 @@ export const useUserStore = create<UserStore>((set) => ({
           const reviewResponse = await fetch('/api/reviews/orders');
           if (reviewResponse.ok) {
             const reviewData = await reviewResponse.json();
-            reviewCount = reviewData.data?.myReviews?.length || 0;
+            // API 응답 구조에 맞게 수정: data 래퍼 없음
+            reviewCount = reviewData.myReviews?.length || 0;
           }
         } catch (reviewError) {
           console.error('리뷰 수 조회 실패:', reviewError);

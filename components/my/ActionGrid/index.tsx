@@ -25,8 +25,8 @@ const ActionGrid = () => {
       <Flex direction="column" align="center" gap={8} paddingVertical={16}>
         <Link href="/my/review" className={styles.review_link}>
           <Image src={ReviewIcon} alt="리뷰" width={28} height={28} />
-          {/* reviewCount가 null이면 빈 문자열, 숫자가 있으면 숫자 표시 */}
-          <Text size={1.2}>리뷰 {reviewCount ?? ''}</Text>
+          {/* reviewCount가 null이면 0, 숫자가 있으면 숫자 표시 */}
+          <Text size={1.2}>리뷰 {reviewCount ?? 0}</Text>
         </Link>
       </Flex>
     </article>
