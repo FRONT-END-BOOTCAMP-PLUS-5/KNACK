@@ -1,5 +1,29 @@
-.checkbox_style {
-  width: 18.8px;
-  height: 18.8px;
-  margin-right: 6px;
+.checkbox_input {
+  width: 0;
+  height: 0;
+}
+
+.checkbox_label {
+  width: 19px;
+  height: 19px;
+  background: #fff;
+  border: 2px solid #2222224d;
+  border-radius: 2px;
+  position: relative;
+
+  &.active {
+    background: #222;
+  }
+}
+
+.check_icon {
+  color: #2222224d;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  &.active {
+    color: #fff;
+  }
 }
