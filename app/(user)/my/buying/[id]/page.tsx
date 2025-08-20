@@ -78,7 +78,7 @@ export default function OrderPage({ params }: OrderPageProps) {
 
     const total = productTotal + (paymentData?.shippingFee ?? 0) - (item?.couponPrice ?? 0) - (item?.point ?? 0);
 
-    const step: Step = statusToStep(meta.status);
+    const step: Step = statusToStep(item?.payment?.status);
 
     // 주소 안전 매핑
     const name =

@@ -14,8 +14,9 @@ import { IProduct } from '@/types/product';
 import AddressModal from '@/components/address/AddressModal';
 import { formatFullAddress } from '@/utils/formatAddressUtils';
 import RequestModal from '@/components/address/RequestModal';
-import { AddressDtoWithPostalFields, Coupon, CheckoutRow, OrderItem, IAddress, BestCoupon } from '@/types/order';
+import { Coupon, CheckoutRow, OrderItem, BestCoupon } from '@/types/order';
 import CouponSelectModal from '@/components/Payments/CouponSelectModal';
+import { IAddress } from '@/types/address';
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
 
@@ -32,14 +33,7 @@ export default function CheckoutPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [selectedCouponId, setSelectedCouponId] = useState<number | null>(null);
 
-  const [IAddress, setIAddress] = useState<{
-    id: number;
-    name: string;
-    phone: string;
-    fullAddress: string;
-    request: string;
-    postalCode?: string;
-  } | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<IAddress | null>(null);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isReqOpen, setReqOpen] = useState(false);
   const [isOpenCouponModal, setOpenCouponModal] = useState(false);
@@ -101,7 +95,7 @@ export default function CheckoutPage() {
       applicableCount: applicableCoupons.length,
       isCouponApplicable,
     };
-  }, [orderItems, selectedCoupon, deliveryType, applicableCoupons.length]);
+  }, [orderItems, selectedCoupon, applicableCoupons.length]);
 
   // ----- totals -----
   const priceWithoutDelivery = useMemo(
@@ -128,13 +122,13 @@ export default function CheckoutPage() {
 
   // ----- save request message -----
   const handleSaveRequestMessage = async () => {
-    if (!IAddress?.id) {
+    if (!selectedAddress?.id) {
       alert('주소가 선택되지 않았습니다.');
       return;
     }
     try {
-      await requester.patch(`/api/addresses/${IAddress.id}/message`, {
-        requestMessage: IAddress.request,
+      await requester.patch(`/api/addresses/${selectedAddress.id}/message`, {
+        requestMessage: selectedAddress.message,
       });
     } catch (e) {
       console.error('요청사항 저장 실패', e);
@@ -145,7 +139,7 @@ export default function CheckoutPage() {
   // ----- payment -----
   const handlePayment = async () => {
     if (!orderItems.length) return alert('상품을 선택해주세요.');
-    if (!IAddress) return alert('주소지를 선택해주세요.');
+    if (!selectedAddress) return alert('주소지를 선택해주세요.');
 
     try {
       await handleSaveRequestMessage();
@@ -173,7 +167,7 @@ export default function CheckoutPage() {
         orderId: `order_${Date.now()}`, // 권장: 서버에서 선발급한 orderNumber 사용
         orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''
           } 주문`,
-        customerName: IAddress.name || '홍길동',
+        customerName: selectedAddress.name || '홍길동',
         successUrl: `${window.location.origin}/payments/success`,
         failUrl: `${window.location.origin}/payments/failure`,
       });
@@ -241,7 +235,14 @@ export default function CheckoutPage() {
         // 쿠폰 조회
         const { data: couponRes } = await requester.get('/api/coupon');
         const fetched = couponRes?.result ?? couponRes ?? [];
-        setCoupons(fetched);
+
+        // 구매한 상품 ID 목록
+        const purchasedProductIds = new Set(orderItems.map(item => item.productId));
+
+        // 구매한 상품에 적용 가능한 쿠폰만 필터링
+        const validCoupons = fetched.filter((coupon: Coupon) => purchasedProductIds.has(coupon.productId));
+
+        setCoupons(validCoupons);
 
         // 1) productId별 주문 합계 사전 집계 (최적화)
         const totalsByProductId = orderItems.reduce<Map<number, number>>((map, it) => {
@@ -284,64 +285,20 @@ export default function CheckoutPage() {
         const addresses: AddressDto[] = res.data;
         const def = addresses.find((a) => a.isDefault);
         if (def) {
-          const zip =
-            (
-              def as AddressDto & {
-                postalCode?: string;
-                postCode?: string;
-                zipcode?: string;
-                zipCode?: string;
-                zonecode?: string;
-              }
-            ).postalCode ??
-            (
-              def as AddressDto & {
-                postalCode?: string;
-                postCode?: string;
-                zipcode?: string;
-                zipCode?: string;
-                zonecode?: string;
-              }
-            ).postCode ??
-            (
-              def as AddressDto & {
-                postalCode?: string;
-                postCode?: string;
-                zipcode?: string;
-                zipCode?: string;
-                zonecode?: string;
-              }
-            ).zipcode ??
-            (
-              def as AddressDto & {
-                postalCode?: string;
-                postCode?: string;
-                zipcode?: string;
-                zipCode?: string;
-                zonecode?: string;
-              }
-            ).zipCode ??
-            (
-              def as AddressDto & {
-                postalCode?: string;
-                postCode?: string;
-                zipcode?: string;
-                zipCode?: string;
-                zonecode?: string;
-              }
-            ).zonecode ??
-            '';
-
           const addr = {
             id: def.id,
             name: def.name,
             phone: def.phone ?? '',
-            fullAddress: formatFullAddress(def), // ✅ [우편번호] + 주소
-            request: def.message ?? '',
-            postalCode: zip || undefined,
+            detail: def.detail ?? '',
+            message: def.message ?? '',
+            isDefault: def.isDefault ?? false,
+            address: {
+              zipCode: def.address.zipCode,
+              main: def.address.main,
+            },
           };
-          setIAddress(addr);
-          sessionStorage.setItem('IAddress', JSON.stringify(addr));
+          setSelectedAddress(addr);
+          sessionStorage.setItem('selectedAddress', JSON.stringify(addr));
         }
       } catch (err) {
         console.error('주소 불러오기 실패', err);
@@ -352,12 +309,12 @@ export default function CheckoutPage() {
   return (
     <main className={styles.checkout_container}>
       <AddressBox
-        IAddress={IAddress ?? null}
+        selectedAddress={selectedAddress ?? null}
         onOpenModal={() => setIsAddressModalOpen(true)}
         onOpenRequestModal={() => setReqOpen(true)}
         onChangeRequest={(req) => {
-          if (!IAddress) return;
-          setIAddress({ ...IAddress, request: req }); // zustand 업데이트
+          if (!selectedAddress) return;
+          setSelectedAddress({ ...selectedAddress, message: req }); // zustand 업데이트
         }}
       />
 
@@ -415,22 +372,17 @@ export default function CheckoutPage() {
       {isAddressModalOpen && (
         <AddressModal
           onClose={() => setIsAddressModalOpen(false)}
-          IAddress={
-            IAddress
+          selectedAddress={
+            selectedAddress
               ? {
-                ...IAddress,
-                request: IAddress.request,
+                ...selectedAddress,
+                message: selectedAddress.message,
               }
               : null
           }
           onChangeSelected={(a: IAddress) => {
             const zip =
-              (a as unknown as AddressDtoWithPostalFields).postalCode ??
-              (a as unknown as AddressDtoWithPostalFields).postCode ??
-              (a as unknown as AddressDtoWithPostalFields).zipcode ??
-              (a as unknown as AddressDtoWithPostalFields).zipCode ??
-              (a as unknown as AddressDtoWithPostalFields).zonecode ??
-              '';
+              a.address.zipCode ?? '';
 
             if (!a?.id) return; // Early return if no valid address
 
@@ -438,25 +390,29 @@ export default function CheckoutPage() {
               id: a.id,
               name: a.name ?? '',
               phone: a.phone ?? '',
-              fullAddress: a.fullAddress ?? '',
-              request: a.request ?? '',
-              postalCode: zip || undefined,
+              address: {
+                zipCode: zip,
+                main: a.address.main,
+              },
+              detail: a.detail ?? '',
+              message: a.message ?? '',
+              isDefault: a.isDefault ?? false,
             };
-            setIAddress(mapped);
-            sessionStorage.setItem('IAddress', JSON.stringify(mapped));
+            setSelectedAddress(mapped);
+            sessionStorage.setItem('selectedAddress', JSON.stringify(mapped));
           }}
         />
       )}
 
       <RequestModal
         open={isReqOpen}
-        value={IAddress?.request ?? ''}
+        value={selectedAddress?.message ?? ''}
         onClose={() => setReqOpen(false)}
         onApply={(next) => {
-          if (!IAddress) return;
-          const updated = { ...IAddress, request: next };
-          setIAddress(updated);
-          sessionStorage.setItem('IAddress', JSON.stringify(updated));
+          if (!selectedAddress) return;
+          const updated = { ...selectedAddress, request: next };
+          setSelectedAddress(updated);
+          sessionStorage.setItem('selectedAddress', JSON.stringify(updated));
         }}
       />
     </main>

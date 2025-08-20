@@ -6,7 +6,7 @@ import { formatPhoneNumber, phonePattern } from '@/utils/formatAddressUtils'
 import { AddressBoxProps } from '@/types/order'
 
 export default function AddressBox({
-    IAddress,
+    selectedAddress,
     onOpenModal,
     onOpenRequestModal,
     onChangeRequest,
@@ -14,8 +14,9 @@ export default function AddressBox({
     const [request, setRequest] = useState<string>('')
 
     useEffect(() => {
-        setRequest(IAddress?.request ?? '')
-    }, [IAddress])
+        setRequest(selectedAddress?.message ?? '')
+        console.log(selectedAddress);
+    }, [selectedAddress])
 
     return (
         <div className={styles.container}>
@@ -28,17 +29,17 @@ export default function AddressBox({
                     <button className={styles.change_btn} onClick={onOpenModal}><p className={styles.text_lookup}>주소 변경</p></button>
                 </div>
                 <div className={styles.div_8px} />
-                {IAddress ? (
+                {selectedAddress ? (
                     <>
                         <div className={styles.table}>
                             <div className={styles.label}><p>받는 분</p></div>
-                            <div className={styles.value}>{IAddress.name}</div>
+                            <div className={styles.value}>{selectedAddress.name}</div>
 
                             <div className={styles.label}><p>연락처</p></div>
-                            <div className={styles.value}>{IAddress.phone && phonePattern.test(IAddress.phone) ? formatPhoneNumber(IAddress.phone) : IAddress.phone || '-'}</div>
+                            <div className={styles.value}>{selectedAddress.phone && phonePattern.test(selectedAddress.phone) ? formatPhoneNumber(selectedAddress.phone) : selectedAddress.phone || '-'}</div>
 
                             <div className={styles.label}><p>주소</p></div>
-                            <div className={styles.value}>{IAddress.fullAddress}</div>
+                            <div className={styles.value}>({selectedAddress.address.zipCode}) {selectedAddress.address.main} {selectedAddress.detail}</div>
                         </div>
 
                         <div className={styles.request_row} onClick={onOpenRequestModal}>

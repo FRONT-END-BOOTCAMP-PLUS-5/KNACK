@@ -1,6 +1,6 @@
 // types/order.ts
 import { IOptionValue } from './product';
-import { IAddress, IAddressRef } from './address';
+import { IAddress } from './address';
 
 /* ---------- 장바구니/주문 ---------- */
 
@@ -189,6 +189,7 @@ export type RepoOrderItem = {
   paymentId: number;
   payment: {
     paymentNumber: bigint;
+    status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | 'CONFIRMED' | 'DELIVERING' | 'COMPLETED' | string;
   }
   price: number | bigint;
   salePrice?: number | bigint;
@@ -231,7 +232,7 @@ export interface AddressAddModalProps {
 
 /* AddressBox props */
 export type AddressBoxProps = {
-  IAddress: IAddress | null;
+  selectedAddress: IAddress | null;
   onOpenModal: () => void;
   onOpenRequestModal?: () => void;
   onChangeRequest: (request: string) => void;
