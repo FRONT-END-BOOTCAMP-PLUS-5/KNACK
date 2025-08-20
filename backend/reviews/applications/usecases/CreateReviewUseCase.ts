@@ -8,7 +8,7 @@ export class CreateReviewUseCase {
     userId: string, 
     productId: number, 
     orderId: number,
-    reviewData: Omit<Review, 'userId' | 'productId' | 'createdAt'>
+    reviewData: Omit<Review, 'id' | 'userId' | 'productId' | 'createdAt'>
   ): Promise<Review> {
     try {
       // 1. 이미 해당 주문에 대한 리뷰가 있는지 확인 (orderId 기준)
