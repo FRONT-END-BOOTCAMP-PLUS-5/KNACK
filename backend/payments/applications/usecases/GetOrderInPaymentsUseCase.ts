@@ -23,12 +23,12 @@ export class GetOrderInPaymentsUseCase {
 
     private mapToDto(p: RepoPayment): GetOrderbyPaymentsDto {
         const items = this.extractItems(p);
-
+        console.log(items)
         return {
             id: p.id,
             createdAt: p.createdAt ?? new Date(),
             address: p.address ?? null,
-            paymentNumber: p.paymentNumber,     // BigInt 유지
+            paymentNumber: p.paymentNumber, // BigInt 유지
             tossPaymentKey: p.tossPaymentKey ?? '',
             price: Number(p.price ?? 0),
             approvedAt: p.approvedAt ?? new Date(),
@@ -46,12 +46,13 @@ export class GetOrderInPaymentsUseCase {
                 deliveryStatus: item.deliveryStatus ?? 1,
                 count: item.quantity ?? item.count ?? 1,
                 optionValueId: item.optionValueId ?? 0,
+                couponPrice: item.couponPrice ?? 0,
+                point: item.point ?? 0,
                 product: {
                     id: item.product?.id ?? item.productId,
                     korName: item.product?.korName ?? '',
                     engName: item.product?.engName ?? '',
                     thumbnailImage: item.product?.thumbnailImage ?? '',
-                    thumbnailImage: item.product?.thumbnailImage ?? null,
                 },
                 optionValue: {
                     id: item.optionValue?.id ?? 0,

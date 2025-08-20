@@ -22,6 +22,8 @@ export interface GetOrderbyPaymentsDto {
         deliveryStatus: number | null;
         count: number;
         optionValueId: number;
+        couponPrice: number; // 쿠폰 할인 금액
+        point: number; // 사용한 포인트
         product: {
             id: number;
             korName: string;

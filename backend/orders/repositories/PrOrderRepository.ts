@@ -20,6 +20,8 @@ export class PrOrderRepository implements OrderRepository {
             createdAt: o.createdAt,
             paymentId: null,
             optionValueId: o.optionValueId,
+            couponPrice: o.couponPrice,
+            point: o.point,
           },
         })
       )

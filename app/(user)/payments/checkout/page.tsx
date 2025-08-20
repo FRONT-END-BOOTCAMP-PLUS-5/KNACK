@@ -66,6 +66,7 @@ export default function CheckoutPage() {
 
     // 2) 선택 쿠폰이 실제로 적용 가능한지
     const isCouponApplicable = !!selectedCoupon && orderItems.some((it) => it.productId === selectedCoupon.productId);
+    console.log('isCouponApplicable', isCouponApplicable);
 
     // 3) 해당 상품군 합계(쿠폰 타깃 금액)
     const targetSum = isCouponApplicable
@@ -80,7 +81,7 @@ export default function CheckoutPage() {
       : 0;
 
     // 5) 배송비
-    const shippingFee = deliveryType === 'FAST' ? 5000 : 0;
+    const shippingFee = 0;
 
     // 6) 쿠폰 적용 후 상품금액
     const productAfterCoupon = Math.max(0, baseSum - couponDiscount);

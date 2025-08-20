@@ -2,7 +2,7 @@
 import { Prisma } from "@prisma/client"
 import { OrderDto } from "@/backend/orders/applications/dtos/GetOrderDto"
 import { OrderItemDto } from "@/backend/orders/applications/dtos/GetOrderItemDto"
-import { DtoStatus } from "@/types/order"
+import { ComputeTotalsOrder, DtoStatus } from "@/types/order"
 
 type OrderRow = Prisma.OrderGetPayload<{
     include: { product: true; payment: { include: { address: true } } }
@@ -42,4 +42,60 @@ export function serializeBigInt<T>(value: T): T {
     return JSON.parse(
         JSON.stringify(value, (_k, v) => (typeof v === 'bigint' ? v.toString() : v))
     )
+}
+
+export function toNum(v: unknown, fallback = 0) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+}
+
+/**
+ * 주문 목록에서 각종 금액을 합산.
+ */
+
+export function computeTotalsFromOrders(orders: ComputeTotalsOrder[] = []) {
+    let subtotal = 0;
+    let shippingFee = 0;
+    let couponUsed = 0;
+    let pointsUsed = 0;
+
+    for (const o of orders) {
+        const price =
+            toNum(
+                (o as Record<string, unknown>)?.price ?? 0
+            );
+
+        const qty = Math.max(
+            1,
+            toNum(o.count, 1)
+        );
+
+        const lineSubtotal = price * qty;
+        subtotal += lineSubtotal;
+
+        shippingFee += toNum(
+            o.shippingFee ?? o.deliveryFee ?? o.shipFee ?? 0
+        );
+
+        couponUsed += Math.abs(
+            toNum(o.couponPrice ?? 0)
+        );
+
+        pointsUsed += Math.abs(
+            toNum(o.point ?? 0)
+        );
+    }
+
+    const total = Math.max(
+        0,
+        subtotal + shippingFee - couponUsed - pointsUsed
+    );
+
+    return {
+        subtotal,
+        shippingFee,
+        couponUsed,
+        pointsUsed,
+        total,
+    };
 }

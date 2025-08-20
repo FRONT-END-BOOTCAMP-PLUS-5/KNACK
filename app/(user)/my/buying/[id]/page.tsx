@@ -5,14 +5,11 @@ import Image from "next/image";
 import styles from "./buying.module.scss";
 import BuyingFooter from "@/components/my/BuyingFooter";
 import { BuyingHeader } from "@/components/my/BuyingHeader";
-import { OrderPageProps, RepoAddress, RepoOrderItem } from "@/types/order";
+import { OrderPageProps, RepoAddress, RepoOrderItem, Step, STEPS } from "@/types/order";
 import requester from "@/utils/requester";
 import { useState, useEffect, useMemo } from "react";
 import { STORAGE_PATHS } from "@/constraint/auth";
 import { useRouter } from "next/navigation";
-
-const STEPS = ["구매 확정", "배송 대기", "배송 중", "배송 완료"] as const;
-type Step = typeof STEPS[number];
 
 function ProgressBar({ current }: { current: Step }) {
     const currentIdx = STEPS.indexOf(current);
@@ -50,7 +47,7 @@ export default function OrderPage({ params }: OrderPageProps) {
     const paymentData = paymentDataStr ? JSON.parse(paymentDataStr) : null;
 
     const router = useRouter();
-    const [item, setItem] = useState<RepoOrderItem[]>([]);
+    const [item, setItem] = useState<RepoOrderItem | null>(null);
     const [address, setAddress] = useState<RepoAddress | null>(null);
     const [meta, setMeta] = useState<{
         paymentNumber?: string;
@@ -80,8 +77,14 @@ export default function OrderPage({ params }: OrderPageProps) {
     }, [params.id]);
 
     // 합계 계산
-    const productTotal = 0;
-    const total = productTotal + paymentData?.shippingFee - paymentData?.couponDiscountAmount - paymentData?.pointAmount;
+    const productTotal = useMemo(() => {
+        if (!item) return 0;
+        const price = Number(item.price ?? 0);
+        const quantity = item.count ?? 1;
+        return price * quantity;
+    }, [item]);
+
+    const total = productTotal + (paymentData?.shippingFee ?? 0) - (item?.couponPrice ?? 0) - (item?.point ?? 0);
 
     const step: Step = statusToStep(meta.status);
 
@@ -100,11 +103,11 @@ export default function OrderPage({ params }: OrderPageProps) {
         (address?.message ?? "") || "";
 
     const thumb =
-        (item.product)?.thumbnailImage ??
+        (item?.product)?.thumbnailImage ??
         "/placeholder.png";
-    const korname = (item.product)?.korName ?? "";
-    const engname = (item.product)?.engName ?? "";
-    const variant = (item.optionValue)?.name ?? (item.optionValue)?.value ?? "";
+    const korname = (item?.product)?.korName ?? "";
+    const engname = (item?.product)?.engName ?? "";
+    const variant = (item?.optionValue)?.name ?? (item?.optionValue)?.value ?? "";
 
     return (
         <>
@@ -117,7 +120,7 @@ export default function OrderPage({ params }: OrderPageProps) {
                 </section>
 
                 {/* 상품 카드 */}
-                <section key={item.id} className={`${styles.section} ${styles.product_card}`}>
+                <section key={item?.id} className={`${styles.section} ${styles.product_card}`}>
                     <div className={styles.thumb_wrap}>
                         <Image
                             src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${thumb}`}
@@ -131,7 +134,7 @@ export default function OrderPage({ params }: OrderPageProps) {
                         <div className={styles.sub_title}>{engname}</div>
                         {variant && <div className={styles.variant}>{variant}</div>}
                     </div>
-                </section><button className={styles.detail_btn} onClick={() => router.push(`/products/${item.product?.id}`)}>상품 상세</button>
+                </section><button className={styles.detail_btn} onClick={() => router.push(`/products/${item?.product?.id}`)}>상품 상세</button>
 
                 {/* 진행 상황 */}
                 <section className={styles.section_pink}>

@@ -3,6 +3,10 @@ import { AddressDto } from '@/backend/address/applications/dtos/AddressDto';
 import { IOptionValue } from './product';
 
 /* ---------- 장바구니/주문 ---------- */
+
+export const STEPS = ["구매 확정", "배송 대기", "배송 중", "배송 완료"] as const;
+export type Step = typeof STEPS[number];
+
 export type CheckoutRow = {
   productId: number;
   quantity: number;
@@ -21,6 +25,38 @@ export type OrderItem = {
   optionValue?: IOptionValue;
 };
 
+export interface OrderResponse {
+  id?: number;
+  orderId?: number;
+  orderNumber?: string;
+  number?: string;
+  product?: {
+    engName?: string;
+    thumbnailImage?: string;
+  };
+  productTitle?: string;
+  title?: string;
+  size?: string;
+  option?: string;
+  variant?: string;
+  shippingType?: string;
+  deliveryType?: string;
+  statusText?: string;
+  status?: string;
+  thumbnailImage?: string;
+  imageUrl?: string;
+}
+
+export type ComputeTotalsOrder = {
+  price?: number | unknown;
+  count?: number;
+  shippingFee?: number;
+  deliveryFee?: number;
+  shipFee?: number;
+  couponPrice?: number;
+  point?: number;
+}
+
 export interface RepresentativeProduct {
   id: number;
   korName: string;
@@ -31,6 +67,8 @@ export interface RepresentativeProduct {
 }
 
 export type RepoPayment = {
+  point: number;
+  couponPrice: number;
   id: number;
   userId: string;
   address?: RepoAddress | null;
@@ -50,6 +88,9 @@ export type RepoPayment = {
       productId: number;
       quantity: number;
       price: number | bigint;
+      salePrice?: number | bigint;
+      couponPrice?: number;
+      point?: number;
       product?: { korName?: string | null; engName?: string | null; thumbnailImage?: string | null } | null;
       productName?: string | null;
     }>;
@@ -106,6 +147,8 @@ export const graphInclude = {
       deliveryStatus: true,
       count: true,          // or quantity
       paymentId: true,
+      couponPrice: true,
+      point: true,
       optionValueId: true,
       product: {
         select: {
@@ -151,6 +194,8 @@ export type RepoOrderItem = {
   createdAt?: Date;
   deliveryStatus?: number;
   optionValueId?: number;
+  couponPrice?: number;
+  point?: number;
   product?: {
     id: number;
     korName?: string;

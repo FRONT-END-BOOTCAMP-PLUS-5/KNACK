@@ -3,45 +3,10 @@ import PaymentReceipt from '@/components/my/PaymentReceipt';
 import requester from '@/utils/requester';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
-
-type ReceiptItem = {
-    id: string;
-    orderNumber: string;
-    title: string;
-    optionText: string;
-    status?: string;
-    imageUrl: string;
-};
-
-type PaymentData = {
-    orders?: {
-        id?: string | number;
-        orderId?: string | number;
-        orderNumber?: string;
-        number?: string;
-        title?: string;
-        productTitle?: string;
-        size?: string;
-        option?: string;
-        shippingType?: string;
-        statusText?: string;
-        status?: string;
-        thumbnailImage?: string;
-        imageUrl?: string;
-    }[];
-    approvedAt?: string;
-    totals?: {
-        subtotal?: number;
-        inspectionFee?: number;
-        serviceFee?: number;
-        shippingFee?: number;
-        couponUsed?: number;
-        pointsUsed?: number;
-        total?: number;
-    };
-    paymentNumber?: string | number;
-    cardMasked?: string;
-};
+import styles from './orderPage.module.scss';
+import { computeTotalsFromOrders } from '@/utils/orders';
+import { PaymentData, ReceiptItem } from '@/types/payment';
+import { OrderResponse } from '@/types/order';
 
 export default function OrderPage() {
     const { id } = useParams<{ id: string }>();
@@ -54,22 +19,48 @@ export default function OrderPage() {
         (async () => {
             try {
                 const { data } = await requester.get(`/api/payments/${id}`);
-                console.log(data.orders);
 
-                // ✅ PaymentReceipt가 기대하는 형태로 매핑
-                const mapped: ReceiptItem[] = (data.orders ?? []).map((o: NonNullable<PaymentData['orders']>[0]) => ({
+                // ✅ 영수증 카드용 아이템 매핑
+                const mapped: ReceiptItem[] = (data.orders ?? []).map((o: OrderResponse) => ({
                     id: String(o.id ?? o.orderId),
                     orderNumber: o.orderNumber ?? o.number ?? '',
-                    title: o.product?.engName ?? '',
-                    optionText: [o.size ?? o.option, o.shippingType ?? '일반배송']
-                        .filter(Boolean)
-                        .join(' / '),
+                    title:
+                        o.product?.engName ??
+                        o.productTitle ??
+                        o.title ??
+                        '',
+                    optionText:
+                        [
+                            o.size ?? o.option ?? o.variant,
+                            o.shippingType ?? o.deliveryType ?? '일반배송',
+                        ]
+                            .filter(Boolean)
+                            .join(' / '),
                     status: o.statusText ?? o.status,
-                    imageUrl: o.product?.thumbnailImage ?? o.imageUrl ?? '/placeholder.png',
+                    imageUrl:
+                        o.product?.thumbnailImage ??
+                        o.thumbnailImage ??
+                        o.imageUrl ??
+                        '/placeholder.png',
                 }));
 
+                // ✅ totals 재계산
+                const totals = computeTotalsFromOrders(data.orders);
+
+                // ✅ 결제정보 병합 (서버값이 있으면 유지하고, totals는 재계산값으로 덮어씀)
+                const merged: PaymentData = {
+                    ...data,
+                    totals,
+                    paymentNumber: data.paymentNumber ?? data.number ?? data.id,
+                    cardMasked:
+                        data.cardMasked ??
+                        data.card?.numberMasked ??
+                        data.cardInfo?.masked ??
+                        'KB국민카드 ••••••••••700*',
+                };
+
                 setItems(mapped);
-                setPaymentData(data);
+                setPaymentData(merged);
             } catch (e) {
                 console.error('Failed to fetch payment data:', e);
             }
@@ -83,14 +74,11 @@ export default function OrderPage() {
     }, [paymentData?.approvedAt]);
 
     return (
-        <div>
+        <div className={styles.page}>
             <PaymentReceipt
                 items={items}
                 totals={{
-                    // 필요하면 서버 응답에 맞춰 계산/매핑하세요. (일단 안전 기본값)
                     subtotal: paymentData?.totals?.subtotal ?? 0,
-                    inspectionFee: paymentData?.totals?.inspectionFee ?? 0,
-                    serviceFee: paymentData?.totals?.serviceFee ?? 0,
                     shippingFee: paymentData?.totals?.shippingFee ?? 0,
                     couponUsed: paymentData?.totals?.couponUsed ?? 0,
                     pointsUsed: paymentData?.totals?.pointsUsed ?? 0,

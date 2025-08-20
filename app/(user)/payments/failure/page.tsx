@@ -38,7 +38,7 @@ export default function PaymentFail() {
                     parsed.some(it =>
                         ['FAST', 'fast', 'normal'].includes(String(it.deliveryType || '').toLowerCase())
                     )
-                setDeliveryFee(hasFast ? 5000 : 0)
+                setDeliveryFee(0)
             }
         } catch (e) {
             console.error('❌ orderItems 파싱 실패:', e)

@@ -49,7 +49,7 @@ export default function LayoutWrapper({ children }: IProps) {
   const hideFooterPaths = ['/products', '/cart', '/payments'];
 
   // 헤더와 푸터 모두 숨길 경로들
-  const hideAllLayoutPaths = ['/login', '/signup', '/my/buying', '/find-email', '/find-password'];
+  const hideAllLayoutPaths = ['/login', '/signup', '/my/buying', '/find-email', '/find-password', '/my/buying', '/my/order'];
 
   // nav와 검색버튼을을 숨김
   const hideHeaderElementsPaths = ['/my', '/cart'];
@@ -67,6 +67,7 @@ export default function LayoutWrapper({ children }: IProps) {
     if (pathname.startsWith('/my/address')) return '주소록';
     if (pathname.startsWith('/cart')) return '장바구니';
     if (pathname.startsWith('/my/buying')) return '구매 진행 중';
+    if (pathname.startsWith('/my/order')) return '결제 내역 상세';
     if (pathname.startsWith('/payments/checkout')) return '배송/결제';
     return undefined;
   };
