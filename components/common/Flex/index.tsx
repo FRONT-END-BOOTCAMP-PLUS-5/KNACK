@@ -15,6 +15,7 @@ interface IProps {
   paddingHorizontal?: number;
   marginVertical?: number;
   marginHorizontal?: number;
+  style?: React.CSSProperties;
 }
 
 const Flex = ({
@@ -30,6 +31,7 @@ const Flex = ({
   paddingHorizontal = 0,
   marginVertical = 0,
   marginHorizontal = 0,
+  style,
 }: IProps) => {
   const Tag = tag;
 
@@ -43,6 +45,7 @@ const Flex = ({
         flexDirection: direction,
         gap: gap + 'px',
         margin: `${marginVertical}px ${marginHorizontal}px`,
+        ...style,
       }}
     >
       {children}
