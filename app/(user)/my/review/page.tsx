@@ -7,7 +7,7 @@ import ReactStars from 'react-stars';
 import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './review.module.scss';
 
-import { ReviewOrderDto } from '@/types/review';
+import { ReviewOrderDto, MyReviewDto } from '@/types/review';
 import { useReview } from '@/hooks/useReview';
 import { REVIEW_INCENTIVE_MESSAGE, ERROR_MESSAGES } from '@/utils/review';
 
@@ -96,7 +96,7 @@ export default function ReviewPage() {
                <div className={styles.empty_message}>{ERROR_MESSAGES.NO_REVIEWABLE_ORDERS}</div>
              ) : (
               <div className={styles.product_list}>
-                {reviewableOrders.map((order) => (
+                {reviewableOrders.map((order: ReviewOrderDto) => (
                   <div 
                     key={`write-${order.orderId}`} 
                     className={styles.product_link}
@@ -154,7 +154,7 @@ export default function ReviewPage() {
                <p className={styles.empty_message}>{ERROR_MESSAGES.NO_MY_REVIEWS}</p>
              ) : (
               <div className={styles.product_list}>
-                {myreview.map((order) => (
+                {myreview.map((order: MyReviewDto) => (
                   <div key={`my-${order.orderId}`} className={styles.product_link} onClick={() => handleReviewClick(order.productId)}>
                     <div className={styles.product_item}>
                       <div className={styles.product_image}>

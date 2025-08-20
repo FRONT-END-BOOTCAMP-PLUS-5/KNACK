@@ -5,21 +5,19 @@ export interface ReviewOrderDto {
   productName: string;
   productEngName: string;
   thumbnailImage: string;
-  category: {
-    engName: string;
-    korName: string;
-  } | undefined;
-  optionValue?: {
-    id: number;
-    name: string;
-    typeId: number;
-  };
   size?: string;
-  hasReview: boolean;
-  review?: {
+}
+
+export interface MyReviewDto {
+  orderId: number;
+  productId: number;
+  productName: string;
+  productEngName: string;
+  thumbnailImage: string;
+  size?: string;
+  review: {
     contents: string;
     rating: number;
-    reviewImages?: string;
     createdAt: Date;
   };
 }

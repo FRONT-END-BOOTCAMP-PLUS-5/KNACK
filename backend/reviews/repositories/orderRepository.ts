@@ -1,12 +1,12 @@
-import { OrderWithReviewStatus } from '../applications/dtos/ReviewDto';
+import { Order } from '../domains/entities/Order';
 import prisma from '../../utils/prisma';
 
 export interface OrderRepository {
-  findOrdersWithReviewStatus(userId: string): Promise<OrderWithReviewStatus[]>;
+  findOrdersWithReviewStatus(userId: string): Promise<Order[]>;
 }
 
 export class PrismaOrderRepository implements OrderRepository {
-  async findOrdersWithReviewStatus(userId: string): Promise<OrderWithReviewStatus[]> {
+  async findOrdersWithReviewStatus(userId: string): Promise<Order[]> {
     try {
       const orders = await prisma.order.findMany({
         where: { userId },
@@ -37,18 +37,20 @@ export class PrismaOrderRepository implements OrderRepository {
         orderBy: { createdAt: 'desc' }
       });
 
-      // Prisma 결과를 OrderWithReviewStatus 인터페이스에 맞게 변환
+      // Prisma 결과를 Order 엔티티에 맞게 변환
       return orders.map(order => ({
         id: order.id,
         userId: order.userId,
         productId: order.productId,
-        product: {
+        product: order.product ? {
           id: order.product.id,
           thumbnailImage: order.product.thumbnailImage,
           engName: order.product.engName,
           korName: order.product.korName
-        },
-        optionValue: order.optionValue,
+        } : undefined,
+        optionValue: order.optionValue ? {
+          name: order.optionValue.name
+        } : undefined,
         // review는 배열이므로 첫 번째 요소만 사용 (존재 여부 확인용)
         review: order.review.length > 0 ? { id: order.review[0].id } : undefined
       }));

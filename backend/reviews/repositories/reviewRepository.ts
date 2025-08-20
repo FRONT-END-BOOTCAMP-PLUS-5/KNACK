@@ -5,6 +5,7 @@ import prisma from '../../utils/prisma';
 export interface ReviewRepository {
   findReviewsByUserId(userId: string): Promise<Review[]>;
   findReviewByUserAndProduct(userId: string, productId: number): Promise<Review | null>;
+  findReviewByOrderId(orderId: number): Promise<Review | null>;
   createReview(review: Omit<Review, 'id'>): Promise<Review>;
   findReviewsWithRelations(userId: string): Promise<ReviewWithRelations[]>;
 }
@@ -44,6 +45,37 @@ export class PrismaReviewRepository implements ReviewRepository {
     try {
       const review = await prisma.review.findFirst({
         where: { userId, productId },
+        select: {
+          userId: true,
+          productId: true,
+          orderId: true,
+          contents: true,
+          rating: true,
+          createdAt: true
+        }
+      });
+
+      if (!review) return null;
+
+      return {
+        id: 0, // 기본값
+        userId: review.userId,
+        productId: review.productId,
+        orderId: review.orderId,
+        contents: review.contents,
+        rating: review.rating || 0,
+        reviewImages: undefined,
+        createdAt: review.createdAt || new Date()
+      };
+    } catch (error) {
+      throw new Error('리뷰를 조회할 수 없습니다.');
+    }
+  }
+
+  async findReviewByOrderId(orderId: number): Promise<Review | null> {
+    try {
+      const review = await prisma.review.findFirst({
+        where: { orderId },
         select: {
           userId: true,
           productId: true,

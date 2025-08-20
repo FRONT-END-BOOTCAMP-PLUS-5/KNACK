@@ -17,14 +17,18 @@ export class GetReviewableOrdersUseCase {
       // 메모리에서 필터링 (데이터베이스 쿼리 없음)
       return orders
         .filter(order => !order.review && order.product) // 리뷰가 없는 주문만
-        .map(order => ({
-          orderId: order.id,
-          productId: order.product.id,
-          productName: order.product.korName,
-          productEngName: order.product.engName,
-          thumbnailImage: order.product.thumbnailImage || '',
-          size: order.optionValue?.name || ''
-        }));
+        .map(order => {
+          // filter에서 이미 product가 존재함을 확인했으므로 타입 단언 사용
+          const product = order.product!;
+          return {
+            orderId: order.id,
+            productId: product.id,
+            productName: product.korName,
+            productEngName: product.engName,
+            thumbnailImage: product.thumbnailImage || '',
+            size: order.optionValue?.name || ''
+          };
+        });
     } catch (error) {
       throw new Error('리뷰 작성 가능한 주문을 조회할 수 없습니다.');
     }
