@@ -6,7 +6,7 @@ import styles from './SuccessPage.module.scss';
 import requester from '@/utils/requester';
 import { useUserStore } from '@/store/userStore';
 import axios from 'axios';
-import { Coupon, OrderItem, ProcessedPayment, RepresentativeProduct, SelectedAddress } from '@/types/order';
+import { Coupon, OrderItem, ProcessedPayment, RepresentativeProduct, IAddress } from '@/types/order';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 
@@ -16,7 +16,7 @@ export default function PaymentSuccess() {
   const user = useUserStore((s) => s.user);
 
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<SelectedAddress | null>(null);
+  const [IAddress, setIAddress] = useState<IAddress | null>(null);
   const [paymentNumber, setPaymentNumber] = useState('');
   const [savedOrderIds, setSavedOrderIds] = useState<number[]>([]);
   const [paymentId, setPaymentId] = useState<number | null>(null);
@@ -49,7 +49,7 @@ export default function PaymentSuccess() {
     const stored = sessionStorage.getItem('paymentData');
     const coupon = sessionStorage.getItem('selectedCoupon');
     const orderItems = sessionStorage.getItem('orderItems');
-    const address = sessionStorage.getItem('selectedAddress');
+    const address = sessionStorage.getItem('IAddress');
 
     if (stored) {
       const paymentData = JSON.parse(stored);
@@ -69,7 +69,7 @@ export default function PaymentSuccess() {
     }
     if (address) {
       const parsed = JSON.parse(address);
-      setSelectedAddress(parsed);
+      setIAddress(parsed);
     }
   }, []);
 
@@ -78,7 +78,7 @@ export default function PaymentSuccess() {
   // 2) 결제 및 주문 저장
   useEffect(() => {
     if (!user) return;
-    if (!selectedAddress?.id) return;
+    if (!IAddress?.id) return;
     if (orderItems.length === 0) return;
     if (hasRun.current) return;
     if (!tossPaymentKey || !tossOrderId || Number.isNaN(paymentAmount)) return;
@@ -113,7 +113,7 @@ export default function PaymentSuccess() {
             price: item.price,
             salePrice: targetSumAfterCoupon,
             count: item.quantity,
-            addressId: selectedAddress.id,
+            addressId: IAddress.id,
             paymentId: null,
             optionValueId: item?.optionValue?.id,
             couponPrice: discountAmount,
@@ -130,7 +130,7 @@ export default function PaymentSuccess() {
           tossPaymentKey,
           orderId: tossOrderId,
           amount: paymentAmount,
-          addressId: selectedAddress.id,
+          addressId: IAddress.id,
           orderIds: createdOrderIds,
           selectedCouponId: selectedCoupon?.id ?? null,
           pointsToUse: pointsToUse,
@@ -145,7 +145,7 @@ export default function PaymentSuccess() {
 
         // 정리
         sessionStorage.removeItem('orderItems');
-        sessionStorage.removeItem('selectedAddress');
+        sessionStorage.removeItem('IAddress');
       } catch (err) {
         console.error('❌ 결제/주문 저장 실패', err);
         if (axios.isAxiosError(err)) console.error('📛 서버 응답:', err.response?.data);
@@ -157,7 +157,7 @@ export default function PaymentSuccess() {
         sessionStorage.removeItem('processingOrderId');
       }
     })();
-  }, [selectedAddress, orderItems, tossPaymentKey, tossOrderId, paymentAmount, router, pointsToUse, selectedCoupon?.id, targetSumAfterCoupon, user, discountAmount]);
+  }, [IAddress, orderItems, tossPaymentKey, tossOrderId, paymentAmount, router, pointsToUse, selectedCoupon?.id, targetSumAfterCoupon, user, discountAmount]);
 
   // 3) 대표상품 조회 (위에서 저장한 paymentId로 API 호출)
   useEffect(() => {

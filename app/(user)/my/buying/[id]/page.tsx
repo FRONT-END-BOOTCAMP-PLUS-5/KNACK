@@ -5,11 +5,15 @@ import Image from "next/image";
 import styles from "./buying.module.scss";
 import BuyingFooter from "@/components/my/BuyingFooter";
 import { BuyingHeader } from "@/components/my/BuyingHeader";
-import { OrderPageProps, RepoAddress, RepoOrderItem, Step, STEPS } from "@/types/order";
+import { OrderPageProps, RepoOrderItem, Step, STEPS } from "@/types/order";
 import requester from "@/utils/requester";
 import { useState, useEffect, useMemo } from "react";
 import { STORAGE_PATHS } from "@/constraint/auth";
 import { useRouter } from "next/navigation";
+import RequestModal from "@/components/address/RequestModal";
+import AddressModal from '@/components/address/AddressModal'
+import { formatPhoneNumber } from "@/utils/formatAddressUtils";
+import { IAddress } from "@/types/address";
 
 function ProgressBar({ current }: { current: Step }) {
     const currentIdx = STEPS.indexOf(current);
@@ -48,13 +52,15 @@ export default function OrderPage({ params }: OrderPageProps) {
 
     const router = useRouter();
     const [item, setItem] = useState<RepoOrderItem | null>(null);
-    const [address, setAddress] = useState<RepoAddress | null>(null);
+    const [address, setAddress] = useState<IAddress | null>(null);
     const [meta, setMeta] = useState<{
         paymentNumber?: string;
         status?: string;
         method?: string;
         createdAt?: string;
     }>({});
+    const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+    const [isReqOpen, setReqOpen] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -94,9 +100,9 @@ export default function OrderPage({ params }: OrderPageProps) {
     const phone =
         (address?.phone ?? "") || "-";
     const zip =
-        (address?.zipCode ?? "") || "";
+        (address?.address?.zipCode ?? "") || "";
     const main =
-        (address?.main ?? "") || "";
+        (address?.address?.main ?? "") || "";
     const detail =
         (address?.detail ?? "") || "";
     const message =
@@ -108,6 +114,10 @@ export default function OrderPage({ params }: OrderPageProps) {
     const korname = (item?.product)?.korName ?? "";
     const engname = (item?.product)?.engName ?? "";
     const variant = (item?.optionValue)?.name ?? (item?.optionValue)?.value ?? "";
+
+    useEffect(() => {
+        console.log(address);
+    }, [address]);
 
     return (
         <>
@@ -181,14 +191,14 @@ export default function OrderPage({ params }: OrderPageProps) {
                         <div className={styles.value_strong}>{formatPrice(total)}</div>
                     </div>
 
-                    <button className={styles.subtle_btn}>결제 내역 상세보기</button>
+                    <button className={styles.subtle_btn} onClick={() => router.push(`/my/order/${item?.payment?.paymentNumber}`)}>결제 내역 상세보기</button>
                 </section>
 
                 {/* 배송 주소 */}
                 <section className={styles.section}>
                     <div className={styles.block_title_row}>
                         <div className={styles.block_title}>배송 주소</div>
-                        <button className={styles.link_btn}>배송지 변경</button>
+                        <button className={styles.link_btn} onClick={() => setIsAddressModalOpen(true)}>배송지 변경</button>
                     </div>
 
                     <div className={styles.addr_card}>
@@ -198,7 +208,7 @@ export default function OrderPage({ params }: OrderPageProps) {
                         </div>
                         <div className={styles.addr_row}>
                             <div className={styles.addr_label}>휴대폰 번호</div>
-                            <div className={styles.addr_value}>{phone}</div>
+                            <div className={styles.addr_value}>{formatPhoneNumber(phone)}</div>
                         </div>
                         <div className={styles.addr_row}>
                             <div className={styles.addrLabel}>주소</div>
@@ -211,7 +221,7 @@ export default function OrderPage({ params }: OrderPageProps) {
 
                     <div className={styles.block_title_row_2}>
                         <div className={styles.block_title}>배송 요청사항</div>
-                        <button className={styles.link_btn}>요청사항 변경</button>
+                        <button className={styles.link_btn} onClick={() => setReqOpen(true)}>요청사항 변경</button>
                     </div>
 
                     <div className={styles.addr_card}>
@@ -221,6 +231,53 @@ export default function OrderPage({ params }: OrderPageProps) {
                         </div>
                     </div>
                 </section>
+
+                {isAddressModalOpen && (
+                    <AddressModal
+                        onClose={() => setIsAddressModalOpen(false)}
+                        selectedAddress={address ? {
+                            id: address.id,
+                            name: address.name,
+                            phone: address.phone,
+                            address: {
+                                zipCode: address.address?.zipCode ?? '',
+                                main: address.address?.main ?? '',
+                            },
+                            detail: address.detail ?? '',
+                            message: address.message ?? '',
+                            isDefault: address.isDefault ?? false,
+                        } : null}
+                        onChangeSelected={(a: IAddress) => {
+                            if (!a?.id) return;
+                            const mapped = {
+                                id: a.id,
+                                name: a.name ?? '',
+                                phone: a.phone ?? '',
+                                address: {
+                                    zipCode: a.address.zipCode,
+                                    main: a.address.main,
+                                },
+                                detail: a.detail ?? '',
+                                message: a.message ?? '',
+                                isDefault: a.isDefault ?? false,
+                            };
+                            setAddress(mapped);
+                            sessionStorage.setItem('IAddress', JSON.stringify(mapped));
+                        }}
+                    />
+                )}
+
+                <RequestModal
+                    open={isReqOpen}
+                    value={address?.message ?? ''}
+                    onClose={() => setReqOpen(false)}
+                    onApply={(next) => {
+                        if (!address) return;
+                        const updated = { ...address, message: next };
+                        setAddress(updated);
+                        sessionStorage.setItem('IAddress', JSON.stringify(updated));
+                    }}
+                />
             </main>
 
             {/* 하단 CTA(디자인에 따라 BuyingFooter가 fixed 버튼을 포함할 수도 있음) */}

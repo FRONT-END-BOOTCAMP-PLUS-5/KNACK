@@ -6,7 +6,8 @@ import { useSearchParams } from 'next/navigation'
 import requester from '@/utils/requester'
 import styles from './FailPage.module.scss'
 import { useUserStore } from '@/store/userStore'
-import { OrderItem, SelectedAddress } from '@/types/order'
+import { OrderItem } from '@/types/order'
+import { IAddress } from '@/types/address'
 
 export default function PaymentFail() {
     const sp = useSearchParams()
@@ -21,7 +22,7 @@ export default function PaymentFail() {
     )
 
     const [orderItems, setOrderItems] = useState<OrderItem[]>([])
-    const [selectedAddress, setSelectedAddress] = useState<SelectedAddress>(null)
+    const [address, setAddress] = useState<IAddress | null>(null)
     const [deliveryFee, setDeliveryFee] = useState<number>(0)
     const user = useUserStore(s => s.user)
 
@@ -45,10 +46,10 @@ export default function PaymentFail() {
         }
 
         try {
-            const rawAddress = sessionStorage.getItem('selectedAddress')
-            if (rawAddress) setSelectedAddress(JSON.parse(rawAddress))
+            const rawAddress = sessionStorage.getItem('IAddress')
+            if (rawAddress) setAddress(JSON.parse(rawAddress))
         } catch (e) {
-            console.error('❌ selectedAddress 파싱 실패:', e)
+            console.error('❌ IAddress 파싱 실패:', e)
         }
     }, [])
 
@@ -56,7 +57,7 @@ export default function PaymentFail() {
 
     useEffect(() => {
         const sendFailLog = async () => {
-            if (!user || !selectedAddress?.id || hasRun.current) return
+            if (!user || !address?.id || hasRun.current) return
             hasRun.current = true
 
             try {
@@ -69,7 +70,7 @@ export default function PaymentFail() {
                     failureMessage: message,
                     method: 'TOSS',
                     userId: user.id,
-                    addressId: selectedAddress.id,
+                    addressId: address.id,
                     price: priceSum,
                 })
             } catch (err) {
@@ -78,7 +79,7 @@ export default function PaymentFail() {
         }
 
         sendFailLog()
-    }, [orderId, code, message, user, selectedAddress?.id, orderItems, deliveryFee])
+    }, [orderId, code, message, user, address?.id, orderItems, deliveryFee])
 
     return (
         <div className={styles.fail}>

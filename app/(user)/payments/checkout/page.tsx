@@ -14,7 +14,7 @@ import { IProduct } from '@/types/product';
 import AddressModal from '@/components/address/AddressModal';
 import { formatFullAddress } from '@/utils/formatAddressUtils';
 import RequestModal from '@/components/address/RequestModal';
-import { AddressDtoWithPostalFields, Coupon, CheckoutRow, OrderItem, SelectedAddress, BestCoupon } from '@/types/order';
+import { AddressDtoWithPostalFields, Coupon, CheckoutRow, OrderItem, IAddress, BestCoupon } from '@/types/order';
 import CouponSelectModal from '@/components/Payments/CouponSelectModal';
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
@@ -32,7 +32,7 @@ export default function CheckoutPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [selectedCouponId, setSelectedCouponId] = useState<number | null>(null);
 
-  const [selectedAddress, setSelectedAddress] = useState<{
+  const [IAddress, setIAddress] = useState<{
     id: number;
     name: string;
     phone: string;
@@ -128,13 +128,13 @@ export default function CheckoutPage() {
 
   // ----- save request message -----
   const handleSaveRequestMessage = async () => {
-    if (!selectedAddress?.id) {
+    if (!IAddress?.id) {
       alert('주소가 선택되지 않았습니다.');
       return;
     }
     try {
-      await requester.patch(`/api/addresses/${selectedAddress.id}/message`, {
-        requestMessage: selectedAddress.request,
+      await requester.patch(`/api/addresses/${IAddress.id}/message`, {
+        requestMessage: IAddress.request,
       });
     } catch (e) {
       console.error('요청사항 저장 실패', e);
@@ -145,7 +145,7 @@ export default function CheckoutPage() {
   // ----- payment -----
   const handlePayment = async () => {
     if (!orderItems.length) return alert('상품을 선택해주세요.');
-    if (!selectedAddress) return alert('주소지를 선택해주세요.');
+    if (!IAddress) return alert('주소지를 선택해주세요.');
 
     try {
       await handleSaveRequestMessage();
@@ -173,7 +173,7 @@ export default function CheckoutPage() {
         orderId: `order_${Date.now()}`, // 권장: 서버에서 선발급한 orderNumber 사용
         orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''
           } 주문`,
-        customerName: selectedAddress.name || '홍길동',
+        customerName: IAddress.name || '홍길동',
         successUrl: `${window.location.origin}/payments/success`,
         failUrl: `${window.location.origin}/payments/failure`,
       });
@@ -340,8 +340,8 @@ export default function CheckoutPage() {
             request: def.message ?? '',
             postalCode: zip || undefined,
           };
-          setSelectedAddress(addr);
-          sessionStorage.setItem('selectedAddress', JSON.stringify(addr));
+          setIAddress(addr);
+          sessionStorage.setItem('IAddress', JSON.stringify(addr));
         }
       } catch (err) {
         console.error('주소 불러오기 실패', err);
@@ -352,12 +352,12 @@ export default function CheckoutPage() {
   return (
     <main className={styles.checkout_container}>
       <AddressBox
-        selectedAddress={selectedAddress ?? null}
+        IAddress={IAddress ?? null}
         onOpenModal={() => setIsAddressModalOpen(true)}
         onOpenRequestModal={() => setReqOpen(true)}
         onChangeRequest={(req) => {
-          if (!selectedAddress) return;
-          setSelectedAddress({ ...selectedAddress, request: req }); // zustand 업데이트
+          if (!IAddress) return;
+          setIAddress({ ...IAddress, request: req }); // zustand 업데이트
         }}
       />
 
@@ -415,15 +415,15 @@ export default function CheckoutPage() {
       {isAddressModalOpen && (
         <AddressModal
           onClose={() => setIsAddressModalOpen(false)}
-          selectedAddress={
-            selectedAddress
+          IAddress={
+            IAddress
               ? {
-                ...selectedAddress,
-                request: selectedAddress.request,
+                ...IAddress,
+                request: IAddress.request,
               }
               : null
           }
-          onChangeSelected={(a: SelectedAddress) => {
+          onChangeSelected={(a: IAddress) => {
             const zip =
               (a as unknown as AddressDtoWithPostalFields).postalCode ??
               (a as unknown as AddressDtoWithPostalFields).postCode ??
@@ -442,21 +442,21 @@ export default function CheckoutPage() {
               request: a.request ?? '',
               postalCode: zip || undefined,
             };
-            setSelectedAddress(mapped);
-            sessionStorage.setItem('selectedAddress', JSON.stringify(mapped));
+            setIAddress(mapped);
+            sessionStorage.setItem('IAddress', JSON.stringify(mapped));
           }}
         />
       )}
 
       <RequestModal
         open={isReqOpen}
-        value={selectedAddress?.request ?? ''}
+        value={IAddress?.request ?? ''}
         onClose={() => setReqOpen(false)}
         onApply={(next) => {
-          if (!selectedAddress) return;
-          const updated = { ...selectedAddress, request: next };
-          setSelectedAddress(updated);
-          sessionStorage.setItem('selectedAddress', JSON.stringify(updated));
+          if (!IAddress) return;
+          const updated = { ...IAddress, request: next };
+          setIAddress(updated);
+          sessionStorage.setItem('IAddress', JSON.stringify(updated));
         }}
       />
     </main>

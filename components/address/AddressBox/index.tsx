@@ -6,7 +6,7 @@ import { formatPhoneNumber, phonePattern } from '@/utils/formatAddressUtils'
 import { AddressBoxProps } from '@/types/order'
 
 export default function AddressBox({
-    selectedAddress,
+    IAddress,
     onOpenModal,
     onOpenRequestModal,
     onChangeRequest,
@@ -14,8 +14,8 @@ export default function AddressBox({
     const [request, setRequest] = useState<string>('')
 
     useEffect(() => {
-        setRequest(selectedAddress?.request ?? '')
-    }, [selectedAddress])
+        setRequest(IAddress?.request ?? '')
+    }, [IAddress])
 
     return (
         <div className={styles.container}>
@@ -28,17 +28,17 @@ export default function AddressBox({
                     <button className={styles.change_btn} onClick={onOpenModal}><p className={styles.text_lookup}>주소 변경</p></button>
                 </div>
                 <div className={styles.div_8px} />
-                {selectedAddress ? (
+                {IAddress ? (
                     <>
                         <div className={styles.table}>
                             <div className={styles.label}><p>받는 분</p></div>
-                            <div className={styles.value}>{selectedAddress.name}</div>
+                            <div className={styles.value}>{IAddress.name}</div>
 
                             <div className={styles.label}><p>연락처</p></div>
-                            <div className={styles.value}>{selectedAddress.phone && phonePattern.test(selectedAddress.phone) ? formatPhoneNumber(selectedAddress.phone) : selectedAddress.phone || '-'}</div>
+                            <div className={styles.value}>{IAddress.phone && phonePattern.test(IAddress.phone) ? formatPhoneNumber(IAddress.phone) : IAddress.phone || '-'}</div>
 
                             <div className={styles.label}><p>주소</p></div>
-                            <div className={styles.value}>{selectedAddress.fullAddress}</div>
+                            <div className={styles.value}>{IAddress.fullAddress}</div>
                         </div>
 
                         <div className={styles.request_row} onClick={onOpenRequestModal}>

@@ -1,6 +1,6 @@
 // types/order.ts
-import { AddressDto } from '@/backend/address/applications/dtos/AddressDto';
 import { IOptionValue } from './product';
+import { IAddress, IAddressRef } from './address';
 
 /* ---------- 장바구니/주문 ---------- */
 
@@ -186,6 +186,10 @@ export type RepoAddress = {
 export type RepoOrderItem = {
   id: number;
   productId: number;
+  paymentId: number;
+  payment: {
+    paymentNumber: bigint;
+  }
   price: number | bigint;
   salePrice?: number | bigint;
   quantity?: number;
@@ -215,44 +219,18 @@ export type ProcessedPayment = {
 };
 
 /* ---------- 주소 ---------- */
-export type AddressDtoWithPostalFields = AddressDto & {
-  postalCode?: string;
-  postCode?: string;
-  zipcode?: string;
-  zipCode?: string;
-  zonecode?: string;
-};
-
-export type SelectedAddress = {
-  id: number;
-  name: string;
-  phone?: string;
-  fullAddress?: string;
-  request?: string;
-} | null;
-
-export type ApiAddress = {
-  id: number;
-  name: string;
-  phone: string;
-  zipCode: string;
-  main: string;
-  detail: string | null;
-  message: string | null;
-  isDefault?: boolean;
-};
 
 export interface AddressAddModalProps {
   onClose: () => void;
-  onSaved?: (addr: SelectedAddress) => void;
-  editing?: ApiAddress | null;
+  onSaved?: (addr: IAddress) => void;
+  editing?: IAddress | null;
   /** 신규 등록 시 카카오 검색에서 넘겨줄 초기값 (선택) */
-  initial?: Partial<Pick<ApiAddress, 'zipCode' | 'main'>>;
+  initial?: Partial<Pick<IAddress['address'], 'zipCode' | 'main'>>;
 }
 
 /* AddressBox props */
 export type AddressBoxProps = {
-  selectedAddress: SelectedAddress | null;
+  IAddress: IAddress | null;
   onOpenModal: () => void;
   onOpenRequestModal?: () => void;
   onChangeRequest: (request: string) => void;
@@ -269,8 +247,8 @@ export type RequestModalProps = {
 /* AddressModal props */
 export type AddressModalProps = {
   onClose: () => void;
-  selectedAddress: SelectedAddress | null;
-  onChangeSelected: (addr: SelectedAddress) => void;
+  selectedAddress: IAddress | null;
+  onChangeSelected: (addr: IAddress) => void;
 };
 
 /* ---------- 포인트/결제 요약 ---------- */
