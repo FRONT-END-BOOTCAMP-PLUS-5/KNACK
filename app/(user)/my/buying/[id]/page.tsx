@@ -105,7 +105,6 @@ export default function OrderPage({ params }: OrderPageProps) {
         (async () => {
             try {
                 const res = await requester.get(`/api/orders/${params.id}`);
-                console.log(res.data);
                 const data = res.data ?? {};
                 setItem(data ?? null);
                 setAddress(data.payment?.address ? {

@@ -60,7 +60,6 @@ export default function CheckoutPage() {
 
     // 2) 선택 쿠폰이 실제로 적용 가능한지
     const isCouponApplicable = !!selectedCoupon && orderItems.some((it) => it.productId === selectedCoupon.productId);
-    console.log('isCouponApplicable', isCouponApplicable);
 
     // 3) 해당 상품군 합계(쿠폰 타깃 금액)
     const targetSum = isCouponApplicable

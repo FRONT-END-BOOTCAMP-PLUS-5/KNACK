@@ -25,7 +25,6 @@ export async function GET(
 
         const usecase = new GetOrderByIdUseCase(new PrOrderRepository())
         const order = await usecase.execute(id, userId)
-        console.log(order)
         if (!order) {
             return NextResponse.json({ error: 'not_found' }, { status: 404 })
         }

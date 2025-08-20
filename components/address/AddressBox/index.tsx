@@ -15,7 +15,6 @@ export default function AddressBox({
 
     useEffect(() => {
         setRequest(selectedAddress?.message ?? '')
-        console.log(selectedAddress);
     }, [selectedAddress])
 
     return (

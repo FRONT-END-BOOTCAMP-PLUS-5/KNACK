@@ -47,7 +47,6 @@ export class PrPaymentRepository implements PaymentRepository {
     }
 
     async save(payment: CreatePaymentDto): Promise<number | null> {
-        console.log(payment)
 
         const created = await prisma.payment.create({
             data: {

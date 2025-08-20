@@ -23,7 +23,6 @@ export class GetOrderInPaymentsUseCase {
 
     private mapToDto(p: RepoPayment): GetOrderbyPaymentsDto {
         const items = this.extractItems(p);
-        console.log(items)
         return {
             id: p.id,
             createdAt: p.createdAt ?? new Date(),
