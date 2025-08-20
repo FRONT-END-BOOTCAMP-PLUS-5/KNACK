@@ -14,7 +14,6 @@ export default function SearchCategory() {
   const categoryIdParam = searchParams.get('categoryId');
   const keywordParam = searchParams.get('keyword');
 
-  console.log(categories);
   const isAllTab = () => {
     if (!categoryIdParam && !keywordParam) return true;
     return false;
