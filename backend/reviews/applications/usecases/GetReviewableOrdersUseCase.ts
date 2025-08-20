@@ -1,7 +1,7 @@
-import { ReviewRepository } from '@/backend/reviews/repositories/ReviewRepository';
-import { OrderRepository } from '@/backend/reviews/repositories/OrderRepository';
-import { ReviewDto } from '@/backend/reviews/applications/dtos/ReviewDto';
-import { Order } from '@/backend/reviews/domains/entities/Order';
+import { ReviewRepository } from '../../repositories/ReviewRepository';
+import { OrderRepository } from '../../repositories/OrderRepository';
+import { ReviewDto } from '../dtos/ReviewDto';
+import { Order } from '../../domains/entities/Order';
 
 export class GetReviewableOrdersUseCase {
   constructor(

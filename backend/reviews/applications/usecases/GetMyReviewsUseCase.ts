@@ -1,5 +1,5 @@
-import { ReviewRepository } from '@/backend/reviews/repositories/ReviewRepository';
-import { MyReviewDto } from '@/backend/reviews/applications/dtos/ReviewDto';
+import { ReviewRepository } from '../../repositories/ReviewRepository';
+import { MyReviewDto } from '../dtos/ReviewDto';
 
 export class GetMyReviewsUseCase {
   constructor(private reviewRepository: ReviewRepository) {}
