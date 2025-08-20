@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CreateReviewUseCase } from '../../../backend/reviews/applications/usecases/CreateReviewUseCase';
-import { PrismaReviewRepository } from '../../../backend/reviews/repositories/ReviewRepository';
+import { CreateReviewUseCase } from '@/backend/reviews/applications/usecases/CreateReviewUseCase';
+import { PrismaReviewRepository } from '@/backend/reviews/repositories/ReviewRepository';
 
 export async function POST(request: NextRequest) {
   try {

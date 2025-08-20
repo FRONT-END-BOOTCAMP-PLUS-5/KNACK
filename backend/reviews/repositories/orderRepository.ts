@@ -1,5 +1,5 @@
-import { Order } from '../domains/entities/Order';
-import prisma from '../../utils/prisma';
+import { Order } from '@/backend/reviews/domains/entities/Order';
+import prisma from '@/backend/utils/prisma';
 
 export interface OrderRepository {
   findOrdersWithReviewStatus(userId: string): Promise<Order[]>;

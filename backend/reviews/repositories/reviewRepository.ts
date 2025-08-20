@@ -1,6 +1,6 @@
-import { Review } from '../domains/entities/Review';
-import { ReviewWithRelations } from '../applications/dtos/ReviewDto';
-import prisma from '../../utils/prisma';
+import { Review } from '@/backend/reviews/domains/entities/Review';
+import { ReviewWithRelations } from '@/backend/reviews/applications/dtos/ReviewDto';
+import prisma from '@/backend/utils/prisma';
 
 export interface ReviewRepository {
   findReviewsByUserId(userId: string): Promise<Review[]>;
