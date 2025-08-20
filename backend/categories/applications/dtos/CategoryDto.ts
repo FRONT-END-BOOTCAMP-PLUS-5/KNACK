@@ -9,4 +9,6 @@ export interface SubCategoryDto {
   id: number;
   korName: string;
   engName: string;
+  image?: string;
+  categoryId: number;
 }
