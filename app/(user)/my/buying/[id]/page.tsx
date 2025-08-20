@@ -61,26 +61,12 @@ export default function OrderPage({ params }: OrderPageProps) {
     }>({});
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
     const [isReqOpen, setReqOpen] = useState(false);
+    const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const res = await requester.get(`/api/orders/${params.id}`);
-                console.log(res.data);
-                const data = res.data ?? {};
-                setItem(data ?? null);
-                setAddress(data.payment.address ?? null);
-                setMeta({
-                    paymentNumber: String(data.paymentId ?? ""),
-                    status: data.status,
-                    method: data.method,
-                    createdAt: data.createdAt,
-                });
-            } catch (e) {
-                console.error("Failed to fetch payment data:", e);
-            }
-        })();
-    }, [params.id]);
+    // 하단 버튼 클릭시 완료 처리
+    const handleFooterClick = () => {
+        setIsPaymentCompleted(true);
+    };
 
     // 합계 계산
     const productTotal = useMemo(() => {
@@ -116,8 +102,54 @@ export default function OrderPage({ params }: OrderPageProps) {
     const variant = (item?.optionValue)?.name ?? (item?.optionValue)?.value ?? "";
 
     useEffect(() => {
-        console.log(address);
-    }, [address]);
+        (async () => {
+            try {
+                const res = await requester.get(`/api/orders/${params.id}`);
+                console.log(res.data);
+                const data = res.data ?? {};
+                setItem(data ?? null);
+                setAddress(data.payment?.address ? {
+                    ...data.payment.address,
+                    address: {
+                        zipCode: data.payment.address.zipCode,
+                        main: data.payment.address.main,
+                    }
+                } : null);
+                setMeta({
+                    paymentNumber: String(data.paymentId ?? ""),
+                    status: data.status,
+                    method: data.method,
+                    createdAt: data.createdAt,
+                });
+
+                // status가 CONFIRMED이면 결제 완료 처리
+                if (data.status === 'CONFIRMED') {
+                    setIsPaymentCompleted(true);
+                }
+                // 결제 완료 시간 체크 로직
+                else if (data.payment?.approvedAt) {
+                    const approvedTime = new Date(data.payment.approvedAt).getTime();
+                    const currentTime = new Date().getTime();
+                    const timeDiff = currentTime - approvedTime;
+
+                    // 15분(900000ms) 이상 지났으면 완료 처리
+                    if (timeDiff >= 900000) {
+                        setIsPaymentCompleted(true);
+                        requester.put(`/api/payments/${data.paymentId}`, { status: 'CONFIRMED' });
+                    } else {
+                        // 남은 시간만큼 타이머 설정
+                        const remainingTime = 900000 - timeDiff;
+                        setTimeout(() => {
+                            setIsPaymentCompleted(true);
+                            requester.put(`/api/payments/${data.paymentId}`, { status: 'CONFIRMED' });
+                        }, remainingTime);
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to fetch payment data:", e);
+            }
+        })();
+    }, [params.id]);
 
     return (
         <>
@@ -281,7 +313,9 @@ export default function OrderPage({ params }: OrderPageProps) {
             </main>
 
             {/* 하단 CTA(디자인에 따라 BuyingFooter가 fixed 버튼을 포함할 수도 있음) */}
-            <BuyingFooter />
+            {!isPaymentCompleted ? (
+                <BuyingFooter onClickPayment={handleFooterClick} />
+            ) : null}
         </>
     );
 }

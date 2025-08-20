@@ -205,6 +205,13 @@ export class PrPaymentRepository implements PaymentRepository {
         return data as unknown as RepoPayment | null;
     }
 
+    async updateStatusById(paymentId: number, status: string): Promise<void> {
+        await prisma.payment.update({
+            where: { id: paymentId },
+            data: { status },
+        });
+    }
+
     private toRecord(row: {
         id: number;
         userId: string;

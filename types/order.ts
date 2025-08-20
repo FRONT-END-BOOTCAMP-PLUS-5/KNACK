@@ -195,6 +195,7 @@ export type RepoOrderItem = {
   quantity?: number;
   count?: number;
   tracking?: string | null;
+  approvedAt?: Date;
   createdAt?: Date;
   deliveryStatus?: number;
   optionValueId?: number;
