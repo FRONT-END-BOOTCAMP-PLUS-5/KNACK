@@ -1,8 +1,7 @@
 import Flex from '@/components/common/Flex';
 import styles from './productDetailImage.module.scss';
 import Text from '@/components/common/Text';
-import { STORAGE_PATHS } from '@/constraint/auth';
-import Image from 'next/image';
+import DynamicImage from '../DynamicImage';
 
 interface IProps {
   detailImage?: string | null;
@@ -17,11 +16,9 @@ const ProductDetailImage = ({ detailImage }: IProps) => {
         상세 정보
       </Text>
 
-      <Flex direction="column" gap={40}>
-        {detailImages?.map((item) => (
-          <div className={styles.image_box} key={item}>
-            <Image src={`${STORAGE_PATHS.PRODUCT.DETAIL}/${item}`} fill alt="상품 이미지" />
-          </div>
+      <Flex direction="column">
+        {detailImages?.map((item, index) => (
+          <DynamicImage key={item} src={item} alt={'상세이미지' + index} />
         ))}
       </Flex>
     </section>

@@ -50,7 +50,7 @@ const ProductDetail = async ({ params }: IProps) => {
 
   return (
     <div className={styles.product_detail_container}>
-      <ProductTopImage sliderImage={productData?.subImages ?? ''} />
+      <ProductTopImage thumbnailImage={productData?.thumbnailImage ?? ''} sliderImage={productData?.subImages ?? ''} />
       <DefaultInfo data={productData} />
       <AdditionalBenefits />
       <Divider height={1} paddingHorizontal={16} />
