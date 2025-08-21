@@ -16,6 +16,7 @@ import { useCartStore } from '@/store/cartStore';
 import HeaderCategory from './HeaderCategory';
 import HeaderInput from '../HeaderInput';
 import SearchModal from '../SearchModal';
+import Portal from '../Portal';
 
 export default function Header({
   hideHeaderElements = false,
@@ -147,7 +148,11 @@ export default function Header({
       )}
 
       {/* 검색모달 */}
-      {isSearchModalOpen && <SearchModal handleSearchInputClick={handleSearchInputClick} />}
+      {isSearchModalOpen && (
+        <Portal>
+          <SearchModal handleSearchInputClick={handleSearchInputClick} />
+        </Portal>
+      )}
     </header>
   );
 }
