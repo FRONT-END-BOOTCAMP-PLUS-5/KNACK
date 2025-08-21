@@ -27,4 +27,5 @@ export interface IPageSubCategory {
   categoryId: number;
   korName: string;
   engName: string;
+  image: string;
 }

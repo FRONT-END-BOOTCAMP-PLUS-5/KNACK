@@ -23,7 +23,9 @@ export class PrCategoryRepository implements CategoryRepository {
           category.id,
           category.korName,
           category.engName,
-          category.subCategories.map((sub) => new SubCategory(sub.id, sub.korName, sub.engName, sub.categoryId))
+          category.subCategories.map(
+            (sub) => new SubCategory(sub.id, sub.korName, sub.engName, sub.categoryId, sub.image ?? undefined)
+          )
         )
     );
   }
