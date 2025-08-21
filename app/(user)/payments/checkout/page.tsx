@@ -12,7 +12,6 @@ import FinalOrderSummary from '@/components/Payments/Order/FinalOrderSummary';
 import { AddressDto } from '@/backend/address/applications/dtos/AddressDto';
 import { IProduct } from '@/types/product';
 import AddressModal from '@/components/address/AddressModal';
-import { formatFullAddress } from '@/utils/formatAddressUtils';
 import RequestModal from '@/components/address/RequestModal';
 import { Coupon, CheckoutRow, OrderItem, BestCoupon } from '@/types/order';
 import CouponSelectModal from '@/components/Payments/CouponSelectModal';

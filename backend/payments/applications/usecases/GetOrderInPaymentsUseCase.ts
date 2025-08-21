@@ -13,8 +13,8 @@ export class GetOrderInPaymentsUseCase {
         if (orders.length === 0) return [];
 
         // case A: orders[].orderItems[] (중첩 구조)
-        if ('orderItems' in (orders[0] as RepoOrder)) {
-            return (orders as RepoOrder[]).flatMap(o => o.orderItems ?? []);
+        if ('orderItems' in orders[0]) {
+            return (orders as unknown as RepoOrder[]).flatMap(o => o.orderItems ?? []);
         }
 
         // case B: orders[]가 곧 아이템 레벨 (지금 콘솔 출력 형태)
