@@ -14,6 +14,8 @@ import { cartService } from '@/services/cart';
 import { ICart } from '@/types/cart';
 import { useCartStore } from '@/store/cartStore';
 import HeaderCategory from './HeaderCategory';
+import HeaderInput from '../HeaderInput';
+import SearchModal from '../SearchModal';
 
 export default function Header({
   hideHeaderElements = false,
@@ -27,6 +29,7 @@ export default function Header({
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<HeaderTab>(DEFAULT_ACTIVE_TAB);
   const [carts, setCarts] = useState<ICart[]>([]);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   const { cartCount, setCartCount } = useCartStore();
   const { getCart } = cartService;
@@ -70,6 +73,10 @@ export default function Header({
     setCartCount(carts.length);
   }, [carts.length, setCartCount]);
 
+  const handleSearchInputClick = (state: boolean) => {
+    setIsSearchModalOpen(state);
+  };
+
   return (
     <header className={styles.header}>
       <div className={styles.header_container}>
@@ -89,11 +96,7 @@ export default function Header({
         {/* 검색창 또는 페이지 제목 */}
         {!hideHeaderElements ? (
           <div className={styles.search_container}>
-            <svg className={styles.search_icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
-            <input type="text" placeholder="브랜드, 상품, 태그 등" className={styles.search_input} />
+            <HeaderInput handleSearchInputClick={handleSearchInputClick} />
           </div>
         ) : pageTitle ? (
           <h2 className={styles.page_title}>{pageTitle}</h2>
