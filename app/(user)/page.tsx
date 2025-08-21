@@ -1,25 +1,12 @@
+'use client';
+
+import BannerSlide from '@/components/main/BannerSlide';
+import 'swiper/css';
+
 export default function Home() {
   return (
-    <main>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-      <div>메인</div>
-    </main>
+    <section>
+      <BannerSlide />
+    </section>
   );
 }
