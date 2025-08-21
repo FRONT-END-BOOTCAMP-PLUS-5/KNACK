@@ -1,0 +1,248 @@
+$page-max: 428px;
+$bg: #fff;
+$bg-soft: #fafafa;
+$text: #111;
+$text-weak: #777;
+$line: #eee;
+$accent: #111; // 심플 블랙 느낌
+
+.page {
+    max-width: $page-max;
+    margin: 0 auto;
+    color: $text;
+    background: $bg;
+}
+
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 40px 1fr 40px;
+    align-items: center;
+    padding: 12px 12px;
+    background: $bg;
+
+    h1 {
+        margin: 0;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 700;
+    }
+}
+
+.back_btn {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: $text;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+}
+
+.header_spacer {
+    width: 32px;
+    height: 32px;
+}
+
+.meta_row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    font-size: 14px;
+}
+
+.meta_row_2 {
+    display: flex;
+    padding: 12px 16px;
+    font-size: 14px;
+}
+
+.meta_label {
+    color: $text;
+    font-weight: 600;
+    display: flex;
+}
+
+.meta_value {
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.card {
+    background: $bg;
+}
+
+.item_row {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    column-gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid $line;
+}
+
+.thumb {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: $bg-soft;
+}
+
+.item_body {
+    display: grid;
+    gap: 4px;
+}
+
+.item_top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .orderNumber {
+        font-size: 12px;
+        color: $text-weak;
+    }
+}
+
+.badge {
+    font-size: 11px;
+    color: #555;
+    background: #f2f2f2;
+    padding: 2px 6px;
+    border-radius: 999px;
+    border: 1px solid #e7e7e7;
+}
+
+.title_line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.title {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chevron {
+    color: $text-weak;
+}
+
+.option {
+    font-size: 12px;
+    color: $text-weak;
+}
+
+.total_card {
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 16px;
+    border-bottom: 1px solid $line;
+    background: rgb(250, 250, 250);
+
+    .total_label {
+        color: $text;
+        font-weight: 600;
+        font-size: 18px;
+        margin-bottom: 4px;
+    }
+
+    .total_value {
+        font-size: 22px;
+        font-weight: 800;
+        left: 80%;
+        position: relative;
+    }
+}
+
+.detail_card {
+    padding: 4px 0 8px;
+    background: $bg;
+    border-bottom: 1px solid #eee;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+
+.label {
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tip {
+    display: inline-block;
+    font-size: 12px;
+    color: $text-weak;
+    border: 1px solid $line;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    text-align: center;
+    line-height: 14px;
+    cursor: help;
+}
+
+.value {
+    font-size: 14px;
+}
+
+.value_strong {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.value_muted {
+    color: $text-weak;
+}
+
+.meta_group {
+    padding: 12px 16px;
+    border-bottom: 1px solid $line;
+}
+
+.meta_group_2 {
+    padding: 12px 16px;
+}
+
+.meta_title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.meta_notice {
+    font-size: 12px;
+    color: $text-weak;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+/* 작은 화면 최적화 */
+@media (max-width: 360px) {
+    .title {
+        font-size: 13px;
+    }
+
+    .total_value {
+        font-size: 20px;
+    }
+}

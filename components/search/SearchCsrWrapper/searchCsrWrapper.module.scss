@@ -1,0 +1,10 @@
+.sticky_wrapper {
+  position: sticky;
+  top: 97px;
+  background-color: $white;
+  z-index: 1;
+}
+
+.stuck {
+  border-bottom: 1px solid $light-gray04;
+}

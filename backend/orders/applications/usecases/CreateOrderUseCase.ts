@@ -4,7 +4,7 @@ import { OrderRepository } from '../../domains/repositories/OrderRepository';
 import { CreateOrderItemDto } from '../dtos/CreateOrderItemDto';
 
 export class CreateOrderUseCase {
-  constructor(private repo: OrderRepository) {}
+  constructor(private repo: OrderRepository) { }
 
   async execute(input: { userId: string; items: CreateOrderItemDto[] }): Promise<number[]> {
     const now = new Date();
@@ -18,6 +18,8 @@ export class CreateOrderUseCase {
       deliveryStatus: 1, // Convert string to number based on schema
       createdAt: now,
       optionValueId: item.optionValueId,
+      couponPrice: item.couponPrice ?? 0,
+      point: item.point ?? 0,
     }));
 
     return this.repo.saveMany(orders);

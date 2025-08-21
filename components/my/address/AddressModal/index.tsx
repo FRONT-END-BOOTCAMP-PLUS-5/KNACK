@@ -15,11 +15,11 @@ import { IAddress } from '@/types/address';
 
 interface IProps {
   open?: boolean;
-  addressInfo?: IAddress;
+  addressInfo: IAddress;
   modalType?: 'default' | 'change' | 'add';
   setOpen: (status: boolean) => void;
   onChangeAddressInfo?: <K extends keyof IAddress>(key: K, value: IAddress[K]) => void;
-  onClickSave?: () => void;
+  onClickSave?: (selectAddress: IAddress) => void;
 }
 
 const AddressModal = ({ addressInfo, modalType, setOpen, onChangeAddressInfo, onClickSave }: IProps) => {
@@ -32,7 +32,7 @@ const AddressModal = ({ addressInfo, modalType, setOpen, onChangeAddressInfo, on
     onChangeAddressInfo?.('address', { main: data.address, zipCode: data.zonecode });
   };
 
-  const handleSave = () => {
+  const handleSave = (addressInfo: IAddress) => {
     if (!addressInfo?.name) {
       setMessage('받으시는분이 입력되지 않았어요.');
       setMessageOpen(true);
@@ -57,7 +57,7 @@ const AddressModal = ({ addressInfo, modalType, setOpen, onChangeAddressInfo, on
       return;
     }
 
-    onClickSave?.();
+    onClickSave?.(addressInfo);
   };
 
   useEffect(() => {
@@ -142,7 +142,10 @@ const AddressModal = ({ addressInfo, modalType, setOpen, onChangeAddressInfo, on
         </label>
       </Flex>
       <Flex paddingHorizontal={20}>
-        <button className={`${styles.address_save_button} ${enterCheck && styles.active}`} onClick={handleSave}>
+        <button
+          className={`${styles.address_save_button} ${enterCheck && styles.active}`}
+          onClick={() => handleSave(addressInfo)}
+        >
           저장하기
         </button>
       </Flex>
