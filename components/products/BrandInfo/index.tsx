@@ -12,6 +12,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { likeService } from '@/services/like';
 import { IBrandLikeList } from '@/types/like';
 import { useLikeStore } from '@/store/likeStore';
+import Snackbar from '@mui/material/Snackbar';
+import Link from 'next/link';
+import SnackbarContent from '@mui/material/SnackbarContent';
+import Slide from '@mui/material/Slide';
 
 interface IProps {
   brandData?: IBrand;
@@ -21,6 +25,7 @@ const BrandInfo = ({ brandData }: IProps) => {
   const { addBrandLike, getBrandLikes, deleteBrandLike } = likeService;
   const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
   const [likedCheck, setLikedCheck] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
 
   const { productDetailBrandLike, setProductDetailBrandLike } = useLikeStore();
 
@@ -71,8 +76,9 @@ const BrandInfo = ({ brandData }: IProps) => {
           .then((res) => {
             if (res.status === 200) {
               handleGetBrandLikes();
-              alert('잘 담겼어요!');
+
               setProductDetailBrandLike(productDetailBrandLike + 1);
+              setToastOpen(true);
             }
           })
           .catch((error) => {
@@ -123,6 +129,25 @@ const BrandInfo = ({ brandData }: IProps) => {
       <button className={styles.brand_like_button} onClick={() => handleAddBrandLike(brandData?.id ?? 0)}>
         <Image src={likedCheck ? onBookMark : bookmark} alt="좋아요" width={22} height={22} />
       </button>
+
+      <Snackbar
+        className={styles.toast_contianer}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        open={toastOpen}
+        onClose={() => setToastOpen(false)}
+        slots={{ transition: Slide }}
+        // autoHideDuration={3000}
+      >
+        <SnackbarContent
+          className={styles.toast_content}
+          message="관심 브랜드에 저장되었습니다."
+          action={
+            <Link className={styles.toast_move_button} href={'/saved'}>
+              보러가기
+            </Link>
+          }
+        />
+      </Snackbar>
     </article>
   );
 };

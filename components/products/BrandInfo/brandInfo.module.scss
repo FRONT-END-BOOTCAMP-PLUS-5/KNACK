@@ -2,6 +2,7 @@
   padding: 20px 16px;
   display: flex;
   width: 100%;
+  position: relative;
 
   & .brand_logo_wrap {
     border-radius: 50%;
@@ -16,4 +17,32 @@
   background: #fff;
   border: none;
   cursor: pointer;
+}
+
+.toast_contianer {
+  display: flex;
+  justify-content: center;
+  margin-left: none;
+  width: 100%;
+
+  & > div {
+    font-size: 1.4rem;
+  }
+}
+
+.toast_content {
+  max-width: 90%;
+}
+
+.toast_move_button {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  font-size: 1.4rem;
+  text-decoration: underline;
+  padding-right: 10px;
+}
+
+.font_size {
+  font-size: 1.4rem;
 }
