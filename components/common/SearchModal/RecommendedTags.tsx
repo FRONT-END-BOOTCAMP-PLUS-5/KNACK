@@ -29,7 +29,7 @@ export default function RecommendedTags({ handleSearchInputClick }: IProps) {
         </div>
         <div className={styles.layer_search_item_content_wrap}>
           <div className={styles.search_card_tag_wrap}>
-            {CATEGORY_ALL_TAB.subCategories.map((tag, index) => (
+            {CATEGORY_ALL_TAB.subCategories.slice(0, 6).map((tag, index) => (
               <div key={index} className={styles.search_card_tag} onClick={() => handleTagClick(tag.value)}>
                 <span>{tag.name}</span>
               </div>
