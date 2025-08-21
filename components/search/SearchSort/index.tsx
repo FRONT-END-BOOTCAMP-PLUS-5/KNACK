@@ -9,7 +9,7 @@ import filterArrow from '@/public/icons/filter_arrow.svg';
 import checkCircle from '@/public/icons/check_circle.svg';
 import checkIcon from '@/public/icons/check.svg';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createPortal } from 'react-dom';
+import Portal from '@/components/common/Portal';
 
 interface IProps {
   filterQuery: ISearchProductListRequest;
@@ -77,8 +77,8 @@ export default function SearchSort({ filterQuery }: IProps) {
 
         <Image src={filterArrow} alt={'리스트 정렬 아이콘'} width={16} height={16} />
       </div>
-      {isSortModalOpen &&
-        createPortal(
+      {isSortModalOpen && (
+        <Portal>
           <section className={styles.sort_bottom_sheet}>
             <ul>
               {PRODUCT_FILTER_SORT.map((item) => (
@@ -95,9 +95,9 @@ export default function SearchSort({ filterQuery }: IProps) {
               ))}
             </ul>
             <div className={styles.background_black} onClick={() => setIsSortModalOpen(false)} />
-          </section>,
-          document.body
-        )}
+          </section>
+        </Portal>
+      )}
     </section>
   );
 }
