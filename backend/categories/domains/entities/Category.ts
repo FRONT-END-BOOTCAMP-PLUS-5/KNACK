@@ -12,6 +12,7 @@ export class SubCategory {
     public readonly id: number,
     public readonly korName: string,
     public readonly engName: string,
-    public readonly categoryId: number
+    public readonly categoryId: number,
+    public readonly image?: string
   ) {}
 }

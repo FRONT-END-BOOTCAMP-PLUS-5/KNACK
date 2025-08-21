@@ -37,5 +37,6 @@ export const STORAGE_PATHS = {
     SLIDER: `${STORAGE_PREFIX}/uploads/product/slider`,
     DETAIL: `${STORAGE_PREFIX}/uploads/product/detail`,
     LOGO: `${STORAGE_PREFIX}/uploads/product/logo`,
+    CATEGORY: `${STORAGE_PREFIX}/uploads/product/category`,
   },
 };

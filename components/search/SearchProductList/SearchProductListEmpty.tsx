@@ -17,9 +17,11 @@ export default function SearchProductListEmpty() {
       <Text size={1.3} color="gray3" weight={400} className={styles.empty_text}>
         {emptyText}
       </Text>
-      <button className={styles.empty_button} type="button" onClick={clearFilters}>
-        필터 초기화
-      </button>
+      {!keyword && (
+        <button className={styles.empty_button} type="button" onClick={clearFilters}>
+          필터 초기화
+        </button>
+      )}
     </Flex>
   );
 }

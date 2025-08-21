@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import styles from './header.module.scss';
 import { HEADER_TABS, DEFAULT_ACTIVE_TAB, HeaderTab } from '@/constraint/header';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { IProps } from '@/types/header';
 import Image from 'next/image';
 import BellIcon from '@/public/icons/bell.svg';
@@ -13,6 +13,7 @@ import HomeIcon from '@/public/icons/home.svg';
 import { cartService } from '@/services/cart';
 import { ICart } from '@/types/cart';
 import { useCartStore } from '@/store/cartStore';
+import HeaderCategory from './HeaderCategory';
 
 export default function Header({
   hideHeaderElements = false,
@@ -23,6 +24,7 @@ export default function Header({
   showHomeButton = false,
 }: IProps) {
   // 현재 활성화된 탭 상태 관리
+  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<HeaderTab>(DEFAULT_ACTIVE_TAB);
   const [carts, setCarts] = useState<ICart[]>([]);
 
@@ -123,7 +125,8 @@ export default function Header({
       </div>
 
       {/* 탭 네비게이션 */}
-      {!hideHeaderElements && (
+      {!hideHeaderElements && pathname === '/search' && <HeaderCategory />}
+      {!hideHeaderElements && pathname !== '/search' && (
         <nav className={styles.tab_navigation} aria-label="카테고리 탭">
           <ul className={styles.tab_list}>
             {HEADER_TABS.map((tab) => (

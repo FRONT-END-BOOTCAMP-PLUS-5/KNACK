@@ -9,6 +9,7 @@ import filterArrow from '@/public/icons/filter_arrow.svg';
 import checkCircle from '@/public/icons/check_circle.svg';
 import checkIcon from '@/public/icons/check.svg';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { createPortal } from 'react-dom';
 
 interface IProps {
   filterQuery: ISearchProductListRequest;
@@ -76,25 +77,27 @@ export default function SearchSort({ filterQuery }: IProps) {
 
         <Image src={filterArrow} alt={'리스트 정렬 아이콘'} width={16} height={16} />
       </div>
-      {isSortModalOpen && (
-        <section className={styles.sort_bottom_sheet}>
-          <ul>
-            {PRODUCT_FILTER_SORT.map((item) => (
-              <li
-                key={item.id}
-                className={isSortActive(item.value) ? styles.active : ''}
-                onClick={() => onClickSort(item.value)}
-              >
-                <Flex justify="between">
-                  <p>{item.name}</p>
-                  {isSortActive(item.value) && <Image src={checkIcon} alt={'체크 아이콘'} width={16} height={16} />}
-                </Flex>
-              </li>
-            ))}
-          </ul>
-          <div className={styles.background_black} onClick={() => setIsSortModalOpen(false)} />
-        </section>
-      )}
+      {isSortModalOpen &&
+        createPortal(
+          <section className={styles.sort_bottom_sheet}>
+            <ul>
+              {PRODUCT_FILTER_SORT.map((item) => (
+                <li
+                  key={item.id}
+                  className={isSortActive(item.value) ? styles.active : ''}
+                  onClick={() => onClickSort(item.value)}
+                >
+                  <Flex justify="between">
+                    <p>{item.name}</p>
+                    {isSortActive(item.value) && <Image src={checkIcon} alt={'체크 아이콘'} width={16} height={16} />}
+                  </Flex>
+                </li>
+              ))}
+            </ul>
+            <div className={styles.background_black} onClick={() => setIsSortModalOpen(false)} />
+          </section>,
+          document.body
+        )}
     </section>
   );
 }
