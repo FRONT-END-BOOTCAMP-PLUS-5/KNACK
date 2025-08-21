@@ -1,0 +1,33 @@
+.image_box {
+  max-width: 440px;
+  width: 100%;
+  height: auto;
+  padding-top: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgb(244, 244, 244);
+}
+
+.swiper_slide {
+  display: flex !important;
+  justify-content: center;
+  width: 87% !important;
+}
+
+.swiper_container {
+  position: relative;
+  padding: 12px 0;
+
+  & .swiper_index {
+    background: #00000045;
+    padding: 5px 10px;
+    position: absolute;
+    bottom: 24px;
+    right: 45px;
+    z-index: 100;
+    color: #fff;
+    border-radius: 10px;
+    font-size: 1.2rem;
+  }
+}

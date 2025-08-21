@@ -1,3 +1,5 @@
+'use client';
+
 import { useCategoryStore } from '@/store/categoryStore';
 import { useSearchParams } from 'next/navigation';
 import { CATEGORY_ALL_TAB } from '@/constraint/header';
