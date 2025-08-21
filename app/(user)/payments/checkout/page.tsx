@@ -12,10 +12,10 @@ import FinalOrderSummary from '@/components/Payments/Order/FinalOrderSummary';
 import { AddressDto } from '@/backend/address/applications/dtos/AddressDto';
 import { IProduct } from '@/types/product';
 import AddressModal from '@/components/address/AddressModal';
-import { formatFullAddress } from '@/utils/formatAddressUtils';
 import RequestModal from '@/components/address/RequestModal';
-import { AddressDtoWithPostalFields, Coupon, CheckoutRow, OrderItem, SelectedAddress, BestCoupon } from '@/types/order';
+import { Coupon, CheckoutRow, OrderItem, BestCoupon } from '@/types/order';
 import CouponSelectModal from '@/components/Payments/CouponSelectModal';
+import { IAddress } from '@/types/address';
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
 
@@ -24,7 +24,7 @@ export default function CheckoutPage() {
   const [checkout, setCheckout] = useState<CheckoutRow[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [deliveryType, setDeliveryType] = useState<'FAST' | 'STOCK'>('FAST');
-  const [deliveryFee, setDeliveryFee] = useState<number>(5000);
+  const [deliveryFee, setDeliveryFee] = useState<number>(0);
 
   // ✅ 포인트/쿠폰 상태
   const [availablePoints, setAvailablePoints] = useState<number>(0);
@@ -32,14 +32,7 @@ export default function CheckoutPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [selectedCouponId, setSelectedCouponId] = useState<number | null>(null);
 
-  const [selectedAddress, setSelectedAddress] = useState<{
-    id: number;
-    name: string;
-    phone: string;
-    fullAddress: string;
-    request: string;
-    postalCode?: string;
-  } | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<IAddress | null>(null);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isReqOpen, setReqOpen] = useState(false);
   const [isOpenCouponModal, setOpenCouponModal] = useState(false);
@@ -70,8 +63,8 @@ export default function CheckoutPage() {
     // 3) 해당 상품군 합계(쿠폰 타깃 금액)
     const targetSum = isCouponApplicable
       ? orderItems
-          .filter((it) => it.productId === selectedCoupon!.productId)
-          .reduce((s, it) => s + it.price * it.quantity, 0)
+        .filter((it) => it.productId === selectedCoupon!.productId)
+        .reduce((s, it) => s + it.price * it.quantity, 0)
       : 0;
 
     // 4) 쿠폰 할인금액 (과할인 방지)
@@ -80,7 +73,7 @@ export default function CheckoutPage() {
       : 0;
 
     // 5) 배송비
-    const shippingFee = deliveryType === 'FAST' ? 5000 : 0;
+    const shippingFee = 0;
 
     // 6) 쿠폰 적용 후 상품금액
     const productAfterCoupon = Math.max(0, baseSum - couponDiscount);
@@ -100,7 +93,7 @@ export default function CheckoutPage() {
       applicableCount: applicableCoupons.length,
       isCouponApplicable,
     };
-  }, [orderItems, selectedCoupon, deliveryType, applicableCoupons.length]);
+  }, [orderItems, selectedCoupon, applicableCoupons.length]);
 
   // ----- totals -----
   const priceWithoutDelivery = useMemo(
@@ -133,7 +126,7 @@ export default function CheckoutPage() {
     }
     try {
       await requester.patch(`/api/addresses/${selectedAddress.id}/message`, {
-        requestMessage: selectedAddress.request,
+        requestMessage: selectedAddress.message,
       });
     } catch (e) {
       console.error('요청사항 저장 실패', e);
@@ -170,9 +163,8 @@ export default function CheckoutPage() {
       await toss.requestPayment('카드', {
         amount: totalPrice,
         orderId: `order_${Date.now()}`, // 권장: 서버에서 선발급한 orderNumber 사용
-        orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${
-          orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''
-        } 주문`,
+        orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''
+          } 주문`,
         customerName: selectedAddress.name || '홍길동',
         successUrl: `${window.location.origin}/payments/success`,
         failUrl: `${window.location.origin}/payments/failure`,
@@ -208,19 +200,19 @@ export default function CheckoutPage() {
         const items: OrderItem[] = results.flatMap((p, i) =>
           p
             ? [
-                {
-                  productId: p.id,
-                  price: p.price,
-                  quantity: checkout[i].quantity,
-                  thumbnail_image: p.thumbnailImage,
-                  deliveryType: checkout[i].deliveryMethod,
-                  kor_name: p.korName,
-                  eng_name: p.engName,
-                  optionValue: p?.productOptionMappings[0]?.optionType?.optionValue?.find(
-                    (item) => item?.id === checkout[i]?.optionValueId
-                  ),
-                },
-              ]
+              {
+                productId: p.id,
+                price: p.price,
+                quantity: checkout[i].quantity,
+                thumbnail_image: p.thumbnailImage,
+                deliveryType: checkout[i].deliveryMethod,
+                kor_name: p.korName,
+                eng_name: p.engName,
+                optionValue: p?.productOptionMappings[0]?.optionType?.optionValue?.find(
+                  (item) => item?.id === checkout[i]?.optionValueId
+                ),
+              },
+            ]
             : []
         );
 
@@ -241,7 +233,14 @@ export default function CheckoutPage() {
         // 쿠폰 조회
         const { data: couponRes } = await requester.get('/api/coupon');
         const fetched = couponRes?.result ?? couponRes ?? [];
-        setCoupons(fetched);
+
+        // 구매한 상품 ID 목록
+        const purchasedProductIds = new Set(orderItems.map(item => item.productId));
+
+        // 구매한 상품에 적용 가능한 쿠폰만 필터링
+        const validCoupons = fetched.filter((coupon: Coupon) => purchasedProductIds.has(coupon.productId));
+
+        setCoupons(validCoupons);
 
         // 1) productId별 주문 합계 사전 집계 (최적화)
         const totalsByProductId = orderItems.reduce<Map<number, number>>((map, it) => {
@@ -284,61 +283,17 @@ export default function CheckoutPage() {
         const addresses: AddressDto[] = res.data;
         const def = addresses.find((a) => a.isDefault);
         if (def) {
-          const zip =
-            (
-              def as AddressDto & {
-                postalCode?: string;
-                postCode?: string;
-                zipcode?: string;
-                zipCode?: string;
-                zonecode?: string;
-              }
-            ).postalCode ??
-            (
-              def as AddressDto & {
-                postalCode?: string;
-                postCode?: string;
-                zipcode?: string;
-                zipCode?: string;
-                zonecode?: string;
-              }
-            ).postCode ??
-            (
-              def as AddressDto & {
-                postalCode?: string;
-                postCode?: string;
-                zipcode?: string;
-                zipCode?: string;
-                zonecode?: string;
-              }
-            ).zipcode ??
-            (
-              def as AddressDto & {
-                postalCode?: string;
-                postCode?: string;
-                zipcode?: string;
-                zipCode?: string;
-                zonecode?: string;
-              }
-            ).zipCode ??
-            (
-              def as AddressDto & {
-                postalCode?: string;
-                postCode?: string;
-                zipcode?: string;
-                zipCode?: string;
-                zonecode?: string;
-              }
-            ).zonecode ??
-            '';
-
           const addr = {
             id: def.id,
             name: def.name,
             phone: def.phone ?? '',
-            fullAddress: formatFullAddress(def), // ✅ [우편번호] + 주소
-            request: def.message ?? '',
-            postalCode: zip || undefined,
+            detail: def.detail ?? '',
+            message: def.message ?? '',
+            isDefault: def.isDefault ?? false,
+            address: {
+              zipCode: def.address.zipCode,
+              main: def.address.main,
+            },
           };
           setSelectedAddress(addr);
           sessionStorage.setItem('selectedAddress', JSON.stringify(addr));
@@ -357,7 +312,7 @@ export default function CheckoutPage() {
         onOpenRequestModal={() => setReqOpen(true)}
         onChangeRequest={(req) => {
           if (!selectedAddress) return;
-          setSelectedAddress({ ...selectedAddress, request: req }); // zustand 업데이트
+          setSelectedAddress({ ...selectedAddress, message: req }); // zustand 업데이트
         }}
       />
 
@@ -367,7 +322,7 @@ export default function CheckoutPage() {
         deliveryType={deliveryType}
         onChangeDelivery={(t) => {
           setDeliveryType(t);
-          setDeliveryFee(t === 'FAST' ? 5000 : 0);
+          setDeliveryFee(0);
         }}
         // 💰 금액(전부 부모 계산)
         baseSum={pricing.baseSum}
@@ -418,19 +373,14 @@ export default function CheckoutPage() {
           selectedAddress={
             selectedAddress
               ? {
-                  ...selectedAddress,
-                  request: selectedAddress.request,
-                }
+                ...selectedAddress,
+                message: selectedAddress.message,
+              }
               : null
           }
-          onChangeSelected={(a: SelectedAddress) => {
+          onChangeSelected={(a: IAddress) => {
             const zip =
-              (a as unknown as AddressDtoWithPostalFields).postalCode ??
-              (a as unknown as AddressDtoWithPostalFields).postCode ??
-              (a as unknown as AddressDtoWithPostalFields).zipcode ??
-              (a as unknown as AddressDtoWithPostalFields).zipCode ??
-              (a as unknown as AddressDtoWithPostalFields).zonecode ??
-              '';
+              a.address.zipCode ?? '';
 
             if (!a?.id) return; // Early return if no valid address
 
@@ -438,9 +388,13 @@ export default function CheckoutPage() {
               id: a.id,
               name: a.name ?? '',
               phone: a.phone ?? '',
-              fullAddress: a.fullAddress ?? '',
-              request: a.request ?? '',
-              postalCode: zip || undefined,
+              address: {
+                zipCode: zip,
+                main: a.address.main,
+              },
+              detail: a.detail ?? '',
+              message: a.message ?? '',
+              isDefault: a.isDefault ?? false,
             };
             setSelectedAddress(mapped);
             sessionStorage.setItem('selectedAddress', JSON.stringify(mapped));
@@ -450,11 +404,11 @@ export default function CheckoutPage() {
 
       <RequestModal
         open={isReqOpen}
-        value={selectedAddress?.request ?? ''}
+        value={selectedAddress?.message ?? ''}
         onClose={() => setReqOpen(false)}
         onApply={(next) => {
           if (!selectedAddress) return;
-          const updated = { ...selectedAddress, request: next };
+          const updated = { ...selectedAddress, message: next }; // ← 여기!
           setSelectedAddress(updated);
           sessionStorage.setItem('selectedAddress', JSON.stringify(updated));
         }}

@@ -5,4 +5,6 @@ export interface CreateOrderItemDto {
   price: number;
   salePrice?: number;
   optionValueId: number;
+  couponPrice?: number;
+  point?: number;
 }

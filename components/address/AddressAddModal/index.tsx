@@ -3,12 +3,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import styles from './addressAddModal.module.scss'
 import requester from '@/utils/requester'
-import { formatAddressDisplay } from '@/utils/formatAddressUtils' // 주소 포맷터만 재사용 중이면 그대로 두고, 아니라면 유틸 이름 변경 권장
-import type { ApiAddress, SelectedAddress } from '@/types/order'
 import Image from 'next/image'
 import { AddressAddModalProps } from '@/types/order'
 import DaumPostcodeEmbed, { Address } from 'react-daum-postcode'
 import CloseLarge from '@/public/icons/close_large.svg';
+import { IAddress } from '@/types/address'
 
 const NAME_MIN = 2
 const NAME_MAX = 50
@@ -17,8 +16,8 @@ const phonePattern = /^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/
 export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressAddModalProps) {
     const isEdit = !!editing
 
-    const [zipCode, setZipCode] = useState(editing?.zipCode ?? initial?.zipCode ?? '')
-    const [main, setMain] = useState(editing?.main ?? initial?.main ?? '')
+    const [zipCode, setZipCode] = useState(editing?.address?.zipCode ?? initial?.zipCode ?? '')
+    const [main, setMain] = useState(editing?.address?.main ?? initial?.main ?? '')
     const [detail, setDetail] = useState(editing?.detail ?? '')
     const [name, setName] = useState(editing?.name ?? '')
     const [phone, setPhone] = useState(editing?.phone ?? '')
@@ -67,12 +66,12 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
         const payload = { name, phone, zipCode, main, detail }
 
         try {
-            let saved: ApiAddress
+            let saved: IAddress
             if (isEdit && editing) {
-                const res = await requester.put<ApiAddress>(`/api/addresses/${editing.id}`, payload)
+                const res = await requester.put<IAddress>(`/api/addresses/${editing.id}`, payload)
                 saved = { ...res.data, id: editing.id }
             } else {
-                const res = await requester.post<ApiAddress>('/api/addresses', { ...payload })
+                const res = await requester.post<IAddress>('/api/addresses', { ...payload })
                 saved = res.data
             }
 
@@ -82,18 +81,19 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
                 await requester.patch(`/api/addresses/${saved.id}`)
             }
 
-            const selected: SelectedAddress = {
+            const selected: IAddress = {
                 id: saved.id,
                 name: saved.name,
                 phone: saved.phone ?? '',
-                fullAddress: formatAddressDisplay({
-                    zipCode: saved.zipCode,
-                    main: saved.main,
-                    detail: saved.detail,
-                }),
-                request: saved.message ?? '',
+                detail: saved.detail ?? '',
+                isDefault: saved.isDefault,
+                message: saved.message ?? '',
+                address: {
+                    zipCode: saved.address.zipCode,
+                    main: saved.address.main,
+                },
             }
-            sessionStorage.setItem('selectedAddress', JSON.stringify(selected))
+            sessionStorage.setItem('IAddress', JSON.stringify(selected))
             onSaved?.(selected)
             onClose()
         } catch (e) {
@@ -104,8 +104,8 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
 
     // editing/initial이 바뀌어도 폼이 갱신되도록
     useEffect(() => {
-        setZipCode(editing?.zipCode ?? initial?.zipCode ?? '')
-        setMain(editing?.main ?? initial?.main ?? '')
+        setZipCode(editing?.address.zipCode ?? initial?.zipCode ?? '')
+        setMain(editing?.address.main ?? initial?.main ?? '')
         setDetail(editing?.detail ?? '')
         setName(editing?.name ?? '')
         setPhone(editing?.phone ?? '')

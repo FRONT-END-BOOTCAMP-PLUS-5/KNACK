@@ -1,0 +1,25 @@
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 40px 1fr 40px;
+    align-items: center;
+    height: 44px;
+    padding: 0 12px;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+
+    h1 {
+        text-align: center;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .back,
+    .menu {
+        border: 0;
+        background: none;
+        cursor: pointer;
+    }
+}

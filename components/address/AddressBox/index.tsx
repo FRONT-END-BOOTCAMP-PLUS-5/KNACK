@@ -14,7 +14,7 @@ export default function AddressBox({
     const [request, setRequest] = useState<string>('')
 
     useEffect(() => {
-        setRequest(selectedAddress?.request ?? '')
+        setRequest(selectedAddress?.message ?? '')
     }, [selectedAddress])
 
     return (
@@ -38,7 +38,7 @@ export default function AddressBox({
                             <div className={styles.value}>{selectedAddress.phone && phonePattern.test(selectedAddress.phone) ? formatPhoneNumber(selectedAddress.phone) : selectedAddress.phone || '-'}</div>
 
                             <div className={styles.label}><p>주소</p></div>
-                            <div className={styles.value}>{selectedAddress.fullAddress}</div>
+                            <div className={styles.value}>({selectedAddress.address.zipCode}) {selectedAddress.address.main} {selectedAddress.detail}</div>
                         </div>
 
                         <div className={styles.request_row} onClick={onOpenRequestModal}>

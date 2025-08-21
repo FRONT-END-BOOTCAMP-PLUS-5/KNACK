@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '../../auth/[...nextauth]/auth'
 import { GetOrderByIdUseCase } from '@/backend/orders/applications/usecases/GetOrderByIdUseCase'
 import { PrOrderRepository } from '@/backend/orders/repositories/PrOrderRepository'
+import { serializeBigInt } from '@/utils/orders'
 
 export async function GET(
     _req: NextRequest,
@@ -27,9 +28,12 @@ export async function GET(
         if (!order) {
             return NextResponse.json({ error: 'not_found' }, { status: 404 })
         }
-        return NextResponse.json(order)
+        return NextResponse.json(serializeBigInt(order))
     } catch (e) {
         console.error('[GET /api/orders/[id]] failed:', e)
         return NextResponse.json({ error: 'internal_error' }, { status: 500 })
     }
 }
+
+
+

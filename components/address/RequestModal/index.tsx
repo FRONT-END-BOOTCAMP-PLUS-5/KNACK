@@ -11,6 +11,15 @@ export default function RequestModal({ open, value, onClose, onApply }: RequestM
     const [custom, setCustom] = useState<string>('');
     const inputRef = useRef<HTMLInputElement>(null);
 
+
+    const isCustom = selected === '직접 입력';
+    const canApply = useMemo(() => {
+        if (selected === '요청사항 없음') return true;
+        if (isCustom) return custom.trim().length > 0;
+        return !!selected;
+    }, [selected, isCustom, custom]);
+
+
     // 초기 선택값 동기화
     useEffect(() => {
         if (!open) return;
@@ -27,13 +36,6 @@ export default function RequestModal({ open, value, onClose, onApply }: RequestM
             setTimeout(() => inputRef.current?.focus(), 0);
         }
     }, [open, value]);
-
-    const isCustom = selected === '직접 입력';
-    const canApply = useMemo(() => {
-        if (selected === '요청사항 없음') return true;
-        if (isCustom) return custom.trim().length > 0;
-        return !!selected;
-    }, [selected, isCustom, custom]);
 
     if (!open) return null;
 
