@@ -11,6 +11,7 @@ import onBookMark from '@/public/icons/book_mark_active.svg';
 import { useCallback, useEffect, useState } from 'react';
 import { likeService } from '@/services/like';
 import { IBrandLikeList } from '@/types/like';
+import { useLikeStore } from '@/store/likeStore';
 
 interface IProps {
   brandData?: IBrand;
@@ -20,6 +21,8 @@ const BrandInfo = ({ brandData }: IProps) => {
   const { addBrandLike, getBrandLikes, deleteBrandLike } = likeService;
   const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
   const [likedCheck, setLikedCheck] = useState(false);
+
+  const { productDetailBrandLike, setProductDetailBrandLike } = useLikeStore();
 
   const handleGetBrandLikes = useCallback(() => {
     getBrandLikes()
@@ -34,7 +37,7 @@ const BrandInfo = ({ brandData }: IProps) => {
       .catch((error) => {
         console.log('error', error.message);
       });
-  }, [brandData, getBrandLikes]);
+  }, [brandData?.id, getBrandLikes]);
 
   const initLikeBrand = useCallback(() => {
     handleGetBrandLikes();
@@ -47,13 +50,14 @@ const BrandInfo = ({ brandData }: IProps) => {
           if (res.status === 200) {
             alert('취소완료!');
             initLikeBrand();
+            setProductDetailBrandLike(productDetailBrandLike - 1);
           }
         })
         .catch((error) => {
           console.log('error', error.message);
         });
     },
-    [deleteBrandLike, initLikeBrand]
+    [deleteBrandLike, initLikeBrand, productDetailBrandLike, setProductDetailBrandLike]
   );
 
   const handleAddBrandLike = useCallback(
@@ -68,6 +72,7 @@ const BrandInfo = ({ brandData }: IProps) => {
             if (res.status === 200) {
               handleGetBrandLikes();
               alert('잘 담겼어요!');
+              setProductDetailBrandLike(productDetailBrandLike + 1);
             }
           })
           .catch((error) => {
@@ -75,12 +80,24 @@ const BrandInfo = ({ brandData }: IProps) => {
           });
       }
     },
-    [addBrandLike, brandLikeList, handleDeleteBrandLike, handleGetBrandLikes, likedCheck]
+    [
+      addBrandLike,
+      brandLikeList,
+      handleDeleteBrandLike,
+      handleGetBrandLikes,
+      likedCheck,
+      productDetailBrandLike,
+      setProductDetailBrandLike,
+    ]
   );
 
   useEffect(() => {
     initLikeBrand();
   }, [initLikeBrand]);
+
+  useEffect(() => {
+    setProductDetailBrandLike(brandData?._count?.brandLike ?? 0);
+  }, [brandData?._count?.brandLike, setProductDetailBrandLike]);
 
   return (
     <article className={styles.brand_wrap}>
@@ -98,7 +115,7 @@ const BrandInfo = ({ brandData }: IProps) => {
             {brandData?.engName}
           </Text>
           <Text size={1.2} color="gray2">
-            {brandData?.korName} ㆍ 관심 {brandData?._count?.brandLike}
+            {brandData?.korName} ㆍ 관심 {productDetailBrandLike}
           </Text>
         </Flex>
       </Flex>

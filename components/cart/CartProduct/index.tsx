@@ -20,7 +20,7 @@ interface IProps {
 }
 
 const CartProduct = ({ cartData, selectCarts, addSelectCart, optionOpen, onClickDelete }: IProps) => {
-  const { korName, engName, thumbnailImage, price } = cartData.product ?? {};
+  const { korName, engName, thumbnailImage, price, id } = cartData.product ?? {};
   const router = useRouter();
 
   const [checked, setChecked] = useState(false);
@@ -51,7 +51,7 @@ const CartProduct = ({ cartData, selectCarts, addSelectCart, optionOpen, onClick
         <Checkbox checked={checked} onChangeCheckbox={(status) => addSelectCart(cartData, status)} />
         <ChipButton text="삭제" onClick={() => onClickDelete(cartData)} />
       </section>
-      <Link href={'/'} className={styles.item_info_wrap}>
+      <Link href={`/products/${id}`} className={styles.item_info_wrap}>
         <span className={styles.item_image}>
           <Image
             src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${thumbnailImage}`}

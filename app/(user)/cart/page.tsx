@@ -86,6 +86,8 @@ const CartPage = () => {
   };
 
   const onClickMultiRemoveCart = () => {
+    if (selectCarts?.length === 0) return alert('상품을 선택해주세요!');
+
     setMultiDeleteOpen(true);
   };
 
