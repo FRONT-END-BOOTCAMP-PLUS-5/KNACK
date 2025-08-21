@@ -1,0 +1,43 @@
+/* ProgressBar.module.scss */
+.progress {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* 단계 수에 맞춰 분할 */
+    column-gap: 2px;
+    /* 막대 사이 간격 */
+    row-gap: 2px;
+    align-items: start;
+}
+
+.step {
+    display: grid;
+    grid-template-rows: 6px auto;
+    /* 위: 막대, 아래: 라벨 */
+    row-gap: 6px;
+}
+
+.bar {
+    height: 6px;
+    background: #eae6e4;
+    /* 비활성(연한 회색/연핑크 느낌) */
+    border-radius: 2px;
+}
+
+.active {
+    background: #111;
+    /* 활성(진한 검정) */
+}
+
+.step_label {
+    font-size: 12px;
+    color: #666;
+    text-align: left;
+    /* 스샷처럼 왼쪽 정렬 */
+    white-space: nowrap;
+}
+
+.current {
+    font-weight: 700;
+    color: #111;
+    /* 현재 단계 라벨 강조 */
+}

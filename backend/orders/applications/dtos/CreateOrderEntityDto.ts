@@ -8,4 +8,6 @@ export interface CreateOrderEntityDto {
   deliveryStatus: number;
   createdAt: Date;
   optionValueId: number;
+  couponPrice: number;
+  point: number;
 }
