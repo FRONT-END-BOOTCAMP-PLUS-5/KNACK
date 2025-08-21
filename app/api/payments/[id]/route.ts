@@ -51,13 +51,13 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<Param
     }
 }
 
-export async function PUT(_req: NextRequest, { params }: { params: Promise<Params> }) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
         if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-        const { id: raw } = await params
+        const raw = params.id
         if (!/^\d+$/.test(raw)) {
             return NextResponse.json({ error: 'invalid id' }, { status: 400 })
         }
@@ -69,30 +69,18 @@ export async function PUT(_req: NextRequest, { params }: { params: Promise<Param
         if (!payment) {
             return NextResponse.json({ error: 'not_found' }, { status: 404 })
         }
-
         if (payment.userId !== userId) {
             return NextResponse.json({ error: 'forbidden' }, { status: 403 })
         }
 
-        // 결제 승인 시간으로부터 15분이 지났는지 확인
-        const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000)
-        const shouldConfirm = payment.approvedAt && payment.approvedAt < fifteenMinutesAgo
-
-        if (shouldConfirm || _req.headers.get('x-confirm-action') === 'true') {
-            const usecase = new UpdatePaymentStatusUseCase(repository)
-            await usecase.execute(paymentId, 'CONFIRMED')
-
-            return NextResponse.json({
-                message: 'Payment status updated to CONFIRMED',
-                status: 'CONFIRMED'
-            })
-        }
+        // ✅ 15분 체크 제거: 요청이 오면 바로 CONFIRMED로 업데이트
+        const usecase = new UpdatePaymentStatusUseCase(repository)
+        await usecase.execute(paymentId, 'CONFIRMED')
 
         return NextResponse.json({
-            message: 'No action needed',
-            status: payment.status
+            message: 'Payment status updated to CONFIRMED',
+            status: 'CONFIRMED',
         })
-
     } catch (e) {
         console.error('PUT /api/payments/[id] failed:', e)
         return NextResponse.json({ error: 'internal_error' }, { status: 500 })

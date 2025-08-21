@@ -39,11 +39,21 @@ export default function BuyingPage({ params }: BuyingPageProps) {
     }>({});
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
     const [isReqOpen, setReqOpen] = useState(false);
-    const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
+    const [isPaymentCompleted, setIsPaymentCompleted] = useState(true);
+    const [confirming, setConfirming] = useState(false);
 
     // 하단 버튼 클릭시 완료 처리
-    const handleFooterClick = () => {
-        setIsPaymentCompleted(true);
+    const handleFooterClick = async (item: RepoOrderItem) => {
+        setConfirming(true);
+        try {
+            setIsPaymentCompleted(true);
+            await requester.put(`/api/payments/${item.paymentId}`, { status: 'CONFIRMED' });
+        } catch (error) {
+            console.error('Failed to confirm payment:', error);
+            setIsPaymentCompleted(false);
+        } finally {
+            setConfirming(false);
+        }
     };
 
     // 합계 계산
@@ -86,6 +96,7 @@ export default function BuyingPage({ params }: BuyingPageProps) {
             try {
                 const res = await requester.get(`/api/orders/${orderId}`);
                 const data = res.data ?? {};
+                console.log(data, isPaymentCompleted)
                 setItem(data ?? null);
                 setAddress(data.payment?.address ? {
                     ...data.payment.address,
@@ -100,9 +111,10 @@ export default function BuyingPage({ params }: BuyingPageProps) {
                     method: data.method,
                     createdAt: data.createdAt,
                 });
+                const paymentStatus = data.payment?.status as string | undefined;
 
                 // status가 CONFIRMED이면 결제 완료 처리
-                if (data.status === 'CONFIRMED') {
+                if (paymentStatus === 'CONFIRMED') {
                     setIsPaymentCompleted(true);
                 }
                 // 결제 완료 시간 체크 로직
@@ -117,6 +129,7 @@ export default function BuyingPage({ params }: BuyingPageProps) {
                         requester.put(`/api/payments/${data.paymentId}`, { status: 'CONFIRMED' });
                     } else {
                         // 남은 시간만큼 타이머 설정
+                        setIsPaymentCompleted(false);
                         const remainingTime = 900000 - timeDiff;
                         setTimeout(() => {
                             setIsPaymentCompleted(true);
@@ -293,7 +306,10 @@ export default function BuyingPage({ params }: BuyingPageProps) {
 
             {/* 하단 CTA(디자인에 따라 BuyingFooter가 fixed 버튼을 포함할 수도 있음) */}
             {!isPaymentCompleted ? (
-                <BuyingFooter onClickPayment={handleFooterClick} />
+                <BuyingFooter
+                    onClickPayment={() => item && handleFooterClick(item)}
+                    disabled={!item || confirming || isPaymentCompleted}
+                />
             ) : null}
         </>
     );

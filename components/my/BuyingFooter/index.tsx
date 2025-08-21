@@ -1,9 +1,24 @@
+'use client';
+
 import styles from './buyingFooter.module.scss';
 
-export default function BuyingFooter({ onClickPayment }: { onClickPayment: () => void }) {
+type Props = {
+    onClickPayment: () => void;
+    disabled?: boolean;
+};
+
+export default function BuyingFooter({ onClickPayment, disabled }: Props) {
     return (
         <div className={styles.stickyCta}>
-            <button className={styles.primaryBtn} onClick={onClickPayment}>구매 결정하기</button>
+            <button
+                type="button"
+                className={styles.primaryBtn}
+                onClick={onClickPayment}
+                disabled={disabled}
+                aria-disabled={disabled}
+            >
+                구매 결정하기
+            </button>
         </div>
     );
 }
