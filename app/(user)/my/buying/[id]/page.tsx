@@ -46,6 +46,13 @@ function statusToStep(status?: string): Step {
 }
 
 export default function BuyingPage({ params }: BuyingPageProps) {
+    const [orderId, setOrderId] = useState<string>('');
+
+    useEffect(() => {
+        params.then(({ id }) => {
+            setOrderId(id);
+        });
+    }, [params]);
 
     const paymentDataStr = sessionStorage.getItem('paymentData');
     const paymentData = paymentDataStr ? JSON.parse(paymentDataStr) : null;
@@ -102,9 +109,11 @@ export default function BuyingPage({ params }: BuyingPageProps) {
     const variant = (item?.optionValue)?.name ?? (item?.optionValue)?.value ?? "";
 
     useEffect(() => {
+        if (!orderId) return;
+
         (async () => {
             try {
-                const res = await requester.get(`/api/orders/${params.id}`);
+                const res = await requester.get(`/api/orders/${orderId}`);
                 const data = res.data ?? {};
                 setItem(data ?? null);
                 setAddress(data.payment?.address ? {
@@ -148,7 +157,7 @@ export default function BuyingPage({ params }: BuyingPageProps) {
                 console.error("Failed to fetch payment data:", e);
             }
         })();
-    }, [params.id]);
+    }, [orderId]);
 
     return (
         <>

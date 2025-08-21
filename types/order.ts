@@ -117,7 +117,7 @@ export type RepoIndependentOrder = {
 
 export type DtoStatus = 'DONE' | 'PENDING' | 'FAILED' | 'CANCELED' | 'CONFIRMED' | 'DELIVERING' | 'COMPLETED' | string;
 
-export type BuyingPageProps = { params: { id: string } };
+export type BuyingPageProps = { params: Promise<{ id: string }> };
 
 const addressSelect = {
   id: true,
