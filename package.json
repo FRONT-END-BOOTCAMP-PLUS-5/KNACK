@@ -32,6 +32,7 @@
     "react-daum-postcode": "^3.2.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.61.1",
+    "react-stars": "^2.2.5",
     "sass": "^1.89.2",
     "swiper": "^11.2.10",
     "zod": "^4.0.15",
