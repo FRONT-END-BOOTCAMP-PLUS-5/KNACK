@@ -1,0 +1,177 @@
+// 오버레이
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+// 바텀시트 컨테이너
+.bottom_sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+// 핸들바
+.handle {
+  width: 40px;
+  height: 4px;
+  background-color: #e0e0e0;
+  border-radius: 2px;
+  margin: 0 auto 16px auto;
+}
+
+// 제목
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding-bottom: 16px;
+}
+
+// 섹션 제목
+.section_title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+}
+
+// 질문 제목
+.question_title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+}
+
+// 별점 컨테이너
+.rating_container {
+  margin-bottom: 20px;
+}
+
+// 별점 분포 컨테이너
+.rating_distribution {
+  gap: 32px;
+}
+
+// 평균 별점
+.average_rating {
+  font-size: 4rem;
+  font-weight: 700;
+}
+
+// 별 아이콘
+.star_icon {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+// 별점 분포 리스트
+.rating_list {
+  flex-direction: column;
+}
+
+// 별점 항목
+.rating_item {
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+// 프로그레스 바 컨테이너
+.progress_container {
+  width: 100px;
+  height: 8px;
+  background-color: #000000;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+// 프로그레스 바
+.progress_bar {
+  height: 100%;
+  background-color: #000000;
+  transition: width 0.3s ease;
+}
+
+// 별점 숫자
+.rating_number {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+// 설문지 결과 컨테이너
+.question_results {
+  margin-bottom: 20px;
+}
+
+// 답변 항목
+.answer_item {
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+// 답변 텍스트
+.answer_text {
+  font-size: 1.2rem;
+}
+
+// 답변 통계
+.answer_stats {
+  gap: 8px;
+}
+
+// 답변 인원수
+.answer_count {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+// 답변 퍼센트
+.answer_percent {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+// 별점 분포 가로선
+.rating_line {
+  width: 100%;
+  height: 1px;
+  background-color: #000000;
+  margin: 16px 0;
+}
+
+// 별점 숫자들
+.rating_numbers {
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 8px;
+}
+
+// 애니메이션
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+

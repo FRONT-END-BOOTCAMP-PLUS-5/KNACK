@@ -3,8 +3,8 @@
 import Text from '@/components/common/Text';
 import Flex from '@/components/common/Flex';
 import Button from '@/components/common/Button';
-import BottomSheet from '@/components/common/BottomSheet';
 import { useState } from 'react';
+import styles from './reviewBottomSheet.module.scss';
 
 interface IProps {
   productData: {
@@ -48,40 +48,37 @@ const ReviewBottomSheet = ({ productData }: IProps) => {
       
       {/* 바텀시트 */}
       {isReviewSheetOpen && (
-        <BottomSheet>
-          <div style={{ padding: '20px' }}>
-            <Text tag="h3" size={1.5} weight={600} paddingBottom={16}>
+        <div className={styles.overlay} onClick={closeReviewSheet}>
+          <div className={styles.bottom_sheet} onClick={(e) => e.stopPropagation()}>
+            
+            {/* 핸들바 */}
+            <div className={styles.handle} />
+            
+            <Text tag="h3" className={styles.title}>
               리뷰 상세 정보
             </Text>
             
             {/* 별점 분포 표시 */}
             {hasReviews && (
-              <div style={{ marginBottom: '20px' }}>
-                <Text tag="h4" size={1.3} weight={600} paddingBottom={8}>
+              <div className={styles.rating_container}>
+                <Text tag="h4" className={styles.section_title}>
                   별점 분포
                 </Text>
-                <Flex gap={32}>
-                  <Text size={4} weight={700}>
+                <Flex className={styles.rating_distribution}>
+                  <Text className={styles.average_rating}>
                     {productData.averageRating || 0}
-                    <Text tag="span">★</Text>
+                    <Text tag="span" className={styles.star_icon}>★</Text>
                   </Text>
-                  <Flex direction="column">
+                  <Flex className={styles.rating_list}>
                     {ratingProgressData.map((item) => (
-                      <Flex align="center" gap={8} key={item.rating} marginVertical={4}>
-                        <div style={{ 
-                          width: '100px', 
-                          height: '8px', 
-                          backgroundColor: '#f0f0f0', 
-                          borderRadius: '4px',
-                          overflow: 'hidden'
-                        }}>
-                          <div style={{ 
-                            width: `${item.percent}%`, 
-                            height: '100%', 
-                            backgroundColor: '#ffd700' 
-                          }} />
+                      <Flex className={styles.rating_item} key={item.rating}>
+                        <div className={styles.progress_container}>
+                          <div 
+                            className={styles.progress_bar} 
+                            style={{ width: `${item.percent}%` }} 
+                          />
                         </div>
-                        <Text size={1.1} color="gray5">
+                        <Text className={styles.rating_number}>
                           {item.rating}
                         </Text>
                       </Flex>
@@ -93,24 +90,24 @@ const ReviewBottomSheet = ({ productData }: IProps) => {
             
             {/* allQuestionAnswers 데이터를 바텀시트에 표시 */}
             {hasReviews && productData.allQuestionAnswers && (
-              <div>
-                <Text tag="h4" size={1.3} weight={600} paddingBottom={8}>
+              <div className={styles.question_results}>
+                <Text tag="h4" className={styles.section_title}>
                   설문지 결과 상세
                 </Text>
                 {Object.entries(productData.allQuestionAnswers).map(([question, answers]) => (
-                  <div key={question} style={{ marginBottom: '20px' }}>
-                    <Text tag="h5" size={1.2} weight={600} paddingBottom={8}>
+                  <div key={question}>
+                    <Text tag="h5" className={styles.question_title}>
                       {question}
                     </Text>
                     
                     {Object.entries(answers).map(([answer, stats]) => (
-                      <Flex key={answer} justify="between" align="center" paddingVertical={4}>
-                        <Text size={1.2}>{answer}</Text>
-                        <Flex gap={8}>
-                          <Text size={1.2} color="gray5">
+                      <Flex className={styles.answer_item} key={answer}>
+                        <Text className={styles.answer_text}>{answer}</Text>
+                        <Flex className={styles.answer_stats}>
+                          <Text className={styles.answer_count}>
                             {stats.count}명
                           </Text>
-                          <Text size={1.2} weight={600}>
+                          <Text className={styles.answer_percent}>
                             {stats.percent}%
                           </Text>
                         </Flex>
@@ -121,7 +118,7 @@ const ReviewBottomSheet = ({ productData }: IProps) => {
               </div>
             )}
           </div>
-        </BottomSheet>
+        </div>
       )}
     </>
   );
