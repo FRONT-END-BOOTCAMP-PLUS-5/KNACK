@@ -62,6 +62,7 @@ const SavedPage = () => {
         .then((res) => {
           if (res.status === 200) {
             initLikeBrand();
+            alert('삭제완료!');
           }
         })
         .catch((error) => {
@@ -95,6 +96,7 @@ const SavedPage = () => {
         .then((res) => {
           if (res.status === 200) {
             initSave();
+            alert('삭제완료!');
           }
         })
         .catch((error) => {
@@ -112,7 +114,6 @@ const SavedPage = () => {
 
       if (likeCheck) {
         handleDeleteLike(productId);
-        alert('제거완료');
       } else {
         addLike(productId)
           .then((res) => {
