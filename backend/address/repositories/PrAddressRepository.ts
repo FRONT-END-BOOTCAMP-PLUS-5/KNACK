@@ -16,7 +16,13 @@ export class PrAddressRepository implements AddressRepository {
     }
 
     const created = await prisma.address.create({ data });
-    return this.toDto(created);
+    return this.toDto({
+      ...created,
+      address: {
+        zipCode: created.zipCode,
+        main: created.main,
+      },
+    });
   }
 
   async update(data: UpdateAddressDto): Promise<void> {
@@ -35,7 +41,13 @@ export class PrAddressRepository implements AddressRepository {
 
   async getById(id: number): Promise<AddressDto | null> {
     const result = await prisma.address.findUnique({ where: { id } });
-    return result ? this.toDto(result) : null;
+    return result ? this.toDto({
+      ...result,
+      address: {
+        zipCode: result.zipCode,
+        main: result.main,
+      },
+    }) : null;
   }
 
   async setNonDefaultByUserId(userId: string): Promise<void> {
@@ -47,7 +59,13 @@ export class PrAddressRepository implements AddressRepository {
 
   async findByUserId(userId: string): Promise<AddressDto[]> {
     const results = await prisma.address.findMany({ where: { userId } });
-    return results.map(this.toDto);
+    return results.map(result => this.toDto({
+      ...result,
+      address: {
+        zipCode: result.zipCode,
+        main: result.main,
+      },
+    }));
   }
 
   async setDefault(id: number): Promise<void> {
@@ -77,9 +95,11 @@ export class PrAddressRepository implements AddressRepository {
       userId: address.userId,
       name: address.name,
       phone: address.phone,
-      zipCode: address.zipCode,
+      address: {
+        zipCode: address.address.zipCode,
+        main: address.address.main,
+      },
       detail: address.detail,
-      main: address.main,
       message: address.message,
       isDefault: address.isDefault,
     };
