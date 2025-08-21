@@ -169,7 +169,7 @@ export default function PaymentSuccess() {
 
         // 정리
         sessionStorage.removeItem('orderItems');
-        sessionStorage.removeItem('IAddress');
+        sessionStorage.removeItem('selectedAddress');
       } catch (err) {
         console.error('❌ 결제/주문 저장 실패', err);
         if (axios.isAxiosError(err)) console.error('📛 서버 응답:', err.response?.data);

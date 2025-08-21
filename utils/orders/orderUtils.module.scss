@@ -1,53 +1,43 @@
-$dot-size: 10px;
-$dot-gap: 6px;
-$page-max: 440px;
-
+/* ProgressBar.module.scss */
 .progress {
-    position: relative;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    /* ✅ 4단계 */
-    column-gap: 0;
-    align-items: center;
-    margin-bottom: 6px;
+    /* 단계 수에 맞춰 분할 */
+    column-gap: 2px;
+    /* 막대 사이 간격 */
+    row-gap: 2px;
+    align-items: start;
 }
 
-.progress_step {
-    position: relative;
-    text-align: center;
-}
-
-.dot {
-    margin: 0 auto $dot-gap;
-    width: $dot-size;
-    height: $dot-size;
-    border-radius: 50%;
-    background: #ddd;
-
-    &.active {
-        background: #111;
-    }
+.step {
+    display: grid;
+    grid-template-rows: 6px auto;
+    /* 위: 막대, 아래: 라벨 */
+    row-gap: 6px;
 }
 
 .bar {
-    /* 점 바로 아래로 선을 내립니다 */
-    position: absolute;
-    top: calc(#{$dot-size} + 2px);
-    /* ✅ 점 아래 */
-    right: -50%;
-    width: 100%;
-    height: 2px;
-    background: #eee;
-    z-index: 0;
+    height: 6px;
+    background: #eae6e4;
+    /* 비활성(연한 회색/연핑크 느낌) */
+    border-radius: 2px;
+}
 
-    &.active {
-        background: #111;
-    }
+.active {
+    background: #111;
+    /* 활성(진한 검정) */
 }
 
 .step_label {
     font-size: 12px;
-    color: #444;
-    /* 필요하면 간격 */
-    /* margin-top: 2px; */
+    color: #666;
+    text-align: left;
+    /* 스샷처럼 왼쪽 정렬 */
+    white-space: nowrap;
+}
+
+.current {
+    font-weight: 700;
+    color: #111;
+    /* 현재 단계 라벨 강조 */
 }
