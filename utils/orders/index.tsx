@@ -2,7 +2,8 @@
 import { Prisma } from "@prisma/client"
 import { OrderDto } from "@/backend/orders/applications/dtos/GetOrderDto"
 import { OrderItemDto } from "@/backend/orders/applications/dtos/GetOrderItemDto"
-import { ComputeTotalsOrder, DtoStatus } from "@/types/order"
+import { ComputeTotalsOrder, DtoStatus, Step, STEPS } from "@/types/order"
+import styles from "./orderUtils.module.scss";
 
 type OrderRow = Prisma.OrderGetPayload<{
     include: { product: true; payment: { include: { address: true } } }
@@ -98,4 +99,34 @@ export function computeTotalsFromOrders(orders: ComputeTotalsOrder[] = []) {
         pointsUsed,
         total,
     };
+}
+
+export function ProgressBar({ current }: { current: Step }) {
+    const currentIdx = STEPS.indexOf(current);
+    return (
+        <div className={styles.progress}>
+            {STEPS.map((label, i) => (
+                <div key={label} className={styles.progress_step}>
+                    <div className={[styles.dot, i <= currentIdx ? styles.active : ""].join(" ")} />
+                    <div className={styles.step_label}>{label}</div>
+                    {i < STEPS.length - 1 && (
+                        <div className={[styles.bar, i < currentIdx ? styles.active : ""].join(" ")} />
+                    )}
+                </div>
+            ))}
+        </div>
+    );
+}
+
+export function formatPrice(n?: number) {
+    return (n ?? 0).toLocaleString() + "원";
+}
+
+export function statusToStep(status?: string): Step {
+    const s = (status ?? "").toUpperCase();
+    if (s === "PAID") return "구매 확정";
+    if (s === "CONFIRMED") return "배송 대기";
+    if (s === "DELIVERING") return "배송 중";
+    if (s === "COMPLETED") return "배송 완료";
+    return "구매 확정";
 }

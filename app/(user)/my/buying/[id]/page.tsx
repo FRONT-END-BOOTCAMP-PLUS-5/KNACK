@@ -5,7 +5,7 @@ import Image from "next/image";
 import styles from "./buying.module.scss";
 import BuyingFooter from "@/components/my/BuyingFooter";
 import { BuyingHeader } from "@/components/my/BuyingHeader";
-import { BuyingPageProps, RepoOrderItem, Step, STEPS } from "@/types/order";
+import { BuyingPageProps, RepoOrderItem, Step } from "@/types/order";
 import requester from "@/utils/requester";
 import { useState, useEffect, useMemo } from "react";
 import { STORAGE_PATHS } from "@/constraint/auth";
@@ -14,36 +14,7 @@ import RequestModal from "@/components/address/RequestModal";
 import AddressModal from '@/components/address/AddressModal'
 import { formatPhoneNumber } from "@/utils/formatAddressUtils";
 import { IAddress } from "@/types/address";
-
-function ProgressBar({ current }: { current: Step }) {
-    const currentIdx = STEPS.indexOf(current);
-    return (
-        <div className={styles.progress}>
-            {STEPS.map((label, i) => (
-                <div key={label} className={styles.progress_step}>
-                    <div className={[styles.dot, i <= currentIdx ? styles.active : ""].join(" ")} />
-                    <div className={styles.step_label}>{label}</div>
-                    {i < STEPS.length - 1 && (
-                        <div className={[styles.bar, i < currentIdx ? styles.active : ""].join(" ")} />
-                    )}
-                </div>
-            ))}
-        </div>
-    );
-}
-
-function formatPrice(n?: number) {
-    return (n ?? 0).toLocaleString() + "원";
-}
-
-function statusToStep(status?: string): Step {
-    const s = (status ?? "").toUpperCase();
-    if (s === "PAID") return "구매 확정";
-    if (s === "CONFIRMED") return "배송 대기";
-    if (s === "DELIVERING") return "배송 중";
-    if (s === "COMPLETED") return "배송 완료";
-    return "구매 확정";
-}
+import { formatPrice, ProgressBar, statusToStep } from "@/utils/orders";
 
 export default function BuyingPage({ params }: BuyingPageProps) {
     const [orderId, setOrderId] = useState<string>('');
@@ -213,17 +184,17 @@ export default function BuyingPage({ params }: BuyingPageProps) {
 
                     <div className={styles.list_row}>
                         <div className={styles.label}>배송비</div>
-                        <div className={styles.value}>{formatPrice(paymentData?.shippingFee)}</div>
+                        <div className={styles.value}>{formatPrice(0)}</div>
                     </div>
 
                     <div className={styles.list_row}>
                         <div className={styles.label}>쿠폰 적용가</div>
-                        <div className={styles.value}>{formatPrice(paymentData.couponDiscountAmount)}</div>
+                        <div className={styles.value}>{formatPrice(item?.couponPrice)}</div>
                     </div>
 
                     <div className={styles.list_row}>
                         <div className={styles.label}>포인트 사용</div>
-                        <div className={styles.value}>{formatPrice(paymentData.pointAmount)}</div>
+                        <div className={styles.value}>{formatPrice(item?.point)}</div>
                     </div>
 
                     <div className={`${styles.list_row} ${styles.total_row}`}>

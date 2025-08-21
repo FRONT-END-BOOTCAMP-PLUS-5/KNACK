@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './SuccessPage.module.scss';
 import requester from '@/utils/requester';
 import { useUserStore } from '@/store/userStore';
 import axios from 'axios';
-import { Coupon, OrderItem, ProcessedPayment, RepresentativeProduct } from '@/types/order';
+import { Coupon, OrderItem, RepresentativeProduct } from '@/types/order';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import { IAddress } from '@/types/address';
@@ -45,12 +45,30 @@ export default function PaymentSuccess() {
     [orderItems]
   );
 
+  // Helper function to read processed payments
+  type ProcessedPayment = { tossPaymentKey: string; tossOrderId: string; at: number };
+
+  const readProcessed = useCallback((): ProcessedPayment[] => {
+    try { return JSON.parse(sessionStorage.getItem('processedPayments') || '[]'); }
+    catch { return []; }
+  }, []);
+
+  const writeProcessed = useCallback((entry: ProcessedPayment) => {
+    const list = readProcessed();
+    // 같은 paymentKey 또는 같은 orderId가 이미 있으면 중복으로 간주
+    const dup = list.some(p => p.tossPaymentKey === entry.tossPaymentKey || p.tossOrderId === entry.tossOrderId);
+    if (!dup) {
+      list.push(entry);
+      sessionStorage.setItem('processedPayments', JSON.stringify(list));
+    }
+  }, [readProcessed]);
+
   // 1) sessionStorage에서 복구
   useEffect(() => {
     const stored = sessionStorage.getItem('paymentData');
     const coupon = sessionStorage.getItem('selectedCoupon');
     const orderItems = sessionStorage.getItem('orderItems');
-    const address = sessionStorage.getItem('IAddress');
+    const address = sessionStorage.getItem('selectedAddress');
 
     if (stored) {
       const paymentData = JSON.parse(stored);
@@ -78,26 +96,28 @@ export default function PaymentSuccess() {
 
   // 2) 결제 및 주문 저장
   useEffect(() => {
-    if (!user) return;
-    if (!IAddress?.id) return;
-    if (orderItems.length === 0) return;
-    if (hasRun.current) return;
-    if (!tossPaymentKey || !tossOrderId || Number.isNaN(paymentAmount)) return;
+    if (!user) { console.log('SKIP: no user'); return; }
+    if (!IAddress?.id) { console.log('SKIP: no address'); return; }
+    if (orderItems.length === 0) { console.log('SKIP: no orderItems'); return; }
+    if (!tossPaymentKey || !tossOrderId || Number.isNaN(paymentAmount)) {
+      console.log('SKIP: invalid params', { tossPaymentKey, tossOrderId, paymentAmount });
+      return;
+    }
+    if (hasRun.current) { console.log('SKIP: hasRun'); return; }
 
-    // 매번 fresh하게 읽기
-    const readProcessed = (): ProcessedPayment[] =>
-      JSON.parse(sessionStorage.getItem('processedPayments') ?? '[]');
-
-    // 같은 주문이면 전체 플로우 스킵 (paymentKey는 다를 수 있음)
-    if (readProcessed().some(p => p.orderId === tossOrderId)) {
-      console.log('이미 처리된 주문:', tossOrderId);
+    // 이미 처리된 결제/주문이면 스킵 (여기서 막히면 아래가 안 찍힘)
+    const already = readProcessed().some(
+      p => p.tossPaymentKey === tossPaymentKey || p.tossOrderId === tossOrderId
+    );
+    if (already) {
+      console.log('SKIP: already processed', { tossPaymentKey, tossOrderId });
       return;
     }
 
-    // 인플라이트 가드 (더블클릭 방지)
+    // 인플라이트 락
     const inflightKey = sessionStorage.getItem('processingOrderId');
     if (inflightKey && inflightKey === tossOrderId) {
-      console.log('이미 처리 중인 주문입니다.');
+      console.log('SKIP: inflight lock');
       return;
     }
     sessionStorage.setItem('processingOrderId', tossOrderId);
@@ -144,6 +164,9 @@ export default function PaymentSuccess() {
         setPaymentNumber(String(paymentRes.data.paymentNumber ?? ''));
         console.log('✅ 결제 저장 완료:', { paymentNumber: paymentRes.data.paymentNumber, id: pid });
 
+        // ✅ 여기서만 '처리됨' 기록
+        writeProcessed({ tossPaymentKey, tossOrderId, at: Date.now() });
+
         // 정리
         sessionStorage.removeItem('orderItems');
         sessionStorage.removeItem('IAddress');
@@ -158,7 +181,7 @@ export default function PaymentSuccess() {
         sessionStorage.removeItem('processingOrderId');
       }
     })();
-  }, [IAddress, orderItems, tossPaymentKey, tossOrderId, paymentAmount, router, pointsToUse, selectedCoupon?.id, targetSumAfterCoupon, user, discountAmount]);
+  }, [IAddress, orderItems, tossPaymentKey, tossOrderId, paymentAmount, router, pointsToUse, selectedCoupon?.id, targetSumAfterCoupon, user, discountAmount, readProcessed, writeProcessed]);
 
   // 3) 대표상품 조회 (위에서 저장한 paymentId로 API 호출)
   useEffect(() => {
