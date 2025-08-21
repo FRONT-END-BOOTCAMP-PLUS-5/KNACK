@@ -2,7 +2,6 @@
   max-width: 440px;
   width: 100%;
   height: auto;
-  padding-top: 100%;
   position: relative;
   overflow: hidden;
   border-radius: 10px;
@@ -29,5 +28,22 @@
     color: #fff;
     border-radius: 10px;
     font-size: 1.2rem;
+  }
+
+  & .slide_text_box {
+    position: absolute;
+    bottom: 18px;
+    left: 18px;
+
+    & .banner_main_text {
+      white-space: pre-wrap;
+      word-break: keep-all;
+      width: 100%;
+      max-width: 265px;
+    }
+
+    & .banner_sub_text {
+      color: #ffffffcd;
+    }
   }
 }
