@@ -5,7 +5,7 @@ import Image from "next/image";
 import styles from "./buying.module.scss";
 import BuyingFooter from "@/components/my/BuyingFooter";
 import { BuyingHeader } from "@/components/my/BuyingHeader";
-import { OrderPageProps, RepoOrderItem, Step, STEPS } from "@/types/order";
+import { BuyingPageProps, RepoOrderItem, Step, STEPS } from "@/types/order";
 import requester from "@/utils/requester";
 import { useState, useEffect, useMemo } from "react";
 import { STORAGE_PATHS } from "@/constraint/auth";
@@ -45,7 +45,7 @@ function statusToStep(status?: string): Step {
     return "구매 확정";
 }
 
-export default function OrderPage({ params }: OrderPageProps) {
+export default function BuyingPage({ params }: BuyingPageProps) {
 
     const paymentDataStr = sessionStorage.getItem('paymentData');
     const paymentData = paymentDataStr ? JSON.parse(paymentDataStr) : null;
