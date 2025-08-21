@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './basicInput.module.scss';
 import Image from 'next/image';
 import closeIcon from '@/public/icons/circle_close.svg';
@@ -7,15 +7,17 @@ import useDebounce from '@/hooks/useDebounce';
 interface IProps {
   placeholder?: string;
   onChange?: (value: string) => void;
+  onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>, keyword: string) => void;
 }
 
-export default function BasicInput({ placeholder, onChange }: IProps) {
+export default function BasicInput({ placeholder, onChange, onKeyDown }: IProps) {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const debouncedSearchKeyword = useDebounce(searchKeyword);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSearchKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchKeyword(e.target.value);
-  };
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     if (onChange) {
@@ -28,16 +30,22 @@ export default function BasicInput({ placeholder, onChange }: IProps) {
     setSearchKeyword('');
   };
 
+  const handleSearchKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(e.target.value);
+  };
+
   return (
     <div className={styles.search_area}>
       <div className={styles.search}>
         <input
+          ref={inputRef}
           className={styles.input_search}
           type="text"
           placeholder={placeholder}
           title="검색창"
           value={searchKeyword}
           onChange={handleSearchKeywordChange}
+          onKeyDown={(event) => onKeyDown(event, searchKeyword)}
         />
         {searchKeyword && (
           <button className={styles.btn_search_delete} onClick={handleDeleteClick}>

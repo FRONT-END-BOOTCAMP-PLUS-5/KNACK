@@ -4,19 +4,22 @@ import styles from './searchModal.module.scss';
 import SearchHeader from './SearchHeader';
 import RecentKeywords from './RecentKeywords';
 import RecommendedTags from './RecommendedTags';
-import PopularKeywords from './PopularKeywords';
 import RecentProducts from './RecentProducts';
 
-export default function SearchModal() {
+interface IProps {
+  handleSearchInputClick: (state: boolean) => void;
+}
+
+export default function SearchModal({ handleSearchInputClick }: IProps) {
   return (
     <article className={styles.search_container}>
-      <SearchHeader />
+      <SearchHeader handleSearchInputClick={handleSearchInputClick} />
 
       <section className={styles.search_content_wrap}>
-        <RecentKeywords />
-        <RecommendedTags />
-        <PopularKeywords />
-        <RecentProducts />
+        <RecentKeywords handleSearchInputClick={handleSearchInputClick} />
+        <RecommendedTags handleSearchInputClick={handleSearchInputClick} />
+        {/* <PopularKeywords /> */}
+        <RecentProducts handleSearchInputClick={handleSearchInputClick} />
       </section>
     </article>
   );

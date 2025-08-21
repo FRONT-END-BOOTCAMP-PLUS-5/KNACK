@@ -3,7 +3,11 @@
 import Link from 'next/link';
 import styles from './searchModal.module.scss';
 
-export default function RecentProducts() {
+interface IProps {
+  handleSearchInputClick: (state: boolean) => void;
+}
+
+export default function RecentProducts({ handleSearchInputClick }: IProps) {
   return (
     <section className={styles.search_card_items}>
       <div className={styles.layer_search_item}>

@@ -145,6 +145,9 @@ export default function Header({
           </ul>
         </nav>
       )}
+
+      {/* 검색모달 */}
+      {isSearchModalOpen && <SearchModal handleSearchInputClick={handleSearchInputClick} />}
     </header>
   );
 }
