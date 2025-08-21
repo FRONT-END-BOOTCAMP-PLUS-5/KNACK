@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import styles from './searchModal.module.scss';
 import { CATEGORY_ALL_TAB } from '@/constraint/header';
 import { useRouter } from 'next/navigation';

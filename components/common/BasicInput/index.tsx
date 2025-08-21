@@ -7,7 +7,7 @@ import useDebounce from '@/hooks/useDebounce';
 interface IProps {
   placeholder?: string;
   onChange?: (value: string) => void;
-  onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>, keyword: string) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>, keyword: string) => void;
 }
 
 export default function BasicInput({ placeholder, onChange, onKeyDown }: IProps) {
@@ -45,7 +45,7 @@ export default function BasicInput({ placeholder, onChange, onKeyDown }: IProps)
           title="검색창"
           value={searchKeyword}
           onChange={handleSearchKeywordChange}
-          onKeyDown={(event) => onKeyDown(event, searchKeyword)}
+          onKeyDown={(event) => onKeyDown && onKeyDown(event, searchKeyword)}
         />
         {searchKeyword && (
           <button className={styles.btn_search_delete} onClick={handleDeleteClick}>
