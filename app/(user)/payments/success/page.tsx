@@ -6,9 +6,10 @@ import styles from './SuccessPage.module.scss';
 import requester from '@/utils/requester';
 import { useUserStore } from '@/store/userStore';
 import axios from 'axios';
-import { Coupon, OrderItem, ProcessedPayment, RepresentativeProduct, IAddress } from '@/types/order';
+import { Coupon, OrderItem, ProcessedPayment, RepresentativeProduct } from '@/types/order';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
+import { IAddress } from '@/types/address';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
