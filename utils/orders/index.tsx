@@ -102,16 +102,18 @@ export function computeTotalsFromOrders(orders: ComputeTotalsOrder[] = []) {
 }
 
 export function ProgressBar({ current }: { current: Step }) {
-    const currentIdx = STEPS.indexOf(current);
+    const currentIdx = Math.max(0, STEPS.indexOf(current)); // -1 방지
+
     return (
         <div className={styles.progress}>
             {STEPS.map((label, i) => (
-                <div key={label} className={styles.progress_step}>
-                    <div className={[styles.dot, i <= currentIdx ? styles.active : ""].join(" ")} />
-                    <div className={styles.step_label}>{label}</div>
-                    {i < STEPS.length - 1 && (
-                        <div className={[styles.bar, i < currentIdx ? styles.active : ""].join(" ")} />
-                    )}
+                <div key={label} className={styles.step}>
+                    {/* 막대 (현재 단계 포함해서 진하게) */}
+                    <div className={`${styles.bar} ${i <= currentIdx ? styles.active : ''}`} />
+                    {/* 라벨 (현재 단계는 볼드) */}
+                    <div className={`${styles.step_label} ${i === currentIdx ? styles.current : ''}`}>
+                        {label}
+                    </div>
                 </div>
             ))}
         </div>
