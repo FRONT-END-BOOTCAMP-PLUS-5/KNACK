@@ -3,10 +3,16 @@
 import { PaymentRecord } from "@/types/payment"
 import { CreatePaymentDto } from "../../applications/dtos/CreatePaymentDto"
 import { GetPaymentDto } from "../../applications/dtos/GetPaymentDto"
+import { RepoPayment } from "@/types/order"
 
 export interface PaymentRepository {
-    findWithOrdersByNumber(paymentNumber: bigint, userId: string): Promise<GetPaymentDto | null>
-    findWithOrdersById(paymentId: number, userId: string): Promise<GetPaymentDto | null>
+
+    // Add these methods that return RepoPayment with orders
+    findWithOrdersByNumber(paymentNumber: bigint, userId: string): Promise<RepoPayment | null>
+    findWithOrdersById(paymentId: number, userId: string): Promise<RepoPayment | null>
+
+    findWithOrderItemsByNumber(paymentNumber: bigint, userId: string): Promise<RepoPayment | null>
+    findWithOrderItemsById(paymentId: number, userId: string): Promise<RepoPayment | null>
 
     // 상태 전이: CONFIRMING -> PAID (동시성 방지: where에 status 포함)
     markPaid(args: {
@@ -47,6 +53,7 @@ export interface PaymentRepository {
      * Toss Webhook 등을 통해 결제 상태 갱신
      */
     updateStatusByTossPaymentKey(tossPaymentKey: string, status: string): Promise<void>
+    updateStatusById(paymentId: number, status: string): Promise<void>
 
     generateTodayPaymentNumber(): Promise<number>
 

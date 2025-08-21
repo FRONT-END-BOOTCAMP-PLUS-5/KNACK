@@ -5,5 +5,5 @@ export interface Payment {
     price: number
     createdAt: Date
     paymentNumber: string
-    status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED'
+    status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | 'CONFIRMED' | 'DELIVERING' | 'COMPLETED'
 }

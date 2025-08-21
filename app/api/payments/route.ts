@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
                 tossPaymentKey: string; orderId: string; amount: number
             }): Promise<TossConfirmResult> {
                 const data = await serverPost('/payments/confirm', { paymentKey: tossPaymentKey, orderId, amount }, 'toss')
+                console.log(data);
                 return {
                     paymentKey: data.paymentKey,
                     method: data.method,

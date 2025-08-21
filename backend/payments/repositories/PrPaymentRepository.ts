@@ -4,6 +4,7 @@ import { PaymentRepository } from '@/backend/payments/domains/repositories/Payme
 import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto';
 import { GetPaymentDto } from '@/backend/payments/applications/dtos/GetPaymentDto';
 import { PaymentRecord, PaymentStatus } from '@/types/payment';
+import { graphInclude, RepoPayment } from '@/types/order';
 
 export class PrPaymentRepository implements PaymentRepository {
 
@@ -46,7 +47,6 @@ export class PrPaymentRepository implements PaymentRepository {
     }
 
     async save(payment: CreatePaymentDto): Promise<number | null> {
-        console.log(payment)
 
         const created = await prisma.payment.create({
             data: {
@@ -71,7 +71,6 @@ export class PrPaymentRepository implements PaymentRepository {
         return created.id;
 
     }
-
 
     async updateOrderPaymentIds(orderIds: number[], paymentId: number): Promise<void> {
         await prisma.order.updateMany({
@@ -170,60 +169,46 @@ export class PrPaymentRepository implements PaymentRepository {
         })
     }
 
-    async findWithOrdersByNumber(paymentNumber: bigint, userId: string): Promise<GetPaymentDto | null> {
+    async findWithOrdersById(paymentId: number, userId: string): Promise<RepoPayment | null> {
         const data = await prisma.payment.findFirst({
-            where: {
-                paymentNumber: Number(paymentNumber),
-                userId
-            },
-            include: {
-                orders: { select: { id: true } },
-            },
-        });
-
-        if (!data) return null;
-
-        return {
-            id: data.id,
-            userId: data.userId,
-            addressId: data.addressId,
-            price: data.price ?? 0,
-            createdAt: data.createdAt ?? new Date(),
-            paymentNumber: BigInt(data.paymentNumber),
-            tossPaymentKey: data.tossPaymentKey ?? '',
-            approvedAt: data.approvedAt ?? new Date(),
-            method: data.method,
-            status: data.status as 'DONE' | 'CANCELED',
-            orderIds: data.orders.map(order => order.id),
-        };
+            where: { id: paymentId, userId },
+            include: graphInclude,
+        })
+        return data as unknown as RepoPayment | null
     }
 
-    async findWithOrdersById(paymentId: number, userId: string): Promise<GetPaymentDto | null> {
+    async findWithOrdersByNumber(paymentNumber: bigint, userId: string): Promise<RepoPayment | null> {
         const data = await prisma.payment.findFirst({
-            where: {
-                id: paymentId,
-                userId
-            },
-            include: {
-                orders: { select: { id: true } },
-            },
+            // ❌ Number(paymentNumber) 금지
+            // paymentNumber 컬럼 타입이 BigInt 라면 아래처럼 BigInt 그대로 비교
+            where: { paymentNumber, userId },
+            include: graphInclude,
+        })
+        return data as unknown as RepoPayment | null
+    }
+
+    // ✅ 새 메서드: 그래프 그대로 반환(축약/매핑 금지)
+    async findWithOrderItemsById(paymentId: number, userId: string): Promise<RepoPayment | null> {
+        const data = await prisma.payment.findFirst({
+            where: { id: paymentId, userId },
+            include: graphInclude,
         });
+        return data as unknown as RepoPayment | null;
+    }
 
-        if (!data) return null;
+    async findWithOrderItemsByNumber(paymentNumber: bigint, userId: string): Promise<RepoPayment | null> {
+        const data = await prisma.payment.findFirst({
+            where: { paymentNumber, userId }, // BigInt 그대로
+            include: graphInclude,
+        });
+        return data as unknown as RepoPayment | null;
+    }
 
-        return {
-            id: data.id,
-            userId: data.userId,
-            addressId: data.addressId,
-            price: data.price ?? 0,
-            createdAt: data.createdAt ?? new Date(),
-            paymentNumber: BigInt(data.paymentNumber),
-            tossPaymentKey: data.tossPaymentKey ?? '',
-            approvedAt: data.approvedAt ?? new Date(),
-            method: data.method,
-            status: data.status as 'DONE' | 'CANCELED',
-            orderIds: data.orders.map(order => order.id),
-        };
+    async updateStatusById(paymentId: number, status: string): Promise<void> {
+        await prisma.payment.update({
+            where: { id: paymentId },
+            data: { status },
+        });
     }
 
     private toRecord(row: {

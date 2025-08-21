@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './SuccessPage.module.scss';
 import requester from '@/utils/requester';
 import { useUserStore } from '@/store/userStore';
 import axios from 'axios';
-import { Coupon, OrderItem, RepresentativeProduct, SelectedAddress } from '@/types/order';
+import { Coupon, OrderItem, RepresentativeProduct } from '@/types/order';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
+import { IAddress } from '@/types/address';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
@@ -16,7 +17,7 @@ export default function PaymentSuccess() {
   const user = useUserStore((s) => s.user);
 
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<SelectedAddress | null>(null);
+  const [IAddress, setIAddress] = useState<IAddress | null>(null);
   const [paymentNumber, setPaymentNumber] = useState('');
   const [savedOrderIds, setSavedOrderIds] = useState<number[]>([]);
   const [paymentId, setPaymentId] = useState<number | null>(null);
@@ -44,6 +45,24 @@ export default function PaymentSuccess() {
     [orderItems]
   );
 
+  // Helper function to read processed payments
+  type ProcessedPayment = { tossPaymentKey: string; tossOrderId: string; at: number };
+
+  const readProcessed = useCallback((): ProcessedPayment[] => {
+    try { return JSON.parse(sessionStorage.getItem('processedPayments') || '[]'); }
+    catch { return []; }
+  }, []);
+
+  const writeProcessed = useCallback((entry: ProcessedPayment) => {
+    const list = readProcessed();
+    // 같은 paymentKey 또는 같은 orderId가 이미 있으면 중복으로 간주
+    const dup = list.some(p => p.tossPaymentKey === entry.tossPaymentKey || p.tossOrderId === entry.tossOrderId);
+    if (!dup) {
+      list.push(entry);
+      sessionStorage.setItem('processedPayments', JSON.stringify(list));
+    }
+  }, [readProcessed]);
+
   // 1) sessionStorage에서 복구
   useEffect(() => {
     const stored = sessionStorage.getItem('paymentData');
@@ -69,7 +88,7 @@ export default function PaymentSuccess() {
     }
     if (address) {
       const parsed = JSON.parse(address);
-      setSelectedAddress(parsed);
+      setIAddress(parsed);
     }
   }, []);
 
@@ -77,21 +96,37 @@ export default function PaymentSuccess() {
 
   // 2) 결제 및 주문 저장
   useEffect(() => {
-    if (!user) return;
-    if (!selectedAddress?.id) return;
-    if (orderItems.length === 0) return;
-    if (hasRun.current) return;
-    if (!tossPaymentKey || !tossOrderId || Number.isNaN(paymentAmount)) return;
+    if (!user) { console.log('SKIP: no user'); return; }
+    if (!IAddress?.id) { console.log('SKIP: no address'); return; }
+    if (orderItems.length === 0) { console.log('SKIP: no orderItems'); return; }
+    if (!tossPaymentKey || !tossOrderId || Number.isNaN(paymentAmount)) {
+      console.log('SKIP: invalid params', { tossPaymentKey, tossOrderId, paymentAmount });
+      return;
+    }
+    if (hasRun.current) { console.log('SKIP: hasRun'); return; }
 
-    const alreadyProcessed = sessionStorage.getItem('paymentProcessed') === 'true';
-    if (alreadyProcessed) return;
+    // 이미 처리된 결제/주문이면 스킵 (여기서 막히면 아래가 안 찍힘)
+    const already = readProcessed().some(
+      p => p.tossPaymentKey === tossPaymentKey || p.tossOrderId === tossOrderId
+    );
+    if (already) {
+      console.log('SKIP: already processed', { tossPaymentKey, tossOrderId });
+      return;
+    }
 
-    sessionStorage.setItem('paymentProcessed', 'true');
+    // 인플라이트 락
+    const inflightKey = sessionStorage.getItem('processingOrderId');
+    if (inflightKey && inflightKey === tossOrderId) {
+      console.log('SKIP: inflight lock');
+      return;
+    }
+    sessionStorage.setItem('processingOrderId', tossOrderId);
+
     hasRun.current = true;
 
     (async () => {
       try {
-        console.log('➡️ 주문 저장 요청 /api/orders', { orderItems, addr: selectedAddress.id });
+        console.log('➡️ 주문 저장 요청 /api/orders', { orderItems, targetSumAfterCoupon, discountAmount, pointsToUse });
         const orderRes = await requester.post('/api/orders', {
           userId: user.id,
           items: orderItems.map((item) => ({
@@ -99,9 +134,11 @@ export default function PaymentSuccess() {
             price: item.price,
             salePrice: targetSumAfterCoupon,
             count: item.quantity,
-            addressId: selectedAddress.id,
+            addressId: IAddress.id,
             paymentId: null,
             optionValueId: item?.optionValue?.id,
+            couponPrice: discountAmount,
+            point: pointsToUse,
           })),
         });
 
@@ -114,7 +151,7 @@ export default function PaymentSuccess() {
           tossPaymentKey,
           orderId: tossOrderId,
           amount: paymentAmount,
-          addressId: selectedAddress.id,
+          addressId: IAddress.id,
           orderIds: createdOrderIds,
           selectedCouponId: selectedCoupon?.id ?? null,
           pointsToUse: pointsToUse,
@@ -127,29 +164,24 @@ export default function PaymentSuccess() {
         setPaymentNumber(String(paymentRes.data.paymentNumber ?? ''));
         console.log('✅ 결제 저장 완료:', { paymentNumber: paymentRes.data.paymentNumber, id: pid });
 
+        // ✅ 여기서만 '처리됨' 기록
+        writeProcessed({ tossPaymentKey, tossOrderId, at: Date.now() });
+
         // 정리
         sessionStorage.removeItem('orderItems');
-        sessionStorage.removeItem('selectedAddress');
+        sessionStorage.removeItem('IAddress');
       } catch (err) {
         console.error('❌ 결제/주문 저장 실패', err);
         if (axios.isAxiosError(err)) console.error('📛 서버 응답:', err.response?.data);
         sessionStorage.removeItem('paymentProcessed');
         hasRun.current = false;
         router.replace('/payments/failure');
+      } finally {
+        // 인플라이트 해제
+        sessionStorage.removeItem('processingOrderId');
       }
     })();
-  }, [
-    selectedAddress,
-    orderItems,
-    tossPaymentKey,
-    tossOrderId,
-    paymentAmount,
-    router,
-    pointsToUse,
-    selectedCoupon?.id,
-    targetSumAfterCoupon,
-    user,
-  ]);
+  }, [IAddress, orderItems, tossPaymentKey, tossOrderId, paymentAmount, router, pointsToUse, selectedCoupon?.id, targetSumAfterCoupon, user, discountAmount, readProcessed, writeProcessed]);
 
   // 3) 대표상품 조회 (위에서 저장한 paymentId로 API 호출)
   useEffect(() => {
@@ -175,8 +207,7 @@ export default function PaymentSuccess() {
         const ordRes = await requester.get(`/api/orders/${firstOrderId}`);
         const order = ordRes.data;
         console.log(order);
-        const items = order?.items ?? [];
-        setRepProd(items[0]);
+        setRepProd(order.product ?? null);
       } catch (e) {
         console.error('❌ 대표상품/주문 로드 실패', e);
         setRepProd(null);
@@ -189,25 +220,23 @@ export default function PaymentSuccess() {
 
   return (
     <div className={styles.sheet}>
-      {/* 닫기 아이콘이 필요하면 onClick에 원하는 경로로 */}
-      {/* <button className={styles.close} aria-label="닫기" onClick={() => router.push('/')}>×</button> */}
 
       <h2 className={styles.title}>구매가 완료되었습니다.</h2>
       <p className={styles.subtitle}>주문 즉시 출고를 준비하여 안전하게 배송 될 예정입니다.</p>
 
       <div className={styles.image_wrap}>
-        {repProd?.thumbnailUrl && (
+        {repProd?.thumbnailImage && (
           <Image
-            src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${repProd.thumbnailUrl}`}
+            src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${repProd.thumbnailImage}`}
             alt={repProd.name}
-            width={160}
-            height={160}
+            width={80}
+            height={80}
             className={styles.productImage}
           />
         )}
       </div>
 
-      <button className={styles.primary_btn} onClick={() => router.push('/orders')}>
+      <button className={styles.primary_btn} onClick={() => router.push(`/my/order/${paymentNumber}`)}>
         구매 내역 상세보기
       </button>
       <p className={styles.notice}>구매 후 15분 이내에 구매 여부를 결정할 수 있습니다.</p>
