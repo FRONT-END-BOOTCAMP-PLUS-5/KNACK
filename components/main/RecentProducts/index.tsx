@@ -56,6 +56,8 @@ const RecentProducts = () => {
     handleGetRecentlyProduct(storage);
   }, [handleGetRecentlyProduct]);
 
+  if (recentProducts?.length === 0) return;
+
   return (
     <div className={styles.recent_container}>
       <Flex align="center" justify="between">
