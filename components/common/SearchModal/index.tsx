@@ -8,6 +8,7 @@ import RecentProducts from './RecentProducts';
 import { productsService } from '@/services/products';
 import { useCallback, useEffect, useState } from 'react';
 import { IRecentProduct } from '@/types/product';
+import Portal from '../Portal';
 
 interface IProps {
   handleSearchInputClick: (state: boolean) => void;
@@ -45,15 +46,17 @@ export default function SearchModal({ handleSearchInputClick }: IProps) {
   }, [handleGetRecentlyProduct]);
 
   return (
-    <article className={styles.search_container}>
-      <SearchHeader handleSearchInputClick={handleSearchInputClick} />
+    <Portal>
+      <article className={styles.search_container}>
+        <SearchHeader handleSearchInputClick={handleSearchInputClick} />
 
-      <section className={styles.search_content_wrap}>
-        <RecentKeywords handleSearchInputClick={handleSearchInputClick} />
-        <RecommendedTags handleSearchInputClick={handleSearchInputClick} />
-        {/* <PopularKeywords /> */}
-        <RecentProducts recentProducts={recentProducts} handleSearchInputClick={handleSearchInputClick} />
-      </section>
-    </article>
+        <section className={styles.search_content_wrap}>
+          <RecentKeywords handleSearchInputClick={handleSearchInputClick} />
+          <RecommendedTags handleSearchInputClick={handleSearchInputClick} />
+          {/* <PopularKeywords /> */}
+          <RecentProducts recentProducts={recentProducts} handleSearchInputClick={handleSearchInputClick} />
+        </section>
+      </article>
+    </Portal>
   );
 }

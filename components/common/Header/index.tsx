@@ -7,7 +7,7 @@ import { HEADER_TABS, DEFAULT_ACTIVE_TAB, HeaderTab } from '@/constraint/header'
 import { usePathname, useRouter } from 'next/navigation';
 import { IProps } from '@/types/header';
 import Image from 'next/image';
-import BellIcon from '@/public/icons/bell.svg';
+import HamburgerIcon from '@/public/icons/hamburger.svg';
 import CartIcon from '@/public/icons/cart.svg';
 import HomeIcon from '@/public/icons/home.svg';
 import { cartService } from '@/services/cart';
@@ -16,7 +16,7 @@ import { useCartStore } from '@/store/cartStore';
 import HeaderCategory from './HeaderCategory';
 import HeaderInput from '../HeaderInput';
 import SearchModal from '../SearchModal';
-import Portal from '../Portal';
+import CategoryBrandModal from '../CategoryBrandModal';
 
 export default function Header({
   hideHeaderElements = false,
@@ -31,6 +31,7 @@ export default function Header({
   const [activeTab, setActiveTab] = useState<HeaderTab>(DEFAULT_ACTIVE_TAB);
   const [carts, setCarts] = useState<ICart[]>([]);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [isCategoryBrandModalOpen, setIsCategoryBrandModalOpen] = useState(true);
 
   const { cartCount, setCartCount } = useCartStore();
   const { getCart } = cartService;
@@ -78,6 +79,10 @@ export default function Header({
     setIsSearchModalOpen(state);
   };
 
+  const handleCategoryBrandModalOpen = (state: boolean) => {
+    setIsCategoryBrandModalOpen(state);
+  };
+
   return (
     <header className={styles.header}>
       <div className={styles.header_container}>
@@ -103,12 +108,12 @@ export default function Header({
           <h2 className={styles.page_title}>{pageTitle}</h2>
         ) : null}
 
-        {/* 액션 버튼들 (알림, 장바구니) */}
+        {/* 액션 버튼들 (카테고리&브랜드 모달, 장바구니) */}
         {/* hideActionButtons이 true면 숨김 (프로필, 주문내역 등) */}
         {!hideActionButtons && (
           <div className={styles.header_actions}>
-            <button className={styles.icon_button}>
-              <Image src={BellIcon} width={24} height={24} alt="알림" />
+            <button className={styles.icon_button} onClick={() => setIsCategoryBrandModalOpen(true)}>
+              <Image src={HamburgerIcon} width={24} height={24} alt="카테고리 & 브랜드 모달" />
             </button>
 
             <button className={styles.icon_button} onClick={handleCartClick}>
@@ -148,10 +153,14 @@ export default function Header({
       )}
 
       {/* 검색모달 */}
-      {isSearchModalOpen && (
-        <Portal>
-          <SearchModal handleSearchInputClick={handleSearchInputClick} />
-        </Portal>
+      {isSearchModalOpen && <SearchModal handleSearchInputClick={handleSearchInputClick} />}
+
+      {/* 카테고리&브랜드모달 */}
+      {isCategoryBrandModalOpen && (
+        <CategoryBrandModal
+          handleCategoryBrandModalOpen={handleCategoryBrandModalOpen}
+          handleCartClick={handleCartClick}
+        />
       )}
     </header>
   );

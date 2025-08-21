@@ -3,7 +3,7 @@
   position: sticky;
   top: 0;
   width: 100%;
-  background-color: #fff;
+  background-color: $white;
   z-index: 1000;
 }
 
@@ -21,7 +21,7 @@
 .logo h1 {
   font-size: 2.1rem;
   font-weight: 700;
-  color: #222;
+  color: $black;
   margin: 0;
   white-space: nowrap;
 }
@@ -36,7 +36,7 @@
   background: none;
   cursor: pointer;
   padding: 0;
-  color: #222;
+  color: $black;
 }
 
 .back_button svg {
@@ -50,7 +50,7 @@
   transform: translateX(-50%);
   font-size: 1.8rem;
   font-weight: 700;
-  color: #222;
+  color: $black;
   margin: 0;
   white-space: nowrap;
 }
@@ -80,7 +80,7 @@
   border-radius: 1.8rem;
   background-color: #f8f8f8;
   font-size: 1.35rem;
-  color: #222;
+  color: $black;
   outline: none;
 }
 
@@ -89,7 +89,7 @@
 }
 
 .search_input:focus {
-  background-color: #f0f0f0;
+  background-color: $light-gray05;
 }
 
 .header_actions {
@@ -116,15 +116,15 @@
 .bag_icon {
   width: 2.1rem;
   height: 2.1rem;
-  color: #222;
+  color: $black;
 }
 
 /* Tab Navigation Styles */
 /* 탭 네비게이션 컨테이너 - 가로 스크롤 가능한 탭 리스트를 감싸는 요소 */
 .tab_navigation {
   width: 100%;
-  background-color: #fff;
-  border-bottom: 1px solid #f0f0f0;
+  background-color: $white;
+  border-bottom: 1px solid $light-gray04;
 }
 
 /* 탭 리스트 - 가로로 나열된 탭들을 감싸는 ul 요소 */
@@ -167,12 +167,12 @@
 
 /* 탭 버튼 호버 효과 */
 .tab_button:hover {
-  color: #222;
+  color: $black;
 }
 
 /* 활성화된 탭 버튼 스타일 */
 .tab_button.active {
-  color: #222;
+  color: $black;
   font-weight: 700;
 }
 
@@ -185,15 +185,15 @@
   transform: translateX(-50%);
   width: 3rem;
   height: 0.2rem;
-  background-color: #222;
+  background-color: $black;
   border-radius: 0.1rem;
 }
 
 .cart_count {
   align-items: center;
-  background-color: #ef6253;
+  background-color: $red01;
   border-radius: 8px;
-  color: #fff;
+  color: $white;
   display: flex;
   font-size: 1.1rem;
   font-weight: 700;
