@@ -39,7 +39,7 @@ const AddressPage = () => {
       });
   }, [getAddress]);
 
-  const onClickAddressSave = () => {
+  const onClickAddressSave = (selectAddress: IAddress) => {
     if (modalType === 'add') {
       const data = addAddressConversion(addressInfo, user?.id);
 
@@ -58,7 +58,7 @@ const AddressPage = () => {
     }
 
     if (modalType === 'change') {
-      actionUpdateAddress();
+      actionUpdateAddress(selectAddress);
     }
   };
 
@@ -67,13 +67,11 @@ const AddressPage = () => {
   };
 
   const handleUpdateAddress = (type: 'default' | 'change', addressInfo: IAddress) => {
-    const data = updateAddressConversion(addressInfo, user?.id);
-
     setModalType(type);
 
     if (type === 'default') {
-      data['isDefault'] = true;
-      actionUpdateAddress();
+      addressInfo['isDefault'] = true;
+      actionUpdateAddress(addressInfo);
     }
 
     if (type === 'change') {
@@ -82,13 +80,14 @@ const AddressPage = () => {
     }
   };
 
-  const actionUpdateAddress = () => {
-    const data = updateAddressConversion(addressInfo, user?.id);
+  const actionUpdateAddress = (selectAddress: IAddress) => {
+    const data = updateAddressConversion(selectAddress, user?.id);
 
     updateAddress(data)
       .then((res) => {
         if (res) {
           initAddress();
+          alert('변경이 완료 되었어요!');
         }
       })
       .catch((error) => {
@@ -99,9 +98,12 @@ const AddressPage = () => {
   const handleDeleteAddress = (id: number) => {
     deleteAddress(id)
       .then((res) => {
-        if (res) {
-          initAddress();
+        if (res?.result?.message) {
+          return alert('결제중인 주소가 있어요!');
         }
+
+        initAddress();
+        alert('성공적으로 삭제 했어요!');
       })
       .catch((error) => {
         console.log('error', error.message);
