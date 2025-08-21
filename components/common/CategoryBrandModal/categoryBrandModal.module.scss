@@ -133,18 +133,29 @@
   position: relative;
   text-overflow: ellipsis;
   width: 100px;
-  font-weight: 700;
+  font-weight: 400;
   padding-left: 12px;
   font-size: 1.4rem;
   max-height: 33px;
   overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
   &::before {
-    background: $black;
+    background: transparent;
     content: '';
     height: 45px;
     left: 0;
     position: absolute;
     width: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  &.active {
+    font-weight: 700;
+    &::before {
+      background: $black;
+    }
   }
 }
 
@@ -161,7 +172,7 @@
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  height: calc(100vh - 164px);
+  height: calc(100vh - 160px);
   overflow-x: hidden;
   overflow-y: auto;
 }
