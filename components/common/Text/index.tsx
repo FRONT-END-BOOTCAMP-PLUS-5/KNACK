@@ -1,6 +1,6 @@
 'use client';
 
-const TEXT_COLOR = {
+export const TEXT_COLOR = {
   black1: '#222',
   gray1: '#222222cc',
   gray2: '#22222280',
