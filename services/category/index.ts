@@ -1,11 +1,8 @@
-import requester from '@/utils/requester';
+import { IPageCategory } from '@/types/category';
+import { get } from '@/utils/requester';
 
 export const categoryService = {
   getCategories: async () => {
-    const { data, error } = await requester.get(`/api/categories`).catch((error) => error);
-
-    if (error) throw new Error(error.message);
-
-    return data;
+    return await get<IPageCategory[]>(`/api/categories`);
   },
 };

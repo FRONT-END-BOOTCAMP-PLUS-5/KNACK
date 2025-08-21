@@ -7,7 +7,7 @@ export async function GET() {
     const categoryRepository = new PrCategoryRepository();
     const categories = await new GetCategoryUseCase(categoryRepository).execute();
 
-    return NextResponse.json({ result: categories, status: 200 });
+    return NextResponse.json(categories);
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json({ message: error.message }, { status: 503 });
