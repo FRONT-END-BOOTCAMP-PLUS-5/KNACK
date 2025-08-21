@@ -3,6 +3,7 @@ import styles from './textReview.module.scss';
 import Flex from '@/components/common/Flex';
 import Button from '@/components/common/Button';
 import { REVIEW_QUESTIONS, DEFAULT_CATEGORY_ID } from '@/utils/review';
+import ReviewBottomSheet from '../ReviewBottomSheet';
 
 interface IProps {
   productData: {
@@ -25,7 +26,6 @@ interface IProps {
 const TextReview = ({ productData }: IProps) => {
   // 리뷰가 없어도 UI는 표시하되, 내용만 다르게
   const hasReviews = productData._count.reviews && productData._count.reviews > 0;
-
 
   // 별점 분포 데이터 생성 (5점부터 1점까지)
   const ratingProgressData = [5, 4, 3, 2, 1].map(rating => ({
@@ -98,58 +98,8 @@ const TextReview = ({ productData }: IProps) => {
         </Flex>
       )}
       
-      <Button text="리뷰 더보기" size="large" style="border" />
-      
-      {/* allQuestionAnswers 데이터 표시 */}
-      {hasReviews && productData.allQuestionAnswers && (
-        <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
-          <Flex gap={32}>
-            <Text size={4} weight={700}>
-              {productData.averageRating || 0}
-              <Text tag="span">★</Text>
-            </Text>
-            <Flex direction="column">
-              {ratingProgressData.map((item) => (
-                <Flex align="center" gap={8} key={item.rating} marginVertical={4}>
-                  <div className={styles.review_progress_bar}>
-                    <div className={styles.progress} style={{ width: `${item.percent}%` }} />
-                  </div>
-
-                  <Text className={styles.progress_rating} size={1.1} color="gray5">
-                    {item.rating}
-                  </Text>
-                </Flex>
-              ))}
-            </Flex>
-          </Flex>
-          
-          <Text tag="h3" size={1.5} weight={600} paddingBottom={16}>
-            설문지 결과 상세
-          </Text>
-          
-          {Object.entries(productData.allQuestionAnswers).map(([question, answers]) => (
-            <div key={question} style={{ marginBottom: '20px' }}>
-              <Text tag="h4" size={1.3} weight={600} paddingBottom={8}>
-                {question}
-              </Text>
-              
-              {Object.entries(answers).map(([answer, stats]) => (
-                <Flex key={answer} justify="between" align="center" paddingVertical={4}>
-                  <Text size={1.2}>{answer}</Text>
-                  <Flex gap={8}>
-                    <Text size={1.2} color="gray5">
-                      {stats.count}명
-                    </Text>
-                    <Text size={1.2} weight={600}>
-                      {stats.percent}%
-                    </Text>
-                  </Flex>
-                </Flex>
-              ))}
-            </div>
-          ))}
-        </div>
-      )}
+      {/* ReviewBottomSheet 컴포넌트 사용 */}
+      <ReviewBottomSheet productData={productData} />
     </section>
   );
 };
