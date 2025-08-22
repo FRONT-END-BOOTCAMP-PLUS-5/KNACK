@@ -7,8 +7,10 @@
   bottom: 0;
   z-index: 1000;
   background-color: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(.8rem);
+  -webkit-backdrop-filter: blur(.8rem);
+  max-width: 440px;
+  margin: 0 auto;
 }
 
 // 바텀시트 컨테이너
@@ -18,124 +20,186 @@
   left: 0;
   right: 0;
   background-color: white;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-  padding: 20px;
-  max-height: 80vh;
+  border-top-left-radius: 1.6rem;
+  border-top-right-radius: 1.6rem;
+  padding: 1.8rem 2.4rem 2.4rem;
+  min-height: 90vh;
   overflow-y: auto;
   transform: translateY(100%);
   animation: slideUp 0.3s ease-out forwards;
 }
 
-// 핸들바
-.handle {
-  width: 40px;
-  height: 4px;
-  background-color: #e0e0e0;
-  border-radius: 2px;
-  margin: 0 auto 16px auto;
+// 헤더
+.review_header {
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2.4rem;
+  display: flex;
 }
 
 // 제목
 .title {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 600;
-  padding-bottom: 16px;
+  color: #333;
+  margin: 0;
 }
 
-// 섹션 제목
-.section_title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  padding-bottom: 8px;
-  margin-bottom: 20px;
-}
-
-// 질문 제목
-.question_title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  padding-bottom: 8px;
-  margin-bottom: 20px;
+// 닫기 버튼
+.close_button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  
+  img {
+    width: 5rem;
+    height: 5rem;
+  }
 }
 
 // 별점 컨테이너
 .rating_container {
-  margin-bottom: 20px;
+  margin-bottom: 3.2rem;
+  display: flex;
+  gap: 3.2rem;
 }
 
-// 별점 분포 컨테이너
-.rating_distribution {
-  gap: 32px;
+// 별점 요약
+.rating_summary {
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+  min-width: 8rem;
 }
 
 // 평균 별점
 .average_rating {
-  font-size: 4rem;
+  font-size: 3.5rem;
   font-weight: 700;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: .8rem;
 }
 
 // 별 아이콘
 .star_icon {
-  font-size: 4rem;
+  font-size: 2rem;
   font-weight: 700;
-  color: #000000;
+  color: $gray01;
+  margin-top: 1rem;
+  margin-left: -.5rem;
 }
 
-// 별점 분포 리스트
-.rating_list {
+// 리뷰 개수
+.review_count {
+  font-size: 1.4rem;
+  color: #666;
+  font-weight: 500;
+}
+
+// 별점 분포
+.rating_distribution {
+  flex: 1;
+  display: flex;
   flex-direction: column;
+  gap: .5rem;
 }
 
 // 별점 항목
 .rating_item {
+  display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 4px 0;
+  gap: 1.6rem;
 }
 
 // 프로그레스 바 컨테이너
 .progress_container {
-  width: 100px;
-  height: 8px;
-  background-color: #000000;
-  border-radius: 4px;
+  flex: 1;
+  height: .4rem;
+  background-color: #f0f0f0;
+  border-radius: .2rem;
   overflow: hidden;
 }
 
 // 프로그레스 바
 .progress_bar {
   height: 100%;
-  background-color: #000000;
+  background-color: #333;
   transition: width 0.3s ease;
+  border-radius: .2rem;
 }
 
 // 별점 숫자
 .rating_number {
-  font-size: 1.1rem;
-  color: #666;
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: 500;
+  min-width: 2.4rem;
+  text-align: right;
 }
 
-// 설문지 결과 컨테이너
-.question_results {
-  margin-bottom: 20px;
+// 리뷰가 없을 때
+.no_reviews {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.no_reviews_text {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: .8rem;
+}
+
+.no_reviews_subtext {
+  font-size: 1.4rem;
+  color: #999;
+  font-weight: 400;
+}
+
+// 질문 블록
+.question_block {
+  margin-bottom: 1.4rem;
+  padding-bottom: 1.4rem;
+  border-bottom: 1px solid $light-gray03;
+}
+
+// 질문 제목
+.question_title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.6rem;
+  color: #333;
 }
 
 // 답변 항목
 .answer_item {
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 0;
+  padding: 0rem 0 1rem;
 }
 
 // 답변 텍스트
 .answer_text {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  color: #333;
+  flex: 1;
 }
 
 // 답변 통계
 .answer_stats {
-  gap: 8px;
+  display: flex;
+  gap: 1.6rem;
+  align-items: center;
 }
 
 // 답변 인원수
@@ -146,23 +210,11 @@
 
 // 답변 퍼센트
 .answer_percent {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 600;
-}
-
-// 별점 분포 가로선
-.rating_line {
-  width: 100%;
-  height: 1px;
-  background-color: #000000;
-  margin: 16px 0;
-}
-
-// 별점 숫자들
-.rating_numbers {
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 8px;
+  color: #333;
+  min-width: 5rem;
+  text-align: right;
 }
 
 // 애니메이션
@@ -173,5 +225,20 @@
   to {
     transform: translateY(0);
   }
+}
+
+// 리뷰 더보기 버튼
+.review_button {
+  background-color: white;
+  border: none;
+  border-radius: .8rem;
+  padding: 1.2rem 2.4rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  border: 1px solid $light-gray03;
 }
 
