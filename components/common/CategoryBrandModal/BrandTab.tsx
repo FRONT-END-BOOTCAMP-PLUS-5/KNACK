@@ -23,12 +23,8 @@ export default function BrandTab() {
 
   const handleTabChange = (tab: 'ALL' | 'MY') => {
     setActiveBrandTab(tab);
-    if (tab === 'ALL') {
-      setTimeout(() => {
-        if (brands.length > 0) {
-          setActiveTag(brands[0].tag);
-        }
-      }, 100);
+    if (tab === 'ALL' && brands.length > 0) {
+      setActiveTag(brands[0].tag);
     }
   };
 
@@ -48,48 +44,33 @@ export default function BrandTab() {
     initBrands();
   }, []);
 
-  // 스크롤 감지하여 활성 태그 업데이트
   useEffect(() => {
-    const handleScroll = () => {
-      if (!brandContainerRef.current || activeBrandTab !== 'ALL') return;
-
-      const container = brandContainerRef.current;
-
-      // 각 브랜드 그룹의 위치를 확인하여 현재 보이는 태그 찾기
-      let currentActiveTag = '';
-
-      Object.entries(brandGroupRefs.current).forEach(([tag, element]) => {
-        if (!element) return;
-
-        const rect = element.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        const elementTop = rect.top - containerRect.top;
-
-        // 요소가 화면 상단에 가까우면 해당 태그를 활성화
-        if (elementTop <= 100 && elementTop > -rect.height) {
-          currentActiveTag = tag;
-        }
-      });
-
-      if (currentActiveTag && currentActiveTag !== activeTag) {
-        setActiveTag(currentActiveTag);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && activeBrandTab === 'ALL') {
+            const tag = entry.target.getAttribute('data-brand-tag') || '';
+            setActiveTag(tag);
+          }
+        });
+      },
+      {
+        root: brandContainerRef.current,
+        rootMargin: '-20% 0px -70% 0px',
+        threshold: 0,
       }
-    };
+    );
 
-    const container = brandContainerRef.current;
-    if (container && activeBrandTab === 'ALL') {
-      container.addEventListener('scroll', handleScroll);
-      setTimeout(() => {
-        handleScroll();
-      }, 100);
-    }
+    Object.values(brandGroupRefs.current).forEach((element) => {
+      if (element) {
+        observer.observe(element);
+      }
+    });
 
     return () => {
-      if (container) {
-        container.removeEventListener('scroll', handleScroll);
-      }
+      observer.disconnect();
     };
-  }, [activeTag, brands, activeBrandTab]);
+  }, [brands, activeBrandTab]);
 
   const handleTagClick = useCallback((tag: string) => {
     const targetElement = brandGroupRefs.current[tag];
@@ -181,6 +162,7 @@ export default function BrandTab() {
               brands.map((brandGroup) => (
                 <div
                   key={brandGroup.tag}
+                  data-brand-tag={brandGroup.tag}
                   ref={(el) => {
                     brandGroupRefs.current[brandGroup.tag] = el;
                   }}
