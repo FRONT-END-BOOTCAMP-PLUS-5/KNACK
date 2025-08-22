@@ -78,7 +78,7 @@ export type RepoPayment = {
   tossPaymentKey?: string | null;
   approvedAt?: Date | null;
   method?: string | null;
-  status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | 'CONFIRMED' | 'DELIVERING' | 'COMPLETED' | string;
+  status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
   orders: Array<{
     id: number;
     status: string;
@@ -115,7 +115,7 @@ export type RepoIndependentOrder = {
   address?: RepoAddress | null;
 }
 
-export type DtoStatus = 'DONE' | 'PENDING' | 'FAILED' | 'CANCELED' | 'CONFIRMED' | 'DELIVERING' | 'COMPLETED' | string;
+export type DtoStatus = 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
 
 export type BuyingPageProps = { params: Promise<{ id: string }> };
 
@@ -189,7 +189,7 @@ export type RepoOrderItem = {
   paymentId: number;
   payment: {
     paymentNumber: bigint;
-    status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | 'CONFIRMED' | 'DELIVERING' | 'COMPLETED' | string;
+    status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
   }
   price: number | bigint;
   salePrice?: number | bigint;

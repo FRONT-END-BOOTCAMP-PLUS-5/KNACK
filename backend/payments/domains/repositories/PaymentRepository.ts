@@ -53,7 +53,6 @@ export interface PaymentRepository {
      * Toss Webhook 등을 통해 결제 상태 갱신
      */
     updateStatusByTossPaymentKey(tossPaymentKey: string, status: string): Promise<void>
-    updateStatusById(paymentId: number, status: string): Promise<void>
 
     generateTodayPaymentNumber(): Promise<number>
 

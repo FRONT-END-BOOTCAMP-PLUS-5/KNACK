@@ -124,11 +124,11 @@ export function formatPrice(n?: number) {
     return (n ?? 0).toLocaleString() + "원";
 }
 
-export function statusToStep(status?: string): Step {
-    const s = (status ?? "").toUpperCase();
-    if (s === "PAID") return "구매 확정";
-    if (s === "CONFIRMED") return "배송 대기";
-    if (s === "DELIVERING") return "배송 중";
-    if (s === "COMPLETED") return "배송 완료";
+export function statusToStep(status?: number): Step {
+    const s = (status ?? 1);
+    if (s === 1) return "구매 확정";
+    if (s === 2) return "배송 대기";
+    if (s === 3) return "배송 중";
+    if (s === 4) return "배송 완료";
     return "구매 확정";
 }

@@ -43,11 +43,11 @@ export default function BuyingPage({ params }: BuyingPageProps) {
     const [confirming, setConfirming] = useState(false);
 
     // 하단 버튼 클릭시 완료 처리
-    const handleFooterClick = async (item: RepoOrderItem) => {
+    const handleFooterClick = async () => {
         setConfirming(true);
         try {
             setIsPaymentCompleted(true);
-            await requester.put(`/api/payments/${item.paymentId}`, { status: 'CONFIRMED' });
+            await requester.put(`/api/orders/${orderId}`, { status: 2 });
         } catch (error) {
             console.error('Failed to confirm payment:', error);
             setIsPaymentCompleted(false);
@@ -66,7 +66,7 @@ export default function BuyingPage({ params }: BuyingPageProps) {
 
     const total = productTotal + (paymentData?.shippingFee ?? 0) - (item?.couponPrice ?? 0) - (item?.point ?? 0);
 
-    const step: Step = statusToStep(item?.payment?.status);
+    const step: Step = statusToStep(item?.deliveryStatus);
 
     // 주소 안전 매핑
     const name =
@@ -111,10 +111,10 @@ export default function BuyingPage({ params }: BuyingPageProps) {
                     method: data.method,
                     createdAt: data.createdAt,
                 });
-                const paymentStatus = data.payment?.status as string | undefined;
+                const paymentStatus = data.deliveryStatus as number | undefined;
 
                 // status가 CONFIRMED이면 결제 완료 처리
-                if (paymentStatus === 'CONFIRMED') {
+                if (paymentStatus === 2) {
                     setIsPaymentCompleted(true);
                 }
                 // 결제 완료 시간 체크 로직
@@ -126,14 +126,14 @@ export default function BuyingPage({ params }: BuyingPageProps) {
                     // 15분(900000ms) 이상 지났으면 완료 처리
                     if (timeDiff >= 900000) {
                         setIsPaymentCompleted(true);
-                        requester.put(`/api/payments/${data.paymentId}`, { status: 'CONFIRMED' });
+                        requester.put(`/api/orders/${orderId}`, { status: 2 });
                     } else {
                         // 남은 시간만큼 타이머 설정
                         setIsPaymentCompleted(false);
                         const remainingTime = 900000 - timeDiff;
                         setTimeout(() => {
                             setIsPaymentCompleted(true);
-                            requester.put(`/api/payments/${data.paymentId}`, { status: 'CONFIRMED' });
+                            requester.put(`/api/orders/${orderId}`, { status: 2 });
                         }, remainingTime);
                     }
                 }
@@ -141,7 +141,7 @@ export default function BuyingPage({ params }: BuyingPageProps) {
                 console.error("Failed to fetch payment data:", e);
             }
         })();
-    }, [orderId]);
+    }, [isPaymentCompleted, orderId]);
 
     return (
         <>
@@ -306,13 +306,12 @@ export default function BuyingPage({ params }: BuyingPageProps) {
 
 
             {/* 하단 CTA(디자인에 따라 BuyingFooter가 fixed 버튼을 포함할 수도 있음) */}
-            {
-                !isPaymentCompleted ? (
-                    <BuyingFooter
-                        onClickPayment={() => item && handleFooterClick(item)}
-                        disabled={!item || confirming || isPaymentCompleted}
-                    />
-                ) : null
+            {!isPaymentCompleted ? (
+                <BuyingFooter
+                    onClickPayment={() => item && handleFooterClick()}
+                    disabled={!item || confirming || isPaymentCompleted}
+                />
+            ) : null
             }
         </>
     );
