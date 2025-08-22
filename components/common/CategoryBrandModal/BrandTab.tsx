@@ -4,11 +4,14 @@ import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
+import BookMark from '@/public/icons/book_mark.svg';
 import BookMarkOn from '@/public/icons/book_mark_active.svg';
 import styles from './categoryBrandModal.module.scss';
 import { brandService } from '@/services/brand';
 import { IBrandWithTagList } from '@/types/brand';
 import DragScroll from '@/components/common/DragScroll';
+import BrandMy from './BrandMy';
+import Link from 'next/link';
 
 export default function BrandTab() {
   const [brands, setBrands] = useState<IBrandWithTagList[]>([]);
@@ -18,11 +21,9 @@ export default function BrandTab() {
   const tagRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const brandGroupRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
-  // 탭 전환 시 ref 초기화
   const handleTabChange = (tab: 'ALL' | 'MY') => {
     setActiveBrandTab(tab);
     if (tab === 'ALL') {
-      // ALL 탭으로 돌아올 때 ref들을 초기화하고 첫 번째 태그를 활성화
       setTimeout(() => {
         if (brands.length > 0) {
           setActiveTag(brands[0].tag);
@@ -78,7 +79,6 @@ export default function BrandTab() {
     const container = brandContainerRef.current;
     if (container && activeBrandTab === 'ALL') {
       container.addEventListener('scroll', handleScroll);
-      // 탭 전환 시 약간의 지연 후 스크롤 이벤트 실행
       setTimeout(() => {
         handleScroll();
       }, 100);
@@ -91,7 +91,6 @@ export default function BrandTab() {
     };
   }, [activeTag, brands, activeBrandTab]);
 
-  // 태그 클릭 시 해당 브랜드 그룹으로 스크롤
   const handleTagClick = useCallback((tag: string) => {
     const targetElement = brandGroupRefs.current[tag];
     if (targetElement && brandContainerRef.current) {
@@ -140,7 +139,7 @@ export default function BrandTab() {
           <div onClick={() => handleTabChange('MY')}>
             <Flex direction="column" width="self" gap={4} align="center" className={styles.brand_button_wrapper}>
               <div className={`${styles.brand_button_image} ${activeBrandTab === 'MY' ? styles.active : ''}`}>
-                <Image src={BookMarkOn} alt="관심 브랜드 아이콘" width={20} height={20} />
+                <Image src={BookMarkOn} alt="관심 브랜드 아이콘" width={24} height={24} />
               </div>
               <Text
                 color={activeBrandTab === 'MY' ? 'black1' : 'lightGray1'}
@@ -188,7 +187,7 @@ export default function BrandTab() {
                   className={styles.brand_group}
                 >
                   {brandGroup.brandList.map((brand) => (
-                    <section key={brand.id} className={styles.brand_item}>
+                    <Link key={brand.id} className={styles.brand_item} href={`/search?keyword=${brand.korName}`}>
                       <Flex justify="between" align="center">
                         <Flex gap={16} align="center">
                           <span className={styles.logo_image}>
@@ -209,21 +208,17 @@ export default function BrandTab() {
                           </Flex>
                         </Flex>
                         <button className={styles.book_mark_button}>
-                          <Image src={BookMarkOn} alt="좋아요 아이콘" width={20} height={20} />
+                          <Image src={BookMark} alt="좋아요 아이콘" width={20} height={20} />
                         </button>
                       </Flex>
-                    </section>
+                    </Link>
                   ))}
                 </div>
               ))}
           </div>
         </>
       )}
-      {activeBrandTab === 'MY' && (
-        <div>
-          <Text>관심 브랜드</Text>
-        </div>
-      )}
+      {activeBrandTab === 'MY' && <BrandMy />}
     </article>
   );
 }
