@@ -63,19 +63,21 @@ export default function CategoryBrandModal({ handleCategoryBrandModalOpen, handl
               <span className={styles.cart_count}>{cartCount}</span>
             </button>
           </div>
-          <div className={styles.kakao_banner_container}>
-            <div className={styles.kakao_banner_wrapper}>
-              <div>
-                <Text color="black1" size={1.6} weight={700}>
-                  최대 3만원 즉시할인
-                </Text>
-                <Text color="gray5" size={1.3}>
-                  카카오페이 머니 결제 시
-                </Text>
+          {activeTab === 'category' && (
+            <div className={styles.kakao_banner_container}>
+              <div className={styles.kakao_banner_wrapper}>
+                <div>
+                  <Text color="black1" size={1.6} weight={700}>
+                    최대 3만원 즉시할인
+                  </Text>
+                  <Text color="gray5" size={1.3}>
+                    카카오페이 머니 결제 시
+                  </Text>
+                </div>
+                <Image src={Kakao} width={250} height={100} alt="카카오 페이 배너" />
               </div>
-              <Image src={Kakao} width={250} height={100} alt="카카오 페이 배너" />
             </div>
-          </div>
+          )}
         </section>
         {activeTab === 'category' && (
           <CategoryTab categoryList={categoryList} handleCategoryBrandModalOpen={handleCategoryBrandModalOpen} />

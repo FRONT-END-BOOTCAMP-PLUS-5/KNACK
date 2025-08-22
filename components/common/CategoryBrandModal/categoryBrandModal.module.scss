@@ -16,7 +16,6 @@
   top: 0;
   z-index: 1;
   background-color: $white;
-  border-bottom: 1px solid $light-gray03;
 }
 
 .header_wrapper {
@@ -32,17 +31,19 @@
 
 .kakao_banner_container {
   background-color: $white;
+  border-bottom: 1px solid $light-gray03;
 }
 
 .kakao_banner_wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 98px;
   margin: 4px 8px 12px;
   padding-left: 12px;
   overflow: hidden;
   border-radius: 10px;
   background-color: #f6f6f6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .nav_container {
@@ -234,4 +235,48 @@
   font-size: 1.3rem;
   margin-top: 6px;
   text-align: center;
+}
+
+// 브랜드
+
+.brand_header_container {
+  height: 98px;
+}
+
+.logo_image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: $black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.brand_container {
+  padding: 20px 16px;
+  overflow-y: auto;
+}
+
+.brand_item {
+  padding: 16px 0;
+  border-bottom: 1px solid $light-gray03;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.book_mark_button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
 }

@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   try {
     const brandRepository = new PrBrandRepository();
     const brands = await new GetBrandUseCase(brandRepository).execute({ keyword, key });
-    return NextResponse.json({ result: brands, status: 200 });
+    return NextResponse.json(brands);
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json({ message: error.message, status: 503 });
