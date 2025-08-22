@@ -9,8 +9,8 @@ export const likeService = {
     return data;
   },
 
-  deleteLike: async (id: number) => {
-    const { data, error } = await requester.delete(`api/likes`, { data: { id: id } }).catch((error) => error);
+  deleteLike: async (productId: number) => {
+    const { data, error } = await requester.delete(`api/likes`, { data: { id: productId } }).catch((error) => error);
 
     if (error) throw new Error(error.message);
 

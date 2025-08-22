@@ -1,9 +1,24 @@
 'use client';
 
-import Link from 'next/link';
 import styles from './searchModal.module.scss';
+import { CATEGORY_ALL_TAB } from '@/constraint/header';
+import { useRouter } from 'next/navigation';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
-export default function RecommendedTags() {
+interface IProps {
+  handleSearchInputClick: (state: boolean) => void;
+}
+
+export default function RecommendedTags({ handleSearchInputClick }: IProps) {
+  const router = useRouter();
+  const { addStorage } = useLocalStorage();
+
+  const handleTagClick = (tag: string) => {
+    addStorage(tag);
+    router.push(`/search?keyword=${encodeURIComponent(tag)}`);
+    handleSearchInputClick(false);
+  };
+
   return (
     <section className={styles.search_card_items}>
       <div className={styles.layer_search_item}>
@@ -13,14 +28,10 @@ export default function RecommendedTags() {
         </div>
         <div className={styles.layer_search_item_content_wrap}>
           <div className={styles.search_card_tag_wrap}>
-            {Array.from({ length: 6 }).map((tag, index) => (
-              <Link
-                key={index}
-                href={`/search?keyword=${encodeURIComponent('태그')}`}
-                className={styles.search_card_tag}
-              >
-                <span>{'태그'}</span>
-              </Link>
+            {CATEGORY_ALL_TAB.subCategories.slice(0, 6).map((tag, index) => (
+              <div key={index} className={styles.search_card_tag} onClick={() => handleTagClick(tag.value)}>
+                <span>{tag.name}</span>
+              </div>
             ))}
           </div>
         </div>

@@ -26,6 +26,7 @@
   font-weight: 600;
 
   &::placeholder {
+    font-weight: 400;
     color: $light-gray01;
   }
 }
