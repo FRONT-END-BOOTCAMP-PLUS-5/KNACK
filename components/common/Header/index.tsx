@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import styles from './header.module.scss';
 import { HEADER_TABS, DEFAULT_ACTIVE_TAB, HeaderTab } from '@/constraint/header';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { IProps } from '@/types/header';
 import Image from 'next/image';
 import HamburgerIcon from '@/public/icons/hamburger.svg';
@@ -28,10 +28,11 @@ export default function Header({
 }: IProps) {
   // 현재 활성화된 탭 상태 관리
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<HeaderTab>(DEFAULT_ACTIVE_TAB);
   const [carts, setCarts] = useState<ICart[]>([]);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [isCategoryBrandModalOpen, setIsCategoryBrandModalOpen] = useState(true);
+  const [isCategoryBrandModalOpen, setIsCategoryBrandModalOpen] = useState(false);
 
   const { cartCount, setCartCount } = useCartStore();
   const { getCart } = cartService;
@@ -74,6 +75,11 @@ export default function Header({
   useEffect(() => {
     setCartCount(carts.length);
   }, [carts.length, setCartCount]);
+
+  useEffect(() => {
+    setIsSearchModalOpen(false);
+    setIsCategoryBrandModalOpen(false);
+  }, [pathname, searchParams]);
 
   const handleSearchInputClick = (state: boolean) => {
     setIsSearchModalOpen(state);
