@@ -13,37 +13,71 @@ import { TossConfirmResult, TossGateway } from '@/types/payment'
 import { serverPost } from '@/backend/utils/serverRequester'
 import { PrOrderRepository } from '@/backend/orders/repositories/PrOrderRepository'
 
+export const runtime = 'nodejs'; // Prisma/Node 모듈이면 안전
+
+import axios from 'axios';
+
 export async function POST(req: NextRequest) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await getServerSession(authOptions);
         if (!session?.user) {
-            return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+            return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
         }
-        const userId = session.user.id
+        const userId = session.user.id;
 
+        const body = await req.json();
         const {
             tossPaymentKey, orderId, amount, addressId, orderIds,
             selectedCouponId, pointsToUse
-        } = await req.json()
+        } = body;
+
+        // ✅ 1) 입력값 1차 검증 (개발서버에서 특히 중요)
+        if (!tossPaymentKey || !orderId || !Number.isFinite(Number(amount))) {
+            return NextResponse.json({ message: 'bad params', body }, { status: 400 });
+        }
+        if (!Number.isFinite(Number(addressId))) {
+            return NextResponse.json({ message: 'bad addressId', addressId }, { status: 400 });
+        }
+        if (!Array.isArray(orderIds) || orderIds.length === 0) {
+            return NextResponse.json({ message: 'empty orderIds' }, { status: 400 });
+        }
+
+        console.log('[POST /api/payments] IN', {
+            userId,
+            orderId,
+            amount: Number(amount),
+            addressId: Number(addressId),
+            orderIdsLen: orderIds.length,
+            mode: process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY?.startsWith('test_') ? 'test' : 'live',
+        });
 
         const tossGateway: TossGateway = {
-            async confirmPayment({
-                tossPaymentKey, orderId, amount
-            }: {
-                tossPaymentKey: string; orderId: string; amount: number
-            }): Promise<TossConfirmResult> {
-                const data = await serverPost('/payments/confirm', { paymentKey: tossPaymentKey, orderId, amount }, 'toss')
-                return {
-                    paymentKey: data.paymentKey,
-                    method: data.method,
-                    status: data.status,
-                    approvedAt: data.approvedAt,
-                    requestedAt: data.requestedAt,
-                    amount: data.amount,
-                    // card 등 부가 필드가 있다면 TossConfirmResult에 포함되도록 타입/리턴 확장
+            async confirmPayment({ tossPaymentKey, orderId, amount }) {
+                try {
+                    const data = await serverPost('/payments/confirm',
+                        { paymentKey: tossPaymentKey, orderId, amount },
+                        'toss'
+                    );
+                    return {
+                        paymentKey: data.paymentKey,
+                        method: data.method,
+                        status: data.status,
+                        approvedAt: data.approvedAt,
+                        requestedAt: data.requestedAt,
+                        amount: data.amount,
+                    };
+                } catch (e: unknown) {
+                    if (axios.isAxiosError(e)) {
+                        console.error('[TOSS CONFIRM ERR]', e.response?.status, e.response?.data);
+                        const code = e.response?.data?.code;
+                        const msg = e.response?.data?.message;
+                        // Toss 에러 코드를 그대로 던져 프론트/로그에서 즉시 확인 가능하게
+                        throw new Error(`TOSS:${code}:${msg}`);
+                    }
+                    throw e;
                 }
             }
-        }
+        };
 
         const usecase = new ConfirmPaymentUseCase(
             new PrPaymentRepository(),
@@ -52,7 +86,7 @@ export async function POST(req: NextRequest) {
             new PrUserPointsRepository(),
             tossGateway,
             new PrCardRepository(),
-        )
+        );
 
         const result = await usecase.execute({
             userId,
@@ -63,23 +97,22 @@ export async function POST(req: NextRequest) {
             orderIds: (orderIds as number[]) ?? [],
             selectedCouponId: selectedCouponId ? Number(selectedCouponId) : null,
             pointsToUse: pointsToUse ? Number(pointsToUse) : 0,
-        })
+        });
 
-        // ✅ id를 포함해 응답을 명시적으로 구성
         return NextResponse.json({
-            id: result.id,                                  // payment 테이블 id
+            id: result.id,
             status: result.status,
             paymentNumber: result.paymentNumber ?? null,
             approvedAt: result.approvedAt ?? null,
             method: result.method ?? null,
             orderIds,
             amount: Number(amount),
-        }, { status: 201 })
-    } catch (e) {
-        console.error('[POST /api/payments] failed:', e)
-        return NextResponse.json(
-            { message: (e as Error).message ?? '결제 승인 실패' },
-            { status: 400 }
-        )
+        }, { status: 201 });
+
+    } catch (e: unknown) {
+        console.error('[POST /api/payments] failed:', e);
+        // ✅ Toss 에러면 코드 그대로 노출 (개발 중에만)
+        const msg = (e instanceof Error ? e.message : String(e)) || '결제 승인 실패';
+        return NextResponse.json({ message: msg }, { status: 400 });
     }
 }

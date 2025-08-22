@@ -3,27 +3,33 @@
 import { useEffect, useState } from 'react'
 import styles from './addressModal.module.scss'
 import requester from '@/utils/requester'
-import { formatAddressDisplay, formatPhoneNumber, phonePattern } from '@/utils/formatAddressUtils'
+import { formatPhoneNumber, phonePattern } from '@/utils/formatAddressUtils'
 import Image from 'next/image'
 import { AddressAddModal } from '../AddressAddModal'
-import { AddressModalProps, ApiAddress, SelectedAddress } from '@/types/order'
+import { AddressModalProps } from '@/types/order'
+import { IAddress } from '@/types/address'
 
 export default function AddressModal({
     onClose, selectedAddress, onChangeSelected,
 }: AddressModalProps) {
-    const [saved, setSaved] = useState<ApiAddress[]>([])
+    const [saved, setSaved] = useState<IAddress[]>([])
     const selectedId = selectedAddress?.id ?? 0
     // 상단 state 추가
     const [openAddModal, setOpenAddModal] = useState(false)
-    const [editing, setEditing] = useState<ApiAddress | null>(null)
-    const [initial, setInitial] = useState<Partial<ApiAddress> | null>(null)
+    const [editing, setEditing] = useState<IAddress | null>(null)
+    const [initial, setInitial] = useState<Partial<IAddress> | null>(null)
 
     // 주소 목록 로드 함수 분리 (재사용)
     const loadAddresses = async () => {
         try {
-            const res = await requester.get<ApiAddress[]>('/api/addresses')
+            const res = await requester.get<IAddress[]>('/api/addresses')
             const list = [...res.data].sort((a, b) => Number(!!b.isDefault) - Number(!!a.isDefault))
-            setSaved(list)
+            const mappedList = list.map(addr => ({
+                ...addr,
+                zipCode: addr.address.zipCode,
+                main: addr.address.main,
+            }))
+            setSaved(mappedList)
         } catch (e) {
             console.error('주소 목록 불러오기 실패:', e)
         }
@@ -37,29 +43,39 @@ export default function AddressModal({
     useEffect(() => {
         (async () => {
             try {
-                const res = await requester.get<ApiAddress[]>('/api/addresses')
+                const res = await requester.get<IAddress[]>('/api/addresses')
                 const list = [...res.data].sort((a, b) => Number(!!b.isDefault) - Number(!!a.isDefault))
-                setSaved(list)
+                const mappedList = list.map(addr => ({
+                    ...addr,
+                    zipCode: addr.address.zipCode,
+                    main: addr.address.main,
+                }))
+                setSaved(mappedList)
             } catch (e) {
                 console.error('주소 목록 불러오기 실패:', e)
             }
         })()
     }, [])
 
-    const handleSelect = (addr: ApiAddress) => {
-        const sel: SelectedAddress = {
+    const handleSelect = (addr: IAddress) => {
+        const sel: IAddress = {
             id: addr.id,
             name: addr.name,
             phone: addr.phone ?? '',
-            fullAddress: formatAddressDisplay({ zipCode: addr.zipCode, main: addr.main, detail: addr.detail }),
-            request: addr.message ?? '',
+            detail: addr.detail ?? undefined,
+            message: addr.message ?? '',
+            isDefault: addr.isDefault ?? false,
+            address: {
+                zipCode: addr.address.zipCode,
+                main: addr.address.main,
+            },
         }
         onChangeSelected(sel)
-        sessionStorage.setItem('selectedAddress', JSON.stringify(sel))
+        sessionStorage.setItem('IAddress', JSON.stringify(sel))
         onClose()
     }
 
-    const edit = (addr: ApiAddress) => {
+    const edit = (addr: IAddress) => {
         setEditing(addr)
         setInitial(null)
         setOpenAddModal(true)
@@ -71,7 +87,7 @@ export default function AddressModal({
             await requester.delete(`/api/addresses/${id}`)
             setSaved(prev => prev.filter(a => a.id !== id))
             if (selectedId === id) {
-                onChangeSelected({ id: 0, name: '', phone: '', fullAddress: '', request: '' })
+                onChangeSelected({ id: 0, name: '', phone: '', detail: '', isDefault: false, message: '', address: { zipCode: '', main: '' } })
             }
         } catch {
             alert('삭제 실패')
@@ -85,13 +101,19 @@ export default function AddressModal({
 
     // 키보드로도 선택 가능
     const keySelect =
-        (addr: ApiAddress) =>
+        (addr: IAddress) =>
             (e: React.KeyboardEvent<HTMLElement>) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault()
                     handleSelect(addr)
                 }
             }
+
+    useEffect(() => {
+        if (saved) {
+            console.log(saved)
+        }
+    }, [saved])
 
     return (
         <div className={styles.modal_overlay}>
@@ -147,7 +169,7 @@ export default function AddressModal({
                                             {addr.isDefault && <span className={styles.badge}>기본 배송지</span>}
                                         </div>
                                         <div className={styles.addr_text}>
-                                            ({addr.zipCode}) {addr.main}{addr.detail ? ` ${addr.detail}` : ''}
+                                            ({addr.address.zipCode}) {addr.address.main}{addr.detail ? ` ${addr.detail}` : ''}
                                         </div>
                                         <div className={styles.phone_text}>
                                             {phonePattern.test(addr.phone) ? formatPhoneNumber(addr.phone) : addr.phone}

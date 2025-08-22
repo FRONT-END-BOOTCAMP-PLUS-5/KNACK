@@ -1,0 +1,49 @@
+.image_box {
+  max-width: 440px;
+  width: 100%;
+  height: auto;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgb(244, 244, 244);
+}
+
+.swiper_slide {
+  display: flex !important;
+  justify-content: center;
+  width: 87% !important;
+}
+
+.swiper_container {
+  position: relative;
+  padding: 12px 0;
+
+  & .swiper_index {
+    background: #00000045;
+    padding: 5px 10px;
+    position: absolute;
+    bottom: 24px;
+    right: 45px;
+    z-index: 100;
+    color: #fff;
+    border-radius: 10px;
+    font-size: 1.2rem;
+  }
+
+  & .slide_text_box {
+    position: absolute;
+    bottom: 18px;
+    left: 18px;
+
+    & .banner_main_text {
+      white-space: pre-wrap;
+      word-break: keep-all;
+      width: 100%;
+      max-width: 265px;
+    }
+
+    & .banner_sub_text {
+      color: #ffffffcd;
+    }
+  }
+}

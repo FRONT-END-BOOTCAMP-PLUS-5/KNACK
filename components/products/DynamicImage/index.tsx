@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import styles from './dynamicImage.module.scss';
 import { useState } from 'react';
-import { STORAGE_PATHS } from '@/constraint/auth';
 
 interface IProps {
   src: string;
@@ -16,7 +15,7 @@ const DynamicImage = ({ src, alt }: IProps) => {
   return (
     <div className={styles.image_box} style={{ paddingTop: imageRatio ? `${imageRatio * 100}%` : '100%' }}>
       <Image
-        src={`${STORAGE_PATHS.PRODUCT.DETAIL}/${src}`}
+        src={src}
         fill
         style={{
           objectFit: 'contain',
