@@ -13,24 +13,27 @@ export class PrBrandLikesRepository implements BrandLikesRepository {
         },
       });
 
-      return result.id;
+      return result.brandId;
     } catch {
       throw new Error('=====BRANDS_INSERT_ERROR=====');
     }
   }
 
-  async delete(id: number): Promise<number> {
+  async delete(brandId: number, userId: string): Promise<number> {
+    console.log('========================================');
+    console.log('PrBrandLikesRepository', brandId, '/', userId);
+    console.log('========================================');
     try {
       const result = await prisma.brandLike.delete({
         where: {
-          id: id,
+          userId_brandId: { brandId, userId },
         },
         select: {
-          id: true,
+          brandId: true,
         },
       });
 
-      return result.id;
+      return result.brandId;
     } catch {
       throw new Error('=====BRAND_LIKE_INSERT_ERROR=====');
     }
@@ -43,7 +46,6 @@ export class PrBrandLikesRepository implements BrandLikesRepository {
           userId: userId,
         },
         select: {
-          id: true,
           brand: {
             select: {
               engName: true,

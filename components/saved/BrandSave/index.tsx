@@ -34,7 +34,13 @@ const BrandSave = ({ brandLikeData, onClickBookMark }: IProps) => {
           </Text>
           <Flex direction="column" gap={20}>
             {brandLikeData?.map((item) => (
-              <Flex key={item?.id} className={styles.save_item} tag="article" direction="column" gap={20}>
+              <Flex
+                key={'brand_saved_' + item?.brand?.id}
+                className={styles.save_item}
+                tag="article"
+                direction="column"
+                gap={20}
+              >
                 <Flex justify="between" align="center">
                   <Flex gap={16} align="center">
                     <span className={styles.logo_image}>
@@ -54,7 +60,7 @@ const BrandSave = ({ brandLikeData, onClickBookMark }: IProps) => {
                       </Text>
                     </Flex>
                   </Flex>
-                  <button className={styles.book_mark_button} onClick={() => onClickBookMark(item?.id)}>
+                  <button className={styles.book_mark_button} onClick={() => onClickBookMark(item?.brand?.id)}>
                     <Image src={BookMarkOn} alt="좋아요 아이콘" width={20} height={20} />
                   </button>
                 </Flex>
