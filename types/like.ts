@@ -17,7 +17,6 @@ export interface IBrandList {
 }
 
 export interface IBrandLikeList {
-  id: number;
   brand: Brand;
 }
 
