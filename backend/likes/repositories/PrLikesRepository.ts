@@ -12,24 +12,24 @@ export class PrLikesRepository implements LikesRepository {
         },
       });
 
-      return result.id;
+      return result.productId;
     } catch {
       throw new Error('=====LIKE_INSERT_ERROR=====');
     }
   }
 
-  async delete(id: number): Promise<number> {
+  async delete(productId: number, userId: string): Promise<number> {
     try {
       const result = await prisma.productLike.delete({
         where: {
-          id: id,
+          userId_productId: { userId, productId },
         },
         select: {
-          id: true,
+          productId: true,
         },
       });
 
-      return result.id;
+      return result.productId;
     } catch {
       throw new Error('=====LIKE_INSERT_ERROR=====');
     }
@@ -42,7 +42,6 @@ export class PrLikesRepository implements LikesRepository {
           userId: userId,
         },
         select: {
-          id: true,
           createdAt: true,
           product: {
             select: {

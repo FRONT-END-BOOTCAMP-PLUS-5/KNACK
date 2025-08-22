@@ -7,9 +7,9 @@ export class DeleteLikesUseCase {
     this.repository = repository;
   }
 
-  async delete(id: number): Promise<number> {
+  async delete(id: number, userId: string): Promise<number> {
     try {
-      const result = await this.repository.delete(id);
+      const result = await this.repository.delete(id, userId);
 
       return result;
     } catch {

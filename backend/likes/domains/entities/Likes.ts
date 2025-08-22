@@ -1,5 +1,4 @@
 export interface Like {
-  id: number;
   product: Product;
   createdAt?: Date | null;
 }
