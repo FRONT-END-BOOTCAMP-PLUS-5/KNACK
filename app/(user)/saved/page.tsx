@@ -10,6 +10,13 @@ import ProductSave from '@/components/saved/ProductSave';
 import BrandSave from '@/components/saved/BrandSave';
 import RecentlySave from '@/components/saved/RecentlySave';
 import { TABS } from '@/constraint/saved';
+import { useSearchParams } from 'next/navigation';
+
+interface SAVED_TABS {
+  product: string;
+  brand: string;
+  recent: string;
+}
 
 const SavedPage = () => {
   const { addLike, deleteLike, getLikes, deleteBrandLike, getBrandLikes } = likeService;
@@ -18,6 +25,8 @@ const SavedPage = () => {
   const [likeList, setLikeList] = useState<ILikeList[]>([]);
   const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
   const [recentProducts, setRecentProducts] = useState<IRecentProduct[]>([]);
+
+  const searchParams = useSearchParams();
 
   const handleGetRecentlyProduct = useCallback(
     (ids: string[]) => {
@@ -148,7 +157,13 @@ const SavedPage = () => {
     handleGetRecentlyProduct(storage);
   }, [handleGetRecentlyProduct]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const tabs = { product: 0, brand: 1, recent: 2 };
+
+    const params = (searchParams.get('tab') as keyof SAVED_TABS) ?? 'product';
+
+    setSelectTab(tabs[params]);
+  }, [searchParams]);
 
   return (
     <section>
