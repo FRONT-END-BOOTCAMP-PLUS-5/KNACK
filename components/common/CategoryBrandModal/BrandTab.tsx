@@ -18,6 +18,19 @@ export default function BrandTab() {
   const tagRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const brandGroupRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
+  // 탭 전환 시 ref 초기화
+  const handleTabChange = (tab: 'ALL' | 'MY') => {
+    setActiveBrandTab(tab);
+    if (tab === 'ALL') {
+      // ALL 탭으로 돌아올 때 ref들을 초기화하고 첫 번째 태그를 활성화
+      setTimeout(() => {
+        if (brands.length > 0) {
+          setActiveTag(brands[0].tag);
+        }
+      }, 100);
+    }
+  };
+
   useEffect(() => {
     const initBrands = async () => {
       try {
@@ -37,7 +50,7 @@ export default function BrandTab() {
   // 스크롤 감지하여 활성 태그 업데이트
   useEffect(() => {
     const handleScroll = () => {
-      if (!brandContainerRef.current) return;
+      if (!brandContainerRef.current || activeBrandTab !== 'ALL') return;
 
       const container = brandContainerRef.current;
 
@@ -63,9 +76,12 @@ export default function BrandTab() {
     };
 
     const container = brandContainerRef.current;
-    if (container) {
+    if (container && activeBrandTab === 'ALL') {
       container.addEventListener('scroll', handleScroll);
-      handleScroll();
+      // 탭 전환 시 약간의 지연 후 스크롤 이벤트 실행
+      setTimeout(() => {
+        handleScroll();
+      }, 100);
     }
 
     return () => {
@@ -73,7 +89,7 @@ export default function BrandTab() {
         container.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [activeTag, brands]);
+  }, [activeTag, brands, activeBrandTab]);
 
   // 태그 클릭 시 해당 브랜드 그룹으로 스크롤
   const handleTagClick = useCallback((tag: string) => {
@@ -109,7 +125,7 @@ export default function BrandTab() {
     <article className={styles.brand_container}>
       <section>
         <Flex justify="center" align="center" width="self" gap={70}>
-          <div onClick={() => setActiveBrandTab('ALL')}>
+          <div onClick={() => handleTabChange('ALL')}>
             <Flex direction="column" width="self" gap={4} className={styles.brand_button_wrapper} align="center">
               <div className={`${styles.brand_button_image} ${activeBrandTab === 'ALL' ? styles.active : ''}`}>ALL</div>
               <Text
@@ -121,7 +137,7 @@ export default function BrandTab() {
               </Text>
             </Flex>
           </div>
-          <div onClick={() => setActiveBrandTab('MY')}>
+          <div onClick={() => handleTabChange('MY')}>
             <Flex direction="column" width="self" gap={4} align="center" className={styles.brand_button_wrapper}>
               <div className={`${styles.brand_button_image} ${activeBrandTab === 'MY' ? styles.active : ''}`}>
                 <Image src={BookMarkOn} alt="관심 브랜드 아이콘" width={20} height={20} />

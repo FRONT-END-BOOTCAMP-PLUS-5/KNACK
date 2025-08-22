@@ -265,6 +265,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 
   &.active {
     border: 2px solid $black;
