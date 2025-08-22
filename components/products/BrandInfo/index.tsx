@@ -12,10 +12,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { likeService } from '@/services/like';
 import { IBrandLikeList } from '@/types/like';
 import { useLikeStore } from '@/store/likeStore';
-import Snackbar from '@mui/material/Snackbar';
-import Link from 'next/link';
-import SnackbarContent from '@mui/material/SnackbarContent';
-import Slide from '@mui/material/Slide';
+import LikeToast from '../LikeToast';
 
 interface IProps {
   brandData?: IBrand;
@@ -23,11 +20,10 @@ interface IProps {
 
 const BrandInfo = ({ brandData }: IProps) => {
   const { addBrandLike, getBrandLikes, deleteBrandLike } = likeService;
-  const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
   const [likedCheck, setLikedCheck] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
 
-  const { productDetailBrandLike, setProductDetailBrandLike } = useLikeStore();
+  const { productDetailBrandLike: storeLike, setProductDetailBrandLike: setStoreLike } = useLikeStore();
 
   const handleGetBrandLikes = useCallback(() => {
     getBrandLikes()
@@ -35,14 +31,19 @@ const BrandInfo = ({ brandData }: IProps) => {
         if (res.status === 200) {
           const checked = res.result.some((item: IBrandLikeList) => item?.brand?.id === brandData?.id);
 
-          setBrandLikeList(res.result);
           setLikedCheck(checked);
+
+          const findCount: IBrandLikeList = res.result.find(
+            (item: IBrandLikeList) => item?.brand?.id === brandData?.id
+          );
+
+          setStoreLike(findCount?.brand?._count?.brandLike ?? 0, checked);
         }
       })
       .catch((error) => {
         console.log('error', error.message);
       });
-  }, [brandData?.id, getBrandLikes]);
+  }, [brandData, getBrandLikes, setStoreLike]);
 
   const initLikeBrand = useCallback(() => {
     handleGetBrandLikes();
@@ -54,31 +55,28 @@ const BrandInfo = ({ brandData }: IProps) => {
         .then((res) => {
           if (res.status === 200) {
             alert('취소완료!');
-            initLikeBrand();
-            setProductDetailBrandLike(productDetailBrandLike - 1);
+            setStoreLike(storeLike.count - 1, false);
+            setLikedCheck(!likedCheck);
           }
         })
         .catch((error) => {
           console.log('error', error.message);
         });
     },
-    [deleteBrandLike, initLikeBrand, productDetailBrandLike, setProductDetailBrandLike]
+    [deleteBrandLike, setStoreLike, storeLike.count, likedCheck]
   );
 
   const handleAddBrandLike = useCallback(
     (id: number) => {
       if (likedCheck) {
-        const deleteId = brandLikeList?.find((item) => item?.brand?.id === id)?.id ?? 0;
-
-        handleDeleteBrandLike(deleteId);
+        handleDeleteBrandLike(id);
       } else {
         addBrandLike(id)
           .then((res) => {
             if (res.status === 200) {
-              handleGetBrandLikes();
-
-              setProductDetailBrandLike(productDetailBrandLike + 1);
+              setStoreLike(storeLike.count + 1, true);
               setToastOpen(true);
+              setLikedCheck(!likedCheck);
             }
           })
           .catch((error) => {
@@ -86,24 +84,12 @@ const BrandInfo = ({ brandData }: IProps) => {
           });
       }
     },
-    [
-      addBrandLike,
-      brandLikeList,
-      handleDeleteBrandLike,
-      handleGetBrandLikes,
-      likedCheck,
-      productDetailBrandLike,
-      setProductDetailBrandLike,
-    ]
+    [addBrandLike, handleDeleteBrandLike, likedCheck, storeLike, setStoreLike]
   );
 
   useEffect(() => {
     initLikeBrand();
   }, [initLikeBrand]);
-
-  useEffect(() => {
-    setProductDetailBrandLike(brandData?._count?.brandLike ?? 0);
-  }, [brandData?._count?.brandLike, setProductDetailBrandLike]);
 
   return (
     <article className={styles.brand_wrap}>
@@ -121,33 +107,21 @@ const BrandInfo = ({ brandData }: IProps) => {
             {brandData?.engName}
           </Text>
           <Text size={1.2} color="gray2">
-            {brandData?.korName} ㆍ 관심 {productDetailBrandLike}
+            {brandData?.korName} ㆍ 관심 {storeLike.count}
           </Text>
         </Flex>
       </Flex>
 
       <button className={styles.brand_like_button} onClick={() => handleAddBrandLike(brandData?.id ?? 0)}>
-        <Image src={likedCheck ? onBookMark : bookmark} alt="좋아요" width={22} height={22} />
+        <Image src={storeLike?.status ? onBookMark : bookmark} alt="좋아요" width={22} height={22} />
       </button>
 
-      <Snackbar
-        className={styles.toast_contianer}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      <LikeToast
         open={toastOpen}
-        onClose={() => setToastOpen(false)}
-        slots={{ transition: Slide }}
-        // autoHideDuration={3000}
-      >
-        <SnackbarContent
-          className={styles.toast_content}
-          message="관심 브랜드에 저장되었습니다."
-          action={
-            <Link className={styles.toast_move_button} href={'/saved'}>
-              보러가기
-            </Link>
-          }
-        />
-      </Snackbar>
+        setOpen={() => setToastOpen(false)}
+        message="관심 브랜드에 저장되었습니다."
+        link="/saved?tab=brand"
+      />
     </article>
   );
 };

@@ -16,6 +16,7 @@ import { likeService } from '@/services/like';
 import { ILikeList } from '@/types/like';
 import { useCartStore } from '@/store/cartStore';
 import { useLikeStore } from '@/store/likeStore';
+import LikeToast from '../LikeToast';
 
 interface IProps {
   productData?: IProduct;
@@ -27,12 +28,12 @@ const BottomFixButton = ({ productData }: IProps) => {
   const { upsertCart } = cartService;
   const { addLike, deleteLike, getLikes } = likeService;
   const { cartCount, setCartCount } = useCartStore();
-  const { productDetailLike, setProductDetailLike } = useLikeStore();
+  const { productDetailLike: storeLike, setProductDetailLike: setStoreLike } = useLikeStore();
 
   const [selectOptionId, setSelectOptionId] = useState(0);
   const [deliveryOptionId, setDeliveryOption] = useState(0);
-  const [likeList, setLikeList] = useState<ILikeList[]>([]);
   const [likedCheck, setLikedCheck] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
 
   const onClickNowBuy = () => {
     const checkoutData = [
@@ -78,45 +79,43 @@ const BottomFixButton = ({ productData }: IProps) => {
         if (res.status === 200) {
           const check = res.result.some((item: ILikeList) => item?.product?.id === productData?.id);
 
-          setLikeList(res.result);
           setLikedCheck(check);
+          setStoreLike(productData?._count?.productLike ?? 0, check);
         }
       })
       .catch((error) => {
         console.log('error', error.message);
       });
-  }, [getLikes, productData]);
+  }, [getLikes, productData?._count?.productLike, productData?.id, setStoreLike]);
 
   const handleDeleteLike = useCallback(
     (id: number) => {
       deleteLike(id)
         .then((res) => {
           if (res.status === 200) {
-            handleGetLikes();
+            alert('취소완료!');
+            setStoreLike(storeLike.count - 1, false);
+            setLikedCheck(!likedCheck);
           }
         })
         .catch((error) => {
           console.log('error', error.message);
         });
     },
-    [deleteLike, handleGetLikes]
+    [deleteLike, likedCheck, setStoreLike, storeLike.count]
   );
 
   const handleLikeAdd = useCallback(
     (productId: number) => {
       if (likedCheck) {
-        const deleteId = likeList?.find((item) => item?.product?.id === productId)?.id ?? 0;
-
-        handleDeleteLike(deleteId);
-        alert('취소완료!');
-        setProductDetailLike(productDetailLike - 1);
+        handleDeleteLike(productId);
       } else {
         addLike(productId)
           .then((res) => {
             if (res.status === 200) {
-              alert('잘 담겼어요!');
-              handleGetLikes();
-              setProductDetailLike(productDetailLike + 1);
+              setStoreLike(storeLike.count + 1, true);
+              setToastOpen(true);
+              setLikedCheck(!likedCheck);
             }
           })
           .catch((error) => {
@@ -124,16 +123,12 @@ const BottomFixButton = ({ productData }: IProps) => {
           });
       }
     },
-    [addLike, handleDeleteLike, handleGetLikes, likeList, likedCheck, productDetailLike, setProductDetailLike]
+    [addLike, handleDeleteLike, likedCheck, storeLike, setStoreLike]
   );
 
   useEffect(() => {
     handleGetLikes();
   }, [handleGetLikes]);
-
-  useEffect(() => {
-    setProductDetailLike(productData?._count?.productLike ?? 0);
-  }, [productData?._count?.productLike, setProductDetailLike]);
 
   return (
     <>
@@ -141,10 +136,10 @@ const BottomFixButton = ({ productData }: IProps) => {
         <article className={styles.contents}>
           <div className={styles.icon_wrap}>
             <button className={styles.like_button} onClick={() => handleLikeAdd(productData?.id ?? 0)}>
-              <Image src={likedCheck ? SaveOnIcon : SaveIcon} width={18} height={18} alt="좋아요 아이콘" />
+              <Image src={storeLike.status ? SaveOnIcon : SaveIcon} width={18} height={18} alt="좋아요 아이콘" />
             </button>
             <Text size={1.3} color="gray3" weight={600}>
-              {productDetailLike}
+              {storeLike.count}
             </Text>
           </div>
           <button className={styles.buy_button} onClick={onOpen}>
@@ -165,6 +160,12 @@ const BottomFixButton = ({ productData }: IProps) => {
         onClickCart={onClickCart}
         setSelectOptionId={setSelectOptionId}
         setDeliveryOption={setDeliveryOption}
+      />
+      <LikeToast
+        open={toastOpen}
+        setOpen={() => setToastOpen(false)}
+        message="관심 상품에 저장되었습니다."
+        link="/saved?tab=product"
       />
     </>
   );

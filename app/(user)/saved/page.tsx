@@ -90,9 +90,7 @@ const SavedPage = () => {
 
   const handleDeleteLike = useCallback(
     (id: number) => {
-      const deleteId = likeList?.find((item) => item?.product?.id === id)?.id ?? 0;
-
-      deleteLike(deleteId)
+      deleteLike(id)
         .then((res) => {
           if (res.status === 200) {
             initSave();
@@ -103,7 +101,7 @@ const SavedPage = () => {
           console.log('error', error.message);
         });
     },
-    [deleteLike, initSave, likeList]
+    [deleteLike, initSave]
   );
 
   const handleLikeAdd = useCallback(
