@@ -19,6 +19,7 @@ export default function OrderPage() {
         (async () => {
             try {
                 const { data } = await requester.get(`/api/payments/${id}`);
+                console.log(data);
 
                 // ✅ 영수증 카드용 아이템 매핑
                 const mapped: ReceiptItem[] = (data.orders ?? []).map((o: OrderResponse) => ({

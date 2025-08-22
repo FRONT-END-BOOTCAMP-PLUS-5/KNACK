@@ -210,13 +210,8 @@ export default function BuyingPage({ params }: BuyingPageProps) {
                     <div className={styles.value}>{formatPrice(item?.couponPrice)}</div>
                 </div>
 
-                <div className={styles.list_row}>
-                    <div className={styles.label}>포인트 사용</div>
-                    <div className={styles.value}>{formatPrice(item?.point)}</div>
-                </div>
-
                 <div className={`${styles.list_row} ${styles.total_row}`}>
-                    <div className={styles.label}>총 결제 예정</div>
+                    <div className={styles.label}>결제 예정 금액</div>
                     <div className={styles.value_strong}>{formatPrice(total)}</div>
                 </div>
 

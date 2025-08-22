@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
                         { paymentKey: tossPaymentKey, orderId, amount },
                         'toss'
                     );
+                    console.log(data);
                     return {
                         paymentKey: data.paymentKey,
                         method: data.method,
