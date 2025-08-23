@@ -1,17 +1,19 @@
 import { create } from 'zustand';
 
 interface LikeStore {
-  productDetailLike: number;
-  productDetailBrandLike: number;
+  productDetailLike: { count: number; status: boolean };
+  productDetailBrandLike: { count: number; status: boolean };
 
-  setProductDetailLike: (num: number) => void;
-  setProductDetailBrandLike: (num: number) => void;
+  setProductDetailLike: (num: number, status: boolean) => void;
+  setProductDetailBrandLike: (num: number, status: boolean) => void;
 }
 
 export const useLikeStore = create<LikeStore>((set) => ({
-  productDetailLike: 0,
-  productDetailBrandLike: 0,
+  productDetailLike: { count: 0, status: false },
+  productDetailBrandLike: { count: 0, status: false },
 
-  setProductDetailLike: (count) => set({ productDetailLike: count }),
-  setProductDetailBrandLike: (count) => set({ productDetailBrandLike: count }),
+  setProductDetailLike: (count, status) => {
+    set({ productDetailLike: { count: count, status: status } });
+  },
+  setProductDetailBrandLike: (count, status) => set({ productDetailBrandLike: { count: count, status: status } }),
 }));
