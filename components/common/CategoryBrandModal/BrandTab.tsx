@@ -190,7 +190,11 @@ export default function BrandTab() {
                           </Flex>
                         </Flex>
                         <button className={styles.book_mark_button}>
-                          <Image src={BookMark} alt="좋아요 아이콘" width={20} height={20} />
+                          {brand.isLiked ? (
+                            <Image src={BookMarkOn} alt="좋아요 아이콘" width={20} height={20} />
+                          ) : (
+                            <Image src={BookMark} alt="좋아요 아이콘" width={20} height={20} />
+                          )}
                         </button>
                       </Flex>
                     </Link>
