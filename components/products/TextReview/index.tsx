@@ -10,8 +10,7 @@ interface IProps {
     _count: { reviews: number };
     averageRating?: number;
     ratingDistribution?: { [key: number]: { count: number; percent: number } };
-    topQuestionAnswers?: { [key: string]: { answer: string; percent: number } };
-    allQuestionAnswers?: {
+    questionAnswers?: {
       [question: string]: {
         [answer: string]: {
           count: number;
@@ -40,11 +39,23 @@ const TextReview = ({ productData }: IProps) => {
   
   // 질문지 답변 데이터 생성 (카테고리별로 맞춤)
   const questionAnswerData = categoryQuestions.map(question => {
-    const answerData = productData.topQuestionAnswers?.[question.question];
+    const answers = productData.questionAnswers?.[question.question];
+    if (!answers) {
+      return {
+        question: question.question,
+        answer: '데이터 없음',
+        percent: 0
+      };
+    }
+    
+    // 최고 퍼센트 답변 찾기
+    const maxPercent = Math.max(...Object.values(answers).map((stat: any) => stat.percent));
+    const topAnswer = Object.entries(answers).find(([_, stats]) => stats.percent === maxPercent);
+    
     return {
       question: question.question,
-      answer: answerData?.answer || '데이터 없음',
-      percent: answerData?.percent || 0
+      answer: topAnswer ? topAnswer[0] : '데이터 없음',
+      percent: maxPercent
     };
   });
 

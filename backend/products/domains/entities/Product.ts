@@ -30,13 +30,7 @@ export interface IProduct {
   ratingDistribution?: {
     [key: number]: { count: number; percent: number };
   };
-  topQuestionAnswers?: {
-    [question: string]: {
-      answer: string;
-      percent: number;
-    };
-  };
-  allQuestionAnswers?: {
+  questionAnswers?: {
     [question: string]: {
       [answer: string]: {
         count: number;

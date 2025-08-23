@@ -18,8 +18,7 @@ export class GetProductUseCase {
       // 리뷰 통계 계산해서 직접 추가
       result.averageRating = this.calculateAverageRating(result.reviews);
       result.ratingDistribution = this.calculateRatingDistribution(result.reviews);
-      result.topQuestionAnswers = this.calculateTopQuestionAnswers(result.reviews);
-      result.allQuestionAnswers = this.calculateAllQuestionAnswers(result.reviews);
+      result.questionAnswers = this.calculateQuestionAnswers(result.reviews);
       
     } else {
       console.log('리뷰가 없거나 통계 계산 조건 불충족');
@@ -58,49 +57,7 @@ export class GetProductUseCase {
     return distribution;
   }
 
-  private calculateTopQuestionAnswers(reviews: IProduct['reviews']) {
-    const questionStats: { [key: string]: { [key: string]: number } } = {};
-    
-    reviews.forEach(review => {
-      if (review.contents) {
-        try {
-          const answers = JSON.parse(review.contents) as { [key: string]: string };
-          Object.entries(answers).forEach(([question, answer]) => {
-            if (!questionStats[question]) {
-              questionStats[question] = {};
-            }
-            if (!questionStats[question][answer]) {
-              questionStats[question][answer] = 0;
-            }
-            questionStats[question][answer]++;
-          });
-        } catch (e) {
-          console.warn('Invalid JSON in review contents:', review.contents);
-        }
-      }
-    });
-
-    // 각 질문별로 최다 선택 답변 찾기
-    const result: { [key: string]: { answer: string; percent: number } } = {};
-    
-    Object.entries(questionStats).forEach(([question, answers]) => {
-      const total = Object.values(answers).reduce((sum: number, count: number) => sum + count, 0);
-      
-      // 최다 선택 답변 찾기
-      const topAnswer = Object.entries(answers).reduce((a, b) => 
-        (answers[a[0]] > answers[b[0]]) ? a : b
-      );
-
-      result[question] = {
-        answer: topAnswer[0],
-        percent: Math.round((topAnswer[1] / total) * 100)
-      };
-    });
-
-    return result;
-  }
-
-  private calculateAllQuestionAnswers(reviews: IProduct['reviews']) {
+  private calculateQuestionAnswers(reviews: IProduct['reviews']) {
     const questionStats: { [key: string]: { [key: string]: number } } = {};
     
     reviews.forEach(review => {

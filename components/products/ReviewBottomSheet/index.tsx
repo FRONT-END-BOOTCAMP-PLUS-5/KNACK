@@ -9,7 +9,7 @@ interface IProps {
     _count: { reviews: number };
     averageRating?: number;
     ratingDistribution?: { [key: number]: { count: number; percent: number } };
-    allQuestionAnswers?: {
+    questionAnswers?: {
       [question: string]: {
         [answer: string]: {
           count: number;
@@ -100,9 +100,9 @@ const ReviewBottomSheet = ({ productData }: IProps) => {
             )}
             
             {/* allQuestionAnswers 데이터를 바텀시트에 표시 */}
-            {hasReviews && productData.allQuestionAnswers && (
+            {hasReviews && productData.questionAnswers && (
               <div className={styles.question_results}>
-                {Object.entries(productData.allQuestionAnswers).map(([question, answers]) => {
+                {Object.entries(productData.questionAnswers).map(([question, answers]) => {
                   // 각 질문에서 가장 높은 퍼센트 찾기
                   const maxPercent = Math.max(...Object.values(answers).map((stat: any) => stat.percent));
                   
