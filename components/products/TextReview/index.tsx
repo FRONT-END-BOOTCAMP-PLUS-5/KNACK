@@ -1,8 +1,8 @@
 import Text from '@/components/common/Text';
 import styles from './textReview.module.scss';
 import Flex from '@/components/common/Flex';
-import Button from '@/components/common/Button';
 import { REVIEW_QUESTIONS, DEFAULT_CATEGORY_ID } from '@/utils/review';
+import { createRatingProgressData } from '@/utils/review/ratingUtils';
 import ReviewBottomSheet from '../ReviewBottomSheet';
 
 interface IProps {
@@ -27,11 +27,7 @@ const TextReview = ({ productData }: IProps) => {
   const hasReviews = productData._count.reviews && productData._count.reviews > 0;
 
   // 별점 분포 데이터 생성 (5점부터 1점까지)
-  const ratingProgressData = [5, 4, 3, 2, 1].map(rating => ({
-    rating,
-    percent: productData.ratingDistribution?.[rating]?.percent || 0,
-    count: productData.ratingDistribution?.[rating]?.count || 0
-  }));
+  const ratingProgressData = createRatingProgressData(productData.ratingDistribution);
 
   // 카테고리별 질문지 정보 가져오기
   const categoryId = productData.category.id;
@@ -110,7 +106,10 @@ const TextReview = ({ productData }: IProps) => {
       )}
       
       {/* ReviewBottomSheet 컴포넌트 사용 */}
-      <ReviewBottomSheet productData={productData} />
+      <ReviewBottomSheet 
+        productData={productData} 
+        ratingProgressData={ratingProgressData}
+      />
     </section>
   );
 };

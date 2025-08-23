@@ -3,6 +3,7 @@
 import Button from '@/components/common/Button';
 import { useState } from 'react';
 import styles from './reviewBottomSheet.module.scss';
+import { RatingProgressData } from '@/utils/review/ratingUtils';
 
 interface IProps {
   productData: {
@@ -18,20 +19,14 @@ interface IProps {
       };
     };
   };
+  ratingProgressData: RatingProgressData[];
 }
 
-const ReviewBottomSheet = ({ productData }: IProps) => {
+const ReviewBottomSheet = ({ productData, ratingProgressData }: IProps) => {
   const [isReviewSheetOpen, setIsReviewSheetOpen] = useState(false);
   
   // hasReviews를 더 명확하게 정의
   const hasReviews = Boolean(productData._count.reviews && productData._count.reviews > 0);
-  
-  // 별점 분포 데이터 생성 (5점부터 1점까지)
-  const ratingProgressData = [5, 4, 3, 2, 1].map(rating => ({
-    rating,
-    percent: productData.ratingDistribution?.[rating]?.percent || 0,
-    count: productData.ratingDistribution?.[rating]?.count || 0
-  }));
   
   const openReviewSheet = () => setIsReviewSheetOpen(true);
   const closeReviewSheet = () => setIsReviewSheetOpen(false);
