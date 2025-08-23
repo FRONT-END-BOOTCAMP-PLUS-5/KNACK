@@ -26,21 +26,24 @@ const ReviewBottomSheet = ({ productData }: IProps) => {
   // hasReviews를 더 명확하게 정의
   const hasReviews = Boolean(productData._count.reviews && productData._count.reviews > 0);
   
-  const openReviewSheet = () => setIsReviewSheetOpen(true);
-  const closeReviewSheet = () => setIsReviewSheetOpen(false);
-  
   // 별점 분포 데이터 생성 (5점부터 1점까지)
   const ratingProgressData = [5, 4, 3, 2, 1].map(rating => ({
     rating,
     percent: productData.ratingDistribution?.[rating]?.percent || 0,
     count: productData.ratingDistribution?.[rating]?.count || 0
   }));
-
+  
+  const openReviewSheet = () => setIsReviewSheetOpen(true);
+  const closeReviewSheet = () => setIsReviewSheetOpen(false);
+  
   return (
     <>
-      <button className={styles.review_button} onClick={openReviewSheet}>
-        리뷰 더보기
-      </button>
+      <Button 
+        text="리뷰 더보기"
+        size="large"
+        style="border"
+        onClick={openReviewSheet}
+      />
       
       {/* 바텀시트 */}
       {isReviewSheetOpen && (
@@ -58,75 +61,80 @@ const ReviewBottomSheet = ({ productData }: IProps) => {
             </div>
             
             {/* 별점 분포 표시 */}
-            {(() => {
-              
-              if (productData._count.reviews > 0) {
-                return (
-                  <div className={styles.rating_container}>
-                    <div className={styles.rating_summary}>
-                      <div className={styles.average_rating}>
-                        {productData.averageRating && productData.averageRating > 0 ? productData.averageRating : ''}
-                        {productData.averageRating && productData.averageRating > 0 && <span className={styles.star_icon}>★</span>}
-                      </div>
-                      <div className={styles.review_count}>
-                        리뷰 {productData._count.reviews}
-                      </div>
-                    </div>
-                    <div className={styles.rating_distribution}>
-                      {ratingProgressData.map((item) => (
-                        <div className={styles.rating_item} key={item.rating}>
-                          <div className={styles.progress_container}>
-                            <div 
-                              className={styles.progress_bar} 
-                              style={{ width: `${item.percent}%` }} 
-                            />
-                          </div>
-                          <span className={styles.rating_number}>
-                            {item.rating}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+            {hasReviews ? (
+              <div className={styles.rating_container}>
+                <div className={styles.rating_summary}>
+                  <div className={styles.average_rating}>
+                    {productData.averageRating && productData.averageRating > 0 ? productData.averageRating : ''}
+                    {productData.averageRating && productData.averageRating > 0 && <span className={styles.star_icon}>★</span>}
                   </div>
-                );
-              } else {
-                return (
-                  <div className={styles.no_reviews}>
-                    <div className={styles.no_reviews_text}>
-                      아직 리뷰가 없어요
-                    </div>
-                    <div className={styles.no_reviews_subtext}>
-                      첫 번째 리뷰를 작성해보세요!
-                    </div>
+                  <div className={styles.review_count}>
+                    리뷰 {productData._count.reviews}
                   </div>
-                );
-              }
-            })()}
+                </div>
+                <div className={styles.rating_distribution}>
+                  {ratingProgressData.map((item) => (
+                    <div className={styles.rating_item} key={item.rating}>
+                      <div className={styles.progress_container}>
+                        <div 
+                          className={styles.progress_bar} 
+                          style={{ width: `${item.percent}%` }} 
+                        />
+                      </div>
+                      <span className={styles.rating_number}>
+                        {item.rating}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className={styles.no_reviews}>
+                <div className={styles.no_reviews_text}>
+                  아직 리뷰가 없어요
+                </div>
+                <div className={styles.no_reviews_subtext}>
+                  첫 번째 리뷰를 작성해보세요!
+                </div>
+              </div>
+            )}
             
             {/* allQuestionAnswers 데이터를 바텀시트에 표시 */}
             {hasReviews && productData.allQuestionAnswers && (
               <div className={styles.question_results}>
-                {Object.entries(productData.allQuestionAnswers).map(([question, answers]) => (
-                  <div key={question} className={styles.question_block}>
-                    <h4 className={styles.question_title}>
-                      {question}
-                    </h4>
-                    
-                    {Object.entries(answers).map(([answer, stats]) => (
-                      <div className={styles.answer_item} key={answer}>
-                        <span className={styles.answer_text}>{answer}</span>
-                        <div className={styles.answer_stats}>
-                          <span className={styles.answer_count}>
-                            {stats.count}명
-                          </span>
-                          <span className={styles.answer_percent}>
-                            {stats.percent}%
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ))}
+                {Object.entries(productData.allQuestionAnswers).map(([question, answers]) => {
+                  // 각 질문에서 가장 높은 퍼센트 찾기
+                  const maxPercent = Math.max(...Object.values(answers).map((stat: any) => stat.percent));
+                  
+                  return (
+                    <div key={question} className={styles.question_block}>
+                      <h4 className={styles.question_title}>
+                        {question}
+                      </h4>
+                      
+                      {Object.entries(answers).map(([answer, stats]) => {
+                        // 최고 퍼센트인지 확인
+                        const isHighest = stats.percent === maxPercent;
+                        
+                        return (
+                          <div className={styles.answer_item} key={answer}>
+                            <span className={`${styles.answer_text} ${isHighest ? styles.highest_percent : ''}`}>
+                              {answer}
+                            </span>
+                            <div className={styles.answer_stats}>
+                              <span className={styles.answer_count}>
+                                {stats.count}명
+                              </span>
+                              <span className={styles.answer_percent}>
+                                {stats.percent}%
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

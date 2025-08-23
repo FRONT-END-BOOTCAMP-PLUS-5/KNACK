@@ -41,7 +41,7 @@
 .title {
   font-size: 1.8rem;
   font-weight: 600;
-  color: #333;
+  color: $gray03;
   margin: 0;
 }
 
@@ -79,7 +79,7 @@
 .average_rating {
   font-size: 3.5rem;
   font-weight: 700;
-  color: #333;
+  color: $gray03;
   display: flex;
   align-items: center;
   gap: .8rem;
@@ -128,7 +128,7 @@
 // 프로그레스 바
 .progress_bar {
   height: 100%;
-  background-color: #333;
+  background-color: $gray03;
   transition: width 0.3s ease;
   border-radius: .2rem;
 }
@@ -136,7 +136,7 @@
 // 별점 숫자
 .rating_number {
   font-size: 1.2rem;
-  color: #333;
+  color: $gray03;
   font-weight: 500;
   min-width: 2.4rem;
   text-align: right;
@@ -177,7 +177,7 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1.6rem;
-  color: #333;
+  color: $gray03;
 }
 
 // 답변 항목
@@ -191,8 +191,13 @@
 // 답변 텍스트
 .answer_text {
   font-size: 1.3rem;
-  color: #333;
+  color: $gray03;
   flex: 1;
+  
+  &.highest_percent {
+    font-weight: 700;
+    color: #222;
+  }
 }
 
 // 답변 통계
@@ -212,7 +217,7 @@
 .answer_percent {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #333;
+  color: $gray03;
   min-width: 5rem;
   text-align: right;
 }
