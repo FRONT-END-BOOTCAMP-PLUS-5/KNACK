@@ -1,20 +1,12 @@
 import { ISearchProductListResponse } from '@/types/searchProductList';
-import { get, getSSR } from '@/utils/requester';
+import { get } from '@/utils/requester';
 
 export const searchProductService = {
-  getSearchProductList: async (queryString: string) => {
-    return await get<ISearchProductListResponse>(`/api/search${queryString ? `?${queryString}` : ''}`);
-  },
-
-  getSearchProductListSSR: async (
-    queryString: string,
-    sessionToken?: string,
-    csrfToken?: string
-  ): Promise<ISearchProductListResponse> => {
-    return await getSSR<ISearchProductListResponse>(
+  getSearchProductList: async (queryString: string, userId?: string) => {
+    return await get<ISearchProductListResponse>(
       `/api/search${queryString ? `?${queryString}` : ''}`,
-      sessionToken,
-      csrfToken
+      undefined,
+      userId
     );
   },
 };

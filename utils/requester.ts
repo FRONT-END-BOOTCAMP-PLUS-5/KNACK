@@ -21,8 +21,8 @@ requester.interceptors.request.use((config) => {
 
 // ✅ 간단한 get/post/filePost 함수
 
-export async function get<T = unknown>(url: string, params?: object): Promise<T> {
-  const config: AxiosRequestConfig = { params };
+export async function get<T = unknown>(url: string, params?: object, userId?: string): Promise<T> {
+  const config: AxiosRequestConfig = { params, ...(userId ? { headers: { userId } } : {}) };
   const res: AxiosResponse<T> = await requester.get(url, config);
   return res.data;
 }
@@ -50,26 +50,6 @@ export async function filePut(url: string, file: File): Promise<void> {
     const err = await res.text();
     throw new Error(`S3 upload failed: ${res.status} - ${err}`);
   }
-}
-
-// ✅ SSR용 get 함수 - 세션 토큰 전달
-export async function getSSR<T = unknown>(
-  url: string,
-  sessionToken?: string,
-  csrfToken?: string,
-  params?: object
-): Promise<T> {
-  const config: AxiosRequestConfig = {
-    params,
-    headers: {
-      ...(sessionToken && { Cookie: `next-auth.session-token=${sessionToken}` }),
-      ...(csrfToken && { 'x-csrf-token': csrfToken }),
-    },
-    withCredentials: true,
-  };
-
-  const res: AxiosResponse<T> = await requester.get(url, config);
-  return res.data;
 }
 
 export default requester;

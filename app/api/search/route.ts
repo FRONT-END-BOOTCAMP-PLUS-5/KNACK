@@ -9,13 +9,15 @@ import { authOptions } from '../auth/[...nextauth]/auth';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  console.log('search session@@@@@@', session);
 
   try {
     const { searchParams } = new URL(request.url);
 
+    const headerUserId = request.headers.get('userId');
+    const userId = headerUserId || session?.user?.id || undefined;
+
     const requestDto: GetProductsRequestDto = {
-      userId: session?.user?.id || undefined,
+      userId: userId,
       keyword: searchParams.get('keyword') || undefined,
 
       keywordColorId: getIntArrayParam(searchParams, 'keywordColorId'),
