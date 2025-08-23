@@ -52,4 +52,24 @@ export async function filePut(url: string, file: File): Promise<void> {
   }
 }
 
+// ✅ SSR용 get 함수 - 세션 토큰 전달
+export async function getSSR<T = unknown>(
+  url: string,
+  sessionToken?: string,
+  csrfToken?: string,
+  params?: object
+): Promise<T> {
+  const config: AxiosRequestConfig = {
+    params,
+    headers: {
+      ...(sessionToken && { Cookie: `next-auth.session-token=${sessionToken}` }),
+      ...(csrfToken && { 'x-csrf-token': csrfToken }),
+    },
+    withCredentials: true,
+  };
+
+  const res: AxiosResponse<T> = await requester.get(url, config);
+  return res.data;
+}
+
 export default requester;

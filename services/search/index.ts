@@ -1,5 +1,5 @@
 import { ISearchProductListResponse } from '@/types/searchProductList';
-import { get } from '@/utils/requester';
+import { get, getSSR } from '@/utils/requester';
 
 export const searchProductService = {
   getSearchProductList: async (queryString: string) => {
@@ -11,23 +11,10 @@ export const searchProductService = {
     sessionToken?: string,
     csrfToken?: string
   ): Promise<ISearchProductListResponse> => {
-    const baseURL = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:3000';
-    const url = `${baseURL}/api/search${queryString ? `?${queryString}` : ''}`;
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(sessionToken && { Cookie: `next-auth.session-token=${sessionToken}` }),
-        ...(csrfToken && { 'x-csrf-token': csrfToken }),
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response.json();
+    return await getSSR<ISearchProductListResponse>(
+      `/api/search${queryString ? `?${queryString}` : ''}`,
+      sessionToken,
+      csrfToken
+    );
   },
 };
