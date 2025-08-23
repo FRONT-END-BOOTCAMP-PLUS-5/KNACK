@@ -5,6 +5,7 @@ import { ISearchProductListResponse } from '@/types/searchProductList';
 import { IQueryParams, objectToQueryString } from '@/utils/queryString';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
+import { cookies } from 'next/headers';
 
 interface IProps {
   searchParams: Promise<IQueryParams>;
@@ -12,7 +13,7 @@ interface IProps {
 
 export default async function Search({ searchParams }: IProps) {
   const params = await searchParams;
-  const { getSearchProductList } = searchProductService;
+
   const queryParams: IQueryParams = {
     keyword: params.keyword,
     keywordColorId: params.keywordColorId,
@@ -31,8 +32,15 @@ export default async function Search({ searchParams }: IProps) {
   const queryString = objectToQueryString(queryParams);
 
   try {
-    const initialData: ISearchProductListResponse = await getSearchProductList(queryString);
-    console.log('initialData@@@@@@', initialData);
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get('next-auth.session-token')?.value;
+    const csrfToken = cookieStore.get('next-auth.csrf-token')?.value;
+
+    const initialData: ISearchProductListResponse = await searchProductService.getSearchProductListSSR(
+      queryString,
+      sessionToken,
+      csrfToken
+    );
     return (
       <main>
         <SearchCsrWrapper queryParams={queryParams} />
