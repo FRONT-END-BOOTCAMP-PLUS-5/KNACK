@@ -99,7 +99,7 @@ const ReviewBottomSheet = ({ productData, ratingProgressData }: IProps) => {
               <div className={styles.question_results}>
                 {Object.entries(productData.questionAnswers).map(([question, answers]) => {
                   // 각 질문에서 가장 높은 퍼센트 찾기
-                  const maxPercent = Math.max(...Object.values(answers).map((stat: any) => stat.percent));
+                  const maxPercent = Math.max(...Object.values(answers).map((stat: { count: number; percent: number }) => stat.percent));
                   
                   return (
                     <div key={question} className={styles.question_block}>

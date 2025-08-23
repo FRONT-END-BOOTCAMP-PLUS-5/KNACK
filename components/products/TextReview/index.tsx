@@ -45,8 +45,8 @@ const TextReview = ({ productData }: IProps) => {
     }
     
     // 최고 퍼센트 답변 찾기
-    const maxPercent = Math.max(...Object.values(answers).map((stat: any) => stat.percent));
-    const topAnswer = Object.entries(answers).find(([_, stats]) => stats.percent === maxPercent);
+    const maxPercent = Math.max(...Object.values(answers).map((stat: { count: number; percent: number }) => stat.percent));
+    const topAnswer = Object.entries(answers).find(([, stats]) => stats.percent === maxPercent);
     
     return {
       question: question.question,
