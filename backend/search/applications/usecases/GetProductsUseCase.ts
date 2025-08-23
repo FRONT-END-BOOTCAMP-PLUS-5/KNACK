@@ -37,6 +37,7 @@ export class GetProductsUseCase {
     };
 
     const result = await this.productSearchRepository.getProducts({
+      userId: request.userId,
       filters,
       sort,
       pagination,

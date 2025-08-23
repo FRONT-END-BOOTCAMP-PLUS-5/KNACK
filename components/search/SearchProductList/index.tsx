@@ -1,5 +1,4 @@
 'use client';
-import { GetProductsResponseDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import styles from './searchProductList.module.scss';
 import { ProductCardLarge } from '@/components/common/ProductCard';
 import SearchProductListEmpty from './SearchProductListEmpty';
@@ -7,13 +6,13 @@ import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import Image from 'next/image';
 import loadingIcon from '@/public/images/loading.gif';
 import Flex from '@/components/common/Flex';
+import { ISearchProductListResponse } from '@/types/searchProductList';
 interface IProps {
-  initialData: GetProductsResponseDto;
+  initialData: ISearchProductListResponse;
 }
 
 export default function SearchProductList({ initialData }: IProps) {
   const { items, loading, sentinelRef } = useInfiniteScroll(initialData);
-
   return (
     <>
       {initialData.products.length > 0 && (

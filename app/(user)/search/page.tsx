@@ -32,6 +32,7 @@ export default async function Search({ searchParams }: IProps) {
 
   try {
     const initialData: ISearchProductListResponse = await getSearchProductList(queryString);
+    console.log('initialData@@@@@@', initialData);
     return (
       <main>
         <SearchCsrWrapper queryParams={queryParams} />

@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from './productCard.module.scss';
 import bookmark from '@/public/icons/book_mark.svg';
+import bookmarkActive from '@/public/icons/book_mark_active.svg';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import { ISearchProductList } from '@/types/searchProductList';
 
@@ -56,7 +57,11 @@ const ProductCardLarge = ({ product }: { product: ISearchProductList }) => {
           />
         </div>
         <div className={styles.product_bookmark}>
-          <Image src={bookmark} alt="관심" width={24} height={24} />
+          {product.isLiked ? (
+            <Image src={bookmarkActive} alt="관심" width={24} height={24} />
+          ) : (
+            <Image src={bookmark} alt="관심" width={24} height={24} />
+          )}
         </div>
       </figure>
 
