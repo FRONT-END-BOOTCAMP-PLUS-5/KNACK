@@ -24,16 +24,19 @@ interface IProps {
 
 const BottomFixButton = ({ productData }: IProps) => {
   const router = useRouter();
-  const { onOpen, onClose } = useBottomSheetStore();
+
   const { upsertCart } = cartService;
   const { addLike, deleteLike, getLikes } = likeService;
-  const { cartCount, setCartCount } = useCartStore();
+
+  const { onOpen, onClose } = useBottomSheetStore();
+  const { storeCarts, setStoreCarts } = useCartStore();
   const { productDetailLike: storeLike, setProductDetailLike: setStoreLike } = useLikeStore();
 
   const [selectOptionId, setSelectOptionId] = useState(0);
   const [deliveryOptionId, setDeliveryOption] = useState(0);
   const [likedCheck, setLikedCheck] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
+  const [cartToastOpen, setCartToastOpen] = useState(false);
 
   const onClickNowBuy = () => {
     const checkoutData = [
@@ -53,18 +56,24 @@ const BottomFixButton = ({ productData }: IProps) => {
   const onClickCart = () => {
     if (selectOptionId === 0) return alert('옵션을 선택해주세요.');
 
-    const cardData = {
+    const cartData = {
       count: 1,
       optionValueId: selectOptionId,
       productId: productData?.id,
       id: 0, // upsert 이므로 없는 아이디를 넣어서 insert
     };
 
-    upsertCart(cardData)
+    const cartDuplicate = storeCarts.find(
+      (item) => item.optionValueId === selectOptionId && item.product?.id === productData?.id
+    );
+
+    if (cartDuplicate) return alert('이미 장바구니에 담긴 상품입니다.');
+
+    upsertCart(cartData)
       .then((res) => {
         if (res.status === 200) {
-          alert('장바구니에 담았어요.');
-          setCartCount(cartCount + 1);
+          setCartToastOpen(true);
+          setStoreCarts(cartData);
           onClose();
         }
       })
@@ -164,8 +173,15 @@ const BottomFixButton = ({ productData }: IProps) => {
       <LikeToast
         open={toastOpen}
         setOpen={() => setToastOpen(false)}
-        message="관심 상품에 저장되었습니다."
+        message="관심 상품에 저장되었어요!"
         link="/saved?tab=product"
+      />
+
+      <LikeToast
+        open={cartToastOpen}
+        setOpen={() => setCartToastOpen(false)}
+        message="장바구니에 담겼어요!"
+        link="/cart"
       />
     </>
   );

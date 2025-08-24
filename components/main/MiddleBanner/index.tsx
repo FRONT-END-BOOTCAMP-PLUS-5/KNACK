@@ -1,14 +1,21 @@
 'use client';
 
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react';
 import styles from './middleBanner.module.scss';
 import Image from 'next/image';
 
 import Text from '@/components/common/Text';
 import Flex from '@/components/common/Flex';
 import { MIDDLE_BANNER_SLIDE } from '@/constraint/main';
+import { useState } from 'react';
 
 const MiddleBanner = () => {
+  const [activeIndex, setActiveIndex] = useState(1);
+
+  const handleSwiper = (value: SwiperClass) => {
+    setActiveIndex(value.activeIndex + 1);
+  };
+
   return (
     <div className={styles.middle_banner_container}>
       <Swiper
@@ -17,6 +24,7 @@ const MiddleBanner = () => {
         spaceBetween={15}
         className="mySwiper"
         autoplay={{ delay: 1000 }}
+        onActiveIndexChange={(index) => handleSwiper(index)}
       >
         {MIDDLE_BANNER_SLIDE?.map((item, index) => (
           <SwiperSlide className={styles.swiper_slide} key={'middle_banner_' + index}>
@@ -32,6 +40,9 @@ const MiddleBanner = () => {
           </SwiperSlide>
         ))}
       </Swiper>
+      <div className={styles.swiper_index}>
+        {activeIndex} / {MIDDLE_BANNER_SLIDE?.length}
+      </div>
     </div>
   );
 };

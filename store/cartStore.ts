@@ -1,13 +1,16 @@
+import { ICart } from '@/types/cart';
 import { create } from 'zustand';
 
 interface CartStore {
-  cartCount: number;
+  storeCarts: ICart[];
 
-  setCartCount: (num: number) => void;
+  setStoreCarts: (data: ICart) => void;
+  clearStoreCarts: () => void;
 }
 
 export const useCartStore = create<CartStore>((set) => ({
-  cartCount: 0,
+  storeCarts: [],
 
-  setCartCount: (count) => set({ cartCount: count }),
+  setStoreCarts: (data: ICart) => set((state) => ({ storeCarts: [...state.storeCarts, data] })),
+  clearStoreCarts: () => set({ storeCarts: [] }),
 }));

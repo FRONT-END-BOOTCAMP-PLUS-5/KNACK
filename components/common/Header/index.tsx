@@ -32,8 +32,9 @@ export default function Header({
   const [carts, setCarts] = useState<ICart[]>([]);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
-  const { cartCount, setCartCount } = useCartStore();
   const { getCart } = cartService;
+
+  const { storeCarts, setStoreCarts, clearStoreCarts } = useCartStore();
 
   // Next.js 라우터 (뒤로가기 기능용)
   const router = useRouter();
@@ -71,8 +72,13 @@ export default function Header({
   }, [handleGetCart]);
 
   useEffect(() => {
-    setCartCount(carts.length);
-  }, [carts.length, setCartCount]);
+    if (carts?.length === 0) return;
+
+    clearStoreCarts();
+    carts?.forEach((item) => {
+      setStoreCarts(item);
+    });
+  }, [carts, clearStoreCarts, setStoreCarts]);
 
   const handleSearchInputClick = (state: boolean) => {
     setIsSearchModalOpen(state);
@@ -113,7 +119,7 @@ export default function Header({
 
             <button className={styles.icon_button} onClick={handleCartClick}>
               <Image src={CartIcon} width={24} height={24} alt="장바구니" />
-              <span className={styles.cart_count}>{cartCount}</span>
+              <span className={styles.cart_count}>{storeCarts?.length}</span>
             </button>
           </div>
         )}
