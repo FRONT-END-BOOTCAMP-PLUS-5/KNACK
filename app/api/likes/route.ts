@@ -28,11 +28,17 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return Response.json({ error: '로그인이 필요합니다.' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
 
     const likeRepository = new PrLikesRepository();
-    const likes = new DeleteLikesUseCase(likeRepository).delete(body.id);
+    const likes = new DeleteLikesUseCase(likeRepository).delete(body.id, session?.user?.id);
 
     return NextResponse.json({ result: likes, status: 200 });
   } catch (error) {

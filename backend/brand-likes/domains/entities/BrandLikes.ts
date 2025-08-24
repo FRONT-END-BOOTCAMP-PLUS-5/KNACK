@@ -1,5 +1,4 @@
 export interface BrandLike {
-  id: number;
   brand: Brand;
 }
 
