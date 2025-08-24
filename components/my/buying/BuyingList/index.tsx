@@ -4,51 +4,19 @@ import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import { useRouter } from 'next/navigation';
 import { Payment } from '@/types/payment';
+import { formatKST } from '@/utils/orders';
 
-export default function BuyingList({
-    items,
-    tab,
-}: {
-    items: { payments: Payment[] };
-    tab: 'all' | 'progress' | 'done';
-}) {
+export default function BuyingList({ items }: { items: Payment[] }) {
     const router = useRouter();
-
-    // KST로 YY/MM/DD HH:mm 포맷
-    const formatKST = (d?: string | Date | null) => {
-        if (!d) return '';
-        const dt = new Date(d);
-        // KST 보정
-        const kst = new Date(dt.getTime() + 9 * 60 * 60 * 1000);
-        const yy = String(kst.getUTCFullYear()).slice(2);
-        const mm = String(kst.getUTCMonth() + 1).padStart(2, '0');
-        const dd = String(kst.getUTCDate()).padStart(2, '0');
-        const hh = String(kst.getUTCHours()).padStart(2, '0');
-        const min = String(kst.getUTCMinutes()).padStart(2, '0');
-        return `${yy}/${mm}/${dd} ${hh}:${min}`;
-    };
-
-    // 탭 기준으로 결제단위 필터링 (내부 orders를 거른 후, 표시할 주문이 없으면 제외)
-    const payments = useMemo(() => {
-        console.log(tab)
-        const list = items?.payments ?? [];
-        const filtered = list
-            .map((p) => {
-                let orders = p.orders ?? [];
-                if (tab === 'progress') orders = orders.filter((o) => o.deliveryStatus !== 4);
-                if (tab === 'done') orders = orders.filter((o) => o.deliveryStatus === 4);
-                return { ...p, orders };
-            })
-        return filtered;
-    }, [items, tab]);
 
     return (
         <section className={styles.buying_list_section}>
-            {payments.map((payment) => {
+            {items.map((payment) => {
                 const displayDate = formatKST(payment.approvedAt ?? payment.createdAt);
-                // 결제 상태 뱃지(선택): 모든 주문 완료면 '배송 완료', 아니면 '진행 중'
-                const allDone = payment.orders.every((o) => o.deliveryStatus === 4);
-                const paymentBadge = allDone ? '배송 완료' : '진행 중';
+                // 빈 배열은 완료로 보지 않도록 가드
+                const allDone =
+                    payment.orders.length > 0 &&
+                    payment.orders.every((o) => Number(o.deliveryStatus) === 4);
 
                 return (
                     <article key={payment.id} className={styles.payment_block}>

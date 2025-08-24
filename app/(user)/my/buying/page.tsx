@@ -6,24 +6,24 @@ import { BuyingTabs } from '@/components/my/buying/BuyingTabs';
 import requester from '@/utils/requester';
 import { BuyingItem, Tab } from '@/types/order';
 import { BuyingHistoryHeader } from '@/components/my/BuyingHistoryHeader';
+import { Payment } from '@/types/payment';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export default function BuyingPage() {
-    const [items, setItems] = useState();
+    const [items, setItems] = useState<Payment[]>();
     const [orderItems, setOrderItems] = useState<BuyingItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [tab, setTab] = useState<Tab>('all');
 
-    // 탭 → 서버 쿼리 변환(백엔드가 status 파라미터를 받는 구조일 때)
-    const query = useMemo(() => {
-        // 서버가 all/progress/done을 그대로 받지 않으면 여기서 매핑
-        // e.g. progress → status=progress, done → status=done, all → (파라미터 생략)
-        return tab === 'all' ? '' : `?status=${tab}`;
-    }, [tab]);
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
 
-    const handleTab = (tab: Tab) => {
-        setTab(tab);
-    };
+    // 1) URL에서 탭 읽기 (유효성 체크 + 기본값)
+    const tab: Tab = useMemo(() => {
+        const t = searchParams.get('tab');
+        return t === 'all' || t === 'progress' || t === 'done' ? (t as Tab) : 'progress';
+    }, [searchParams]);
 
     useEffect(() => {
         let cancelled = false;
@@ -33,10 +33,10 @@ export default function BuyingPage() {
                 setLoading(true);
                 setError(null);
 
-                const resp = await requester.get(`/api/payments`);
-                console.log(resp.data.payments);
-                setItems(resp?.data.payments);
-                setOrderItems(resp.data.payments.overallSummary)
+                const resp = (await requester.get(`/api/payments`)).data.payments;
+                console.log(resp.payments);
+                setItems(resp?.payments);
+                setOrderItems(resp.overallSummary)
             } catch (e) {
                 console.error('Failed to fetch orders:', e);
                 if (!cancelled) {
@@ -51,15 +51,38 @@ export default function BuyingPage() {
         return () => {
             cancelled = true;
         };
-    }, [query]);
+    }, []);
+
+    const filteredPayments = useMemo(() => {
+        if (!items?.length) return [];
+        switch (tab) {
+            case 'progress':
+                return items.filter(p => (p.orders ?? []).some(o => Number(o.deliveryStatus) !== 4));
+            case 'done':
+                return items.filter(p => (p.orders ?? []).some(o => Number(o.deliveryStatus) === 4));
+            default:
+                return items;
+        }
+    }, [items, tab]);
+
+    // 3) 탭 변경 시 URL만 바꾸는 핸들러 (BuyingTabs가 필요로 할 경우)
+    const handleTabSelect = (next: Tab) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('tab', next);
+        router.replace(`${pathname}?${params.toString()}`);
+    };
+
+    useEffect(() => {
+        console.log(filteredPayments);
+    }, [filteredPayments]);
 
     return (
         <div>
             <BuyingHistoryHeader />
-            <BuyingTabs onTabSelect={handleTab} counts={{ all: orderItems?.total?.length, progress: orderItems?.inProgress?.length, done: orderItems?.completed?.length }} />
+            <BuyingTabs onTabSelect={handleTabSelect} counts={{ all: orderItems?.total?.length, progress: orderItems?.inProgress?.length, done: orderItems?.completed?.length }} />
             {loading && <div style={{ padding: 16 }}>불러오는 중…</div>}
             {error && <div style={{ padding: 16, color: 'crimson' }}>{error}</div>}
-            {!loading && !error && items && <BuyingList items={items} tab={tab} />}
+            {!loading && !error && items && <BuyingList items={filteredPayments} />}
         </div>
     );
 }
