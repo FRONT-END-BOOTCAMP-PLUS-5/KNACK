@@ -10,7 +10,7 @@ interface IProps {
   open: boolean;
   setOpen: () => void;
   message: string;
-  link: string;
+  link?: string;
 }
 
 const LikeToast = ({ open, setOpen, message, link }: IProps) => {
@@ -27,9 +27,11 @@ const LikeToast = ({ open, setOpen, message, link }: IProps) => {
         className={styles.toast_content}
         message={message}
         action={
-          <Link className={styles.toast_move_button} href={link}>
-            보러가기
-          </Link>
+          link && (
+            <Link className={styles.toast_move_button} href={link}>
+              보러가기
+            </Link>
+          )
         }
       />
     </Snackbar>
