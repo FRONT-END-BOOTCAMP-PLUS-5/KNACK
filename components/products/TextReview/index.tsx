@@ -4,22 +4,10 @@ import Flex from '@/components/common/Flex';
 import { REVIEW_QUESTIONS, DEFAULT_CATEGORY_ID } from '@/utils/review';
 import { createRatingProgressData } from '@/utils/review/ratingUtils';
 import ReviewBottomSheet from '../ReviewBottomSheet';
+import { ITextReviewData } from '@/types/productDetail';
 
 interface IProps {
-  productData: {
-    _count: { reviews: number };
-    averageRating?: number;
-    ratingDistribution?: { [key: number]: { count: number; percent: number } };
-    questionAnswers?: {
-      [question: string]: {
-        [answer: string]: {
-          count: number;
-          percent: number;
-        };
-      };
-    };
-    category: { id: number };
-  };
+  productData: ITextReviewData;
 }
 
 const TextReview = ({ productData }: IProps) => {

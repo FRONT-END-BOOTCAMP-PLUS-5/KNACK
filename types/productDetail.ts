@@ -72,3 +72,19 @@ export interface IReview {
   reviewImages: string | null;
   createdAt: Date | null;
 }
+
+// TextReview 컴포넌트에서 사용하는 타입
+export interface ITextReviewData {
+  _count: { reviews: number };
+  averageRating?: number;
+  ratingDistribution?: { [key: number]: { count: number; percent: number } };
+  questionAnswers?: {
+    [question: string]: {
+      [answer: string]: {
+        count: number;
+        percent: number;
+      };
+    };
+  };
+  category: { id: number };
+}
