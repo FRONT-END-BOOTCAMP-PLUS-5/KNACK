@@ -99,11 +99,10 @@ const AddressPage = () => {
     deleteAddress(id)
       .then((res) => {
         if (res?.result?.message) {
-          return alert('결제중인 주소가 있어요!');
+          alert(res?.result?.message);
         }
 
         initAddress();
-        alert('성공적으로 삭제 했어요!');
       })
       .catch((error) => {
         console.log('error', error.message);

@@ -1,5 +1,6 @@
 .middle_banner_container {
   padding: 32px 0;
+  position: relative;
 }
 
 .image_box {
@@ -44,4 +45,16 @@
   top: 50%;
   left: 16px;
   transform: translateY(-50%);
+}
+
+.swiper_index {
+  background: #00000058;
+  padding: 5px 10px;
+  position: absolute;
+  bottom: 43px;
+  right: 35px;
+  z-index: 100;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 1.2rem;
 }

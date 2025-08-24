@@ -31,7 +31,7 @@ export const addAddressConversion = (data: IAddress, userId?: string) => {
   return conversion;
 };
 
-export const addressListMapper = async (data: IAddressList[]) => {
+export const addressListMapper = async (data: IAddress[]) => {
   const mapper: IAddress[] = await data?.map((item) => {
     return {
       id: item?.id,
@@ -40,8 +40,8 @@ export const addressListMapper = async (data: IAddressList[]) => {
       name: item?.name,
       phone: item?.phone,
       address: {
-        zipCode: item?.zipCode,
-        main: item?.main,
+        zipCode: item?.address?.zipCode,
+        main: item?.address?.main,
       },
       message: '',
     };
