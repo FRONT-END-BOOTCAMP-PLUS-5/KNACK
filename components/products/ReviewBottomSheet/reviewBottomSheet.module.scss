@@ -1,0 +1,249 @@
+// 오버레이
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(.8rem);
+  -webkit-backdrop-filter: blur(.8rem);
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+// 바텀시트 컨테이너
+.bottom_sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-top-left-radius: 1.6rem;
+  border-top-right-radius: 1.6rem;
+  padding: 1.8rem 2.4rem 2.4rem;
+  min-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+// 헤더
+.review_header {
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2.4rem;
+  display: flex;
+}
+
+// 제목
+.title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: $gray03;
+  margin: 0;
+}
+
+// 닫기 버튼
+.close_button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  
+  img {
+    width: 5rem;
+    height: 5rem;
+  }
+}
+
+// 별점 컨테이너
+.rating_container {
+  margin-bottom: 3.2rem;
+  display: flex;
+  gap: 3.2rem;
+}
+
+// 별점 요약
+.rating_summary {
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+  min-width: 8rem;
+}
+
+// 평균 별점
+.average_rating {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: $gray03;
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+}
+
+// 별 아이콘
+.star_icon {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $gray01;
+  margin-top: 1rem;
+  margin-left: -.5rem;
+}
+
+// 리뷰 개수
+.review_count {
+  font-size: 1.4rem;
+  color: #666;
+  font-weight: 500;
+}
+
+// 별점 분포
+.rating_distribution {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+// 별점 항목
+.rating_item {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+// 프로그레스 바 컨테이너
+.progress_container {
+  flex: 1;
+  height: .4rem;
+  background-color: #f0f0f0;
+  border-radius: .2rem;
+  overflow: hidden;
+}
+
+// 프로그레스 바
+.progress_bar {
+  height: 100%;
+  background-color: $gray03;
+  transition: width 0.3s ease;
+  border-radius: .2rem;
+}
+
+// 별점 숫자
+.rating_number {
+  font-size: 1.2rem;
+  color: $gray03;
+  font-weight: 500;
+  min-width: 2.4rem;
+  text-align: right;
+}
+
+// 리뷰가 없을 때
+.no_reviews {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.no_reviews_text {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: .8rem;
+}
+
+.no_reviews_subtext {
+  font-size: 1.4rem;
+  color: #999;
+  font-weight: 400;
+}
+
+// 질문 블록
+.question_block {
+  margin-bottom: 1.4rem;
+  padding-bottom: 1.4rem;
+  border-bottom: 1px solid $light-gray03;
+}
+
+// 질문 제목
+.question_title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.6rem;
+  color: $gray03;
+}
+
+// 답변 항목
+.answer_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0rem 0 1rem;
+}
+
+// 답변 텍스트
+.answer_text {
+  font-size: 1.3rem;
+  color: $gray03;
+  flex: 1;
+  
+  &.highest_percent {
+    font-weight: 700;
+    color: #222;
+  }
+}
+
+// 답변 통계
+.answer_stats {
+  display: flex;
+  gap: 1.6rem;
+  align-items: center;
+}
+
+// 답변 인원수
+.answer_count {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+// 답변 퍼센트
+.answer_percent {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: $gray03;
+  min-width: 5rem;
+  text-align: right;
+}
+
+// 애니메이션
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+// 리뷰 더보기 버튼
+.review_button {
+  background-color: white;
+  border: none;
+  border-radius: .8rem;
+  padding: 1.2rem 2.4rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  border: 1px solid $light-gray03;
+}
+

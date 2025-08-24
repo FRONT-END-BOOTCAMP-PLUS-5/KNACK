@@ -10,7 +10,7 @@ import ReviewIcon from '@/public/icons/my_review.png';
 import CouponIcon from '@/public/icons/my_coupon.png';
 
 const ActionGrid = () => {
-  const { reviewCount } = useReviewCount();
+  const { reviewCount, isLoading } = useReviewCount();
 
   return (
     <article className={styles.grid_box}>
@@ -25,8 +25,9 @@ const ActionGrid = () => {
       <Flex direction="column" align="center" gap={8} paddingVertical={16}>
         <Link href="/my/review" className={styles.review_link}>
           <Image src={ReviewIcon} alt="리뷰" width={28} height={28} />
-          {/* reviewCount가 null이면 0, 숫자가 있으면 숫자 표시 */}
-          <Text size={1.2}>리뷰 {reviewCount ?? 0}</Text>
+          <Text size={1.2}>
+            리뷰 {isLoading ? '0' : reviewCount}
+          </Text>
         </Link>
       </Flex>
     </article>

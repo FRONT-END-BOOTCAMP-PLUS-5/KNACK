@@ -25,6 +25,19 @@ export interface IProduct {
     reviews: number;
     productLike: number;
   };
+  // 리뷰 통계 관련 필드 추가 
+  averageRating?: number;
+  ratingDistribution?: {
+    [key: number]: { count: number; percent: number };
+  };
+  questionAnswers?: {
+    [question: string]: {
+      [answer: string]: {
+        count: number;
+        percent: number;
+      };
+    };
+  };
 }
 
 interface IBrand {

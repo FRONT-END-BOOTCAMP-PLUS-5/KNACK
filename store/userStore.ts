@@ -17,7 +17,6 @@ export interface User {
 interface UserStore {
   // 상태
   user: User | null;
-  reviewCount: number | null; // 사용자의 리뷰 수 추가
   isLoading: boolean;
   error: string | null;
 
@@ -26,14 +25,11 @@ interface UserStore {
   updateUser: (updates: Partial<User>) => void;
   clearUser: () => void;
   fetchUserData: () => Promise<void>;
-  // 리뷰 수만 업데이트하는 액션 추가 (리뷰 작성/삭제 시 사용)
-  updateReviewCount: (count: number) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
   // 초기 상태
   user: null,
-  reviewCount: null, // 리뷰 수 초기값
   isLoading: false,
   error: null,
 
@@ -47,17 +43,14 @@ export const useUserStore = create<UserStore>((set) => ({
     })),
 
   // 사용자 정보 초기화
-  clearUser: () => set({ user: null, reviewCount: null, error: null }),
+  clearUser: () => set({ user: null, error: null }),
 
-  // 리뷰 수 업데이트 (리뷰 작성/삭제 시 사용)
-  updateReviewCount: (count: number) => set({ reviewCount: count }),
-
-  // 서버에서 사용자 정보와 리뷰 수를 함께 가져오기
+  // 서버에서 사용자 정보를 가져오기
   fetchUserData: async () => {
     set({ isLoading: true, error: null });
 
     try {
-      // 1. 사용자 프로필 정보 가져오기
+      // 사용자 프로필 정보 가져오기
       const profileResponse = await fetch('/api/user/profile');
 
       if (!profileResponse.ok) {
@@ -71,27 +64,9 @@ export const useUserStore = create<UserStore>((set) => ({
 
       const profileData = await profileResponse.json();
       
-      // 2. 사용자 리뷰 수 가져오기 (사용자 ID가 있을 때만)
-      let reviewCount = 0;
-      if (profileData.user?.id) {
-        try {
-          const reviewResponse = await fetch('/api/reviews/orders');
-          if (reviewResponse.ok) {
-            const reviewData = await reviewResponse.json();
-            // API 응답 구조에 맞게 수정: data 래퍼 없음
-            reviewCount = reviewData.myReviews?.length || 0;
-          }
-        } catch (reviewError) {
-          console.error('리뷰 수 조회 실패:', reviewError);
-          // 리뷰 수 조회 실패해도 사용자 정보는 설정
-          reviewCount = 0;
-        }
-      }
-
-      // 3. 사용자 정보와 리뷰 수를 함께 설정
+      // 사용자 정보 설정
       set({ 
         user: profileData.user, 
-        reviewCount: reviewCount,
         isLoading: false 
       });
     } catch (error) {

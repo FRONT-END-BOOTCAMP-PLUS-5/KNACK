@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ReactStars from 'react-stars';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import styles from './review.module.scss';
 
 import { ReviewOrderDto, MyReviewDto } from '@/types/review';
@@ -13,7 +13,6 @@ import { REVIEW_INCENTIVE_MESSAGE, ERROR_MESSAGES } from '@/utils/review';
 
 export default function ReviewPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'write' | 'my'>('write');
   
   // 커스텀 훅 사용
@@ -26,10 +25,7 @@ export default function ReviewPage() {
     removeOrderFromReviewable 
   } = useReview();
 
-  // 리뷰 클릭 시 상품 상세페이지로 이동
-  const handleReviewClick = (productId: number) => {
-    router.push(`/products/${productId}`);
-  };
+
 
   // URL 쿼리 파라미터에서 탭 정보 가져오기
   useEffect(() => {
@@ -155,7 +151,7 @@ export default function ReviewPage() {
              ) : (
               <div className={styles.product_list}>
                 {myreview.map((order: MyReviewDto) => (
-                  <div key={`my-${order.orderId}`} className={styles.product_link} onClick={() => handleReviewClick(order.productId)}>
+                  <Link key={`my-${order.orderId}`} href={`/products/${order.productId}`} className={styles.product_link}>
                     <div className={styles.product_item}>
                       <div className={styles.product_image}>
                         <Image 
@@ -211,7 +207,7 @@ export default function ReviewPage() {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}
