@@ -24,8 +24,8 @@ export const useInfiniteScroll = (initialData: ISearchProductListResponse) => {
       pages: [initialData],
       pageParams: [initialData.pageInfo.nextCursor || undefined],
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: 1000,
+    gcTime: 1000,
   });
 
   const items = data?.pages.flatMap((page) => page.products) || [];

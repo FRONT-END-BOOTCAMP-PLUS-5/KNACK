@@ -3,7 +3,7 @@ import { useSearchParams } from 'next/navigation';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
 import styles from './searchProductList.module.scss';
-import { useClearProductFilter } from '@/hooks/useClearProductFilter';
+import { useClearProductFilter } from '@/hooks/search/useClearProductFilter';
 
 export default function SearchProductListEmpty() {
   const { clearFilters } = useClearProductFilter();

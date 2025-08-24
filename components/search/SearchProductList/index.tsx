@@ -2,7 +2,7 @@
 import styles from './searchProductList.module.scss';
 import { ProductCardLarge } from '@/components/common/ProductCard';
 import SearchProductListEmpty from './SearchProductListEmpty';
-import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { useInfiniteScroll } from '@/hooks/search/useInfiniteScroll';
 import Image from 'next/image';
 import loadingIcon from '@/public/images/loading.gif';
 import Flex from '@/components/common/Flex';
