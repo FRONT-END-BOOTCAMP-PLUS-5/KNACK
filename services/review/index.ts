@@ -30,5 +30,15 @@ export const reviewService = {
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : '상품 정보를 가져올 수 없습니다.');
     }
+  },
+
+  // 리뷰 개수 조회
+  getReviewCount: async () => {
+    try {
+      const response = await requester.get('/api/reviews/count');
+      return response.data;
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : '리뷰 개수를 가져올 수 없습니다.');
+    }
   }
 };

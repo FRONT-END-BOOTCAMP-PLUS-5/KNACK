@@ -21,7 +21,7 @@ interface IProps {
 export default function CategoryBrandModal({ handleCategoryBrandModalOpen, handleCartClick }: IProps) {
   const [categoryList, setCategoryList] = useState<IPageCategory[]>([]);
   const [activeTab, setActiveTab] = useState<'category' | 'brand'>('category');
-  const { cartCount } = useCartStore();
+  const { storeCarts } = useCartStore();
   const { getCategories } = categoryService;
 
   const initCategories = useCallback(async () => {
@@ -60,7 +60,7 @@ export default function CategoryBrandModal({ handleCategoryBrandModalOpen, handl
             </nav>
             <button className={styles.icon_button} onClick={handleCartClick}>
               <Image src={CartIcon} width={24} height={24} alt="장바구니" />
-              <span className={styles.cart_count}>{cartCount}</span>
+              <span className={styles.cart_count}>{storeCarts?.length}</span>
             </button>
           </div>
           {activeTab === 'category' && (

@@ -74,7 +74,7 @@ export default function LayoutWrapper({ children }: IProps) {
   const hideHeaderElementsPaths = ['/my', '/cart', '/saved'];
 
   // 로고를 숨기고고 뒤로가기 버튼
-  const showBackButtonPaths = ['/cart', '/my/profile', '/my/address'];
+  const showBackButtonPaths = ['/cart', '/my/profile', '/my/address', '/products/'];
 
   // 홈 버튼을 보여줄 경로들
   const showHomeButtonPaths = ['/cart'];

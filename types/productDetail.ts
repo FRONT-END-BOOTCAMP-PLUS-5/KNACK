@@ -27,6 +27,19 @@ export interface IProduct {
     reviews: number;
     productLike: number;
   };
+  // 리뷰 통계 관련 필드 추가
+  averageRating?: number;
+  ratingDistribution?: {
+    [key: number]: { count: number; percent: number };
+  };
+  questionAnswers?: {
+    [question: string]: {
+      [answer: string]: {
+        count: number;
+        percent: number;
+      };
+    };
+  };
 }
 
 export interface IBrand {
@@ -58,4 +71,20 @@ export interface IReview {
   rating: number | null;
   reviewImages: string | null;
   createdAt: Date | null;
+}
+
+// TextReview 컴포넌트에서 사용하는 타입
+export interface ITextReviewData {
+  _count: { reviews: number };
+  averageRating?: number;
+  ratingDistribution?: { [key: number]: { count: number; percent: number } };
+  questionAnswers?: {
+    [question: string]: {
+      [answer: string]: {
+        count: number;
+        percent: number;
+      };
+    };
+  };
+  category: { id: number };
 }
