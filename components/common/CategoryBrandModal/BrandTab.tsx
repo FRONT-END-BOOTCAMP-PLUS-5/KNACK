@@ -11,7 +11,7 @@ import DragScroll from '@/components/common/DragScroll';
 import BrandMy from './BrandMy';
 import Link from 'next/link';
 import { useBrandList } from '@/hooks/brand/useBrandList';
-import { useBrandAddLike } from '@/hooks/brand/useBrandAddLike';
+import { useToggleBrandLike } from '@/hooks/brand/useToggleBrandLike';
 import Loading from '@/public/images/loading.gif';
 
 export default function BrandTab() {
@@ -21,7 +21,7 @@ export default function BrandTab() {
   const tagRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const brandGroupRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { data: brands = [], isLoading, error, isSuccess, isError } = useBrandList();
-  const { mutate: toggleBrandLike, isPending } = useBrandAddLike();
+  const { mutate: toggleBrandLike, isPending } = useToggleBrandLike();
 
   const handleTabChange = (tab: 'ALL' | 'MY') => {
     setActiveBrandTab(tab);

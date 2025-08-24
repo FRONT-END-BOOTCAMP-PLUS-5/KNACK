@@ -13,7 +13,7 @@ interface IBrandLikeListData {
   status: number;
 }
 
-export const useBrandAddLike = () => {
+export const useToggleBrandLike = () => {
   const queryClient = useQueryClient();
 
   const { addBrandLike, deleteBrandLike } = likeService;

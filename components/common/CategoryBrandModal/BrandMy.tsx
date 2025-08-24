@@ -10,12 +10,12 @@ import { IBrandLikeList } from '@/types/like';
 import EmptyText from '@/components/saved/EmptyText';
 import Link from 'next/link';
 import { useBrandLike } from '@/hooks/brand/useBrandLike';
-import { useBrandAddLike } from '@/hooks/brand/useBrandAddLike';
+import { useToggleBrandLike } from '@/hooks/brand/useToggleBrandLike';
 import Loading from '@/public/images/loading.gif';
 
 export default function BrandMy() {
   const { data: response, isLoading, error, isSuccess, isError } = useBrandLike();
-  const { mutate: toggleBrandLike, isPending } = useBrandAddLike();
+  const { mutate: toggleBrandLike, isPending } = useToggleBrandLike();
 
   // API 응답 구조에 따라 데이터 추출
   const likedBrands = response?.result || response || [];
