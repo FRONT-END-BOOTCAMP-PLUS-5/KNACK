@@ -9,13 +9,15 @@ import { PrUserPointsRepository } from '@/backend/points/repositories/PrUserPoin
 import { PrCardRepository } from '@/backend/payments/repositories/PrCardRepository'
 
 import { ConfirmPaymentUseCase } from '@/backend/payments/applications/usecases/ConfirmPaymentUseCase'
-import { TossConfirmResult, TossGateway } from '@/types/payment'
+import { GetPaymentsByUserIdUseCase } from '@/backend/payments/applications/usecases/GetPaymentsbyUserIdUseCase'
+import { TossGateway } from '@/types/payment'
 import { serverPost } from '@/backend/utils/serverRequester'
 import { PrOrderRepository } from '@/backend/orders/repositories/PrOrderRepository'
 
 export const runtime = 'nodejs'; // Prisma/Node 모듈이면 안전
 
 import axios from 'axios';
+import { serializeBigInt } from '@/utils/orders'
 
 export async function POST(req: NextRequest) {
     try {
@@ -117,3 +119,38 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: msg }, { status: 400 });
     }
 }
+
+export async function GET(req: NextRequest) {
+    try {
+        const session = await getServerSession(authOptions)
+        let userId = session?.user?.id
+
+        // (선택) 로컬 개발 편의: 헤더로 테스트 유저 주입
+        if (!userId && process.env.NODE_ENV === 'development') {
+            const test = req.headers.get('x-test-user-id')
+            if (test) userId = test
+        }
+
+        if (!userId) {
+            return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+        }
+
+        const usecase = new GetPaymentsByUserIdUseCase(new PrPaymentRepository())
+        const payments = await usecase.execute(userId)
+
+        // 응답 포맷 일관성: 객체로 래핑
+        return NextResponse.json(serializeBigInt({ payments }), { status: 200 })
+    } catch (e) {
+        console.error('[GET /api/payments] failed:', e)
+        const msg = e instanceof Error ? e.message : 'internal_error'
+        return NextResponse.json({ error: msg }, { status: 500 })
+    }
+}
+
+
+
+
+
+
+
+

@@ -5,7 +5,22 @@ import { IAddress } from './address';
 /* ---------- 장바구니/주문 ---------- */
 
 export const STEPS = ["구매 확정", "배송 대기", "배송 중", "배송 완료"] as const;
+export type Tab = 'all' | 'progress' | 'done';
 export type Step = typeof STEPS[number];
+
+export interface filterItem {
+  inProgress: BuyingItem[];
+  completed?: BuyingItem[];
+  total: BuyingItem[];
+}
+
+export interface BuyingItem {
+  id: string;
+  imageUrl: string;
+  status?: string;
+  title: string;
+  optionText: string;
+}
 
 export type CheckoutRow = {
   productId: number;
@@ -23,6 +38,14 @@ export type OrderItem = {
   kor_name?: string;
   eng_name?: string;
   optionValue?: IOptionValue;
+};
+
+export type OrderRow = {
+  id: number;
+  deliveryStatus: number; // 4 == 완료
+  tracking?: string | null;
+  product?: { korName: string; thumbnailImage: string };
+  optionValue?: { name?: string; value?: string };
 };
 
 export interface OrderResponse {

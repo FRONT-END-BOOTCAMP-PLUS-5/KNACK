@@ -13,7 +13,8 @@ export class GetOrderAmountByIdUseCase {
         const completedOrders = orders.filter(
             order => order.deliveryStatus === 4)
         return {
-            total: totalOrders, inProgress: inProgressOrders,
+            total: totalOrders,
+            inProgress: inProgressOrders,
             completed: completedOrders
         };
     }

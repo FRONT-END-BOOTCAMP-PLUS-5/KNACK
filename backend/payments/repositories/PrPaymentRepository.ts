@@ -204,6 +204,15 @@ export class PrPaymentRepository implements PaymentRepository {
         return data as unknown as RepoPayment | null;
     }
 
+    async findWithOrderItemsByUserId(userId: string): Promise<RepoPayment[]> {
+        const data = await prisma.payment.findMany({
+            where: { userId },
+            include: graphInclude,
+            orderBy: { createdAt: 'desc' },
+        });
+        return data as unknown as RepoPayment[];
+    }
+
     private toRecord(row: {
         id: number;
         userId: string;

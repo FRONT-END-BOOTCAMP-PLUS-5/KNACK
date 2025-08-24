@@ -1,0 +1,80 @@
+$bg: #fff;
+$border: #eaeaea;
+$text: #111; // 기본 텍스트
+$muted: #9aa0a6; // 비활성 라벨
+$active: #111; // 활성 라벨
+$accent: #d1432e; // 스샷의 빨강 느낌 (원하는 빨강으로 조절)
+
+.tabs {
+    position: sticky;
+    top: 44;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background: $bg;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab {
+    position: relative;
+    display: grid;
+    place-items: center;
+    gap: 4px;
+    padding: 12px 8px 14px; // 아래 여백을 조금 더 줘서 인디케이터 공간 확보
+    text-decoration: none;
+
+    // 세로 구분선 (가운데 탭 양옆에만)
+    &.mid::before,
+    &.mid::after {
+        content: '';
+        position: absolute;
+        top: 18%;
+        bottom: 22%;
+        width: 1px;
+        background: $border;
+    }
+
+    &.mid::before {
+        left: 0;
+    }
+
+    &.mid::after {
+        right: 0;
+    }
+
+    .count {
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1;
+        color: $text; // 기본은 검정
+    }
+
+    .label {
+        font-size: 12px;
+        line-height: 1;
+        color: $muted; // 비활성은 연회색
+    }
+
+    .indicator {
+        position: absolute;
+        left: 14%;
+        right: 14%;
+        bottom: 0;
+        height: 2px;
+        background: $text; // 활성 밑줄은 검정
+        border-radius: 2px;
+    }
+}
+
+.active {
+    .count {
+        color: $accent;
+    }
+
+    // 활성: 빨간 숫자
+    .label {
+        color: $active;
+    }
+
+    // 활성: 검정 라벨
+}

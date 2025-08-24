@@ -6,6 +6,7 @@ import { GetPaymentDto } from "../../applications/dtos/GetPaymentDto"
 import { RepoPayment } from "@/types/order"
 
 export interface PaymentRepository {
+    findWithOrderItemsByUserId(userId: string): Promise<RepoPayment[]>
 
     // Add these methods that return RepoPayment with orders
     findWithOrdersByNumber(paymentNumber: bigint, userId: string): Promise<RepoPayment | null>
