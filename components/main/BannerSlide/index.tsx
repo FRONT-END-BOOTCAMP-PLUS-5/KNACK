@@ -35,7 +35,9 @@ const BannerSlide = () => {
           </SwiperSlide>
         ))}
       </Swiper>
-      <div className={styles.swiper_index}>{activeIndex} / 5</div>
+      <div className={styles.swiper_index}>
+        {activeIndex} / {SLIDES_IMAGE?.length}
+      </div>
     </div>
   );
 };
