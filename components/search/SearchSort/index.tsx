@@ -8,7 +8,7 @@ import Flex from '@/components/common/Flex';
 import filterArrow from '@/public/icons/filter_arrow.svg';
 import checkCircle from '@/public/icons/check_circle.svg';
 import checkIcon from '@/public/icons/check.svg';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Portal from '@/components/common/Portal';
 
 interface IProps {
@@ -19,6 +19,13 @@ export default function SearchSort({ filterQuery }: IProps) {
   const [isSortModalOpen, setIsSortModalOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setIsSortModalOpen(false);
+
+    return () => setIsSortModalOpen(false);
+  }, [searchParams, pathname]);
 
   useEffect(() => {
     if (isSortModalOpen) {
