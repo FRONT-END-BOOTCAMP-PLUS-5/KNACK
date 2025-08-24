@@ -10,6 +10,7 @@ import Footer from '@/components/common/Footer';
 import PaymentHeader from '@/components/Payments/PaymentHeader';
 import { useUserStore } from '@/store/userStore';
 import { BuyingHeader } from '@/components/my/BuyingHeader';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 interface IProps {
   children: React.ReactNode;
@@ -24,7 +25,9 @@ export default function LayoutWrapper({ children }: IProps) {
         defaultOptions: {
           queries: {
             staleTime: 60 * 1000, // 1분
+            gcTime: 10 * 60 * 1000,
             retry: 1,
+            refetchOnWindowFocus: false,
           },
         },
       })
@@ -43,13 +46,29 @@ export default function LayoutWrapper({ children }: IProps) {
   }, [session, status, fetchUserData]);
 
   // 헤더만 숨길 경로들
-  const hideHeaderPaths = ['/login', '/signup', '/find-email', '/find-password', '/my/address', '/saved', '/payments/checkout'];
+  const hideHeaderPaths = [
+    '/login',
+    '/signup',
+    '/find-email',
+    '/find-password',
+    '/my/address',
+    '/saved',
+    '/payments/checkout',
+  ];
 
   // 푸터만 숨길 경로들
   const hideFooterPaths = ['/products', '/cart', '/payments'];
 
   // 헤더와 푸터 모두 숨길 경로들
-  const hideAllLayoutPaths = ['/login', '/signup', '/my/buying', '/find-email', '/find-password', '/my/buying', '/my/order'];
+  const hideAllLayoutPaths = [
+    '/login',
+    '/signup',
+    '/my/buying',
+    '/find-email',
+    '/find-password',
+    '/my/buying',
+    '/my/order',
+  ];
 
   // nav와 검색버튼을을 숨김
   const hideHeaderElementsPaths = ['/my', '/cart', '/saved'];
@@ -132,6 +151,7 @@ export default function LayoutWrapper({ children }: IProps) {
       )}
       {children}
       {!shouldHideFooter && <Footer />}
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

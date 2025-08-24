@@ -7,19 +7,18 @@ import { STORAGE_PATHS } from '@/constraint/auth';
 import BookMark from '@/public/icons/book_mark.svg';
 import BookMarkOn from '@/public/icons/book_mark_active.svg';
 import styles from './categoryBrandModal.module.scss';
-import { brandService } from '@/services/brand';
-import { IBrandWithTagList } from '@/types/brand';
 import DragScroll from '@/components/common/DragScroll';
 import BrandMy from './BrandMy';
 import Link from 'next/link';
+import { useBrandList } from '@/hooks/useBrandList';
 
 export default function BrandTab() {
-  const [brands, setBrands] = useState<IBrandWithTagList[]>([]);
   const [activeBrandTab, setActiveBrandTab] = useState<'ALL' | 'MY'>('ALL');
   const [activeTag, setActiveTag] = useState<string>('');
   const brandContainerRef = useRef<HTMLDivElement>(null);
   const tagRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const brandGroupRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const { data: brands = [], isLoading, error, isSuccess, isError } = useBrandList();
 
   const handleTabChange = (tab: 'ALL' | 'MY') => {
     setActiveBrandTab(tab);
@@ -29,20 +28,10 @@ export default function BrandTab() {
   };
 
   useEffect(() => {
-    const initBrands = async () => {
-      try {
-        const res = await brandService.getBrands();
-        setBrands(res);
-        if (res.length > 0) {
-          setActiveTag(res[0].tag);
-        }
-      } catch (error) {
-        console.error('브랜드 데이터 호출 실패 : ', error);
-      }
-    };
-
-    initBrands();
-  }, []);
+    if (brands.length > 0 && activeBrandTab === 'ALL') {
+      setActiveTag(brands[0].tag);
+    }
+  }, [brands, activeBrandTab]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -133,7 +122,7 @@ export default function BrandTab() {
           </div>
         </Flex>
       </section>
-      {activeBrandTab === 'ALL' && (
+      {activeBrandTab === 'ALL' && isSuccess && (
         <>
           <section className={styles.brand_tag_section}>
             {brands.length > 0 && (
@@ -203,6 +192,20 @@ export default function BrandTab() {
               ))}
           </div>
         </>
+      )}
+      {isLoading && (
+        <Flex justify="center" align="center" paddingVertical={100}>
+          <Text size={1.6} color="gray3">
+            브랜드 목록을 불러오는 중...
+          </Text>
+        </Flex>
+      )}
+      {isError && (
+        <Flex justify="center" align="center" paddingVertical={100}>
+          <Text size={1.6} color="gray3">
+            브랜드 목록을 불러오는데 실패했습니다.
+          </Text>
+        </Flex>
       )}
       {activeBrandTab === 'MY' && <BrandMy />}
     </article>
