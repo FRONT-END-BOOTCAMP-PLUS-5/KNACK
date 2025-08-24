@@ -7,11 +7,12 @@ import requester from '@/utils/requester';
 import { BuyingItem, Tab } from '@/types/order';
 import { BuyingHistoryHeader } from '@/components/my/BuyingHistoryHeader';
 
-export default function BuyingPage({ tab }: { tab: Tab }) {
+export default function BuyingPage() {
     const [items, setItems] = useState();
     const [orderItems, setOrderItems] = useState<BuyingItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [tab, setTab] = useState<Tab>('all');
 
     // 탭 → 서버 쿼리 변환(백엔드가 status 파라미터를 받는 구조일 때)
     const query = useMemo(() => {
@@ -19,6 +20,10 @@ export default function BuyingPage({ tab }: { tab: Tab }) {
         // e.g. progress → status=progress, done → status=done, all → (파라미터 생략)
         return tab === 'all' ? '' : `?status=${tab}`;
     }, [tab]);
+
+    const handleTab = (tab: Tab) => {
+        setTab(tab);
+    };
 
     useEffect(() => {
         let cancelled = false;
@@ -51,7 +56,7 @@ export default function BuyingPage({ tab }: { tab: Tab }) {
     return (
         <div>
             <BuyingHistoryHeader />
-            <BuyingTabs counts={{ all: orderItems?.total?.length, progress: orderItems?.inProgress?.length, done: orderItems?.completed?.length }} />
+            <BuyingTabs onTabSelect={handleTab} counts={{ all: orderItems?.total?.length, progress: orderItems?.inProgress?.length, done: orderItems?.completed?.length }} />
             {loading && <div style={{ padding: 16 }}>불러오는 중…</div>}
             {error && <div style={{ padding: 16, color: 'crimson' }}>{error}</div>}
             {!loading && !error && items && <BuyingList items={items} tab={tab} />}

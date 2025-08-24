@@ -12,10 +12,15 @@ const TABS: { key: Tab; label: string }[] = [
 ];
 
 export function BuyingTabs({
+    onTabSelect,
     counts = { all: 0, progress: 0, done: 0 },
 }: {
+    onTabSelect: (tab: Tab) => void;
     counts?: { all: number; progress: number; done: number };
 }) {
+    const handleTabClick = (tab: Tab) => {
+        onTabSelect(tab);
+    };
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const current = (searchParams.get('tab') as Tab) ?? 'progress';
@@ -39,6 +44,7 @@ export function BuyingTabs({
                         aria-selected={active}
                         scroll={false}
                         className={`${styles.tab} ${active ? styles.active : ''} ${i === 1 ? styles.mid : ''}`}
+                        onClick={() => handleTabClick(t.key)}
                     >
                         <span className={styles.count} aria-hidden="true">
                             {getCount(t.key)}

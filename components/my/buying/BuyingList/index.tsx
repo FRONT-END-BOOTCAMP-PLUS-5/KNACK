@@ -30,6 +30,7 @@ export default function BuyingList({
 
     // 탭 기준으로 결제단위 필터링 (내부 orders를 거른 후, 표시할 주문이 없으면 제외)
     const payments = useMemo(() => {
+        console.log(tab)
         const list = items?.payments ?? [];
         const filtered = list
             .map((p) => {
