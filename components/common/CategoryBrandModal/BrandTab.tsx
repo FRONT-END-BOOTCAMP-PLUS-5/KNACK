@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, MouseEvent } from 'react';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
 import Image from 'next/image';
@@ -10,7 +10,9 @@ import styles from './categoryBrandModal.module.scss';
 import DragScroll from '@/components/common/DragScroll';
 import BrandMy from './BrandMy';
 import Link from 'next/link';
-import { useBrandList } from '@/hooks/useBrandList';
+import { useBrandList } from '@/hooks/brand/useBrandList';
+import { useBrandAddLike } from '@/hooks/brand/useBrandAddLike';
+import Loading from '@/public/images/loading.gif';
 
 export default function BrandTab() {
   const [activeBrandTab, setActiveBrandTab] = useState<'ALL' | 'MY'>('ALL');
@@ -19,6 +21,7 @@ export default function BrandTab() {
   const tagRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const brandGroupRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { data: brands = [], isLoading, error, isSuccess, isError } = useBrandList();
+  const { mutate: toggleBrandLike, isPending } = useBrandAddLike();
 
   const handleTabChange = (tab: 'ALL' | 'MY') => {
     setActiveBrandTab(tab);
@@ -32,6 +35,12 @@ export default function BrandTab() {
       setActiveTag(brands[0].tag);
     }
   }, [brands, activeBrandTab]);
+
+  useEffect(() => {
+    if (error) {
+      console.error('브랜드 목록 조회 실패:', error);
+    }
+  }, [error]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -90,6 +99,13 @@ export default function BrandTab() {
     }
   }, [activeTag]);
 
+  const handleBrandLike = (e: MouseEvent<HTMLButtonElement>, brandId: number, isLiked: boolean) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    toggleBrandLike({ isLiked: isLiked, id: brandId });
+  };
+
   return (
     <article className={styles.brand_container}>
       <section>
@@ -122,6 +138,18 @@ export default function BrandTab() {
           </div>
         </Flex>
       </section>
+      {isLoading && (
+        <Flex justify="center" align="center" paddingVertical={100}>
+          <Image src={Loading} alt="로딩 이미지" width={100} height={100} />
+        </Flex>
+      )}
+      {isError && (
+        <Flex justify="center" align="center" paddingVertical={100}>
+          <Text size={1.6} color="gray3">
+            브랜드 목록을 불러오는데 실패했습니다.
+          </Text>
+        </Flex>
+      )}
       {activeBrandTab === 'ALL' && isSuccess && (
         <>
           <section className={styles.brand_tag_section}>
@@ -178,7 +206,11 @@ export default function BrandTab() {
                             </Text>
                           </Flex>
                         </Flex>
-                        <button className={styles.book_mark_button}>
+                        <button
+                          className={styles.book_mark_button}
+                          onClick={(e) => handleBrandLike(e, brand.id, brand.isLiked)}
+                          disabled={isPending}
+                        >
                           {brand.isLiked ? (
                             <Image src={BookMarkOn} alt="좋아요 아이콘" width={20} height={20} />
                           ) : (
@@ -192,20 +224,6 @@ export default function BrandTab() {
               ))}
           </div>
         </>
-      )}
-      {isLoading && (
-        <Flex justify="center" align="center" paddingVertical={100}>
-          <Text size={1.6} color="gray3">
-            브랜드 목록을 불러오는 중...
-          </Text>
-        </Flex>
-      )}
-      {isError && (
-        <Flex justify="center" align="center" paddingVertical={100}>
-          <Text size={1.6} color="gray3">
-            브랜드 목록을 불러오는데 실패했습니다.
-          </Text>
-        </Flex>
       )}
       {activeBrandTab === 'MY' && <BrandMy />}
     </article>

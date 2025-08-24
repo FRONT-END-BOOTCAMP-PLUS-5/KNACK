@@ -1,57 +1,63 @@
 'use client';
-import { MouseEvent, useEffect, useState } from 'react';
+import { MouseEvent } from 'react';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import BookMarkOn from '@/public/icons/book_mark_active.svg';
 import styles from './categoryBrandModal.module.scss';
-import { likeService } from '@/services/like';
 import { IBrandLikeList } from '@/types/like';
 import EmptyText from '@/components/saved/EmptyText';
 import Link from 'next/link';
+import { useBrandLike } from '@/hooks/brand/useBrandLike';
+import { useBrandAddLike } from '@/hooks/brand/useBrandAddLike';
+import Loading from '@/public/images/loading.gif';
 
 export default function BrandMy() {
-  const [likedBrands, setLikedBrands] = useState<IBrandLikeList[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { getBrandLikes, deleteBrandLike } = likeService;
+  const { data: response, isLoading, error, isSuccess, isError } = useBrandLike();
+  const { mutate: toggleBrandLike, isPending } = useBrandAddLike();
 
-  useEffect(() => {
-    const initLikedBrands = async () => {
-      try {
-        setIsLoading(true);
-        const res = await getBrandLikes();
-        if (res.status === 200) {
-          setLikedBrands(res.result);
-        }
-      } catch (error) {
-        console.error('좋아요한 브랜드 데이터 호출 실패 : ', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // API 응답 구조에 따라 데이터 추출
+  const likedBrands = response?.result || response || [];
 
-    initLikedBrands();
-  }, [getBrandLikes]);
+  // 에러 발생 시 콘솔에 출력
+  if (error) {
+    console.error('좋아요한 브랜드 데이터 호출 실패:', error);
+  }
 
-  const handleDeleteBrandLike = async (e: MouseEvent<HTMLButtonElement>, brandLikeId: number) => {
+  const handleDeleteBrandLike = async (e: MouseEvent<HTMLButtonElement>, brandId: number) => {
     e.preventDefault();
 
-    try {
-      const res = await deleteBrandLike(brandLikeId);
-      if (res.status === 200) {
-        const updatedBrands = likedBrands.filter((brand) => brand.brand?.id !== brandLikeId);
-        setLikedBrands(updatedBrands);
-      }
-    } catch (error) {
-      console.error('브랜드 좋아요 삭제 실패 : ', error);
-    }
+    toggleBrandLike({ isLiked: true, id: brandId });
   };
+
+  if (isLoading) {
+    return (
+      <div className={styles.brand_list_container}>
+        <Flex justify="center" align="center" paddingVertical={100}>
+          <Image src={Loading} alt="로딩 이미지" width={100} height={100} />
+        </Flex>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className={styles.brand_list_container}>
+        <Flex justify="center" align="center" paddingVertical={100}>
+          <Text size={1.6} color="red1">
+            관심 브랜드를 불러오는데 실패했습니다.
+          </Text>
+        </Flex>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.brand_list_container}>
-      {likedBrands.length > 0 &&
-        likedBrands.map((likedBrand) => (
+      {isSuccess &&
+        likedBrands.length > 0 &&
+        likedBrands.map((likedBrand: IBrandLikeList) => (
           <Link
             key={likedBrand?.brand?.id}
             className={styles.brand_item}
@@ -79,6 +85,7 @@ export default function BrandMy() {
               <button
                 className={styles.book_mark_button}
                 onClick={(e) => handleDeleteBrandLike(e, likedBrand?.brand?.id)}
+                disabled={isPending}
               >
                 <Image src={BookMarkOn} alt="좋아요 아이콘" width={20} height={20} />
               </button>
