@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
 import Image from 'next/image';
@@ -34,11 +34,13 @@ export default function BrandMy() {
     initLikedBrands();
   }, [getBrandLikes]);
 
-  const handleDeleteBrandLike = async (brandLikeId: number) => {
+  const handleDeleteBrandLike = async (e: MouseEvent<HTMLButtonElement>, brandLikeId: number) => {
+    e.preventDefault();
+
     try {
       const res = await deleteBrandLike(brandLikeId);
       if (res.status === 200) {
-        const updatedBrands = likedBrands.filter((brand) => brand.id !== brandLikeId);
+        const updatedBrands = likedBrands.filter((brand) => brand.brand?.id !== brandLikeId);
         setLikedBrands(updatedBrands);
       }
     } catch (error) {
@@ -50,7 +52,11 @@ export default function BrandMy() {
     <div className={styles.brand_list_container}>
       {likedBrands.length > 0 &&
         likedBrands.map((likedBrand) => (
-          <Link key={likedBrand.id} className={styles.brand_item} href={`/search?keyword=${likedBrand.brand.korName}`}>
+          <Link
+            key={likedBrand?.brand?.id}
+            className={styles.brand_item}
+            href={`/search?keyword=${likedBrand.brand.korName}`}
+          >
             <Flex justify="between" align="center">
               <Flex gap={16} align="center">
                 <span className={styles.logo_image}>
@@ -70,7 +76,10 @@ export default function BrandMy() {
                   </Text>
                 </Flex>
               </Flex>
-              <button className={styles.book_mark_button} onClick={() => handleDeleteBrandLike(likedBrand.id)}>
+              <button
+                className={styles.book_mark_button}
+                onClick={(e) => handleDeleteBrandLike(e, likedBrand?.brand?.id)}
+              >
                 <Image src={BookMarkOn} alt="좋아요 아이콘" width={20} height={20} />
               </button>
             </Flex>
