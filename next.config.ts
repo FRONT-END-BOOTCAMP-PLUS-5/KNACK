@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['d2ubv3uh3d6fx8.cloudfront.net', 'lh3.googleusercontent.com'],
   },
+  devIndicators: false,
 };
 
 export default nextConfig;

@@ -106,11 +106,12 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
   // 브랜드 데이터 호출 로직
   const initBrands = useCallback(
     async (keyword?: string) => {
-      await getBrands({ keyword: keyword }).then((res) => {
-        if (res.status === 200) {
-          setBrands(res.result);
-        }
-      });
+      try {
+        const res = await getBrands({ keyword: keyword });
+        setBrands(res);
+      } catch (error) {
+        console.error('브랜드 데이터 호출 실패 : ', error);
+      }
     },
     [getBrands]
   );

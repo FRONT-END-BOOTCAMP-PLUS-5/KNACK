@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import styles from './header.module.scss';
 import { HEADER_TABS, DEFAULT_ACTIVE_TAB, HeaderTab } from '@/constraint/header';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { IProps } from '@/types/header';
 import Image from 'next/image';
-import BellIcon from '@/public/icons/bell.svg';
+import HamburgerIcon from '@/public/icons/hamburger.svg';
 import CartIcon from '@/public/icons/cart.svg';
 import HomeIcon from '@/public/icons/home.svg';
 import { cartService } from '@/services/cart';
@@ -16,7 +16,7 @@ import { useCartStore } from '@/store/cartStore';
 import HeaderCategory from './HeaderCategory';
 import HeaderInput from '../HeaderInput';
 import SearchModal from '../SearchModal';
-import Portal from '../Portal';
+import CategoryBrandModal from '../CategoryBrandModal';
 
 export default function Header({
   hideHeaderElements = false,
@@ -28,12 +28,15 @@ export default function Header({
 }: IProps) {
   // 현재 활성화된 탭 상태 관리
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<HeaderTab>(DEFAULT_ACTIVE_TAB);
   const [carts, setCarts] = useState<ICart[]>([]);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [isCategoryBrandModalOpen, setIsCategoryBrandModalOpen] = useState(false);
 
-  const { cartCount, setCartCount } = useCartStore();
   const { getCart } = cartService;
+
+  const { storeCarts, setStoreCarts, clearStoreCarts } = useCartStore();
 
   // Next.js 라우터 (뒤로가기 기능용)
   const router = useRouter();
@@ -71,11 +74,25 @@ export default function Header({
   }, [handleGetCart]);
 
   useEffect(() => {
-    setCartCount(carts.length);
-  }, [carts.length, setCartCount]);
+    if (carts?.length === 0) return;
+
+    clearStoreCarts();
+    carts?.forEach((item) => {
+      setStoreCarts(item);
+    });
+  }, [carts, clearStoreCarts, setStoreCarts]);
+
+  useEffect(() => {
+    setIsSearchModalOpen(false);
+    setIsCategoryBrandModalOpen(false);
+  }, [pathname, searchParams]);
 
   const handleSearchInputClick = (state: boolean) => {
     setIsSearchModalOpen(state);
+  };
+
+  const handleCategoryBrandModalOpen = (state: boolean) => {
+    setIsCategoryBrandModalOpen(state);
   };
 
   return (
@@ -103,17 +120,17 @@ export default function Header({
           <h2 className={styles.page_title}>{pageTitle}</h2>
         ) : null}
 
-        {/* 액션 버튼들 (알림, 장바구니) */}
+        {/* 액션 버튼들 (카테고리&브랜드 모달, 장바구니) */}
         {/* hideActionButtons이 true면 숨김 (프로필, 주문내역 등) */}
         {!hideActionButtons && (
           <div className={styles.header_actions}>
-            <button className={styles.icon_button}>
-              <Image src={BellIcon} width={24} height={24} alt="알림" />
+            <button className={styles.icon_button} onClick={() => setIsCategoryBrandModalOpen(true)}>
+              <Image src={HamburgerIcon} width={24} height={24} alt="카테고리 & 브랜드 모달" />
             </button>
 
             <button className={styles.icon_button} onClick={handleCartClick}>
               <Image src={CartIcon} width={24} height={24} alt="장바구니" />
-              <span className={styles.cart_count}>{cartCount}</span>
+              <span className={styles.cart_count}>{storeCarts?.length}</span>
             </button>
           </div>
         )}
@@ -148,10 +165,14 @@ export default function Header({
       )}
 
       {/* 검색모달 */}
-      {isSearchModalOpen && (
-        <Portal>
-          <SearchModal handleSearchInputClick={handleSearchInputClick} />
-        </Portal>
+      {isSearchModalOpen && <SearchModal handleSearchInputClick={handleSearchInputClick} />}
+
+      {/* 카테고리&브랜드모달 */}
+      {isCategoryBrandModalOpen && (
+        <CategoryBrandModal
+          handleCategoryBrandModalOpen={handleCategoryBrandModalOpen}
+          handleCartClick={handleCartClick}
+        />
       )}
     </header>
   );

@@ -19,21 +19,7 @@ interface IProps {
   }>;
 }
 
-// 리뷰 작성하기 기능이 완성되면 바꿀것
-const REVIEW_PROGRESS = [
-  { id: 0, percent: '80%', rating: 5 },
-  { id: 1, percent: '23%', rating: 4 },
-  { id: 2, percent: '15%', rating: 3 },
-  { id: 3, percent: '10%', rating: 2 },
-  { id: 4, percent: '4%', rating: 1 },
-];
 
-// 리뷰 작성하기 기능이 완성되면 바꿀것
-const REVIEW_RESULT_TEXT = [
-  { id: 0, normal: '두께감이', bold: '보통이에요', percent: '75%' },
-  { id: 1, normal: '무게감이', bold: '보통이에요', percent: '80%' },
-  { id: 2, normal: '퀄리티가', bold: '만족스러워요', percent: '74%' },
-];
 
 const ProductDetail = async ({ params }: IProps) => {
   const { id } = await params;
@@ -60,7 +46,7 @@ const ProductDetail = async ({ params }: IProps) => {
       <Divider />
       <Tab />
       <ProductDetailImage detailImage={productData?.detailImages} />
-      <TextReview reviewProgress={REVIEW_PROGRESS} reviewTextData={REVIEW_RESULT_TEXT} />
+      <TextReview productData={productData} />
       <BottomFixButton productData={productData} />
     </div>
   );
