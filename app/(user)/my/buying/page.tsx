@@ -4,14 +4,14 @@ import { useEffect, useMemo, useState } from 'react';
 import BuyingList from '@/components/my/buying/BuyingList';
 import { BuyingTabs } from '@/components/my/buying/BuyingTabs';
 import requester from '@/utils/requester';
-import { BuyingItem, Tab } from '@/types/order';
+import { FilterItem, Tab } from '@/types/order';
 import { BuyingHistoryHeader } from '@/components/my/BuyingHistoryHeader';
 import { Payment } from '@/types/payment';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export default function BuyingPage() {
     const [items, setItems] = useState<Payment[]>();
-    const [orderItems, setOrderItems] = useState<BuyingItem[]>([]);
+    const [orderItems, setOrderItems] = useState<FilterItem>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -79,7 +79,7 @@ export default function BuyingPage() {
     return (
         <div>
             <BuyingHistoryHeader />
-            <BuyingTabs onTabSelect={handleTabSelect} counts={{ all: orderItems?.total?.length, progress: orderItems?.inProgress?.length, done: orderItems?.completed?.length }} />
+            <BuyingTabs onTabSelect={handleTabSelect} counts={{ all: orderItems?.total?.length ?? 0, progress: orderItems?.inProgress?.length ?? 0, done: orderItems?.completed?.length ?? 0 }} />
             {loading && <div style={{ padding: 16 }}>불러오는 중…</div>}
             {error && <div style={{ padding: 16, color: 'crimson' }}>{error}</div>}
             {!loading && !error && items && <BuyingList items={filteredPayments} />}

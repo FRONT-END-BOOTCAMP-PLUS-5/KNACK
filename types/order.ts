@@ -8,7 +8,7 @@ export const STEPS = ["구매 확정", "배송 대기", "배송 중", "배송 �
 export type Tab = 'all' | 'progress' | 'done';
 export type Step = typeof STEPS[number];
 
-export interface filterItem {
+export interface FilterItem {
   inProgress: BuyingItem[];
   completed?: BuyingItem[];
   total: BuyingItem[];
