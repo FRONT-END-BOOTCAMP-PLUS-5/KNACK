@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { likeService } from '@/services/like';
-import { ISearchProductListResponse } from '@/types/searchProductList';
-import { useSearchParams } from 'next/navigation';
+import { ISearchProductList, ISearchProductListResponse } from '@/types/searchProductList';
 
 interface IProps {
   isLiked: boolean;
@@ -15,7 +14,6 @@ interface IInfiniteScrollProductList {
 
 export const useToggleProductLike = () => {
   const queryClient = useQueryClient();
-  const searchParams = useSearchParams();
   const { addLike, deleteLike } = likeService;
 
   return useMutation({
@@ -27,40 +25,39 @@ export const useToggleProductLike = () => {
       }
     },
     onMutate: async ({ isLiked, id }) => {
-      await queryClient.cancelQueries({
-        queryKey: ['searchProductList', searchParams.toString()],
+      await queryClient.cancelQueries({ queryKey: ['searchProductList'] });
+
+      const queries = queryClient.getQueriesData<IInfiniteScrollProductList>({
+        queryKey: ['searchProductList'],
+      });
+      queries.forEach(([key, prev]) => {
+        if (!prev) return;
+
+        queryClient.setQueryData<IInfiniteScrollProductList>(key, {
+          ...prev,
+          pages: prev.pages.map((page: ISearchProductListResponse) => ({
+            ...page,
+            products: page.products.map((product: ISearchProductList) =>
+              product.id === id
+                ? {
+                    ...product,
+                    isLiked: !isLiked,
+                    likesCount: isLiked ? product.likesCount - 1 : product.likesCount + 1,
+                  }
+                : product
+            ),
+          })),
+        });
       });
 
-      const previousProductList = queryClient.getQueryData(['searchProductList', searchParams.toString()]);
-
-      queryClient.setQueryData(
-        ['searchProductList', searchParams.toString()],
-        (prev: IInfiniteScrollProductList | undefined) => {
-          if (!prev?.pages) return prev;
-
-          return {
-            ...prev,
-            pages: prev.pages.map((page: ISearchProductListResponse) => ({
-              ...page,
-              products: page.products.map((product) =>
-                product.id === id
-                  ? {
-                      ...product,
-                      isLiked: !isLiked,
-                      likesCount: isLiked ? product.likesCount - 1 : product.likesCount + 1,
-                    }
-                  : product
-              ),
-            })),
-          };
-        }
-      );
-
-      return { previousProductList };
+      return { previousQueries: queries };
     },
+
     onError: (err, _, context) => {
-      if (context?.previousProductList) {
-        queryClient.setQueryData(['searchProductList', searchParams.toString()], context.previousProductList);
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
       }
       console.error('상품 좋아요 처리 실패:', err);
     },

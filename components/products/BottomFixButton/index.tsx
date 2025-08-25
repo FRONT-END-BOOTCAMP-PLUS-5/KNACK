@@ -113,23 +113,6 @@ const BottomFixButton = ({ productData }: IProps) => {
       });
   }, [getLikes, productData?._count?.productLike, productData?.id, setStoreLike]);
 
-  // const handleDeleteLike = useCallback(
-  //   (id: number) => {
-  //     deleteLike(id)
-  //       .then((res) => {
-  //         if (res.status === 200) {
-  //           alert('취소완료!');
-  //           setStoreLike(storeLike.count - 1, false);
-  //           setLikedCheck(!likedCheck);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.log('error', error.message);
-  //       });
-  //   },
-  //   [deleteLike, likedCheck, setStoreLike, storeLike.count]
-  // );
-
   const handleLikeAdd = useCallback(
     (productId: number) => {
       if (likedCheck) {
