@@ -36,8 +36,8 @@ const ProductSave = ({ likeList, onClickSave }: IProps) => {
                 <Image src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${item?.thumbnailImage}`} alt="상품 이미지" fill />
               </Link>
               <Flex direction="column">
-                <Flex className={styles.top_content} justify="between">
-                  <Link href={`/products/${item?.id}`}>
+                <Flex className={styles.top_content} justify="between" gap={8}>
+                  <Link href={`/products/${item?.id}`} style={{ width: `calc(100% - 40px)` }}>
                     <Flex direction="column">
                       <Text size={1.2} weight={700} lineHeight="1.7rem">
                         {item?.korName}
@@ -46,7 +46,7 @@ const ProductSave = ({ likeList, onClickSave }: IProps) => {
                     </Flex>
                   </Link>
                   <button className={styles.save_button} onClick={(e) => onClickSave(e, item?.id)}>
-                    <Image src={BookMarkOn} alt="저장" width={18} height={18} />
+                    <Image src={BookMarkOn} alt="저장" width={20} height={20} />
                   </button>
                 </Flex>
 

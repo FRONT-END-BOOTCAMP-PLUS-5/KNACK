@@ -25,4 +25,12 @@ export const productsService = {
 
     return data;
   },
+
+  getProductsThumbnail: async () => {
+    const { data, error } = await requester.get(`/api/products/thumbnail`).catch((error) => error);
+
+    if (error) throw new Error(error.message);
+
+    return data;
+  },
 };
