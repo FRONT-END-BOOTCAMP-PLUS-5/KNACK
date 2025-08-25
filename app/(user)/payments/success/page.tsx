@@ -49,19 +49,25 @@ export default function PaymentSuccess() {
   type ProcessedPayment = { tossPaymentKey: string; tossOrderId: string; at: number };
 
   const readProcessed = useCallback((): ProcessedPayment[] => {
-    try { return JSON.parse(sessionStorage.getItem('processedPayments') || '[]'); }
-    catch { return []; }
+    try {
+      return JSON.parse(sessionStorage.getItem('processedPayments') || '[]');
+    } catch {
+      return [];
+    }
   }, []);
 
-  const writeProcessed = useCallback((entry: ProcessedPayment) => {
-    const list = readProcessed();
-    // 같은 paymentKey 또는 같은 orderId가 이미 있으면 중복으로 간주
-    const dup = list.some(p => p.tossPaymentKey === entry.tossPaymentKey || p.tossOrderId === entry.tossOrderId);
-    if (!dup) {
-      list.push(entry);
-      sessionStorage.setItem('processedPayments', JSON.stringify(list));
-    }
-  }, [readProcessed]);
+  const writeProcessed = useCallback(
+    (entry: ProcessedPayment) => {
+      const list = readProcessed();
+      // 같은 paymentKey 또는 같은 orderId가 이미 있으면 중복으로 간주
+      const dup = list.some((p) => p.tossPaymentKey === entry.tossPaymentKey || p.tossOrderId === entry.tossOrderId);
+      if (!dup) {
+        list.push(entry);
+        sessionStorage.setItem('processedPayments', JSON.stringify(list));
+      }
+    },
+    [readProcessed]
+  );
 
   // 1) sessionStorage에서 복구
   useEffect(() => {
@@ -96,19 +102,29 @@ export default function PaymentSuccess() {
 
   // 2) 결제 및 주문 저장
   useEffect(() => {
-    if (!user) { console.log('SKIP: no user'); return; }
-    if (!IAddress?.id) { console.log('SKIP: no address'); return; }
-    if (orderItems.length === 0) { console.log('SKIP: no orderItems'); return; }
+    if (!user) {
+      console.log('SKIP: no user');
+      return;
+    }
+    if (!IAddress?.id) {
+      console.log('SKIP: no address');
+      return;
+    }
+    if (orderItems.length === 0) {
+      console.log('SKIP: no orderItems');
+      return;
+    }
     if (!tossPaymentKey || !tossOrderId || Number.isNaN(paymentAmount)) {
       console.log('SKIP: invalid params', { tossPaymentKey, tossOrderId, paymentAmount });
       return;
     }
-    if (hasRun.current) { console.log('SKIP: hasRun'); return; }
+    if (hasRun.current) {
+      console.log('SKIP: hasRun');
+      return;
+    }
 
     // 이미 처리된 결제/주문이면 스킵 (여기서 막히면 아래가 안 찍힘)
-    const already = readProcessed().some(
-      p => p.tossPaymentKey === tossPaymentKey || p.tossOrderId === tossOrderId
-    );
+    const already = readProcessed().some((p) => p.tossPaymentKey === tossPaymentKey || p.tossOrderId === tossOrderId);
     if (already) {
       console.log('SKIP: already processed', { tossPaymentKey, tossOrderId });
       return;
@@ -181,7 +197,21 @@ export default function PaymentSuccess() {
         sessionStorage.removeItem('processingOrderId');
       }
     })();
-  }, [IAddress, orderItems, tossPaymentKey, tossOrderId, paymentAmount, router, pointsToUse, selectedCoupon?.id, targetSumAfterCoupon, user, discountAmount, readProcessed, writeProcessed]);
+  }, [
+    IAddress,
+    orderItems,
+    tossPaymentKey,
+    tossOrderId,
+    paymentAmount,
+    router,
+    pointsToUse,
+    selectedCoupon?.id,
+    targetSumAfterCoupon,
+    user,
+    discountAmount,
+    readProcessed,
+    writeProcessed,
+  ]);
 
   // 3) 대표상품 조회 (위에서 저장한 paymentId로 API 호출)
   useEffect(() => {
@@ -206,7 +236,7 @@ export default function PaymentSuccess() {
         // 2) 첫 주문 상세 → 대표상품 + 배송비
         const ordRes = await requester.get(`/api/orders/${firstOrderId}`);
         const order = ordRes.data;
-        console.log(order);
+        console.log('useEffect-대표상품 조회', order);
         setRepProd(order.product ?? null);
       } catch (e) {
         console.error('❌ 대표상품/주문 로드 실패', e);
@@ -220,7 +250,6 @@ export default function PaymentSuccess() {
 
   return (
     <div className={styles.sheet}>
-
       <h2 className={styles.title}>구매가 완료되었습니다.</h2>
       <p className={styles.subtitle}>주문 즉시 출고를 준비하여 안전하게 배송 될 예정입니다.</p>
 
