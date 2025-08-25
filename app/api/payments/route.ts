@@ -123,13 +123,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions)
-        let userId = session?.user?.id
-
-        // (선택) 로컬 개발 편의: 헤더로 테스트 유저 주입
-        if (!userId && process.env.NODE_ENV === 'development') {
-            const test = req.headers.get('x-test-user-id')
-            if (test) userId = test
-        }
+        const userId = session?.user?.id
 
         if (!userId) {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })

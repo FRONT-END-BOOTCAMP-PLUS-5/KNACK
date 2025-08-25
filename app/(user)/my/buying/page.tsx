@@ -14,6 +14,7 @@ export default function BuyingPage() {
     const [orderItems, setOrderItems] = useState<FilterItem>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [cancelled, setCancelled] = useState(false);
 
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -26,8 +27,6 @@ export default function BuyingPage() {
     }, [searchParams]);
 
     useEffect(() => {
-        let cancelled = false;
-
         (async () => {
             try {
                 setLoading(true);
@@ -49,9 +48,9 @@ export default function BuyingPage() {
         })();
 
         return () => {
-            cancelled = true;
+            setCancelled(true);
         };
-    }, []);
+    }, [cancelled]);
 
     const filteredPayments = useMemo(() => {
         if (!items?.length) return [];
@@ -71,10 +70,6 @@ export default function BuyingPage() {
         params.set('tab', next);
         router.replace(`${pathname}?${params.toString()}`);
     };
-
-    useEffect(() => {
-        console.log(filteredPayments);
-    }, [filteredPayments]);
 
     return (
         <div>

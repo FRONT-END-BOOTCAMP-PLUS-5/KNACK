@@ -125,11 +125,11 @@ export function formatPrice(n?: number) {
 }
 
 export function statusToStep(status?: number): Step {
-    const s = (status ?? 1);
-    if (s === 1) return "구매 확정";
-    if (s === 2) return "배송 대기";
-    if (s === 3) return "배송 중";
-    if (s === 4) return "배송 완료";
+    const deliveryStatus = (status ?? 1);
+    if (deliveryStatus === 1) return "구매 확정";
+    if (deliveryStatus === 2) return "배송 대기";
+    if (deliveryStatus === 3) return "배송 중";
+    if (deliveryStatus === 4) return "배송 완료";
     return "구매 확정";
 }
 
