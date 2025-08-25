@@ -13,7 +13,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
     return NextResponse.json({ result: product, status: 200 });
   } catch (err) {
     if (err instanceof Error) {
-      return NextResponse.json({ message: err.message, status: 503 });
+      return NextResponse.json({ message: err.message });
     }
   }
 }

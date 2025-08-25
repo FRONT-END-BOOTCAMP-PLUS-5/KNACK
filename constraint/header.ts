@@ -1,6 +1,13 @@
-export const HEADER_TABS = ['추천', '신상', '신발', '랭킹', '럭셔리', '이벤트'] as const;
+export const HEADER_TABS = [
+  { id: 0, name: '전체', url: '/' },
+  { id: 1, name: 'AI검색', url: '/ai-search' },
+  { id: 2, name: '신상', url: '/' },
+  { id: 3, name: '신발', url: '/' },
+  { id: 4, name: '랭킹', url: '/' },
+  { id: 5, name: '이벤트', url: '/' },
+] as const;
 
-export const DEFAULT_ACTIVE_TAB = '추천';
+export const DEFAULT_ACTIVE_TAB = HEADER_TABS[0];
 
 export type HeaderTab = (typeof HEADER_TABS)[number];
 

@@ -44,6 +44,7 @@ export default function Header({
 
   const handleTabClick = (tab: HeaderTab) => {
     setActiveTab(tab);
+    router.push(tab?.url);
   };
 
   const handleCartClick = () => {
@@ -152,12 +153,12 @@ export default function Header({
         <nav className={styles.tab_navigation} aria-label="카테고리 탭">
           <ul className={styles.tab_list}>
             {HEADER_TABS.map((tab) => (
-              <li key={tab} className={styles.tab_item}>
+              <li key={'header_navigation_' + tab?.id} className={styles.tab_item}>
                 <button
                   className={`${styles.tab_button} ${activeTab === tab ? styles.active : ''}`}
                   onClick={() => handleTabClick(tab)}
                 >
-                  {tab}
+                  {tab?.name}
                 </button>
               </li>
             ))}
