@@ -17,6 +17,7 @@ export interface ISearchProductList {
   reviewsCount: number;
   likesCount: number;
   isSoldOut: boolean;
+  isLiked: boolean;
 }
 
 export interface ISearchProductListResponse {

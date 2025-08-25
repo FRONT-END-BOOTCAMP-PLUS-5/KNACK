@@ -9,7 +9,7 @@ import { FILTER_TAB_KEY, PRODUCT_FILTER } from '@/constraint/product';
 import { ISearchProductListRequest } from '@/types/searchProductList';
 import { calcFilterValueLength, isActiveFilter } from '@/utils/search/searchFilter';
 import resetIcon from '@/public/icons/reset.svg';
-import { useClearProductFilter } from '@/hooks/useClearProductFilter';
+import { useClearProductFilter } from '@/hooks/search/useClearProductFilter';
 
 interface IProps {
   filterQuery: ISearchProductListRequest;

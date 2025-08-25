@@ -12,6 +12,7 @@ export interface IBrandList {
   korName: string;
   logoImage: string;
   likesCount: number;
+  isLiked: boolean;
 }
 
 export interface IBrandWithTagList {

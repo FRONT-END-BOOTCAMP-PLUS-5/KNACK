@@ -38,8 +38,8 @@ import { getFilterCountById } from '@/utils/search/searchBottomSheetTab';
 import { removeFilterValue } from '@/utils/search/removeFilterValue';
 import { objectToQueryString } from '@/utils/queryString';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
-import { useSearchBottomSheetInit } from '@/hooks/useSearchBottomSheetInit';
-import { useFilterCounts } from '@/hooks/useFilterCounts';
+import { useSearchBottomSheetInit } from '@/hooks/search/useSearchBottomSheetInit';
+import { useFilterCounts } from '@/hooks/search/useFilterCounts';
 import { useRouter } from 'next/navigation';
 import searchClose from '@/public/icons/close_large.svg';
 

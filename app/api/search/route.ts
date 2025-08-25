@@ -4,12 +4,20 @@ import { PrProductsRepository } from '@/backend/search/infrastructure/repositori
 import { GetProductsRequestDto } from '@/backend/search/applications/dtos/GetProductsDto';
 import { SortOption } from '@/backend/search/domains/entities/ProductFilters';
 import { getBooleanParam, getIntParam, getIntArrayParam, getStringArrayParam } from '@/utils/searchParams';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/auth';
 
 export async function GET(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
   try {
     const { searchParams } = new URL(request.url);
 
+    const headerUserId = request.headers.get('userId');
+    const userId = headerUserId || session?.user?.id || undefined;
+
     const requestDto: GetProductsRequestDto = {
+      userId: userId,
       keyword: searchParams.get('keyword') || undefined,
 
       keywordColorId: getIntArrayParam(searchParams, 'keywordColorId'),

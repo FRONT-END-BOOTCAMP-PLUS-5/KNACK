@@ -2,6 +2,7 @@ import { ProductFilters, SortOption, PaginationParams, ProductListResponse } fro
 
 export interface ProductSearchRepository {
   getProducts(params: {
+    userId?: string;
     filters?: ProductFilters;
     sort?: SortOption;
     pagination?: PaginationParams;

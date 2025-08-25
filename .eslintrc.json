@@ -9,7 +9,8 @@
     "plugin:jsx-a11y/recommended",
     "eslint-config-prettier",
     "next/core-web-vitals",
-    "plugin:storybook/recommended"
+    "plugin:storybook/recommended",
+    "plugin:@tanstack/eslint-plugin-query/recommended"
   ],
   "plugins": ["@typescript-eslint"],
   "settings": {

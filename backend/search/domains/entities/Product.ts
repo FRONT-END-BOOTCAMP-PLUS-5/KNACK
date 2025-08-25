@@ -13,7 +13,8 @@ export class Product {
     public readonly subCategories: SubCategory[] = [],
     public readonly reviewsCount: number = 0,
     public readonly likesCount: number = 0,
-    public readonly isSoldOut: boolean = false
+    public readonly isSoldOut: boolean = false,
+    public readonly isLiked: boolean = false
   ) {}
 }
 
