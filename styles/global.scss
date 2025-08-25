@@ -242,6 +242,7 @@ html {
   scrollbar-width: none;
   /* 파이어폭스 */
   font-size: 62.5%;
+  overflow-x: hidden;
 }
 
 body {
@@ -254,6 +255,7 @@ body {
   font-family: 'Pretendard', sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
 }
 
 main {
