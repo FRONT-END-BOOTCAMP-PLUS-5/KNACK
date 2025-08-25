@@ -14,8 +14,6 @@ import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import Text from '@/components/common/Text';
 import Link from 'next/link';
 
-const GEMINI_API_KEY = '';
-
 interface ImageDataPart {
   inlineData: {
     mimeType: string;
@@ -29,7 +27,7 @@ type GeminiContentPart = ImageDataPart | TextPart;
 type Base64ImageState = GeminiContentPart[];
 
 const AiSearchPage = () => {
-  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
 
   const { onOpen } = useBottomSheetStore();
   const { getProduct, getProductsThumbnail } = productsService;
@@ -91,7 +89,7 @@ const AiSearchPage = () => {
           {
             inlineData: {
               data: reader.result?.toString().split(',')[1] ?? '',
-              mimeType: 'image/webp',
+              mimeType: reader.result?.toString().split(';')[0].split(':')[1] ?? '',
             },
           },
           {
