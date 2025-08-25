@@ -13,8 +13,12 @@ import Link from 'next/link';
 import { useBrandList } from '@/hooks/brand/useBrandList';
 import { useToggleBrandLike } from '@/hooks/brand/useToggleBrandLike';
 import Loading from '@/public/images/loading.gif';
+import { useUserStore } from '@/store/userStore';
+import { useRouter } from 'next/navigation';
 
 export default function BrandTab() {
+  const router = useRouter();
+  const { user } = useUserStore();
   const [activeBrandTab, setActiveBrandTab] = useState<'ALL' | 'MY'>('ALL');
   const [activeTag, setActiveTag] = useState<string>('');
   const brandContainerRef = useRef<HTMLDivElement>(null);
@@ -101,8 +105,7 @@ export default function BrandTab() {
 
   const handleBrandLike = (e: MouseEvent<HTMLButtonElement>, brandId: number, isLiked: boolean) => {
     e.preventDefault();
-    e.stopPropagation();
-
+    if (!user?.id) return router.push('/login');
     toggleBrandLike({ isLiked: isLiked, id: brandId });
   };
 

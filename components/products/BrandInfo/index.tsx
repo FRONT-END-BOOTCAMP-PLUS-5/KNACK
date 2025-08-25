@@ -13,12 +13,16 @@ import { likeService } from '@/services/like';
 import { IBrandLikeList } from '@/types/like';
 import { useLikeStore } from '@/store/likeStore';
 import LikeToast from '../LikeToast';
+import { useUserStore } from '@/store/userStore';
+import { useRouter } from 'next/navigation';
 
 interface IProps {
   brandData?: IBrand;
 }
 
 const BrandInfo = ({ brandData }: IProps) => {
+  const router = useRouter();
+  const { user } = useUserStore();
   const { addBrandLike, getBrandLikes, deleteBrandLike } = likeService;
   const [likedCheck, setLikedCheck] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
@@ -26,6 +30,7 @@ const BrandInfo = ({ brandData }: IProps) => {
   const { productDetailBrandLike: storeLike, setProductDetailBrandLike: setStoreLike } = useLikeStore();
 
   const handleGetBrandLikes = useCallback(() => {
+    if (!user?.id) return;
     getBrandLikes()
       .then((res) => {
         if (res.status === 200) {
@@ -43,7 +48,7 @@ const BrandInfo = ({ brandData }: IProps) => {
       .catch((error) => {
         console.log('error', error.message);
       });
-  }, [brandData, getBrandLikes, setStoreLike]);
+  }, [brandData, getBrandLikes, setStoreLike, user]);
 
   const initLikeBrand = useCallback(() => {
     handleGetBrandLikes();
@@ -68,6 +73,7 @@ const BrandInfo = ({ brandData }: IProps) => {
 
   const handleAddBrandLike = useCallback(
     (id: number) => {
+      if (!user?.id) return router.push('/login');
       if (likedCheck) {
         handleDeleteBrandLike(id);
       } else {
@@ -84,7 +90,8 @@ const BrandInfo = ({ brandData }: IProps) => {
           });
       }
     },
-    [addBrandLike, handleDeleteBrandLike, likedCheck, storeLike, setStoreLike]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [addBrandLike, handleDeleteBrandLike, likedCheck, storeLike, setStoreLike, user]
   );
 
   useEffect(() => {
