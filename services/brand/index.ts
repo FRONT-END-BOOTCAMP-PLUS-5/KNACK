@@ -1,4 +1,5 @@
-import requester from '@/utils/requester';
+import { IBrandWithTagList } from '@/types/brand';
+import { get } from '@/utils/requester';
 
 export const brandService = {
   getBrands: async ({ keyword, key }: { keyword?: string; key?: string } = {}) => {
@@ -9,10 +10,7 @@ export const brandService = {
 
     const queryString = params.toString();
     const url = `/api/brands${queryString ? `?${queryString}` : ''}`;
-    const { data, error } = await requester.get(url).catch((error) => error);
 
-    if (error) throw new Error(error.message);
-
-    return data;
+    return await get<IBrandWithTagList[]>(url);
   },
 };

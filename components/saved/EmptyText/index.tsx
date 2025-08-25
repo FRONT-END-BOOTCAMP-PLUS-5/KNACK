@@ -21,9 +21,11 @@ const EmptyText = ({ mainText, subText, buttonText, url }: IProps) => {
       <Text size={1.3} color="gray3">
         {subText}
       </Text>
-      <Link className={styles.link_button} href={'/' + url}>
-        {buttonText}
-      </Link>
+      {buttonText && (
+        <Link className={styles.link_button} href={'/' + url}>
+          {buttonText}
+        </Link>
+      )}
     </Flex>
   );
 };
