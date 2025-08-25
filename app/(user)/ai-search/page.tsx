@@ -29,14 +29,14 @@ type Base64ImageState = GeminiContentPart[];
 const AiSearchPage = () => {
   const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
 
-  const { onOpen } = useBottomSheetStore();
+  const { onOpen, onClose } = useBottomSheetStore();
   const { getProduct, getProductsThumbnail } = productsService;
 
   const [loading, setLoading] = useState(false);
   const [base64Image, setBase64Image] = useState<Base64ImageState[]>([]);
   const [product, setProduct] = useState<IProduct>();
   const [uploadImage, setUploadImage] = useState<string | ArrayBuffer | null>();
-  const [thumbnailList, setThumbnailLise] = useState<Base64ImageState[]>([]);
+  const [thumbnailList, setThumbnailList] = useState<Base64ImageState[]>([]);
 
   const aiHandler = async () => {
     if (!uploadImage) {
@@ -65,9 +65,21 @@ const AiSearchPage = () => {
     setLoading(false);
     onOpen();
 
-    getProduct(Number(response.text) ?? 0).then((res) => {
-      setProduct(res.result);
-    });
+    try {
+      getProduct(Number(response.text) ?? 0).then((res) => {
+        if (!res.result) {
+          alert('이미지를 찾지 못했어요... 다시 시도해주세요!');
+          onClose();
+          return;
+        }
+
+        setProduct(res.result);
+      });
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log('err.message', err.message);
+      }
+    }
   };
 
   const fileHandler = (e: ChangeEvent<HTMLInputElement>) => {
@@ -104,7 +116,7 @@ const AiSearchPage = () => {
     getProductsThumbnail().then((res) => {
       if (res) {
         setBase64Image(res.result);
-        setThumbnailLise(res.result);
+        setThumbnailList(res.result);
       }
     });
   }, [getProductsThumbnail]);
@@ -153,7 +165,7 @@ const AiSearchPage = () => {
               )}
             </div>
           </Link>
-          <Flex gap={8} direction="column" align="center" paddingVertical={20}>
+          <Flex gap={8} direction="column" align="center" paddingVertical={20} paddingHorizontal={20}>
             <Text className={styles.main_text} size={1.4}>
               {product?.engName}
             </Text>

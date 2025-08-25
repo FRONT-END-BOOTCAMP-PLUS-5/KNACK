@@ -66,8 +66,9 @@
   align-items: center;
 
   & .result_image {
-    width: 200px;
-    height: 200px;
+    width: 80vw;
+    max-width: 320px;
+    min-height: 200px;
     border-radius: 10px;
     background: $light_gray07;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
