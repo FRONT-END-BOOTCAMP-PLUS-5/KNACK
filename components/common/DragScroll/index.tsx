@@ -2,16 +2,18 @@
 
 import React from 'react';
 import styles from './dragScroll.module.scss';
+import ScrollContainer from 'react-indiana-drag-scroll';
+import 'react-indiana-drag-scroll/dist/style.css';
 
 interface IProps {
   children: React.ReactNode;
   className?: string;
-  showScrollbar?: boolean;
 }
 
-//TODO: pc에서도 터치스크롤 되게 기능 추가해야 됨
-export default function DragScroll({ children, className = '', showScrollbar = false }: IProps) {
-  const scrollbarClass = showScrollbar ? styles.show_scrollbar : styles.hide_scrollbar;
-
-  return <div className={`${styles.drag_scroll} ${scrollbarClass} ${className}`}>{children}</div>;
+export default function DragScroll({ children, className = '' }: IProps) {
+  return (
+    <ScrollContainer className={`scroll-container ${styles.drag_scroll} ${className}`} horizontal>
+      {children}
+    </ScrollContainer>
+  );
 }

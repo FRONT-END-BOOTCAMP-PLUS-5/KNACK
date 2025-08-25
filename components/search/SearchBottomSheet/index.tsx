@@ -380,7 +380,6 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
             tabs={tabs}
             selectedTab={activeTabId}
             onTabSelect={(tabId) => onClickFilterTab(tabId)}
-            showScrollbar={false}
             autoScroll={true}
           />
         </div>
@@ -423,7 +422,7 @@ export default function SearchBottomSheet({ activeTabId, handleSelect, filterQue
         <section className={styles.bottom_sheet_bottom_wrap}>
           <Divider height={1} />
           <Flex justify="between" align="center" className={styles.bottom_sheet_bottom_selected_filter}>
-            <DragScroll showScrollbar={false}>
+            <DragScroll>
               {selectedBottomList.map((item, index) => (
                 <Flex
                   align="center"

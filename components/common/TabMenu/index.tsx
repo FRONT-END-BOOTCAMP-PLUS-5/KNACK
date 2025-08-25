@@ -13,19 +13,11 @@ interface IProps {
   tabs: ITabItem[];
   selectedTab: number;
   onTabSelect: (tabId: number) => void;
-  showScrollbar?: boolean;
   autoScroll?: boolean;
   style?: React.CSSProperties;
 }
 
-export default function TabMenu({
-  tabs,
-  selectedTab,
-  onTabSelect,
-  showScrollbar = false,
-  autoScroll = true,
-  style,
-}: IProps) {
+export default function TabMenu({ tabs, selectedTab, onTabSelect, autoScroll = true, style }: IProps) {
   const tabRefs = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
@@ -44,7 +36,7 @@ export default function TabMenu({
 
   return (
     <section className={styles.tab_menu_container} style={style}>
-      <DragScroll className={styles.tab_menu_scroll} showScrollbar={showScrollbar}>
+      <DragScroll className={styles.tab_menu_scroll}>
         <ul className={styles.tab_menu_list}>
           {tabs.map((item, index) => (
             <li
