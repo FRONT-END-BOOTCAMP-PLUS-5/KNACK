@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import ReactStars from 'react-stars';
 import styles from './reviewWrite.module.scss';
 import { useUserStore } from '@/store/userStore';
-import Toast from '@/components/common/Toast';
 
 import { REVIEW_QUESTIONS, DEFAULT_CATEGORY_ID } from '@/utils/review';
 import { reviewService } from '@/services/review';
@@ -32,17 +31,6 @@ export default function ReviewWritePage() {
   // 답변 상태 관리
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [rating, setRating] = useState(5);
-  
-  // 토스트 상태 관리
-  const [toast, setToast] = useState<{
-    show: boolean;
-    type: 'success' | 'error' | 'warning' | 'info';
-    message: string;
-  }>({
-    show: false,
-    type: 'success',
-    message: ''
-  });
 
   // 상품 정보 가져오기
   useEffect(() => {
@@ -89,19 +77,10 @@ export default function ReviewWritePage() {
     setRating(roundedRating);
   };
 
-  // 토스트 표시 함수
-  const showToast = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
-    setToast({ show: true, type, message });
-    setTimeout(() => {
-      setToast(prev => ({ ...prev, show: false }));
-    }, 1500);
-  };
-
   const handleSubmit = async () => {
     try {
       // 필수 파라미터 검증
       if (!productId || !orderId) {
-        showToast('error', '상품 정보 또는 주문 정보를 찾을 수 없습니다.');
         return;
       }
 
@@ -119,18 +98,12 @@ export default function ReviewWritePage() {
       const result = await reviewService.createReview(reviewData);
 
       if (result.success) {
-        showToast('success', '리뷰가 성공적으로 작성되었습니다!');
-        // 토스트가 끝난 후 페이지 이동
-        setTimeout(() => {
-          router.push(`/my/review?tab=my&oid=${orderId}`);
-        }, 1500);
-      } else {
-        showToast('error', `리뷰 작성 실패: ${result.error}`);
+        // 성공 시 바로 페이지 이동
+        router.push(`/my/review?tab=my&oid=${orderId}`);
       }
       
     } catch (error) {
       console.error('리뷰 제출 실패:', error);
-      showToast('error', '리뷰 제출에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -185,13 +158,6 @@ export default function ReviewWritePage() {
           리뷰 작성 완료
         </button>
       </div>
-
-      {/* 토스트 팝업 */}
-      {toast.show && (
-        <Toast type={toast.type}>
-          {toast.message}
-        </Toast>
-      )}
     </main>
   );
 }

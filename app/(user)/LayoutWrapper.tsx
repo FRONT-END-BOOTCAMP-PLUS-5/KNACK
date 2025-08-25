@@ -48,7 +48,6 @@ export default function LayoutWrapper({ children }: IProps) {
   // 헤더만 숨길 경로들
   const hideHeaderPaths = [
     '/login',
-    '/signup',
     '/find-email',
     '/find-password',
     '/my/address',
@@ -57,12 +56,11 @@ export default function LayoutWrapper({ children }: IProps) {
   ];
 
   // 푸터만 숨길 경로들
-  const hideFooterPaths = ['/products', '/cart', '/payments'];
+  const hideFooterPaths = ['/products', '/cart', '/payments','/signup',];
 
   // 헤더와 푸터 모두 숨길 경로들
   const hideAllLayoutPaths = [
     '/login',
-    '/signup',
     '/my/buying',
     '/find-email',
     '/find-password',
@@ -71,10 +69,10 @@ export default function LayoutWrapper({ children }: IProps) {
   ];
 
   // nav와 검색버튼을을 숨김
-  const hideHeaderElementsPaths = ['/my', '/cart', '/saved'];
+  const hideHeaderElementsPaths = ['/my', '/cart', '/saved','/signup',];
 
   // 로고를 숨기고고 뒤로가기 버튼
-  const showBackButtonPaths = ['/cart', '/my/profile', '/my/address', '/products/'];
+  const showBackButtonPaths = ['/cart', '/my/profile', '/my/address', '/products/','/signup'];
 
   // 홈 버튼을 보여줄 경로들
   const showHomeButtonPaths = ['/cart'];
