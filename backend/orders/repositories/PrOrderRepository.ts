@@ -92,6 +92,21 @@ export class PrOrderRepository implements OrderRepository {
     return order as RepoIndependentOrder;
   }
 
+  async findByUserId(userId: string): Promise<RepoIndependentOrder[]> {
+    const orders = await prisma.order.findMany({
+      where: { userId },
+      include: {
+        product: true,
+        payment: {
+          include: {
+            address: true,
+          },
+        },
+      },
+    });
+    return orders as RepoIndependentOrder[];
+  }
+
   async linkOrdersToPayment(args: { orderIds: number[]; paymentId: number; userId: string }): Promise<number> {
     const result = await prisma.order.updateMany({
       where: {

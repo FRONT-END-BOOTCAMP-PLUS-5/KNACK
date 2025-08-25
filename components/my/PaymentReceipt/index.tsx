@@ -46,14 +46,14 @@ export default function PaymentReceipt({
                 {/* 아이템 리스트 */}
                 <section className={styles.card}>
                     {items.map((item) => (
-                        <article key={item.id} className={styles.item_row}>
+                        <article key={item.id} className={styles.item_row} onClick={() => router.push(`/my/buying/${item.id}`)}>
                             <Image src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${item.imageUrl}`} width={80} height={80} alt="" className={styles.thumb} />
                             <div className={styles.item_body}>
                                 <div className={styles.item_top}>
                                     <span className={styles.order_number}>주문번호 {item.id}</span>
                                     {item.status && <span className={styles.badge}>{item.status}</span>}
                                 </div>
-                                <div className={styles.title_line} onClick={() => router.push(`/my/buying/${item.id}`)}>
+                                <div className={styles.title_line}>
                                     <span className={styles.title}>{item.title}</span>
                                     <span className={styles.chevron} aria-hidden>
                                         &gt;
@@ -96,15 +96,6 @@ export default function PaymentReceipt({
                     <div className={styles.meta_row}>
                         <span className={styles.meta_label}>거래 일시</span>
                         <span className={styles.meta_value}>{fmtDate(info.transactedAt)}</span>
-                    </div>
-                </section>
-
-                {/* 결제정보 */}
-                <section className={styles.meta_group_2}>
-                    <div className={styles.meta_title}>결제정보</div>
-                    <div className={styles.meta_notice}>체결 후 결제 정보 변경은 불가하며, 할부 전환은 카드사 문의 바랍니다.</div>
-                    <div className={styles.meta_row}>
-                        <span className={styles.meta_value}>{info.cardMasked}</span>
                     </div>
                 </section>
             </div>

@@ -1,0 +1,174 @@
+/* 전체 영역 */
+.buying_list_section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* 결제 블록 간 간격 */
+    padding: 0 12px;
+}
+
+/* 결제 단위 블록 */
+.payment_block {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .04);
+    overflow: hidden;
+}
+
+/* 헤더: 결제번호 • 날짜 • > */
+.payment_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+
+    .payment_left {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        font-size: 13px;
+        color: #6b7280;
+
+        /* slate-500 */
+        .payment_number {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        /* gray-900 */
+    }
+
+    .payment_right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .payment_date {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        /* gray-400 */
+        .chevron {
+            font-size: 16px;
+            color: #c7cbd1;
+        }
+    }
+}
+
+/* 각 상품 행 */
+.item_row {
+    display: grid;
+    grid-template-columns: 72px 1fr auto;
+    /* 썸네일 / 본문 / 상태영역 */
+    gap: 12px;
+    padding: 12px 14px;
+    align-items: center;
+    transition: background-color .15s ease;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    &:hover {
+        background: #fafafa;
+    }
+
+    .thumb {
+        width: 72px;
+        height: 72px;
+        border-radius: 10px;
+        object-fit: cover;
+        background: #f6f7f9;
+    }
+
+    .item_body {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+        /* line-clamp 동작 위해 */
+
+        .title_line {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            /* 두 줄 말줄임 */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.35;
+        }
+
+        .option {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.2;
+            /* 예: "245 / 일반배송" 느낌 */
+        }
+    }
+
+    /* 우측 상태/링크 */
+    .status_area {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 6px;
+        text-align: right;
+        white-space: nowrap;
+
+        .badge {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+
+            /* 배송완료=중립 그레이 */
+            /* 진행중일 땐 아래 progress 변형 클래스로 색상 변경 */
+            &.progress {
+                color: #111827;
+            }
+
+            /* ‘배송 중’ = 진하게 */
+        }
+
+        .tracking_link {
+            font-size: 12px;
+            color: #6b7280;
+            text-decoration: underline;
+            background: none;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+
+            &:hover {
+                color: #111827;
+            }
+        }
+    }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 420px) {
+    .payment_header {
+        padding: 10px 12px;
+    }
+
+    .item_row {
+        grid-template-columns: 64px 1fr auto;
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .thumb {
+        width: 64px;
+        height: 64px;
+    }
+
+    .item_body .title_line {
+        font-size: 13.5px;
+    }
+}
