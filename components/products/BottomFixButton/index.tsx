@@ -17,6 +17,7 @@ import { ILikeList } from '@/types/like';
 import { useCartStore } from '@/store/cartStore';
 import { useLikeStore } from '@/store/likeStore';
 import LikeToast from '../LikeToast';
+import { useToggleProductLike } from '@/hooks/search/useToggleProductLike';
 
 interface IProps {
   productData?: IProduct;
@@ -26,7 +27,8 @@ const BottomFixButton = ({ productData }: IProps) => {
   const router = useRouter();
 
   const { upsertCart } = cartService;
-  const { addLike, deleteLike, getLikes } = likeService;
+  const { getLikes } = likeService;
+  const { mutate: toggleProductLike, isPending } = useToggleProductLike();
 
   const { onOpen, onClose } = useBottomSheetStore();
   const { storeCarts, setStoreCarts } = useCartStore();
@@ -97,42 +99,38 @@ const BottomFixButton = ({ productData }: IProps) => {
       });
   }, [getLikes, productData?._count?.productLike, productData?.id, setStoreLike]);
 
-  const handleDeleteLike = useCallback(
-    (id: number) => {
-      deleteLike(id)
-        .then((res) => {
-          if (res.status === 200) {
-            alert('취소완료!');
-            setStoreLike(storeLike.count - 1, false);
-            setLikedCheck(!likedCheck);
-          }
-        })
-        .catch((error) => {
-          console.log('error', error.message);
-        });
-    },
-    [deleteLike, likedCheck, setStoreLike, storeLike.count]
-  );
+  // const handleDeleteLike = useCallback(
+  //   (id: number) => {
+  //     deleteLike(id)
+  //       .then((res) => {
+  //         if (res.status === 200) {
+  //           alert('취소완료!');
+  //           setStoreLike(storeLike.count - 1, false);
+  //           setLikedCheck(!likedCheck);
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.log('error', error.message);
+  //       });
+  //   },
+  //   [deleteLike, likedCheck, setStoreLike, storeLike.count]
+  // );
 
   const handleLikeAdd = useCallback(
     (productId: number) => {
       if (likedCheck) {
-        handleDeleteLike(productId);
+        toggleProductLike({ isLiked: true, id: productId });
+        setStoreLike(storeLike.count - 1, false);
+        setLikedCheck(!likedCheck);
       } else {
-        addLike(productId)
-          .then((res) => {
-            if (res.status === 200) {
-              setStoreLike(storeLike.count + 1, true);
-              setToastOpen(true);
-              setLikedCheck(!likedCheck);
-            }
-          })
-          .catch((error) => {
-            console.log('error', error.message);
-          });
+        toggleProductLike({ isLiked: false, id: productId });
+
+        setStoreLike(storeLike.count + 1, true);
+        setToastOpen(true);
+        setLikedCheck(!likedCheck);
       }
     },
-    [addLike, handleDeleteLike, likedCheck, storeLike, setStoreLike]
+    [likedCheck, storeLike, setStoreLike, toggleProductLike]
   );
 
   useEffect(() => {
@@ -144,7 +142,11 @@ const BottomFixButton = ({ productData }: IProps) => {
       <div className={styles.bottom_fix_wrap}>
         <article className={styles.contents}>
           <div className={styles.icon_wrap}>
-            <button className={styles.like_button} onClick={() => handleLikeAdd(productData?.id ?? 0)}>
+            <button
+              className={styles.like_button}
+              disabled={isPending}
+              onClick={() => handleLikeAdd(productData?.id ?? 0)}
+            >
               <Image src={storeLike.status ? SaveOnIcon : SaveIcon} width={18} height={18} alt="좋아요 아이콘" />
             </button>
             <Text size={1.3} color="gray3" weight={600}>
