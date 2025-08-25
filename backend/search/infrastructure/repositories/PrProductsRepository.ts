@@ -13,11 +13,12 @@ import { Prisma } from '@prisma/client';
 
 export class PrProductsRepository implements ProductSearchRepository {
   async getProducts(params: {
+    userId?: string;
     filters?: ProductFilters;
     sort?: SortOption;
     pagination?: PaginationParams;
   }): Promise<ProductListResponse> {
-    const { filters, sort = 'latest', pagination } = params;
+    const { userId, filters, sort = 'latest', pagination } = params;
     const limit = pagination?.limit || 20;
     const offset = pagination?.offset || 0;
 
@@ -145,6 +146,16 @@ export class PrProductsRepository implements ProductSearchRepository {
             stock: true,
           },
         },
+        productLike: userId
+          ? {
+              where: {
+                userId: userId,
+              },
+              select: {
+                productId: true,
+              },
+            }
+          : false,
         _count: {
           select: {
             reviews: true,
@@ -167,6 +178,9 @@ export class PrProductsRepository implements ProductSearchRepository {
       // isSoldOut 계산: 모든 재고가 0이면 true
       const hasStockMappings = product.productStockMapping.length > 0;
       const isSoldOut = hasStockMappings ? product.productStockMapping.every((stock) => stock.stock === 0) : true;
+
+      // isLiked 계산: userId가 있고 productLike 배열에 항목이 있으면 true
+      const isLiked = userId ? Array.isArray(product.productLike) && product.productLike.length > 0 : false;
 
       return new Product(
         product.id,
@@ -191,7 +205,8 @@ export class PrProductsRepository implements ProductSearchRepository {
           : [],
         product._count.reviews,
         product._count.productLike,
-        isSoldOut
+        isSoldOut,
+        isLiked
       );
     });
 

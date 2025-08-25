@@ -5,7 +5,7 @@ import { BrandRequestDto } from '../applications/dtos/BrandDto';
 
 export class PrBrandRepository implements BrandRepository {
   async getBrands(requestDto: BrandRequestDto): Promise<Brand[]> {
-    const { keyword, key } = requestDto;
+    const { keyword, key, userId } = requestDto;
 
     const brands = await prisma.brand.findMany({
       where: {
@@ -30,11 +30,23 @@ export class PrBrandRepository implements BrandRepository {
             brandLike: true,
           },
         },
+        brandLike: userId
+          ? {
+              where: {
+                userId: userId,
+              },
+              select: {
+                brandId: true,
+              },
+            }
+          : false,
       },
     });
 
-    return brands.map(
-      (brand) => new Brand(brand.id, brand.korName, brand.engName, brand.logoImage, brand._count.brandLike)
-    );
+    return brands.map((brand) => {
+      const isLiked = userId ? Array.isArray(brand.brandLike) && brand.brandLike.length > 0 : false;
+
+      return new Brand(brand.id, brand.korName, brand.engName, brand.logoImage, brand._count.brandLike, isLiked);
+    });
   }
 }

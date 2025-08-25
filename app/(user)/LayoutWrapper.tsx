@@ -10,6 +10,7 @@ import Footer from '@/components/common/Footer';
 import PaymentHeader from '@/components/Payments/PaymentHeader';
 import { useUserStore } from '@/store/userStore';
 import { BuyingHeader } from '@/components/my/BuyingHeader';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 interface IProps {
   children: React.ReactNode;
@@ -24,7 +25,9 @@ export default function LayoutWrapper({ children }: IProps) {
         defaultOptions: {
           queries: {
             staleTime: 60 * 1000, // 1분
+            gcTime: 10 * 60 * 1000,
             retry: 1,
+            refetchOnWindowFocus: false,
           },
         },
       })
@@ -146,6 +149,7 @@ export default function LayoutWrapper({ children }: IProps) {
       )}
       {children}
       {!shouldHideFooter && <Footer />}
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

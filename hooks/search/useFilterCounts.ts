@@ -38,7 +38,7 @@ export const useFilterCounts = (selectedFilter: ISearchProductListRequest): UseF
   }, [selectedFilter, getFilterCounts]);
 
   const buttonText = () => {
-    if (isLoadingCount) return '...개 상품보기';
+    if (isLoadingCount) return '--개 상품보기';
     if (productCount !== null) return `${productCount.toLocaleString()}개 상품보기`;
     return '상품보기';
   };

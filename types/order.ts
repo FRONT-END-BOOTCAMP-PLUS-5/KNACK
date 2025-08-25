@@ -5,7 +5,22 @@ import { IAddress } from './address';
 /* ---------- 장바구니/주문 ---------- */
 
 export const STEPS = ["구매 확정", "배송 대기", "배송 중", "배송 완료"] as const;
+export type Tab = 'all' | 'progress' | 'done';
 export type Step = typeof STEPS[number];
+
+export interface FilterItem {
+  inProgress: BuyingItem[];
+  completed?: BuyingItem[];
+  total: BuyingItem[];
+}
+
+export interface BuyingItem {
+  id: string;
+  imageUrl: string;
+  status?: string;
+  title: string;
+  optionText: string;
+}
 
 export type CheckoutRow = {
   productId: number;
@@ -23,6 +38,14 @@ export type OrderItem = {
   kor_name?: string;
   eng_name?: string;
   optionValue?: IOptionValue;
+};
+
+export type OrderRow = {
+  id: number;
+  deliveryStatus: number; // 4 == 완료
+  tracking?: string | null;
+  product?: { korName: string; thumbnailImage: string };
+  optionValue?: { name?: string; value?: string };
 };
 
 export interface OrderResponse {
@@ -78,7 +101,7 @@ export type RepoPayment = {
   tossPaymentKey?: string | null;
   approvedAt?: Date | null;
   method?: string | null;
-  status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | 'CONFIRMED' | 'DELIVERING' | 'COMPLETED' | string;
+  status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
   orders: Array<{
     id: number;
     status: string;
@@ -115,7 +138,7 @@ export type RepoIndependentOrder = {
   address?: RepoAddress | null;
 }
 
-export type DtoStatus = 'DONE' | 'PENDING' | 'FAILED' | 'CANCELED' | 'CONFIRMED' | 'DELIVERING' | 'COMPLETED' | string;
+export type DtoStatus = 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
 
 export type BuyingPageProps = { params: Promise<{ id: string }> };
 
@@ -189,7 +212,7 @@ export type RepoOrderItem = {
   paymentId: number;
   payment: {
     paymentNumber: bigint;
-    status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | 'CONFIRMED' | 'DELIVERING' | 'COMPLETED' | string;
+    status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
   }
   price: number | bigint;
   salePrice?: number | bigint;

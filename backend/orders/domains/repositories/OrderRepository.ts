@@ -3,6 +3,7 @@ import { OrderDto } from '../../applications/dtos/GetOrderDto'
 import { RepoIndependentOrder } from '@/types/order'
 
 export interface OrderRepository {
+    findByUserId(userId: string): Promise<RepoIndependentOrder[]>
     linkOrdersToPayment(args: {
         orderIds: number[]
         paymentId: number

@@ -1,3 +1,5 @@
+import { OrderRow } from "./order"
+
 export type PaymentStatus = 'PENDING' | 'CONFIRMING' | 'PAID' | 'FAILED' // Local 상태
 
 export interface PaymentRecord {
@@ -83,4 +85,13 @@ export type PaymentData = {
     };
     paymentNumber?: string | number;
     cardMasked?: string;
+};
+
+export type Payment = {
+    id: number;
+    paymentNumber: string;
+    method: string;
+    approvedAt?: string | Date | null;
+    createdAt?: string | Date | null;
+    orders: OrderRow[];
 };

@@ -1,6 +1,7 @@
 export interface BrandRequestDto {
   keyword?: string;
   key?: string;
+  userId?: string;
 }
 
 export interface BrandResponseDto {
@@ -9,6 +10,7 @@ export interface BrandResponseDto {
   engName: string;
   logoImage: string;
   likesCount: number;
+  isLiked: boolean;
 }
 
 export interface BrandWithTagListDto {

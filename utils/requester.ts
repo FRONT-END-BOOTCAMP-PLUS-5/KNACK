@@ -21,8 +21,8 @@ requester.interceptors.request.use((config) => {
 
 // ✅ 간단한 get/post/filePost 함수
 
-export async function get<T = unknown>(url: string, params?: object): Promise<T> {
-  const config: AxiosRequestConfig = { params };
+export async function get<T = unknown>(url: string, params?: object, userId?: string): Promise<T> {
+  const config: AxiosRequestConfig = { params, ...(userId ? { headers: { userId } } : {}) };
   const res: AxiosResponse<T> = await requester.get(url, config);
   return res.data;
 }

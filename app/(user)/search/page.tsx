@@ -5,6 +5,8 @@ import { ISearchProductListResponse } from '@/types/searchProductList';
 import { IQueryParams, objectToQueryString } from '@/utils/queryString';
 import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/auth';
 
 interface IProps {
   searchParams: Promise<IQueryParams>;
@@ -12,7 +14,7 @@ interface IProps {
 
 export default async function Search({ searchParams }: IProps) {
   const params = await searchParams;
-  const { getSearchProductList } = searchProductService;
+
   const queryParams: IQueryParams = {
     keyword: params.keyword,
     keywordColorId: params.keywordColorId,
@@ -31,7 +33,11 @@ export default async function Search({ searchParams }: IProps) {
   const queryString = objectToQueryString(queryParams);
 
   try {
-    const initialData: ISearchProductListResponse = await getSearchProductList(queryString);
+    const session = await getServerSession(authOptions);
+    const initialData: ISearchProductListResponse = await searchProductService.getSearchProductList(
+      queryString,
+      session?.user.id
+    );
     return (
       <main>
         <SearchCsrWrapper queryParams={queryParams} />

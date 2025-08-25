@@ -1,6 +1,7 @@
 import { SortOption } from '@/backend/search/domains/entities/ProductFilters';
 
 export interface GetProductsRequestDto {
+  userId?: string;
   keyword?: string;
 
   keywordColorId?: number[];
@@ -51,6 +52,7 @@ export interface ProductDto {
   reviewsCount: number;
   likesCount: number;
   isSoldOut: boolean;
+  isLiked: boolean;
 }
 
 interface Brand {

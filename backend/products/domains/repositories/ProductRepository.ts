@@ -6,4 +6,5 @@ export interface ProductRepository {
   find(id: number): Promise<IProduct | null>;
   findManyByIds(ids: number[]): Promise<IProducts[]>;
   findRecentProductIds(ids: number[]): Promise<IRecentProduct[]>;
+  findThumbnail(): Promise<{ thumbnailImage: string; id: number; korName: string }[]>;
 }
