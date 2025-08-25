@@ -12,14 +12,13 @@ import AdditionalBenefits from '@/components/products/AdditionalBenefits';
 import { IProduct } from '@/types/productDetail';
 
 import BottomFixButton from '@/components/products/BottomFixButton';
+import Recommends from '@/components/products/Recommends';
 
 interface IProps {
   params: Promise<{
     id: string;
   }>;
 }
-
-
 
 const ProductDetail = async ({ params }: IProps) => {
   const { id } = await params;
@@ -47,6 +46,7 @@ const ProductDetail = async ({ params }: IProps) => {
       <Tab />
       <ProductDetailImage detailImage={productData?.detailImages} />
       <TextReview productData={productData} />
+      <Recommends />
       <BottomFixButton productData={productData} />
     </div>
   );
