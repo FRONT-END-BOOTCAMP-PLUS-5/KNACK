@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import "@/styles/global.scss";
 import LayoutWrapper from "@/app/(user)/LayoutWrapper";
 import SessionProvider from '@/components/providers/SessionProvider';
+import localFont from "next/font/local";
+
+const pretendard = localFont({
+  src: "../../public/fonts/PretendardVariable.woff2",
+  display: "swap",
+  variable: "--font-pretendard",
+});
 
 export const metadata: Metadata = {
   title: "KNACK",
@@ -14,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={pretendard.variable}>
       <body suppressHydrationWarning={true}>
         <SessionProvider>
           <LayoutWrapper>
