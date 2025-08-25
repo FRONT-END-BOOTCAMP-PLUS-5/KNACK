@@ -81,6 +81,7 @@ $accent: #111; // 심플 블랙 느낌
     column-gap: 12px;
     padding: 12px 16px;
     border-bottom: 1px solid $line;
+    cursor: pointer;
 }
 
 .thumb {
@@ -127,9 +128,13 @@ $accent: #111; // 심플 블랙 느낌
     font-weight: 600;
     line-height: 1.2;
     flex: 1 1 auto;
+
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
+    /* ✅ 줄바꿈 허용 */
+    word-break: break-word;
+    /* ✅ 단어 단위로 끊기 */
 }
 
 .chevron {
@@ -159,7 +164,7 @@ $accent: #111; // 심플 블랙 느낌
     .total_value {
         font-size: 22px;
         font-weight: 800;
-        left: 80%;
+        left: 70%;
         position: relative;
     }
 }
