@@ -10,6 +10,7 @@ import { Coupon, OrderItem, RepresentativeProduct } from '@/types/order';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import { IAddress } from '@/types/address';
+import Text from '@/components/common/Text';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
@@ -19,7 +20,6 @@ export default function PaymentSuccess() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [IAddress, setIAddress] = useState<IAddress | null>(null);
   const [paymentNumber, setPaymentNumber] = useState('');
-  const [savedOrderIds, setSavedOrderIds] = useState<number[]>([]);
   const [paymentId, setPaymentId] = useState<number | null>(null);
   const [repProd, setRepProd] = useState<RepresentativeProduct | null>(null);
   const [shippingFee, setShippingFee] = useState(0);
@@ -159,7 +159,6 @@ export default function PaymentSuccess() {
         });
 
         const createdOrderIds: number[] = orderRes.data.orderIds || [];
-        setSavedOrderIds(createdOrderIds);
         console.log('✅ 주문 저장 완료:', createdOrderIds);
 
         console.log('➡️ 결제 확인/저장 요청 /api/payments');
@@ -273,7 +272,8 @@ export default function PaymentSuccess() {
       {/* 결제 요약 */}
       <section className={styles.summary_box}>
         <div className={styles.summary_header}>
-          <span>총 결제금액</span>
+          <Text>총 결제금액 </Text>
+
           <strong>{fmt(totalAmount)}원</strong>
         </div>
 
