@@ -46,7 +46,7 @@ const ProductSave = ({ likeList, onClickSave }: IProps) => {
                     </Flex>
                   </Link>
                   <button className={styles.save_button} onClick={(e) => onClickSave(e, item?.id)}>
-                    <Image src={BookMarkOn} alt="저장" width={18} height={18} />
+                    <Image src={BookMarkOn} alt="저장" width={20} height={20} />
                   </button>
                 </Flex>
 

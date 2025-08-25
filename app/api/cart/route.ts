@@ -9,8 +9,8 @@ import { authOptions } from '../auth/[...nextauth]/auth';
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.id) {
-    return Response.json({ error: '로그인이 필요합니다.' }, { status: 401 });
+  if (!session?.user?.id || !session) {
+    return NextResponse.json({ message: '로그인이 필요합니다.' });
   }
 
   try {
@@ -31,7 +31,7 @@ export async function GET() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    return Response.json({ error: '로그인이 필요합니다.' }, { status: 401 });
+    return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
   }
 
   try {

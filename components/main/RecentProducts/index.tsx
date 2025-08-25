@@ -69,6 +69,7 @@ const RecentProducts = () => {
         </Link>
       </Flex>
       <Swiper
+        style={{ width: '100%' }}
         slidesPerView={2}
         spaceBetween={15}
         freeMode={true}
