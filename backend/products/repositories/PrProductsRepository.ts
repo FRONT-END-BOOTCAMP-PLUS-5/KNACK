@@ -3,6 +3,7 @@ import { ProductRepository } from '../domains/repositories/ProductRepository';
 import { IProduct } from '../domains/entities/Product';
 import { IProducts } from '../domains/entities/Products';
 import { IRecentProduct } from '../domains/entities/RecentProduct';
+import { STORAGE_PATHS } from '@/constraint/auth';
 
 export class PrProductRepository implements ProductRepository {
   async find(id: number): Promise<IProduct | null> {
@@ -200,6 +201,30 @@ export class PrProductRepository implements ProductRepository {
       });
 
       return data;
+    } catch (error) {
+      throw error instanceof Error && error.message;
+    }
+  }
+
+  async findThumbnail(): Promise<{ thumbnailImage: string; id: number; korName: string }[]> {
+    try {
+      const data = await prisma.product.findMany({
+        select: {
+          thumbnailImage: true,
+          id: true,
+          korName: true,
+        },
+      });
+
+      const result = data?.map((item) => {
+        return {
+          thumbnailImage: `${STORAGE_PATHS.PRODUCT?.THUMBNAIL}/${item.thumbnailImage}`,
+          id: item.id,
+          korName: item.korName,
+        };
+      });
+
+      return result;
     } catch (error) {
       throw error instanceof Error && error.message;
     }
