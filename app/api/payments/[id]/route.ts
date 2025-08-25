@@ -5,8 +5,6 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/auth'
 import { PrPaymentRepository } from '@/backend/payments/repositories/PrPaymentRepository'
 import { GetOrderInPaymentsUseCase } from '@/backend/payments/applications/usecases/GetOrderInPaymentsUseCase'
 import { serializeBigInt } from '@/utils/orders'
-import { UpdatePaymentStatusUseCase } from '@/backend/payments/applications/usecases/UpdatePaymentsbyIdUseCase'
-import { PaymentStatus } from '@/types/payment'
 
 type Params = { id: string }
 const INT32_MAX = BigInt(2147483647)
@@ -49,31 +47,5 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<Param
     } catch (e) {
         console.error('GET /api/payments/[id] failed:', e)
         return NextResponse.json({ error: 'internal_error' }, { status: 500 })
-    }
-}
-
-export async function PUT(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    try {
-        const session = await getServerSession(authOptions);
-        const userId = session?.user?.id;
-        if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-        const { id: raw } = await params;
-        if (!/^\d+$/.test(raw)) return NextResponse.json({ error: 'invalid id' }, { status: 400 });
-
-        const paymentId = Number(raw);
-        const repository = new PrPaymentRepository();
-        const payment = await repository.findWithOrdersById(paymentId, userId);
-
-        if (!payment) return NextResponse.json({ error: 'not_found' }, { status: 404 });
-        if (payment.userId !== userId) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
-
-        const usecase = new UpdatePaymentStatusUseCase(repository);
-        await usecase.execute(paymentId, 'CONFIRMED' as PaymentStatus);
-
-        return NextResponse.json({ message: 'Payment status updated to CONFIRMED', status: 'CONFIRMED' as PaymentStatus });
-    } catch (e) {
-        console.error('PUT /api/payments/[id] failed:', e);
-        return NextResponse.json({ error: 'internal_error' }, { status: 500 });
     }
 }

@@ -124,11 +124,25 @@ export function formatPrice(n?: number) {
     return (n ?? 0).toLocaleString() + "원";
 }
 
-export function statusToStep(status?: string): Step {
-    const s = (status ?? "").toUpperCase();
-    if (s === "PAID") return "구매 확정";
-    if (s === "CONFIRMED") return "배송 대기";
-    if (s === "DELIVERING") return "배송 중";
-    if (s === "COMPLETED") return "배송 완료";
+export function statusToStep(status?: number): Step {
+    const deliveryStatus = (status ?? 1);
+    if (deliveryStatus === 1) return "구매 확정";
+    if (deliveryStatus === 2) return "배송 대기";
+    if (deliveryStatus === 3) return "배송 중";
+    if (deliveryStatus === 4) return "배송 완료";
     return "구매 확정";
 }
+
+// KST로 YY/MM/DD HH:mm 포맷
+export const formatKST = (d?: string | Date | null) => {
+    if (!d) return '';
+    const dt = new Date(d);
+    // KST 보정
+    const kst = new Date(dt.getTime() + 9 * 60 * 60 * 1000);
+    const yy = String(kst.getUTCFullYear()).slice(2);
+    const mm = String(kst.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(kst.getUTCDate()).padStart(2, '0');
+    const hh = String(kst.getUTCHours()).padStart(2, '0');
+    const min = String(kst.getUTCMinutes()).padStart(2, '0');
+    return `${yy}/${mm}/${dd} ${hh}:${min}`;
+};
