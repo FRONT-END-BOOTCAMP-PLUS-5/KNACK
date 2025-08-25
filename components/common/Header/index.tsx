@@ -17,6 +17,7 @@ import HeaderCategory from './HeaderCategory';
 import HeaderInput from '../HeaderInput';
 import SearchModal from '../SearchModal';
 import CategoryBrandModal from '../CategoryBrandModal';
+import Logo from '@/public/images/logo_white.png';
 
 export default function Header({
   hideHeaderElements = false,
@@ -101,7 +102,7 @@ export default function Header({
         {/* 로고 또는 뒤로가기 버튼 */}
         {showLogo ? (
           <Link href="/" className={styles.logo}>
-            <h1>KNACK</h1>
+            <Image src={Logo} alt="KNACK Logo" width={72} height={27} />
           </Link>
         ) : showBackButton ? (
           <button className={styles.back_button} onClick={handleBackClick}>
