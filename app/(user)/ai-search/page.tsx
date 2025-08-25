@@ -135,7 +135,7 @@ const AiSearchPage = () => {
         <div className={styles.upload_image}>
           {uploadImage && <DynamicImage src={uploadImage?.toString() ?? ''} alt="업로드 이미지" />}
         </div>
-        {!uploadImage && <span className={styles.upload_text}>이미지</span>}
+        {!uploadImage && <span className={styles.upload_text}>이미지 올리기</span>}
       </label>
 
       <Flex justify="center" align="center" marginVertical={20} gap={10}>
