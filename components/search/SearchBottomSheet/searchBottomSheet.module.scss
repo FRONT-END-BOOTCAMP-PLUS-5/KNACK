@@ -127,7 +127,6 @@
 
 // 브랜드 필터
 .search_brand {
-  padding: 8px 16px;
   font-size: 1.4rem;
   position: relative;
 }
@@ -136,9 +135,11 @@
   position: sticky;
   top: 0;
   z-index: 1;
+  background-color: $white;
+  padding: 0 16px;
 }
 .search_brand_list_wrap {
-  padding: 18px 0;
+  padding: 18px 16px;
 }
 
 .search_brand_list_header {
