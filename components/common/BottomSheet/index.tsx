@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
+import { motion, AnimatePresence, PanInfo, useDragControls } from 'framer-motion';
 import styles from './bottom_sheet.module.scss';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import Image from 'next/image';
@@ -32,6 +32,7 @@ export default function BottomSheet({
 }: IProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const { isOpen, onClose } = useBottomSheetStore();
+  const dragControls = useDragControls();
 
   const getHeightValue = () => {
     switch (height) {
@@ -78,6 +79,7 @@ export default function BottomSheet({
 
   useEffect(() => {
     return () => onClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -108,13 +110,15 @@ export default function BottomSheet({
               stiffness: 400,
             }}
             drag="y"
+            dragControls={dragControls}
+            dragListener={false}
             dragConstraints={{ top: 0 }}
             dragElastic={0.1}
             onDragEnd={handleDragEnd}
             dragMomentum={false}
           >
             {showHandle && (
-              <div className={styles.handle}>
+              <div className={styles.handle} onPointerDown={(e) => dragControls.start(e)}>
                 <div className={styles.handle_bar} />
               </div>
             )}
