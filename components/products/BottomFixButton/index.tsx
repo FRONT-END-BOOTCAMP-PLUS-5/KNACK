@@ -17,6 +17,7 @@ import { ILikeList } from '@/types/like';
 import { useCartStore } from '@/store/cartStore';
 import { useLikeStore } from '@/store/likeStore';
 import LikeToast from '../LikeToast';
+import { useUserStore } from '@/store/userStore';
 import { useToggleProductLike } from '@/hooks/search/useToggleProductLike';
 
 interface IProps {
@@ -33,6 +34,7 @@ const BottomFixButton = ({ productData }: IProps) => {
   const { onOpen, onClose } = useBottomSheetStore();
   const { storeCarts, setStoreCarts } = useCartStore();
   const { productDetailLike: storeLike, setProductDetailLike: setStoreLike } = useLikeStore();
+  const { user } = useUserStore();
 
   const [selectOptionId, setSelectOptionId] = useState(0);
   const [deliveryOptionId, setDeliveryOption] = useState(0);
@@ -41,6 +43,14 @@ const BottomFixButton = ({ productData }: IProps) => {
   const [cartToastOpen, setCartToastOpen] = useState(false);
 
   const onClickNowBuy = () => {
+    if (!user?.id) {
+      return router.push('/login');
+    }
+
+    if (!selectOptionId || selectOptionId === 0) {
+      return alert('옵션을 선택해주세요!');
+    }
+
     const checkoutData = [
       {
         productId: productData?.id,
@@ -73,6 +83,10 @@ const BottomFixButton = ({ productData }: IProps) => {
 
     upsertCart(cartData)
       .then((res) => {
+        if (res.message === '로그인이 필요합니다.') {
+          return router.push('/login');
+        }
+
         if (res.status === 200) {
           setCartToastOpen(true);
           setStoreCarts(cartData);
