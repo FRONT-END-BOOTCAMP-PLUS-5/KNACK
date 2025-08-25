@@ -31,6 +31,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  touch-action: pan-y;
+  user-select: none;
 
   -webkit-overflow-scrolling: touch;
 
@@ -47,6 +49,8 @@
   align-items: center;
   padding: 12px 0 8px;
   cursor: grab;
+  touch-action: none; // 모바일 터치 최적화
+  user-select: none; // 텍스트 선택 방지
 
   &:active {
     cursor: grabbing;
