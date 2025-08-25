@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import styles from './footer.module.scss';
 import { DEFAULT_ACTIVE_TAB } from '@/constraint/footer';
 import { getFooterTabs } from '@/utils/footer/index';
@@ -9,7 +9,24 @@ import { TabId } from '@/types/footer';
 
 export default function Footer() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabId>(DEFAULT_ACTIVE_TAB);
+  const pathname = usePathname();
+
+  const defaultTab = useMemo(() => {
+    switch (pathname) {
+      case '/':
+        return 'HOME';
+      case '/search':
+        return 'SHOP';
+      case '/saved':
+        return 'SAVED';
+      case '/my':
+        return 'MY';
+      default:
+        return DEFAULT_ACTIVE_TAB;
+    }
+  }, [pathname]);
+
+  const [activeTab, setActiveTab] = useState<TabId>(defaultTab);
 
   const handleTabClick = (tab: TabId) => {
     setActiveTab(tab);

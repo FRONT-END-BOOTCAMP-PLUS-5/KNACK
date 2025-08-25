@@ -29,7 +29,7 @@ export default function SearchFilter({ filterQuery, handleSelect }: IProps) {
 
   return (
     <div className={styles.filter_section}>
-      <DragScroll className={styles.filter_scroll} showScrollbar={false}>
+      <DragScroll className={styles.filter_scroll}>
         {isActiveResetButton && (
           <button type="button" className={styles.filter_reset_button} onClick={handleReset}>
             <Image src={resetIcon} alt="초기화 아이콘" width={16} height={16} />

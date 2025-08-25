@@ -154,7 +154,7 @@ export default function BrandTab() {
         <>
           <section className={styles.brand_tag_section}>
             {brands.length > 0 && (
-              <DragScroll showScrollbar={false} className={styles.brand_tag_scroll}>
+              <DragScroll className={styles.brand_tag_scroll}>
                 <Flex gap={16} paddingHorizontal={16}>
                   {brands.map((brandGroup) => (
                     <div

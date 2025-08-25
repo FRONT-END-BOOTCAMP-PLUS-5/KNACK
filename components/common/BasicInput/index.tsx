@@ -16,8 +16,9 @@ export default function BasicInput({ placeholder, onChange, onKeyDown }: IProps)
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (!onKeyDown) return;
     inputRef.current?.focus();
-  }, []);
+  }, [onKeyDown]);
 
   useEffect(() => {
     if (onChange) {
