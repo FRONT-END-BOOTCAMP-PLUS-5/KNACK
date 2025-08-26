@@ -8,14 +8,38 @@ import { Scrollbar } from 'swiper/modules';
 
 import 'swiper/css';
 import 'swiper/css/scrollbar';
+import { useCallback, useEffect, useState } from 'react';
+import { IRelationProducts } from '@/types/productDetail';
+import { productsService } from '@/services/products';
+import Link from 'next/link';
 
 interface IProps {
   sliderImage: string;
   thumbnailImage: string;
+  productId: number;
 }
 
-const ProductTopImage = ({ sliderImage, thumbnailImage }: IProps) => {
+const ProductTopImage = ({ sliderImage, thumbnailImage, productId }: IProps) => {
   const sliderImages = sliderImage.split(',');
+  const { getRelationProducts } = productsService;
+
+  const [relations, setRelations] = useState<IRelationProducts[]>([]);
+
+  const handleGetRelationProducts = useCallback(() => {
+    getRelationProducts(productId)
+      ?.then((res) => {
+        if (res.result) {
+          setRelations(res.result);
+        }
+      })
+      .catch((error) => {
+        console.log('error', error.message);
+      });
+  }, [getRelationProducts, productId]);
+
+  useEffect(() => {
+    handleGetRelationProducts();
+  }, [handleGetRelationProducts]);
 
   return (
     <article>
@@ -48,6 +72,20 @@ const ProductTopImage = ({ sliderImage, thumbnailImage }: IProps) => {
             alt={'관련상품 이미지'}
           />
         </span>
+        {relations?.map((item) => (
+          <Link
+            className={styles.slide_image_box}
+            href={`/products/${item?.relatedProduct?.id}`}
+            key={'relation_products_' + item?.relatedProduct?.id}
+          >
+            <Image
+              width={56}
+              height={56}
+              src={`${STORAGE_PATHS?.PRODUCT?.THUMBNAIL}/${item?.relatedProduct?.thumbnailImage}`}
+              alt={item?.relatedProduct?.korName}
+            />
+          </Link>
+        ))}
       </article>
     </article>
   );

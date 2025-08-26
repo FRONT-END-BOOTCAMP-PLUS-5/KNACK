@@ -41,4 +41,12 @@ export const productsService = {
 
     return data;
   },
+
+  getRelationProducts: async (id: number) => {
+    const { data, error } = await requester.get(`/api/products/relation?id=${id}`).catch((error) => error);
+
+    if (error) throw new Error(error.message);
+
+    return data;
+  },
 };
