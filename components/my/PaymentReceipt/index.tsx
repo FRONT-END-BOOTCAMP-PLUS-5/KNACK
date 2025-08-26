@@ -27,12 +27,12 @@ export default function PaymentReceipt({
     return (
         <>
             <header className={styles.header}>
-                <button className={styles.back_btn} aria-label="뒤로가기" onClick={() => history.back()}>
+                <button className={styles.back_btn} aria-label="뒤로가기" onClick={() => router.push('/my/buying?tab=all')}>
                     <Image src="/icons/header-back.svg" alt="뒤로가기" width={24} height={24} />
                 </button>
                 <h1>결제 내역 상세</h1>
                 <div className={styles.header_spacer} />
-            </header>
+            </header >
             <div className={styles.page}>
                 {/* 상단 헤더 */}
 
