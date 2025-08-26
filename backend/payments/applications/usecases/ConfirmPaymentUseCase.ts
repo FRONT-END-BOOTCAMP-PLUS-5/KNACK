@@ -104,15 +104,9 @@ export class ConfirmPaymentUseCase {
                 })
             }
 
-            // paymentNumber 부여 (repo 제공 방식 우선 사용)
-            if (!claimed.paymentNumber) {
-                const next = await (this.payments).generateTodayPaymentNumber?.()
-            }
-
             // ✅ 장바구니 삭제 (전달된 cartIds 기준)
-            console.log(cartIds)
             if (cartIds && cartIds.length > 0) {
-                await this.cartRepo.deleteManyByIdsForUser(tx, userId, cartIds)
+                await this.cartRepo.deleteManyByIdsForUser(userId, cartIds)
             }
 
             // 갱신된 레코드 반환 (id 포함)
