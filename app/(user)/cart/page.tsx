@@ -18,7 +18,6 @@ import { useRouter } from 'next/navigation';
 import OptionBottomSheet from '@/components/cart/OptionBottomSheet';
 import SelectOrderInfo from '@/components/cart/SelectOrderInfo';
 import EmptyText from '@/components/saved/EmptyText';
-import LikeToast from '@/components/products/LikeToast';
 import Toast from '@/components/common/Toast';
 
 const CartPage = () => {
