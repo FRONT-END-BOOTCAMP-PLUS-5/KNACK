@@ -1,6 +1,8 @@
 import Text from '@/components/common/Text';
 import Flex from '@/components/common/Flex';
 import WebAssetOffSharpIcon from '@mui/icons-material/WebAssetOffSharp';
+import Link from 'next/link';
+import Button from '@/components/common/Button';
 
 export default function NotFound() {
   return (
@@ -9,9 +11,13 @@ export default function NotFound() {
       <Text tag="h2" size={1.8} color="black1" weight={700} paddingTop={20}>
         페이지를 찾을 수 없습니다.
       </Text>
-      <Text tag="p" size={1.4} color="gray5" paddingTop={20}>
+      <Text tag="p" size={1.4} color="gray5" paddingTop={20} paddingBottom={20}>
         올바르지 않은 경로입니다. 다시 시도해주세요.
       </Text>
+
+      <Link href="/">
+        <Button>홈으로 돌아가기</Button>
+      </Link>
     </Flex>
   );
 }
