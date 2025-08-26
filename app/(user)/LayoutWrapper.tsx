@@ -4,13 +4,13 @@ import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { useState, useEffect } from 'react';
-
+import styles from './mainPage.module.scss';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import PaymentHeader from '@/components/Payments/PaymentHeader';
 import { useUserStore } from '@/store/userStore';
-import { BuyingHeader } from '@/components/my/BuyingHeader';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import Image from 'next/image';
+import Loading from '@/public/images/loading.gif';
 
 interface IProps {
   children: React.ReactNode;
@@ -46,33 +46,19 @@ export default function LayoutWrapper({ children }: IProps) {
   }, [session, status, fetchUserData]);
 
   // 헤더만 숨길 경로들
-  const hideHeaderPaths = [
-    '/login',
-    '/find-email',
-    '/find-password',
-    '/my/address',
-    '/saved',
-    '/payments/checkout',
-  ];
+  const hideHeaderPaths = ['/login', '/find-email', '/find-password', '/my/address', '/saved', '/payments/checkout'];
 
   // 푸터만 숨길 경로들
-  const hideFooterPaths = ['/products', '/cart', '/payments','/signup',];
+  const hideFooterPaths = ['/products', '/cart', '/payments', '/signup'];
 
   // 헤더와 푸터 모두 숨길 경로들
-  const hideAllLayoutPaths = [
-    '/login',
-    '/my/buying',
-    '/find-email',
-    '/find-password',
-    '/my/buying',
-    '/my/order',
-  ];
+  const hideAllLayoutPaths = ['/login', '/my/buying', '/find-email', '/find-password', '/my/buying', '/my/order'];
 
   // nav와 검색버튼을을 숨김
-  const hideHeaderElementsPaths = ['/my', '/cart', '/saved','/signup',];
+  const hideHeaderElementsPaths = ['/my', '/cart', '/saved', '/signup'];
 
   // 로고를 숨기고고 뒤로가기 버튼
-  const showBackButtonPaths = ['/cart', '/my/profile', '/my/address', '/products/','/signup'];
+  const showBackButtonPaths = ['/cart', '/my/profile', '/my/address', '/products/', '/signup'];
 
   // 홈 버튼을 보여줄 경로들
   const showHomeButtonPaths = ['/cart'];
@@ -122,7 +108,11 @@ export default function LayoutWrapper({ children }: IProps) {
 
   // 하이드레이션 완료 전까지는 로딩 표시
   if (!mounted) {
-    return <div>Loading...</div>;
+    return (
+      <div className={styles.loading_container}>
+        <Image src={Loading} alt="loading" width={100} height={100} />
+      </div>
+    );
   }
 
   if (paymentsHeaderPaths) {
@@ -149,7 +139,7 @@ export default function LayoutWrapper({ children }: IProps) {
       )}
       {children}
       {!shouldHideFooter && <Footer />}
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   );
 }

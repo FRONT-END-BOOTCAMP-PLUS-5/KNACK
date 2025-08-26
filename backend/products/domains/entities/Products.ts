@@ -49,3 +49,5 @@ interface IOptionType {
   name: string;
   optionValue: IOptionValue[];
 }
+
+export type IRecommendProdcuts = Pick<IProducts, 'engName' | 'korName' | 'id' | 'price' | 'thumbnailImage' | 'brand'>;

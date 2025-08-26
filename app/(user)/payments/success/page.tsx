@@ -13,6 +13,7 @@ import { IAddress } from '@/types/address';
 import Text from '@/components/common/Text';
 import { useCartStore } from '@/store/cartStore';
 import { cartService } from '@/services/cart';
+import Flex from '@/components/common/Flex';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
@@ -260,20 +261,22 @@ export default function PaymentSuccess() {
 
   return (
     <div className={styles.sheet}>
-      <h2 className={styles.title}>구매가 완료되었습니다.</h2>
-      <p className={styles.subtitle}>주문 즉시 출고를 준비하여 안전하게 배송 될 예정입니다.</p>
+      <Flex direction="column" align="center" justify="center">
+        <h2 className={styles.title}>구매가 완료되었습니다.</h2>
+        <p className={styles.subtitle}>주문 즉시 출고를 준비하여 안전하게 배송 될 예정입니다.</p>
 
-      <div className={styles.image_wrap}>
-        {repProd?.thumbnailImage && (
-          <Image
-            src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${repProd.thumbnailImage}`}
-            alt={repProd.name}
-            width={80}
-            height={80}
-            className={styles.productImage}
-          />
-        )}
-      </div>
+        <div className={styles.image_wrap}>
+          {repProd?.thumbnailImage && (
+            <Image
+              src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${repProd.thumbnailImage}`}
+              alt={repProd.name}
+              width={80}
+              height={80}
+              className={styles.productImage}
+            />
+          )}
+        </div>
+      </Flex>
 
       <button className={styles.primary_btn} onClick={() => router.push(`/my/order/${paymentNumber}`)}>
         구매 내역 상세보기
