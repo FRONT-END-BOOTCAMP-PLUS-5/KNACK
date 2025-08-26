@@ -8,6 +8,8 @@ import { STORAGE_PATHS } from '@/constraint/auth';
 import { ISearchProductList } from '@/types/searchProductList';
 import { useToggleProductLike } from '@/hooks/search/useToggleProductLike';
 import LikeToast from '@/components/products/LikeToast';
+import { useUserStore } from '@/store/userStore';
+import { useRouter } from 'next/navigation';
 
 const TOAST_MESSAGE = {
   ADD: '관심 상품에 저장되었어요!',
@@ -17,6 +19,8 @@ const TOAST_MESSAGE = {
 const ProductCardLarge = ({ product }: { product: ISearchProductList }) => {
   const { mutate: toggleProductLike, isPending, isSuccess } = useToggleProductLike();
   const [showToast, setShowToast] = useState(false);
+  const { user } = useUserStore();
+  const router = useRouter();
 
   useEffect(() => {
     if (isSuccess) {
@@ -30,6 +34,7 @@ const ProductCardLarge = ({ product }: { product: ISearchProductList }) => {
 
   const handleToggleProductLike = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    if (!user) return router.push('/login');
     toggleProductLike({ isLiked: product.isLiked, id: product.id });
   };
 
