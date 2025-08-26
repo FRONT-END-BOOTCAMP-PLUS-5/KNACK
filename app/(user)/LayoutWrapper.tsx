@@ -66,16 +66,15 @@ export default function LayoutWrapper({ children }: IProps) {
     '/find-password',
     '/my/buying',
     '/my/order',
+    '/event/fishhook',
   ];
 
-  // nav와 검색버튼을을 숨김
-  const hideHeaderElementsPaths = ['/my', '/cart', '/saved','/signup',];
+  // nav와 검색버튼을 숨김 (검색창, 탭 네비게이션)
+  const hideHeaderElementsPaths = ['/my', '/cart', '/saved','/signup','/products/'];
 
-  // 로고를 숨기고고 뒤로가기 버튼
-  const showBackButtonPaths = ['/cart', '/my/profile', '/my/address', '/products/','/signup'];
-
-  // 홈 버튼을 보여줄 경로들
-  const showHomeButtonPaths = ['/cart'];
+  // 기존 방식 - 새로운 설정 기반으로 대체됨 (주석 처리)
+  // const showBackButtonPaths = ['/cart', '/my/profile', '/my/address', '/products/','/signup'];
+  // const showHomeButtonPaths = ['/cart','/products/'];
 
   // title 노출되는 부분
   const getPageTitle = (pathname: string) => {
@@ -102,14 +101,80 @@ export default function LayoutWrapper({ children }: IProps) {
   // 헤더 요소들(검색창, 탭 네비게이션)을 숨길지 여부
   const shouldHideHeaderElements = hideHeaderElementsPaths.some((path) => pathname.startsWith(path));
 
-  // 액션 버튼들(알림, 장바구니)을 숨길지 여부
-  const shouldHideActionButtons = showBackButtonPaths.some((path) => pathname.startsWith(path));
+    // 기존 로직은 주석 처리 (새로운 설정 기반으로 대체)
+  // const shouldHideActionButtons = showBackButtonPaths.some((path) => pathname.startsWith(path));
 
-  // 뒤로가기 버튼을 보여줄지 여부
-  const shouldShowBackButton = showBackButtonPaths.some((path) => pathname.startsWith(path));
+  // 공통 헤더 설정들을 미리 정의 (중복 제거)
+  const commonHeaderConfigs = {
+    // 뒤로가기 버튼만 표시하는 페이지들의 공통 설정
+    backButtonOnly: {
+      showBackButton: true,      // 뒤로가기 버튼 표시
+      showHomeButton: false,     // 홈 버튼 숨김
+      hideActionButtons: true,   // 액션 버튼들 숨김
+      hideHamburgerOnly: false, // 햄버거 메뉴 표시
+      showCart: false,          // 장바구니 숨김
+    },
+    // 뒤로가기 + 홈 버튼만 표시하는 페이지들의 공통 설정 (장바구니, 햄버거 숨김)
+    backHomeOnly: {
+      showBackButton: true,      // 뒤로가기 버튼 표시
+      showHomeButton: true,      // 홈 버튼 표시
+      hideActionButtons: true,   // 액션 버튼들 숨김 (장바구니, 햄버거 포함)
+      hideHamburgerOnly: false, // 햄버거 메뉴 표시 (hideActionButtons로 제어됨)
+      showCart: false,          // 장바구니 숨김
+    },
+    // 뒤로가기 + 홈 + 장바구니를 표시하는 페이지들의 공통 설정
+    backHomeCart: {
+      showBackButton: true,      // 뒤로가기 버튼 표시
+      showHomeButton: true,      // 홈 버튼 표시
+      hideActionButtons: false,  // 액션 버튼들 표시
+      hideHamburgerOnly: false, // 햄버거 메뉴 표시
+      showCart: true,           // 장바구니 표시
+    },
+  };
+  // 페이지별 헤더 설정을 객체로 관리 (확장성 고려)
+  // 새로운 페이지 추가 시 이 객체에만 설정을 추가하면 됨
+  const pageHeaderConfig = {
+    // 상품 페이지: 뒤로가기 + 홈 + 장바구니 (햄버거 메뉴만 숨김)
+    '/products': {
+      ...commonHeaderConfigs.backHomeCart,  // 공통 설정 상속
+      hideHamburgerOnly: true,              // 햄버거 메뉴만 숨김 (오버라이드)
+    },
+    // 장바구니 페이지: 뒤로가기 + 홈 버튼만 (장바구니, 햄버거 숨김)
+    '/cart': commonHeaderConfigs.backHomeOnly,
+    // 프로필, 주소록, 회원가입 페이지: 뒤로가기만 (다른 버튼들 모두 숨김)
+    '/my/profile': commonHeaderConfigs.backButtonOnly,
+    '/my/address': commonHeaderConfigs.backButtonOnly,
+    '/signup': commonHeaderConfigs.backButtonOnly,
+  };
 
-  // 홈 버튼을 보여줄지 여부
-  const shouldShowHomeButton = showHomeButtonPaths.some((path) => pathname.startsWith(path));
+  // 현재 페이지에 맞는 헤더 설정을 가져오는 함수
+  // pathname이 pageHeaderConfig의 키와 일치하는지 확인하여 해당 설정 반환
+  const getCurrentPageConfig = (pathname: string) => {
+    // 설정된 경로와 일치하는지 확인
+    for (const [path, config] of Object.entries(pageHeaderConfig)) {
+      if (pathname.startsWith(path)) {
+        return config;
+      }
+    }
+    // 일치하는 설정이 없을 경우 기본 설정 반환
+    // 기본적으로는 모든 버튼을 숨기고 장바구니만 표시
+    return {
+      showBackButton: false,     // 뒤로가기 버튼 숨김
+      showHomeButton: false,     // 홈 버튼 숨김
+      hideActionButtons: false,  // 액션 버튼들 표시
+      hideHamburgerOnly: false, // 햄버거 메뉴 표시
+      showCart: true,           // 장바구니 표시
+    };
+  };
+
+  const currentConfig = getCurrentPageConfig(pathname);
+
+  // 새로운 설정 기반으로 헤더 상태 결정
+  const shouldShowBackButton = currentConfig.showBackButton;
+  const shouldShowHomeButton = currentConfig.showHomeButton;
+  const shouldHideActionButtons = currentConfig.hideActionButtons;
+  const shouldHideHamburgerOnly = currentConfig.hideHamburgerOnly;
+  const shouldShowCart = currentConfig.showCart;
 
   // 현재 페이지에 맞는 제목 가져오기
   const pageTitle = getPageTitle(pathname);
@@ -143,8 +208,10 @@ export default function LayoutWrapper({ children }: IProps) {
           showBackButton={shouldShowBackButton} // 뒤로가기 버튼 표시
           pageTitle={pageTitle} // 페이지 제목
           showLogo={shouldShowLogo} // 로고 표시 여부
-          hideActionButtons={shouldHideActionButtons} // 액션 버튼들 숨김(알림, 장바구니니)
+          hideActionButtons={shouldHideActionButtons} // 액션 버튼들 숨김 여부
           showHomeButton={shouldShowHomeButton} // 홈 버튼 표시 여부
+          hideHamburgerOnly={shouldHideHamburgerOnly} // 햄버거 메뉴 숨김 여부
+          showCart={shouldShowCart} // 장바구니 표시 여부
         />
       )}
       {children}
