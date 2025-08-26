@@ -1,7 +1,7 @@
 import prisma from '@/backend/utils/prisma';
 import { ProductRepository } from '../domains/repositories/ProductRepository';
 import { IProduct } from '../domains/entities/Product';
-import { IProducts, IRecommendProdcuts } from '../domains/entities/Products';
+import { IProducts, IRecommendProducts } from '../domains/entities/Products';
 import { IRecentProduct } from '../domains/entities/RecentProduct';
 import { STORAGE_PATHS } from '@/constraint/auth';
 
@@ -230,7 +230,7 @@ export class PrProductRepository implements ProductRepository {
     }
   }
 
-  async findRecommendProducts(): Promise<IRecommendProdcuts[]> {
+  async findRecommendProducts(): Promise<IRecommendProducts[]> {
     try {
       const data = await prisma.product.findMany({
         where: {
