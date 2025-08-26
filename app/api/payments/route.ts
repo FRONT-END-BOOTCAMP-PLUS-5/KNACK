@@ -18,7 +18,6 @@ export const runtime = 'nodejs'; // Prisma/Node 모듈이면 안전
 
 import axios from 'axios';
 import { serializeBigInt } from '@/utils/orders'
-import { PrCartRepository } from '@/backend/cart/repositories/PrCartRepository'
 
 export async function POST(req: NextRequest) {
     try {

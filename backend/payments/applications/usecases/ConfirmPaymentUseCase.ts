@@ -5,7 +5,6 @@ import { UserPointsRepository } from '@/backend/points/domains/repositories/User
 import { TossGateway } from '@/types/payment'
 import prisma from '@/backend/utils/prisma'
 import { OrderRepository } from '@/backend/orders/domains/repositories/OrderRepository'
-import { CartRepository } from '@/backend/cart/domains/repositories/CartRepository'
 import { CardRepository } from '@/types/order'
 
 export class ConfirmPaymentUseCase {

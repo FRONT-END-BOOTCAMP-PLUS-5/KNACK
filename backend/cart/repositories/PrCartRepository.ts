@@ -82,15 +82,4 @@ export class PrCartRepository implements CartRepository {
 
     return result.count;
   }
-
-  async deleteManyByIdsForUser(userId: string, cartIds: number[]): Promise<void> {
-    await prisma.cart.deleteMany({
-      where: {
-        userId,
-        id: {
-          in: cartIds,
-        },
-      },
-    });
-  }
 }

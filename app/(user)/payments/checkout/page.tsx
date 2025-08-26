@@ -159,7 +159,6 @@ export default function CheckoutPage() {
       sessionStorage.setItem('paymentData', JSON.stringify(paymentData));
 
       const toss = await loadTossPayments(TOSS_CLIENT_KEY);
-      console.log(toss);
       await toss.requestPayment('카드', {
         amount: totalPrice,
         orderId: `order_${Date.now()}`, // 권장: 서버에서 선발급한 orderNumber 사용

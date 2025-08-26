@@ -33,7 +33,6 @@ export default function BuyingPage() {
                 setError(null);
 
                 const resp = (await requester.get(`/api/payments`)).data.payments;
-                console.log(resp.payments);
                 setItems(resp?.payments);
                 setOrderItems(resp.overallSummary)
             } catch (e) {
