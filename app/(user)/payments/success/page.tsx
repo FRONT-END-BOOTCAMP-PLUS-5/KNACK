@@ -278,7 +278,7 @@ export default function PaymentSuccess() {
         </div>
       </Flex>
 
-      <button className={styles.primary_btn} onClick={() => router.push(`/my/order/${paymentNumber}`)}>
+      <button className={styles.primary_btn} onClick={() => router.push(paymentNumber ? `/my/order/${paymentNumber}` : '/my/buying?tab=all')}>
         구매 내역 상세보기
       </button>
       <p className={styles.notice}>구매 후 15분 이내에 구매 여부를 결정할 수 있습니다.</p>
