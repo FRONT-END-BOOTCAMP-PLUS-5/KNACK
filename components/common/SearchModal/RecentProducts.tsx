@@ -23,7 +23,9 @@ export default function RecentProducts({ recentProducts, handleSearchInputClick 
         <div className={styles.layer_search_title_wrap}>
           <h4 className={styles.title}>최근 본 상품</h4>
           <div className={styles.title_sub_text}>
-            <button type="button">더보기</button>
+            <button className={styles.color_black} type="button">
+              더보기
+            </button>
           </div>
         </div>
         <div className={styles.layer_search_item_content_wrap}>
