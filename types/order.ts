@@ -23,6 +23,7 @@ export interface BuyingItem {
 }
 
 export type CheckoutRow = {
+  cartId?: number;
   productId: number;
   quantity: number;
   optionValueId?: number;

@@ -81,8 +81,6 @@ export class ConfirmPaymentUseCase {
 
             // 포인트 멱등 차감 (당신의 Repo 시그니처에 맞춰 호출)
             if (pointsToUse && pointsToUse > 0) {
-                // 예: debitByIdempotent(userId, amount, idempotencyKey, tx?) 형태라면 아래처럼:
-                // await this.points.debitByIdempotent({ userId, amount: Number(pointsToUse), idempotencyKey: orderId }, tx)
                 await this.points.debit({
                     userId,
                     amount: Number(pointsToUse),
