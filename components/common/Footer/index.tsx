@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './footer.module.scss';
 import { DEFAULT_ACTIVE_TAB } from '@/constraint/footer';
