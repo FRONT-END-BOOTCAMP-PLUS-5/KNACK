@@ -73,4 +73,4 @@ export interface IRecentProduct {
   };
 }
 
-export type IRecommendProdcut = Pick<IProducts, 'id' | 'korName' | 'engName' | 'thumbnailImage' | 'price' | 'brand'>;
+export type IRecommendProduct = Pick<IProducts, 'id' | 'korName' | 'engName' | 'thumbnailImage' | 'price' | 'brand'>;
