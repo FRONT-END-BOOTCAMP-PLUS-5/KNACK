@@ -311,7 +311,3 @@ export default function PaymentSuccess() {
     </div>
   );
 }
-function removeStoreCarts(cartIds: number[]) {
-  throw new Error('Function not implemented.');
-}
-

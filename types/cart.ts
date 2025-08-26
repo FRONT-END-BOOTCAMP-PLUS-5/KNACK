@@ -8,7 +8,6 @@ export interface CartRef {
 }
 
 export interface ICart {
-  quantity: number;
   count: number;
   id: number;
   createdAt?: Date;

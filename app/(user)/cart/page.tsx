@@ -67,7 +67,6 @@ const CartPage = () => {
       id: selectedCart?.id,
       count: selectedCart?.count,
       optionValueId: selectOptionId,
-      productId: selectedCart?.product?.id ?? 0,
     };
 
     await upsertCart(updateData)
