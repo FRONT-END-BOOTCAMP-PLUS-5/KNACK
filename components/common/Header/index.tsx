@@ -26,6 +26,7 @@ export default function Header({
   showLogo = true,
   hideActionButtons = false,
   showHomeButton = false,
+  hideHamburgerOnly = false,
 }: IProps) {
   // 현재 활성화된 탭 상태 관리
   const pathname = usePathname();
@@ -122,13 +123,16 @@ export default function Header({
           <h2 className={styles.page_title}>{pageTitle}</h2>
         ) : null}
 
-        {/* 액션 버튼들 (카테고리&브랜드 모달, 장바구니) */}
+        {/* 액션 버튼들 (카테고리&브랜드 모달, 장바구니, 홈) */}
         {/* hideActionButtons이 true면 숨김 (프로필, 주문내역 등) */}
         {!hideActionButtons && (
           <div className={styles.header_actions}>
-            <button className={styles.icon_button} onClick={() => setIsCategoryBrandModalOpen(true)}>
-              <Image src={HamburgerIcon} width={24} height={24} alt="카테고리 & 브랜드 모달" />
-            </button>
+            {/* /products/에서만 햄버거 메뉴 숨김 */}
+            {!hideHamburgerOnly && (
+              <button className={styles.icon_button} onClick={() => setIsCategoryBrandModalOpen(true)}>
+                <Image src={HamburgerIcon} width={24} height={24} alt="카테고리 & 브랜드 모달" />
+              </button>
+            )}
 
             <button className={styles.icon_button} onClick={handleCartClick}>
               <Image src={CartIcon} width={24} height={24} alt="장바구니" />
@@ -137,13 +141,11 @@ export default function Header({
           </div>
         )}
 
-        {/* 홈 버튼: showHomeButton이 true일 때만 표시 (독립적으로 동작) */}
+        {/* 홈 버튼: showHomeButton이 true일 때만 표시 (hideActionButtons와 관계없이) */}
         {showHomeButton && (
-          <div className={styles.header_actions}>
-            <button className={styles.icon_button} onClick={handleCartMain}>
-              <Image src={HomeIcon} width={24} height={24} alt="홈" />
-            </button>
-          </div>
+          <button className={styles.icon_button} onClick={handleCartMain}>
+            <Image src={HomeIcon} width={24} height={24} alt="홈" />
+          </button>
         )}
       </div>
 
