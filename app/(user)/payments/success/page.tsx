@@ -11,6 +11,8 @@ import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import { IAddress } from '@/types/address';
 import Text from '@/components/common/Text';
+import { useCartStore } from '@/store/cartStore';
+import { cartService } from '@/services/cart';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
@@ -140,6 +142,11 @@ export default function PaymentSuccess() {
 
     hasRun.current = true;
 
+    // CheckoutPage에서 저장해둔 cartIds 꺼내기
+    const raw = sessionStorage.getItem('cartIds');
+    const cartIds: number[] = raw ? JSON.parse(raw) : [];
+
+
     (async () => {
       try {
         console.log('➡️ 주문 저장 요청 /api/orders', { orderItems, targetSumAfterCoupon, discountAmount, pointsToUse });
@@ -172,6 +179,10 @@ export default function PaymentSuccess() {
           pointsToUse: pointsToUse,
         });
 
+        // ✅ cartIds를 가진 장바구니만 로컬 스토어에서 제거
+        cartService.removesCart(cartIds);
+        useCartStore.getState().removeStoreCarts(cartIds);
+
         // ⚓ paymentId + paymentNumber 확보
         const pid: number | null = paymentRes.data?.id ?? null;
         console.log(pid);
@@ -183,6 +194,7 @@ export default function PaymentSuccess() {
         writeProcessed({ tossPaymentKey, tossOrderId, at: Date.now() });
 
         // 정리
+        sessionStorage.removeItem('cartIds');
         sessionStorage.removeItem('orderItems');
         sessionStorage.removeItem('selectedAddress');
       } catch (err) {

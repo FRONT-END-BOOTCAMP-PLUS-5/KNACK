@@ -182,6 +182,8 @@ export default function CheckoutPage() {
     if (!raw) return;
     try {
       const parsed: CheckoutRow[] = JSON.parse(raw);
+      const cartIds = parsed.map(p => p.cartId).filter(Boolean);
+      sessionStorage.setItem('cartIds', JSON.stringify(cartIds));
       setCheckout(parsed);
     } catch (e) {
       console.error('checkout 파싱 실패', e);
