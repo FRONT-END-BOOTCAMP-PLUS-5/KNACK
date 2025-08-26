@@ -32,7 +32,7 @@ const OptionBottomSheet = ({
   const { thumbnailImage, korName, engName, productOptionMappings, modelNumber, price } = productData ?? {};
 
   return (
-    <BottomSheet>
+    <BottomSheet style={{ padding: 0 }}>
       <Flex justify="center" paddingVertical={16}>
         <Text tag="h2" size={1.8} weight={600}>
           구매 하기
