@@ -9,7 +9,7 @@ import { ICart } from '@/types/cart';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+
 
 interface IProps {
   cartData: ICart;
@@ -17,33 +17,18 @@ interface IProps {
   optionOpen: (selectedCart: ICart) => void;
   onClickDelete: (selectedCart: ICart) => void;
   addSelectCart: (selectData: ICart, checked: boolean) => void;
+  nowPayment: (cart: ICart) => void;
 }
 
-const CartProduct = ({ cartData, selectCarts, addSelectCart, optionOpen, onClickDelete }: IProps) => {
+const CartProduct = ({ cartData, selectCarts, addSelectCart, optionOpen, onClickDelete, nowPayment }: IProps) => {
   const { korName, engName, thumbnailImage, price, id } = cartData.product ?? {};
-  const router = useRouter();
 
   const [checked, setChecked] = useState(false);
-
-  const nowPayment = () => {
-    const checkoutData = [
-      {
-        productId: cartData?.product?.id,
-        quantity: 1,
-        optionValueId: cartData?.optionValueId,
-        deliveryMethod: 'normal',
-      },
-    ];
-
-    localStorage.setItem('checkout', JSON.stringify(checkoutData));
-
-    router.push('/payments/checkout');
-  };
 
   useEffect(() => {
     const check = selectCarts.filter((item) => item.id === cartData.id).length > 0;
     setChecked(check);
-  }, [selectCarts]);
+  }, [selectCarts, cartData.id]);
 
   return (
     <div>
@@ -83,7 +68,7 @@ const CartProduct = ({ cartData, selectCarts, addSelectCart, optionOpen, onClick
       </div>
       <section className={styles.button_wrap}>
         <Button text="옵션 변경" onClick={() => optionOpen(cartData)} />
-        <Button text="바로 주문" style="black" onClick={nowPayment} />
+        <Button text="바로 주문" style="black" onClick={() => nowPayment(cartData)} />
       </section>
     </div>
   );

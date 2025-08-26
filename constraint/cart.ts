@@ -9,4 +9,5 @@ export const CART_INITIAL_VALUE = {
   count: 0,
   id: 0,
   optionValueId: 0,
+  quantity: 0,
 };

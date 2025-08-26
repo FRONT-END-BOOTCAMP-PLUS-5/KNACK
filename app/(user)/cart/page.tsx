@@ -67,6 +67,7 @@ const CartPage = () => {
       id: selectedCart?.id,
       count: selectedCart?.count,
       optionValueId: selectOptionId,
+      productId: selectedCart?.product?.id ?? 0,
     };
 
     await upsertCart(updateData)
@@ -102,21 +103,20 @@ const CartPage = () => {
     setSelectOptionId(selectCart?.optionValueId);
   };
 
-  const onClickPayment = () => {
-    if (selectCarts?.length === 0) return alert('상품을 선택해주세요!');
+  const onClickPayment = (directCart?: ICart) => {
+    // directCart가 있으면 그것만 구매, 없으면 선택된 장바구니들
+    const targets = directCart ? [directCart] : selectCarts;
+    if (targets.length === 0) return alert('상품을 선택해주세요!');
 
-    const checkoutData = selectCarts?.map((item) => {
-      return {
-        cartId: item.id,
-        productId: item?.product?.id,
-        quantity: 1,
-        optionValueId: item?.optionValueId,
-        deliveryMethod: 'normal',
-      };
-    });
+    const checkoutData = targets.map((item) => ({
+      cartId: item.id,
+      productId: item.product?.id,
+      quantity: item.count ?? 1,            // ← ICart에 count가 있으면 그걸 사용
+      optionValueId: item.optionValueId,
+      deliveryMethod: 'normal',
+    }));
 
     localStorage.setItem('checkout', JSON.stringify(checkoutData));
-
     router.push('/payments/checkout');
   };
 
@@ -183,6 +183,7 @@ const CartPage = () => {
                   optionOpen={onClickOptionChange}
                   addSelectCart={addSelectCart}
                   onClickDelete={onClickRemoveCart}
+                  nowPayment={(cart) => onClickPayment(cart)}
                 />
                 <Divider />
               </React.Fragment>
