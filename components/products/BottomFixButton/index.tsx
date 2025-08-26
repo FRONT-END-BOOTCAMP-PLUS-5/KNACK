@@ -99,6 +99,7 @@ const BottomFixButton = ({ productData }: IProps) => {
   };
 
   const handleGetLikes = useCallback(() => {
+    if (!user?.id) return;
     getLikes()
       .then((res) => {
         if (res.status === 200) {
@@ -111,27 +112,11 @@ const BottomFixButton = ({ productData }: IProps) => {
       .catch((error) => {
         console.log('error', error.message);
       });
-  }, [getLikes, productData?._count?.productLike, productData?.id, setStoreLike]);
-
-  // const handleDeleteLike = useCallback(
-  //   (id: number) => {
-  //     deleteLike(id)
-  //       .then((res) => {
-  //         if (res.status === 200) {
-  //           alert('취소완료!');
-  //           setStoreLike(storeLike.count - 1, false);
-  //           setLikedCheck(!likedCheck);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.log('error', error.message);
-  //       });
-  //   },
-  //   [deleteLike, likedCheck, setStoreLike, storeLike.count]
-  // );
+  }, [getLikes, productData?._count?.productLike, productData?.id, setStoreLike, user]);
 
   const handleLikeAdd = useCallback(
     (productId: number) => {
+      if (!user?.id) return router.push('/login');
       if (likedCheck) {
         toggleProductLike({ isLiked: true, id: productId });
         setStoreLike(storeLike.count - 1, false);
@@ -144,7 +129,8 @@ const BottomFixButton = ({ productData }: IProps) => {
         setLikedCheck(!likedCheck);
       }
     },
-    [likedCheck, storeLike, setStoreLike, toggleProductLike]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [likedCheck, storeLike, setStoreLike, toggleProductLike, user]
   );
 
   useEffect(() => {

@@ -10,7 +10,8 @@ import ProductSave from '@/components/saved/ProductSave';
 import BrandSave from '@/components/saved/BrandSave';
 import RecentlySave from '@/components/saved/RecentlySave';
 import { TABS } from '@/constraint/saved';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useUserStore } from '@/store/userStore';
 
 interface SAVED_TABS {
   product: string;
@@ -19,14 +20,20 @@ interface SAVED_TABS {
 }
 
 const SavedPage = () => {
+  const { user } = useUserStore();
+  const router = useRouter();
   const { addLike, deleteLike, getLikes, deleteBrandLike, getBrandLikes } = likeService;
   const { getRecentlyProductList } = productsService;
   const [selectTab, setSelectTab] = useState(0);
   const [likeList, setLikeList] = useState<ILikeList[]>([]);
   const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
   const [recentProducts, setRecentProducts] = useState<IRecentProduct[]>([]);
-
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (!user?.id) return router.replace('/login');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleGetRecentlyProduct = useCallback(
     (ids: string[]) => {
@@ -82,6 +89,7 @@ const SavedPage = () => {
   );
 
   const handleGetLikes = useCallback(() => {
+    if (!user?.id) return;
     getLikes()
       .then((res) => {
         if (res.status === 200) {
@@ -91,7 +99,7 @@ const SavedPage = () => {
       .catch((error) => {
         console.log('error', error.message);
       });
-  }, [getLikes]);
+  }, [getLikes, user]);
 
   const initSave = useCallback(() => {
     handleGetLikes();
@@ -116,7 +124,7 @@ const SavedPage = () => {
   const handleLikeAdd = useCallback(
     (e: MouseEvent<HTMLButtonElement>, productId: number) => {
       e.preventDefault();
-
+      if (!user?.id) return router.push('/login');
       const likeCheck = likeList?.find((likeItem) => likeItem?.product?.id === productId);
 
       if (likeCheck) {
@@ -134,7 +142,8 @@ const SavedPage = () => {
           });
       }
     },
-    [addLike, handleDeleteLike, handleGetLikes, likeList]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [addLike, handleDeleteLike, handleGetLikes, likeList, user]
   );
 
   const onClickSave = (e: MouseEvent<HTMLButtonElement>, id: number) => {
