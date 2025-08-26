@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={pretendard.variable}>
+    <html lang="ko" className={pretendard.variable}>
       <body suppressHydrationWarning={true}>
         <SessionProvider>
           <LayoutWrapper>{children}</LayoutWrapper>
