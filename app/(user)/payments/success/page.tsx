@@ -269,7 +269,7 @@ export default function PaymentSuccess() {
           {repProd?.thumbnailImage && (
             <Image
               src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${repProd.thumbnailImage}`}
-              alt={repProd.name}
+              alt={repProd.korName}
               width={80}
               height={80}
               className={styles.productImage}
