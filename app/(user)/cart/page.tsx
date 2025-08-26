@@ -18,6 +18,8 @@ import { useRouter } from 'next/navigation';
 import OptionBottomSheet from '@/components/cart/OptionBottomSheet';
 import SelectOrderInfo from '@/components/cart/SelectOrderInfo';
 import EmptyText from '@/components/saved/EmptyText';
+import LikeToast from '@/components/products/LikeToast';
+import Toast from '@/components/common/Toast';
 
 const CartPage = () => {
   const { getCart, removeCart, removesCart, upsertCart } = cartService;
@@ -31,6 +33,7 @@ const CartPage = () => {
   const [multiDeleteOpen, setMultiDeleteOpen] = useState(false);
   const [selectedCart, setSelectedCart] = useState<ICart>(CART_INITIAL_VALUE);
   const [selectOptionId, setSelectOptionId] = useState<number>(0);
+  const [toastOpen, setToastOpen] = useState(false);
 
   const handleRemoveCart = () => {
     removeCart(selectedCart?.id)
@@ -111,7 +114,7 @@ const CartPage = () => {
         : selectCarts;
 
     if (!targets.length) {
-      alert('상품을 선택해주세요!');
+      setToastOpen(true);
       return;
     }
 
@@ -157,6 +160,14 @@ const CartPage = () => {
   useEffect(() => {
     initCart();
   }, [initCart]);
+
+  useEffect(() => {
+    if (toastOpen) {
+      setTimeout(() => {
+        setToastOpen(false);
+      }, 2000);
+    }
+  }, [toastOpen]);
 
   return (
     <article className={styles.cart_wrap}>
@@ -247,7 +258,11 @@ const CartPage = () => {
         setSelectOptionId={setSelectOptionId}
         handleOptionChange={handleOptionChange}
       />
+
+      {toastOpen && <Toast>상품을 선택해 주세요!</Toast>}
+
     </article>
+
   );
 };
 
