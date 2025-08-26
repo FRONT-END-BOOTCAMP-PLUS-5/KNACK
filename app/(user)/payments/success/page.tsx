@@ -12,6 +12,7 @@ import { STORAGE_PATHS } from '@/constraint/auth';
 import { IAddress } from '@/types/address';
 import Text from '@/components/common/Text';
 import { useCartStore } from '@/store/cartStore';
+import { cartService } from '@/services/cart';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
@@ -176,10 +177,10 @@ export default function PaymentSuccess() {
           orderIds: createdOrderIds,
           selectedCouponId: selectedCoupon?.id ?? null,
           pointsToUse: pointsToUse,
-          cartIds,
         });
 
         // ✅ cartIds를 가진 장바구니만 로컬 스토어에서 제거
+        cartService.removesCart(cartIds);
         useCartStore.getState().removeStoreCarts(cartIds);
 
         // ⚓ paymentId + paymentNumber 확보

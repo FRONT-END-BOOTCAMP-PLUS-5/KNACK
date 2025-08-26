@@ -89,7 +89,6 @@ export async function POST(req: NextRequest) {
             new PrCouponRepository(),
             new PrUserPointsRepository(),
             tossGateway,
-            new PrCartRepository(),
             new PrCardRepository(),
         );
 
@@ -102,7 +101,6 @@ export async function POST(req: NextRequest) {
             orderIds: (orderIds as number[]) ?? [],
             selectedCouponId: selectedCouponId ? Number(selectedCouponId) : null,
             pointsToUse: pointsToUse ? Number(pointsToUse) : 0,
-            cartIds: cartIds as number[] ?? [],
         });
 
         return NextResponse.json({

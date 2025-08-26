@@ -15,7 +15,6 @@ export class ConfirmPaymentUseCase {
         private readonly coupons: CouponRepository,
         private readonly points: UserPointsRepository,
         private readonly toss: TossGateway,
-        private readonly cartRepo: CartRepository,
         private readonly cards?: CardRepository, // optional
     ) { }
 
@@ -28,11 +27,10 @@ export class ConfirmPaymentUseCase {
         orderIds: number[]
         selectedCouponId?: number | null
         pointsToUse?: number | null
-        cartIds?: number[]
     }) {
         const {
             userId, orderId, tossPaymentKey, amount,
-            addressId, selectedCouponId, pointsToUse, cartIds
+            addressId, selectedCouponId, pointsToUse,
         } = args
 
         // 1) tossPaymentKey로 선점 (동시 처리 차단 + 멱등)
@@ -102,11 +100,6 @@ export class ConfirmPaymentUseCase {
                     useCardPoint: c.useCardPoint,
                     isInterestFree: c.isInterestFree,
                 })
-            }
-
-            // ✅ 장바구니 삭제 (전달된 cartIds 기준)
-            if (cartIds && cartIds.length > 0) {
-                await this.cartRepo.deleteManyByIdsForUser(userId, cartIds)
             }
 
             // 갱신된 레코드 반환 (id 포함)
