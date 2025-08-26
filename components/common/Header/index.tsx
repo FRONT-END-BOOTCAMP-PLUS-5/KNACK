@@ -157,7 +157,7 @@ export default function Header({
             {HEADER_TABS.map((tab) => (
               <li key={'header_navigation_' + tab?.id} className={styles.tab_item}>
                 <button
-                  className={`${styles.tab_button} ${activeTab === tab ? styles.active : ''}`}
+                  className={`${styles.tab_button} ${activeTab?.id === tab?.id ? styles.active : ''}`}
                   onClick={() => handleTabClick(tab)}
                 >
                   {tab?.name}
