@@ -1,5 +1,5 @@
 import { IProduct } from '../entities/Product';
-import { IProducts, IRecommendProducts } from '../entities/Products';
+import { IProducts, IRecommendProducts, IRelationProducts } from '../entities/Products';
 import { IRecentProduct } from '../entities/RecentProduct';
 
 export interface ProductRepository {
@@ -8,4 +8,5 @@ export interface ProductRepository {
   findRecentProductIds(ids: number[]): Promise<IRecentProduct[]>;
   findThumbnail(): Promise<{ thumbnailImage: string; id: number; korName: string }[]>;
   findRecommendProducts(): Promise<IRecommendProducts[]>;
+  findRelationProducts(id: number): Promise<IRelationProducts[]>;
 }

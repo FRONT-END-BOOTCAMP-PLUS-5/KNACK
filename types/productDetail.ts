@@ -88,3 +88,7 @@ export interface ITextReviewData {
   };
   category: { id: number };
 }
+
+export interface IRelationProducts {
+  relatedProduct: Pick<IProduct, 'engName' | 'korName' | 'id' | 'price' | 'thumbnailImage'>;
+}

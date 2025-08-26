@@ -51,3 +51,7 @@ interface IOptionType {
 }
 
 export type IRecommendProducts = Pick<IProducts, 'engName' | 'korName' | 'id' | 'price' | 'thumbnailImage' | 'brand'>;
+
+export interface IRelationProducts {
+  relatedProduct: Pick<IProducts, 'engName' | 'korName' | 'id' | 'price' | 'thumbnailImage'>;
+}
