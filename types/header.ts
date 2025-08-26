@@ -6,4 +6,6 @@ export interface IProps {
   showLogo?: boolean;            // 로고 표시 여부
   hideActionButtons?: boolean;   // 액션 버튼들 숨김(알림, 장바구니)
   showHomeButton?: boolean;      // 홈 버튼 표시 여부
+  hideHamburgerOnly?: boolean;  // 햄버거 메뉴 숨김 여부
+  showCart?: boolean;           // 장바구니 표시 여부
 }

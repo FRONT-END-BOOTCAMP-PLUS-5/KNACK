@@ -106,7 +106,7 @@ const RecentProducts = () => {
                     {value?.price?.toLocaleString()}
                   </Text>
                   <Text size={1.1} color="lightGray1">
-                    관심
+                    관심 {value?._count?.productLike}
                   </Text>
                 </Flex>
               </Link>
