@@ -19,19 +19,13 @@ const DefaultInfo = ({ data }: IProps) => {
   };
 
   useEffect(() => {
-    const getRecent = localStorage.getItem('recent') && JSON.parse(localStorage.getItem('recent') ?? '');
+    if (!data?.id) return;
+    const getRecent = localStorage.getItem('recent');
+    const getRecentArray = getRecent ? JSON.parse(getRecent) : [];
 
-    if (getRecent) {
-      const duplicateCheck = getRecent?.some((item: number) => item === data?.id);
+    const updateRecent = [data?.id, ...getRecentArray.filter((item: number) => item !== data?.id).slice(0, 20)];
 
-      if (!duplicateCheck) {
-        getRecent.push(data?.id);
-
-        localStorageSet(getRecent);
-      }
-    } else {
-      localStorageSet([data?.id ?? 0]);
-    }
+    localStorageSet(updateRecent);
   }, [data?.id]);
 
   return (

@@ -46,7 +46,11 @@ const SavedPage = () => {
       getRecentlyProductList(params.toString())
         .then((res) => {
           if (res.status === 200) {
-            setRecentProducts(res.result);
+            const sortedProducts = ids
+              .map((id) => res.result.find((product: IRecentProduct) => product.id === Number(id)))
+              .filter((product) => product !== undefined);
+
+            setRecentProducts(sortedProducts);
           }
         })
         .catch((error) => {

@@ -31,7 +31,7 @@ export default function RecentProducts({ recentProducts, handleSearchInputClick 
         <div className={styles.layer_search_item_content_wrap}>
           <div className={styles.recent_product_wrap}>
             <div className={styles.recent_product_list}>
-              {recentProducts.map((product, index) => (
+              {recentProducts.slice(0, 10).map((product, index) => (
                 <div
                   key={'recent-product-' + index}
                   onClick={() => onClickRecentProduct(product.id)}
