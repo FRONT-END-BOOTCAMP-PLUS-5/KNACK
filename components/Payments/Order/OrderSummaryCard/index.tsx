@@ -55,7 +55,7 @@ export default function OrderSummaryCard({
                                     <div className={styles.subtitle}>{item.kor_name ?? ''}</div>
                                     <div className={styles.model}>#{item.productId}</div>
                                     <div className={styles.meta}>
-                                        <span className={styles.size}>240(US 5)</span>
+                                        <span className={styles.size}>{item.optionValue?.name ?? ''}</span>
                                         <span className={styles.meta_sep}>/</span>
                                         <span className={styles.inline_icon}>
                                             <Image src="/icons/lightning.png" alt="체크" width={12} height={12} />

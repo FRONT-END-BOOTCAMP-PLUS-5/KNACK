@@ -102,15 +102,23 @@ const CartPage = () => {
     setSelectOptionId(selectCart?.optionValueId);
   };
 
-  const onClickPayment = (directCart?: ICart) => {
-    // directCart가 있으면 그것만 구매, 없으면 선택된 장바구니들
-    const targets = directCart ? [directCart] : selectCarts;
-    if (targets.length === 0) return alert('상품을 선택해주세요!');
+  const onClickPayment = (direct?: ICart | ICart[]) => {
+    // direct가 배열이면 그대로, 객체면 1개 배열로, 없으면 현재 selectCarts
+    const targets = Array.isArray(direct)
+      ? direct
+      : direct
+        ? [direct]
+        : selectCarts;
+
+    if (!targets.length) {
+      alert('상품을 선택해주세요!');
+      return;
+    }
 
     const checkoutData = targets.map((item) => ({
       cartId: item.id,
       productId: item.product?.id,
-      quantity: item.count ?? 1,            // ← ICart에 count가 있으면 그걸 사용
+      quantity: item.count ?? 1,
       optionValueId: item.optionValueId,
       deliveryMethod: 'normal',
     }));

@@ -247,7 +247,6 @@ export default function PaymentSuccess() {
         // 2) 첫 주문 상세 → 대표상품 + 배송비
         const ordRes = await requester.get(`/api/orders/${firstOrderId}`);
         const order = ordRes.data;
-        console.log('useEffect-대표상품 조회', order);
         setRepProd(order.product ?? null);
       } catch (e) {
         console.error('❌ 대표상품/주문 로드 실패', e);
