@@ -124,6 +124,11 @@ export default function PaymentSuccess() {
 
     hasRun.current = true;
 
+    // CheckoutPage에서 저장해둔 cartIds 꺼내기
+    const raw = sessionStorage.getItem('cartIds');
+    const cartIds: number[] = raw ? JSON.parse(raw) : [];
+
+
     (async () => {
       try {
         console.log('➡️ 주문 저장 요청 /api/orders', { orderItems, targetSumAfterCoupon, discountAmount, pointsToUse });
@@ -155,6 +160,7 @@ export default function PaymentSuccess() {
           orderIds: createdOrderIds,
           selectedCouponId: selectedCoupon?.id ?? null,
           pointsToUse: pointsToUse,
+          cartIds,
         });
 
         // ⚓ paymentId + paymentNumber 확보
@@ -168,6 +174,7 @@ export default function PaymentSuccess() {
         writeProcessed({ tossPaymentKey, tossOrderId, at: Date.now() });
 
         // 정리
+        sessionStorage.removeItem('cartIds');
         sessionStorage.removeItem('orderItems');
         sessionStorage.removeItem('selectedAddress');
       } catch (err) {

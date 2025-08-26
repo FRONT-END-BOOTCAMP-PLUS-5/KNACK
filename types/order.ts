@@ -243,6 +243,20 @@ export type ProcessedPayment = {
   paymentKey: string;
 };
 
+// (선택) 카드 저장이 필요하면 CardRepository 타입을 추가로 주입
+export interface CardRepository {
+  save(dto: {
+    paymentId: number
+    issuerCode?: string | null
+    acquirerCode?: string | null
+    number?: string | null
+    installmentPlanMonths?: number | null
+    approveNo?: string | null
+    useCardPoint?: boolean | null
+    isInterestFree?: boolean | null
+  }): Promise<void>
+}
+
 /* ---------- 주소 ---------- */
 
 export interface AddressAddModalProps {

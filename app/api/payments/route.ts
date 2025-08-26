@@ -18,6 +18,7 @@ export const runtime = 'nodejs'; // Prisma/Node 모듈이면 안전
 
 import axios from 'axios';
 import { serializeBigInt } from '@/utils/orders'
+import { PrCartRepository } from '@/backend/cart/repositories/PrCartRepository'
 
 export async function POST(req: NextRequest) {
     try {
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const {
             tossPaymentKey, orderId, amount, addressId, orderIds,
-            selectedCouponId, pointsToUse
+            selectedCouponId, pointsToUse, cartIds,
         } = body;
 
         // ✅ 1) 입력값 1차 검증 (개발서버에서 특히 중요)
@@ -88,6 +89,7 @@ export async function POST(req: NextRequest) {
             new PrCouponRepository(),
             new PrUserPointsRepository(),
             tossGateway,
+            new PrCartRepository(),
             new PrCardRepository(),
         );
 
@@ -100,6 +102,7 @@ export async function POST(req: NextRequest) {
             orderIds: (orderIds as number[]) ?? [],
             selectedCouponId: selectedCouponId ? Number(selectedCouponId) : null,
             pointsToUse: pointsToUse ? Number(pointsToUse) : 0,
+            cartIds: cartIds as number[] ?? [],
         });
 
         return NextResponse.json({

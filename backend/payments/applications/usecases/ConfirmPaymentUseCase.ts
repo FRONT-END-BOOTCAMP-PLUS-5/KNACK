@@ -5,20 +5,8 @@ import { UserPointsRepository } from '@/backend/points/domains/repositories/User
 import { TossGateway } from '@/types/payment'
 import prisma from '@/backend/utils/prisma'
 import { OrderRepository } from '@/backend/orders/domains/repositories/OrderRepository'
-
-// (선택) 카드 저장이 필요하면 CardRepository 타입을 추가로 주입
-export interface CardRepository {
-    save(dto: {
-        paymentId: number
-        issuerCode?: string | null
-        acquirerCode?: string | null
-        number?: string | null
-        installmentPlanMonths?: number | null
-        approveNo?: string | null
-        useCardPoint?: boolean | null
-        isInterestFree?: boolean | null
-    }): Promise<void>
-}
+import { CartRepository } from '@/backend/cart/domains/repositories/CartRepository'
+import { CardRepository } from '@/types/order'
 
 export class ConfirmPaymentUseCase {
     constructor(
@@ -27,6 +15,7 @@ export class ConfirmPaymentUseCase {
         private readonly coupons: CouponRepository,
         private readonly points: UserPointsRepository,
         private readonly toss: TossGateway,
+        private readonly cartRepo: CartRepository,
         private readonly cards?: CardRepository, // optional
     ) { }
 
@@ -39,10 +28,11 @@ export class ConfirmPaymentUseCase {
         orderIds: number[]
         selectedCouponId?: number | null
         pointsToUse?: number | null
+        cartIds?: number[]
     }) {
         const {
             userId, orderId, tossPaymentKey, amount,
-            addressId, selectedCouponId, pointsToUse
+            addressId, selectedCouponId, pointsToUse, cartIds
         } = args
 
         // 1) tossPaymentKey로 선점 (동시 처리 차단 + 멱등)
@@ -119,6 +109,12 @@ export class ConfirmPaymentUseCase {
             // paymentNumber 부여 (repo 제공 방식 우선 사용)
             if (!claimed.paymentNumber) {
                 const next = await (this.payments).generateTodayPaymentNumber?.()
+            }
+
+            // ✅ 장바구니 삭제 (전달된 cartIds 기준)
+            console.log(cartIds)
+            if (cartIds && cartIds.length > 0) {
+                await this.cartRepo.deleteManyByIdsForUser(tx, userId, cartIds)
             }
 
             // 갱신된 레코드 반환 (id 포함)

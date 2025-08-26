@@ -107,6 +107,7 @@ const CartPage = () => {
 
     const checkoutData = selectCarts?.map((item) => {
       return {
+        cartId: item.id,
         productId: item?.product?.id,
         quantity: 1,
         optionValueId: item?.optionValueId,

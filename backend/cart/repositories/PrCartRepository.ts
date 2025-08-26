@@ -1,4 +1,5 @@
 import prisma from '@/backend/utils/prisma';
+import { Prisma } from '@prisma/client';
 import { CartRepository } from '../domains/repositories/CartRepository';
 import { Cart } from '../domains/entities/Cart';
 
@@ -81,5 +82,16 @@ export class PrCartRepository implements CartRepository {
     });
 
     return result.count;
+  }
+
+  async deleteManyByIdsForUser(tx: Prisma.TransactionClient, userId: string, cartIds: number[]): Promise<void> {
+    await tx.cart.deleteMany({
+      where: {
+        userId,
+        id: {
+          in: cartIds,
+        },
+      },
+    });
   }
 }
