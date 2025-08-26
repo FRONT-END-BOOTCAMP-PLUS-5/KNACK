@@ -4,13 +4,13 @@ import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { useState, useEffect } from 'react';
-
+import styles from './mainPage.module.scss';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import PaymentHeader from '@/components/Payments/PaymentHeader';
 import { useUserStore } from '@/store/userStore';
-import { BuyingHeader } from '@/components/my/BuyingHeader';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import Image from 'next/image';
+import Loading from '@/public/images/loading.gif';
 
 interface IProps {
   children: React.ReactNode;
@@ -46,17 +46,10 @@ export default function LayoutWrapper({ children }: IProps) {
   }, [session, status, fetchUserData]);
 
   // 헤더만 숨길 경로들
-  const hideHeaderPaths = [
-    '/login',
-    '/find-email',
-    '/find-password',
-    '/my/address',
-    '/saved',
-    '/payments/checkout',
-  ];
+  const hideHeaderPaths = ['/login', '/find-email', '/find-password', '/my/address', '/saved', '/payments/checkout'];
 
   // 푸터만 숨길 경로들
-  const hideFooterPaths = ['/products', '/cart', '/payments','/signup',];
+  const hideFooterPaths = ['/products', '/cart', '/payments', '/signup'];
 
   // 헤더와 푸터 모두 숨길 경로들
   const hideAllLayoutPaths = [
@@ -70,7 +63,7 @@ export default function LayoutWrapper({ children }: IProps) {
   ];
 
   // nav와 검색버튼을 숨김 (검색창, 탭 네비게이션)
-  const hideHeaderElementsPaths = ['/my', '/cart', '/saved','/signup','/products/'];
+  const hideHeaderElementsPaths = ['/my', '/cart', '/saved', '/signup', '/products/'];
 
   // 기존 방식 - 새로운 설정 기반으로 대체됨 (주석 처리)
   // const showBackButtonPaths = ['/cart', '/my/profile', '/my/address', '/products/','/signup'];
@@ -101,34 +94,34 @@ export default function LayoutWrapper({ children }: IProps) {
   // 헤더 요소들(검색창, 탭 네비게이션)을 숨길지 여부
   const shouldHideHeaderElements = hideHeaderElementsPaths.some((path) => pathname.startsWith(path));
 
-    // 기존 로직은 주석 처리 (새로운 설정 기반으로 대체)
+  // 기존 로직은 주석 처리 (새로운 설정 기반으로 대체)
   // const shouldHideActionButtons = showBackButtonPaths.some((path) => pathname.startsWith(path));
 
   // 공통 헤더 설정들을 미리 정의 (중복 제거)
   const commonHeaderConfigs = {
     // 뒤로가기 버튼만 표시하는 페이지들의 공통 설정
     backButtonOnly: {
-      showBackButton: true,      // 뒤로가기 버튼 표시
-      showHomeButton: false,     // 홈 버튼 숨김
-      hideActionButtons: true,   // 액션 버튼들 숨김
+      showBackButton: true, // 뒤로가기 버튼 표시
+      showHomeButton: false, // 홈 버튼 숨김
+      hideActionButtons: true, // 액션 버튼들 숨김
       hideHamburgerOnly: false, // 햄버거 메뉴 표시
-      showCart: false,          // 장바구니 숨김
+      showCart: false, // 장바구니 숨김
     },
     // 뒤로가기 + 홈 버튼만 표시하는 페이지들의 공통 설정 (장바구니, 햄버거 숨김)
     backHomeOnly: {
-      showBackButton: true,      // 뒤로가기 버튼 표시
-      showHomeButton: true,      // 홈 버튼 표시
-      hideActionButtons: true,   // 액션 버튼들 숨김 (장바구니, 햄버거 포함)
+      showBackButton: true, // 뒤로가기 버튼 표시
+      showHomeButton: true, // 홈 버튼 표시
+      hideActionButtons: true, // 액션 버튼들 숨김 (장바구니, 햄버거 포함)
       hideHamburgerOnly: false, // 햄버거 메뉴 표시 (hideActionButtons로 제어됨)
-      showCart: false,          // 장바구니 숨김
+      showCart: false, // 장바구니 숨김
     },
     // 뒤로가기 + 홈 + 장바구니를 표시하는 페이지들의 공통 설정
     backHomeCart: {
-      showBackButton: true,      // 뒤로가기 버튼 표시
-      showHomeButton: true,      // 홈 버튼 표시
-      hideActionButtons: false,  // 액션 버튼들 표시
+      showBackButton: true, // 뒤로가기 버튼 표시
+      showHomeButton: true, // 홈 버튼 표시
+      hideActionButtons: false, // 액션 버튼들 표시
       hideHamburgerOnly: false, // 햄버거 메뉴 표시
-      showCart: true,           // 장바구니 표시
+      showCart: true, // 장바구니 표시
     },
   };
   // 페이지별 헤더 설정을 객체로 관리 (확장성 고려)
@@ -136,8 +129,8 @@ export default function LayoutWrapper({ children }: IProps) {
   const pageHeaderConfig = {
     // 상품 페이지: 뒤로가기 + 홈 + 장바구니 (햄버거 메뉴만 숨김)
     '/products': {
-      ...commonHeaderConfigs.backHomeCart,  // 공통 설정 상속
-      hideHamburgerOnly: true,              // 햄버거 메뉴만 숨김 (오버라이드)
+      ...commonHeaderConfigs.backHomeCart, // 공통 설정 상속
+      hideHamburgerOnly: true, // 햄버거 메뉴만 숨김 (오버라이드)
     },
     // 장바구니 페이지: 뒤로가기 + 홈 버튼만 (장바구니, 햄버거 숨김)
     '/cart': commonHeaderConfigs.backHomeOnly,
@@ -159,11 +152,11 @@ export default function LayoutWrapper({ children }: IProps) {
     // 일치하는 설정이 없을 경우 기본 설정 반환
     // 기본적으로는 모든 버튼을 숨기고 장바구니만 표시
     return {
-      showBackButton: false,     // 뒤로가기 버튼 숨김
-      showHomeButton: false,     // 홈 버튼 숨김
-      hideActionButtons: false,  // 액션 버튼들 표시
+      showBackButton: false, // 뒤로가기 버튼 숨김
+      showHomeButton: false, // 홈 버튼 숨김
+      hideActionButtons: false, // 액션 버튼들 표시
       hideHamburgerOnly: false, // 햄버거 메뉴 표시
-      showCart: true,           // 장바구니 표시
+      showCart: true, // 장바구니 표시
     };
   };
 
@@ -187,7 +180,11 @@ export default function LayoutWrapper({ children }: IProps) {
 
   // 하이드레이션 완료 전까지는 로딩 표시
   if (!mounted) {
-    return <div>Loading...</div>;
+    return (
+      <div className={styles.loading_container}>
+        <Image src={Loading} alt="loading" width={100} height={100} />
+      </div>
+    );
   }
 
   if (paymentsHeaderPaths) {
@@ -216,7 +213,7 @@ export default function LayoutWrapper({ children }: IProps) {
       )}
       {children}
       {!shouldHideFooter && <Footer />}
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   );
 }

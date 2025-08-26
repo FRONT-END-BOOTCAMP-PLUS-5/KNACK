@@ -72,3 +72,5 @@ export interface IRecentProduct {
     productLike: number;
   };
 }
+
+export type IRecommendProduct = Pick<IProducts, 'id' | 'korName' | 'engName' | 'thumbnailImage' | 'price' | 'brand'>;

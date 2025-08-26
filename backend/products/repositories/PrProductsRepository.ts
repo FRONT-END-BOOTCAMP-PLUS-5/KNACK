@@ -1,7 +1,7 @@
 import prisma from '@/backend/utils/prisma';
 import { ProductRepository } from '../domains/repositories/ProductRepository';
 import { IProduct } from '../domains/entities/Product';
-import { IProducts } from '../domains/entities/Products';
+import { IProducts, IRecommendProdcuts } from '../domains/entities/Products';
 import { IRecentProduct } from '../domains/entities/RecentProduct';
 import { STORAGE_PATHS } from '@/constraint/auth';
 
@@ -225,6 +225,41 @@ export class PrProductRepository implements ProductRepository {
       });
 
       return result;
+    } catch (error) {
+      throw error instanceof Error && error.message;
+    }
+  }
+
+  async findRecommendProducts(): Promise<IRecommendProdcuts[]> {
+    try {
+      const data = await prisma.product.findMany({
+        where: {
+          isRecommended: true,
+        },
+        select: {
+          id: true,
+          korName: true,
+          engName: true,
+          price: true,
+          thumbnailImage: true,
+          brand: {
+            select: {
+              korName: true,
+              engName: true,
+              id: true,
+              logoImage: true,
+            },
+          },
+        },
+      });
+
+      const randomData = [0, 1, 2, 3, 4]?.map((_) => {
+        const random = data.splice(Math.floor(Math.random() * data.length), 1)[0];
+
+        return random;
+      });
+
+      return randomData;
     } catch (error) {
       throw error instanceof Error && error.message;
     }
