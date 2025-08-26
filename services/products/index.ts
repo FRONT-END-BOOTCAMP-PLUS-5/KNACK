@@ -33,4 +33,12 @@ export const productsService = {
 
     return data;
   },
+
+  getRecommendProducts: async () => {
+    const { data, error } = await requester.get(`/api/products/recommend`).catch((error) => error);
+
+    if (error) throw new Error(error.message);
+
+    return data;
+  },
 };
