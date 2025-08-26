@@ -4,12 +4,13 @@ import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { useState, useEffect } from 'react';
-
+import styles from './mainPage.module.scss';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import PaymentHeader from '@/components/Payments/PaymentHeader';
 import { useUserStore } from '@/store/userStore';
-import { BuyingHeader } from '@/components/my/BuyingHeader';
+import Image from 'next/image';
+import Loading from '@/public/images/loading.gif';
 
 interface IProps {
   children: React.ReactNode;
@@ -107,7 +108,11 @@ export default function LayoutWrapper({ children }: IProps) {
 
   // 하이드레이션 완료 전까지는 로딩 표시
   if (!mounted) {
-    return <div>Loading...</div>;
+    return (
+      <div className={styles.loading_container}>
+        <Image src={Loading} alt="loading" width={100} height={100} />
+      </div>
+    );
   }
 
   if (paymentsHeaderPaths) {

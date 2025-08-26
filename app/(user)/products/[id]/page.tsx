@@ -10,9 +10,9 @@ import TextReview from '@/components/products/TextReview';
 import { productsService } from '@/services/products';
 import AdditionalBenefits from '@/components/products/AdditionalBenefits';
 import { IProduct } from '@/types/productDetail';
-
 import BottomFixButton from '@/components/products/BottomFixButton';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 interface IProps {
   params: Promise<{
@@ -53,7 +53,7 @@ const ProductDetail = async ({ params }: IProps) => {
   });
 
   if (!productData) {
-    return <div>존재하지 않는 상품 입니다.</div>;
+    return notFound();
   }
 
   return (
