@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import { IAddress } from '@/types/address';
 import Text from '@/components/common/Text';
+import { useCartStore } from '@/store/cartStore';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
@@ -178,6 +179,9 @@ export default function PaymentSuccess() {
           cartIds,
         });
 
+        // ✅ cartIds를 가진 장바구니만 로컬 스토어에서 제거
+        useCartStore.getState().removeStoreCarts(cartIds);
+
         // ⚓ paymentId + paymentNumber 확보
         const pid: number | null = paymentRes.data?.id ?? null;
         console.log(pid);
@@ -307,3 +311,7 @@ export default function PaymentSuccess() {
     </div>
   );
 }
+function removeStoreCarts(cartIds: number[]) {
+  throw new Error('Function not implemented.');
+}
+
