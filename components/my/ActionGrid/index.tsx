@@ -8,15 +8,19 @@ import { useReviewCount } from '@/hooks/useReviewCount';
 import PointIcon from '@/public/icons/my_point.png';
 import ReviewIcon from '@/public/icons/my_review.png';
 import CouponIcon from '@/public/icons/my_coupon.png';
+import { User } from '@/store/userStore';
 
-const ActionGrid = () => {
+interface IProps {
+  user?: User | null;
+}
+const ActionGrid = ({ user }: IProps) => {
   const { reviewCount, isLoading } = useReviewCount();
 
   return (
     <article className={styles.grid_box}>
       <Flex direction="column" align="center" gap={8} paddingVertical={16}>
         <Image src={PointIcon} alt="포인트" width={28} height={28} />
-        <Text size={1.2}>{0}P</Text>
+        <Text size={1.2}>{user?.point?.toLocaleString()}P</Text>
       </Flex>
       <Flex direction="column" align="center" gap={8} paddingVertical={16}>
         <Image src={CouponIcon} alt="쿠폰" width={28} height={28} />
@@ -25,9 +29,7 @@ const ActionGrid = () => {
       <Flex direction="column" align="center" gap={8} paddingVertical={16}>
         <Link href="/my/review" className={styles.review_link}>
           <Image src={ReviewIcon} alt="리뷰" width={28} height={28} />
-          <Text size={1.2}>
-            리뷰 {isLoading ? '0' : reviewCount}
-          </Text>
+          <Text size={1.2}>리뷰 {isLoading ? '0' : reviewCount}</Text>
         </Link>
       </Flex>
     </article>

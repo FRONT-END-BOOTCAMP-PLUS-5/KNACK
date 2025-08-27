@@ -35,7 +35,7 @@ export default function MyPage() {
     <section className={styles.my_page}>
       <ProfileInfo user={user} />
       <Divider />
-      <ActionGrid />
+      <ActionGrid user={user} />
       <div className={styles.block} />
       <BuyList all={orderStats.all} delivering={orderStats.delivering} completed={orderStats.completed} />
       <div className={styles.block} />
