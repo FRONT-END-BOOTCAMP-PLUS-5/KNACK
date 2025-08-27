@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './footer.module.scss';
 import { DEFAULT_ACTIVE_TAB } from '@/constraint/footer';
@@ -11,7 +11,7 @@ export default function Footer() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const defaultTab = useMemo(() => {
+  const activeTab = useMemo(() => {
     switch (pathname) {
       case '/':
         return 'HOME';
@@ -26,11 +26,7 @@ export default function Footer() {
     }
   }, [pathname]);
 
-  const [activeTab, setActiveTab] = useState<TabId>(defaultTab);
-
   const handleTabClick = (tab: TabId) => {
-    setActiveTab(tab);
-
     // 페이지 이동
     switch (tab) {
       case 'HOME':
