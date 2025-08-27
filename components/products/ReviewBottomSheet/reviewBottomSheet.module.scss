@@ -7,8 +7,8 @@
   bottom: 0;
   z-index: 1000;
   background-color: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(.8rem);
-  -webkit-backdrop-filter: blur(.8rem);
+  backdrop-filter: blur(0.8rem);
+  -webkit-backdrop-filter: blur(0.8rem);
   max-width: 440px;
   margin: 0 auto;
 }
@@ -23,7 +23,7 @@
   border-top-left-radius: 1.6rem;
   border-top-right-radius: 1.6rem;
   padding: 1.8rem 2.4rem 2.4rem;
-  min-height: 90vh;
+  min-height: 75vh;
   overflow-y: auto;
   transform: translateY(100%);
   animation: slideUp 0.3s ease-out forwards;
@@ -53,7 +53,7 @@
   position: absolute;
   right: 0;
   top: 0;
-  
+
   img {
     width: 5rem;
     height: 5rem;
@@ -71,7 +71,7 @@
 .rating_summary {
   display: flex;
   flex-direction: column;
-  gap: .8rem;
+  gap: 0.8rem;
   min-width: 8rem;
 }
 
@@ -82,7 +82,7 @@
   color: $gray03;
   display: flex;
   align-items: center;
-  gap: .8rem;
+  gap: 0.8rem;
 }
 
 // 별 아이콘
@@ -91,7 +91,7 @@
   font-weight: 700;
   color: $gray01;
   margin-top: 1rem;
-  margin-left: -.5rem;
+  margin-left: -0.5rem;
 }
 
 // 리뷰 개수
@@ -106,7 +106,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: .5rem;
+  gap: 0.5rem;
 }
 
 // 별점 항목
@@ -119,9 +119,9 @@
 // 프로그레스 바 컨테이너
 .progress_container {
   flex: 1;
-  height: .4rem;
+  height: 0.4rem;
   background-color: #f0f0f0;
-  border-radius: .2rem;
+  border-radius: 0.2rem;
   overflow: hidden;
 }
 
@@ -130,7 +130,7 @@
   height: 100%;
   background-color: $gray03;
   transition: width 0.3s ease;
-  border-radius: .2rem;
+  border-radius: 0.2rem;
 }
 
 // 별점 숫자
@@ -156,7 +156,7 @@
   font-size: 1.8rem;
   font-weight: 600;
   color: #666;
-  margin-bottom: .8rem;
+  margin-bottom: 0.8rem;
 }
 
 .no_reviews_subtext {
@@ -193,7 +193,7 @@
   font-size: 1.3rem;
   color: $gray03;
   flex: 1;
-  
+
   &.highest_percent {
     font-weight: 700;
     color: #222;
@@ -236,7 +236,7 @@
 .review_button {
   background-color: white;
   border: none;
-  border-radius: .8rem;
+  border-radius: 0.8rem;
   padding: 1.2rem 2.4rem;
   font-size: 1.4rem;
   font-weight: 500;
@@ -246,4 +246,3 @@
   width: 100%;
   border: 1px solid $light-gray03;
 }
-
