@@ -26,7 +26,11 @@ const SSRContent = (productData?: IProduct) => {
 
   return (
     <>
-      <ProductTopImage thumbnailImage={productData?.thumbnailImage ?? ''} sliderImage={productData?.subImages ?? ''} />
+      <ProductTopImage
+        productId={productData?.id}
+        thumbnailImage={productData?.thumbnailImage ?? ''}
+        sliderImage={productData?.subImages ?? ''}
+      />
       <DefaultInfo data={productData} />
       <AdditionalBenefits />
       <Divider height={1} paddingHorizontal={16} />

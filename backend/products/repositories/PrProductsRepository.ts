@@ -1,7 +1,7 @@
 import prisma from '@/backend/utils/prisma';
 import { ProductRepository } from '../domains/repositories/ProductRepository';
 import { IProduct } from '../domains/entities/Product';
-import { IProducts, IRecommendProdcuts } from '../domains/entities/Products';
+import { IProducts, IRecommendProducts, IRelationProducts } from '../domains/entities/Products';
 import { IRecentProduct } from '../domains/entities/RecentProduct';
 import { STORAGE_PATHS } from '@/constraint/auth';
 
@@ -230,7 +230,7 @@ export class PrProductRepository implements ProductRepository {
     }
   }
 
-  async findRecommendProducts(): Promise<IRecommendProdcuts[]> {
+  async findRecommendProducts(): Promise<IRecommendProducts[]> {
     try {
       const data = await prisma.product.findMany({
         where: {
@@ -260,6 +260,31 @@ export class PrProductRepository implements ProductRepository {
       });
 
       return randomData;
+    } catch (error) {
+      throw error instanceof Error && error.message;
+    }
+  }
+
+  async findRelationProducts(id: number): Promise<IRelationProducts[]> {
+    try {
+      const data = await prisma.relatedProduct.findMany({
+        where: {
+          productId: id,
+        },
+        select: {
+          relatedProduct: {
+            select: {
+              id: true,
+              korName: true,
+              engName: true,
+              thumbnailImage: true,
+              price: true,
+            },
+          },
+        },
+      });
+
+      return data;
     } catch (error) {
       throw error instanceof Error && error.message;
     }

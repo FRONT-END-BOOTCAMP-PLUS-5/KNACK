@@ -5,7 +5,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 보호된 경로들 (로그인이 필요한 경로)
-  const protectedPaths = ['/my', '/cart', '/payments'];
+  const protectedPaths = ['/my', '/cart', '/payments', '/event'];
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
 
   // 보호된 경로에 접근하려는 경우

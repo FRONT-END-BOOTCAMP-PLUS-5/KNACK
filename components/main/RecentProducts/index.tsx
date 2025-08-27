@@ -38,7 +38,11 @@ const RecentProducts = () => {
       getRecentlyProductList(params.toString())
         .then((res) => {
           if (res.status === 200) {
-            const result = conversionArray(res.result, 2);
+            const sortedProducts = ids
+              .map((id) => res.result.find((product: IRecentProduct) => product.id === Number(id)))
+              .filter((product) => product !== undefined);
+
+            const result = conversionArray(sortedProducts, 2);
 
             setRecentProducts(result);
           }
@@ -106,7 +110,7 @@ const RecentProducts = () => {
                     {value?.price?.toLocaleString()}
                   </Text>
                   <Text size={1.1} color="lightGray1">
-                    관심
+                    관심 {value?._count?.productLike}
                   </Text>
                 </Flex>
               </Link>

@@ -19,7 +19,7 @@ interface IProps {
 
 const OptionBottomSheet = ({ selectedCart, selectOptionId, handleOptionChange, setSelectOptionId }: IProps) => {
   return (
-    <BottomSheet>
+    <BottomSheet style={{ padding: 0 }}>
       <Flex justify="center" paddingVertical={16}>
         <Text tag="h2" size={1.8} weight={600}>
           옵션 변경

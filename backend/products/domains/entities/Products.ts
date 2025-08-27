@@ -50,4 +50,8 @@ interface IOptionType {
   optionValue: IOptionValue[];
 }
 
-export type IRecommendProdcuts = Pick<IProducts, 'engName' | 'korName' | 'id' | 'price' | 'thumbnailImage' | 'brand'>;
+export type IRecommendProducts = Pick<IProducts, 'engName' | 'korName' | 'id' | 'price' | 'thumbnailImage' | 'brand'>;
+
+export interface IRelationProducts {
+  relatedProduct: Pick<IProducts, 'engName' | 'korName' | 'id' | 'price' | 'thumbnailImage'>;
+}

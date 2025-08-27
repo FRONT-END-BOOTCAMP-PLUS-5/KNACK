@@ -25,6 +25,11 @@
   cursor: pointer;
   height: 44px;
   margin-left: 12px;
+  white-space: nowrap;
+}
+
+.color_black {
+  color: $black;
 }
 
 .search_content_wrap {

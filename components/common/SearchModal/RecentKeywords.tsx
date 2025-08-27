@@ -31,7 +31,7 @@ export default function RecentKeywords({ handleSearchInputClick }: IProps) {
           <div className={styles.layer_search_title_wrap}>
             <h4 className={styles.title}>최근 검색어</h4>
             <div className={styles.title_sub_text}>
-              <button type="button" onClick={deleteAllStorage}>
+              <button className={styles.color_black} type="button" onClick={deleteAllStorage}>
                 지우기
               </button>
             </div>

@@ -1,6 +1,7 @@
 .option_sheet_product {
   display: flex;
   gap: 12px;
+  padding: 0 12px;
   padding-bottom: 12px;
 
   & .image {
@@ -20,7 +21,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
-  padding: 16px 0;
+  padding: 12px;
 }
 
 .option_button {
@@ -43,8 +44,9 @@
   position: absolute;
   bottom: 0;
   left: 50%;
-  width: 440px;
-  padding: 24px 22px;
+  max-width: 440px;
+  width: 100%;
+  padding: 24px 12px;
   transform: translateX(-50%);
   display: flex;
   gap: 12px;
