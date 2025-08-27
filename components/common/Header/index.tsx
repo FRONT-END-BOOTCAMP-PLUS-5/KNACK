@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './header.module.scss';
-import { HEADER_TABS, DEFAULT_ACTIVE_TAB, HeaderTab } from '@/constraint/header';
+import { HEADER_TABS, HeaderTab } from '@/constraint/header';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { IProps } from '@/types/header';
 import Image from 'next/image';
@@ -31,7 +31,6 @@ export default function Header({
   // 현재 활성화된 탭 상태 관리
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<HeaderTab>(DEFAULT_ACTIVE_TAB);
   const [carts, setCarts] = useState<ICart[]>([]);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isCategoryBrandModalOpen, setIsCategoryBrandModalOpen] = useState(false);
@@ -43,8 +42,11 @@ export default function Header({
   // Next.js 라우터 (뒤로가기 기능용)
   const router = useRouter();
 
+  const activeTab = useMemo(() => {
+    return HEADER_TABS.find((tab) => tab?.url === pathname);
+  }, [pathname]);
+
   const handleTabClick = (tab: HeaderTab) => {
-    setActiveTab(tab);
     router.push(tab?.url);
   };
 
