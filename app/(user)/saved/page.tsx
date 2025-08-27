@@ -30,11 +30,6 @@ const SavedPage = () => {
   const [recentProducts, setRecentProducts] = useState<IRecentProduct[]>([]);
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    if (!user?.id) return router.replace('/login');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleGetRecentlyProduct = useCallback(
     (ids: string[]) => {
       const params = new URLSearchParams();

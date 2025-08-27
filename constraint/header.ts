@@ -1,10 +1,8 @@
 export const HEADER_TABS = [
   { id: 0, name: '전체', url: '/' },
   { id: 1, name: 'AI검색', url: '/ai-search' },
-  { id: 2, name: '신상', url: '/' },
-  { id: 3, name: '신발', url: '/' },
-  { id: 4, name: '랭킹', url: '/' },
-  { id: 5, name: '이벤트', url: '/event' },
+  { id: 2, name: '신발', url: '/search?categoryId=5' },
+  { id: 3, name: '이벤트', url: '/event' },
 ] as const;
 
 export const DEFAULT_ACTIVE_TAB = HEADER_TABS[0];
