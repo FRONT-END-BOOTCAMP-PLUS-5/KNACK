@@ -8,6 +8,7 @@
   transform: translateX(-50%);
   max-width: 440px;
   width: 100%;
+  z-index: 1000;
 
   & .contents {
     height: 48px;
