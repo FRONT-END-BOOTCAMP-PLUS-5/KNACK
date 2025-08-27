@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const {
             tossPaymentKey, orderId, amount, addressId, orderIds,
-            selectedCouponId, pointsToUse
+            selectedCouponId, pointsToUse, cartIds,
         } = body;
 
         // ✅ 1) 입력값 1차 검증 (개발서버에서 특히 중요)

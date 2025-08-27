@@ -11,6 +11,8 @@ import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import { IAddress } from '@/types/address';
 import Text from '@/components/common/Text';
+import { useCartStore } from '@/store/cartStore';
+import { cartService } from '@/services/cart';
 import Flex from '@/components/common/Flex';
 
 export default function PaymentSuccess() {
@@ -141,6 +143,11 @@ export default function PaymentSuccess() {
 
     hasRun.current = true;
 
+    // CheckoutPage에서 저장해둔 cartIds 꺼내기
+    const raw = sessionStorage.getItem('cartIds');
+    const cartIds: number[] = raw ? JSON.parse(raw) : [];
+
+
     (async () => {
       try {
         console.log('➡️ 주문 저장 요청 /api/orders', { orderItems, targetSumAfterCoupon, discountAmount, pointsToUse });
@@ -173,6 +180,10 @@ export default function PaymentSuccess() {
           pointsToUse: pointsToUse,
         });
 
+        // ✅ cartIds를 가진 장바구니만 로컬 스토어에서 제거
+        cartService.removesCart(cartIds);
+        useCartStore.getState().removeStoreCarts(cartIds);
+
         // ⚓ paymentId + paymentNumber 확보
         const pid: number | null = paymentRes.data?.id ?? null;
         console.log(pid);
@@ -184,6 +195,7 @@ export default function PaymentSuccess() {
         writeProcessed({ tossPaymentKey, tossOrderId, at: Date.now() });
 
         // 정리
+        sessionStorage.removeItem('cartIds');
         sessionStorage.removeItem('orderItems');
         sessionStorage.removeItem('selectedAddress');
       } catch (err) {
@@ -236,7 +248,6 @@ export default function PaymentSuccess() {
         // 2) 첫 주문 상세 → 대표상품 + 배송비
         const ordRes = await requester.get(`/api/orders/${firstOrderId}`);
         const order = ordRes.data;
-        console.log('useEffect-대표상품 조회', order);
         setRepProd(order.product ?? null);
       } catch (e) {
         console.error('❌ 대표상품/주문 로드 실패', e);
@@ -258,7 +269,7 @@ export default function PaymentSuccess() {
           {repProd?.thumbnailImage && (
             <Image
               src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${repProd.thumbnailImage}`}
-              alt={repProd.name}
+              alt={repProd.korName}
               width={80}
               height={80}
               className={styles.productImage}
@@ -267,7 +278,7 @@ export default function PaymentSuccess() {
         </div>
       </Flex>
 
-      <button className={styles.primary_btn} onClick={() => router.push(`/my/order/${paymentNumber}`)}>
+      <button className={styles.primary_btn} onClick={() => router.push(paymentNumber ? `/my/order/${paymentNumber}` : '/my/buying?tab=all')}>
         구매 내역 상세보기
       </button>
       <p className={styles.notice}>구매 후 15분 이내에 구매 여부를 결정할 수 있습니다.</p>

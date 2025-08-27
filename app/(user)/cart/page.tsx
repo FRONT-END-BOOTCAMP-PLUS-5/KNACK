@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation';
 import OptionBottomSheet from '@/components/cart/OptionBottomSheet';
 import SelectOrderInfo from '@/components/cart/SelectOrderInfo';
 import EmptyText from '@/components/saved/EmptyText';
+import Toast from '@/components/common/Toast';
 
 const CartPage = () => {
   const { getCart, removeCart, removesCart, upsertCart } = cartService;
@@ -31,6 +32,7 @@ const CartPage = () => {
   const [multiDeleteOpen, setMultiDeleteOpen] = useState(false);
   const [selectedCart, setSelectedCart] = useState<ICart>(CART_INITIAL_VALUE);
   const [selectOptionId, setSelectOptionId] = useState<number>(0);
+  const [toastOpen, setToastOpen] = useState(false);
 
   const handleRemoveCart = () => {
     removeCart(selectedCart?.id)
@@ -102,20 +104,28 @@ const CartPage = () => {
     setSelectOptionId(selectCart?.optionValueId);
   };
 
-  const onClickPayment = () => {
-    if (selectCarts?.length === 0) return alert('상품을 선택해주세요!');
+  const onClickPayment = (direct?: ICart | ICart[]) => {
+    // direct가 배열이면 그대로, 객체면 1개 배열로, 없으면 현재 selectCarts
+    const targets = Array.isArray(direct)
+      ? direct
+      : direct
+        ? [direct]
+        : selectCarts;
 
-    const checkoutData = selectCarts?.map((item) => {
-      return {
-        productId: item?.product?.id,
-        quantity: 1,
-        optionValueId: item?.optionValueId,
-        deliveryMethod: 'normal',
-      };
-    });
+    if (!targets.length) {
+      setToastOpen(true);
+      return;
+    }
+
+    const checkoutData = targets.map((item) => ({
+      cartId: item.id,
+      productId: item.product?.id,
+      quantity: item.count ?? 1,
+      optionValueId: item.optionValueId,
+      deliveryMethod: 'normal',
+    }));
 
     localStorage.setItem('checkout', JSON.stringify(checkoutData));
-
     router.push('/payments/checkout');
   };
 
@@ -150,6 +160,14 @@ const CartPage = () => {
     initCart();
   }, [initCart]);
 
+  useEffect(() => {
+    if (toastOpen) {
+      setTimeout(() => {
+        setToastOpen(false);
+      }, 2000);
+    }
+  }, [toastOpen]);
+
   return (
     <article className={styles.cart_wrap}>
       {carts?.length === 0 && (
@@ -182,6 +200,7 @@ const CartPage = () => {
                   optionOpen={onClickOptionChange}
                   addSelectCart={addSelectCart}
                   onClickDelete={onClickRemoveCart}
+                  nowPayment={(cart) => onClickPayment(cart)}
                 />
                 <Divider />
               </React.Fragment>
@@ -238,7 +257,11 @@ const CartPage = () => {
         setSelectOptionId={setSelectOptionId}
         handleOptionChange={handleOptionChange}
       />
+
+      {toastOpen && <Toast>상품을 선택해 주세요!</Toast>}
+
     </article>
+
   );
 };
 

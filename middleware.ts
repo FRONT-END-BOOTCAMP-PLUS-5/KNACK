@@ -3,17 +3,17 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
+
   // 보호된 경로들 (로그인이 필요한 경로)
-  const protectedPaths = ['/my', '/cart','/event'];
+  const protectedPaths = ['/my', '/cart', '/payments', '/event'];
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
-  
+
   // 보호된 경로에 접근하려는 경우
   if (isProtectedPath) {
     try {
       // JWT 토큰 확인
       const token = await getToken({ req: request });
-      
+
       if (!token) {
         // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
         const loginUrl = new URL('/login', request.url);
@@ -26,7 +26,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
   }
-  
+
   return NextResponse.next();
 }
 

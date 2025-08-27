@@ -5,20 +5,7 @@ import { UserPointsRepository } from '@/backend/points/domains/repositories/User
 import { TossGateway } from '@/types/payment'
 import prisma from '@/backend/utils/prisma'
 import { OrderRepository } from '@/backend/orders/domains/repositories/OrderRepository'
-
-// (선택) 카드 저장이 필요하면 CardRepository 타입을 추가로 주입
-export interface CardRepository {
-    save(dto: {
-        paymentId: number
-        issuerCode?: string | null
-        acquirerCode?: string | null
-        number?: string | null
-        installmentPlanMonths?: number | null
-        approveNo?: string | null
-        useCardPoint?: boolean | null
-        isInterestFree?: boolean | null
-    }): Promise<void>
-}
+import { CardRepository } from '@/types/order'
 
 export class ConfirmPaymentUseCase {
     constructor(
@@ -42,7 +29,7 @@ export class ConfirmPaymentUseCase {
     }) {
         const {
             userId, orderId, tossPaymentKey, amount,
-            addressId, selectedCouponId, pointsToUse
+            addressId, selectedCouponId, pointsToUse,
         } = args
 
         // 1) tossPaymentKey로 선점 (동시 처리 차단 + 멱등)
@@ -91,8 +78,6 @@ export class ConfirmPaymentUseCase {
 
             // 포인트 멱등 차감 (당신의 Repo 시그니처에 맞춰 호출)
             if (pointsToUse && pointsToUse > 0) {
-                // 예: debitByIdempotent(userId, amount, idempotencyKey, tx?) 형태라면 아래처럼:
-                // await this.points.debitByIdempotent({ userId, amount: Number(pointsToUse), idempotencyKey: orderId }, tx)
                 await this.points.debit({
                     userId,
                     amount: Number(pointsToUse),
@@ -114,11 +99,6 @@ export class ConfirmPaymentUseCase {
                     useCardPoint: c.useCardPoint,
                     isInterestFree: c.isInterestFree,
                 })
-            }
-
-            // paymentNumber 부여 (repo 제공 방식 우선 사용)
-            if (!claimed.paymentNumber) {
-                const next = await (this.payments).generateTodayPaymentNumber?.()
             }
 
             // 갱신된 레코드 반환 (id 포함)

@@ -6,7 +6,7 @@ import { ICart } from '@/types/cart';
 
 interface IProps {
   selectCarts: ICart[];
-  onClickPayment: () => void;
+  onClickPayment: (direct?: ICart | ICart[]) => void;
 }
 
 const PaymentButton = ({ selectCarts, onClickPayment }: IProps) => {
@@ -19,7 +19,7 @@ const PaymentButton = ({ selectCarts, onClickPayment }: IProps) => {
           text={`${totalPrice.toLocaleString()}원ㆍ총 ${selectCarts?.length ?? 0}건 주문하기`}
           size="large"
           style="orange"
-          onClick={onClickPayment}
+          onClick={() => onClickPayment(selectCarts)}
         />
       </div>
     </div>

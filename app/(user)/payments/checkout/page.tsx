@@ -159,7 +159,6 @@ export default function CheckoutPage() {
       sessionStorage.setItem('paymentData', JSON.stringify(paymentData));
 
       const toss = await loadTossPayments(TOSS_CLIENT_KEY);
-      console.log(toss);
       await toss.requestPayment('카드', {
         amount: totalPrice,
         orderId: `order_${Date.now()}`, // 권장: 서버에서 선발급한 orderNumber 사용
@@ -182,6 +181,8 @@ export default function CheckoutPage() {
     if (!raw) return;
     try {
       const parsed: CheckoutRow[] = JSON.parse(raw);
+      const cartIds = parsed.map(p => p.cartId).filter(Boolean);
+      sessionStorage.setItem('cartIds', JSON.stringify(cartIds));
       setCheckout(parsed);
     } catch (e) {
       console.error('checkout 파싱 실패', e);

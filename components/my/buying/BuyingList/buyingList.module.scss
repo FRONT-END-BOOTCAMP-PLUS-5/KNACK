@@ -67,6 +67,7 @@
     padding: 12px 14px;
     align-items: center;
     transition: background-color .15s ease;
+    cursor: pointer;
 
     &:not(:last-child) {
         border-bottom: 1px solid #f5f5f5;
