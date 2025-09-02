@@ -11,6 +11,8 @@ import PaymentHeader from '@/components/Payments/PaymentHeader';
 import { useUserStore } from '@/store/userStore';
 import Image from 'next/image';
 import Loading from '@/public/images/loading.gif';
+import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 interface IProps {
   children: React.ReactNode;
@@ -32,6 +34,8 @@ export default function LayoutWrapper({ children }: IProps) {
         },
       })
   );
+
+  const { onToast, setOnToast } = useToastStore();
 
   // 세션 사용 (NextAuth에서 직접 관리)
   const { data: session, status } = useSession();
@@ -212,6 +216,13 @@ export default function LayoutWrapper({ children }: IProps) {
         />
       )}
       {children}
+      <MaterialToast
+        open={onToast?.open}
+        setOpen={() => setOnToast(false, '')}
+        message={onToast?.message}
+        link={onToast?.link}
+        autoHideDuration={3000}
+      />
       {!shouldHideFooter && <Footer />}
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
