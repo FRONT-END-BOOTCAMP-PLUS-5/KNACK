@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { WithdrawalAgreements } from '@/types/withdrawal';
 import styles from './withdrawalForm.module.scss';
+import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
 
 interface IProps {
   onSubmit: (password: string) => void;
@@ -16,13 +17,17 @@ export default function WithdrawalForm({ onSubmit, isPending }: IProps) {
     retention: false,
     withdraw: false,
   });
+  const [toastOpen, setToastOpen] = useState<IToastState>({
+    open: false,
+    message: '',
+  });
 
   const isAllAgreed = agreements.delete && agreements.retention && agreements.withdraw;
 
   const handleAgreementChange = (type: keyof WithdrawalAgreements) => {
-    setAgreements(prev => ({
+    setAgreements((prev) => ({
       ...prev,
-      [type]: !prev[type]
+      [type]: !prev[type],
     }));
   };
 
@@ -32,12 +37,12 @@ export default function WithdrawalForm({ onSubmit, isPending }: IProps) {
 
   const handleSubmit = () => {
     if (!password.trim()) {
-      alert('비밀번호를 입력해주세요.');
+      setToastOpen({ open: true, message: '비밀번호를 입력해주세요.' });
       return;
     }
 
     if (!isAllAgreed) {
-      alert('모든 동의 항목에 체크해주세요.');
+      setToastOpen({ open: true, message: '모든 동의 항목에 체크해주세요.' });
       return;
     }
 
@@ -64,9 +69,9 @@ export default function WithdrawalForm({ onSubmit, isPending }: IProps) {
       {/* 동의 체크박스 */}
       <div className={styles.agreement_section}>
         <div className={styles.agreement_item}>
-          <input 
-            type="checkbox" 
-            id="delete_agreement" 
+          <input
+            type="checkbox"
+            id="delete_agreement"
             className={styles.agreement_checkbox}
             checked={agreements.delete}
             onChange={() => handleAgreementChange('delete')}
@@ -76,9 +81,9 @@ export default function WithdrawalForm({ onSubmit, isPending }: IProps) {
           </label>
         </div>
         <div className={styles.agreement_item}>
-          <input 
-            type="checkbox" 
-            id="retention_agreement" 
+          <input
+            type="checkbox"
+            id="retention_agreement"
             className={styles.agreement_checkbox}
             checked={agreements.retention}
             onChange={() => handleAgreementChange('retention')}
@@ -88,9 +93,9 @@ export default function WithdrawalForm({ onSubmit, isPending }: IProps) {
           </label>
         </div>
         <div className={styles.agreement_item}>
-          <input 
-            type="checkbox" 
-            id="withdraw_agreement" 
+          <input
+            type="checkbox"
+            id="withdraw_agreement"
             className={styles.agreement_checkbox}
             checked={agreements.withdraw}
             onChange={() => handleAgreementChange('withdraw')}
@@ -103,7 +108,7 @@ export default function WithdrawalForm({ onSubmit, isPending }: IProps) {
 
       {/* 버튼 */}
       <div className={styles.button_section}>
-        <button 
+        <button
           className={`${styles.withdraw_button} ${isAllAgreed && password ? styles.active : ''}`}
           disabled={!isAllAgreed || !password || isPending}
           onClick={handleSubmit}
@@ -111,6 +116,12 @@ export default function WithdrawalForm({ onSubmit, isPending }: IProps) {
           {isPending ? '탈퇴 처리 중...' : '탈퇴하기'}
         </button>
       </div>
+
+      <MaterialToast
+        open={toastOpen?.open}
+        setOpen={() => setToastOpen({ open: false, message: '' })}
+        message={toastOpen?.message}
+      />
     </div>
   );
 }

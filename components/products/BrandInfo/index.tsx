@@ -12,9 +12,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { likeService } from '@/services/like';
 import { IBrandLikeList } from '@/types/like';
 import { useLikeStore } from '@/store/likeStore';
-import LikeToast from '../LikeToast';
 import { useUserStore } from '@/store/userStore';
 import { useRouter } from 'next/navigation';
+import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
 
 interface IProps {
   brandData?: IBrand;
@@ -25,7 +25,7 @@ const BrandInfo = ({ brandData }: IProps) => {
   const { user } = useUserStore();
   const { addBrandLike, getBrandLikes, deleteBrandLike } = likeService;
   const [likedCheck, setLikedCheck] = useState(false);
-  const [toastOpen, setToastOpen] = useState(false);
+  const [toastOpen, setToastOpen] = useState<IToastState>({ open: false, message: '' });
 
   const { productDetailBrandLike: storeLike, setProductDetailBrandLike: setStoreLike } = useLikeStore();
 
@@ -59,7 +59,7 @@ const BrandInfo = ({ brandData }: IProps) => {
       deleteBrandLike(id)
         .then((res) => {
           if (res.status === 200) {
-            alert('취소완료!');
+            setToastOpen({ open: true, message: '삭제가 완료 되었어요!' });
             setStoreLike(storeLike.count - 1, false);
             setLikedCheck(!likedCheck);
           }
@@ -81,7 +81,7 @@ const BrandInfo = ({ brandData }: IProps) => {
           .then((res) => {
             if (res.status === 200) {
               setStoreLike(storeLike.count + 1, true);
-              setToastOpen(true);
+              setToastOpen({ open: true, message: '관심 브랜드에 저장되었어요!', link: '/saved?tab=brand' });
               setLikedCheck(!likedCheck);
             }
           })
@@ -123,11 +123,10 @@ const BrandInfo = ({ brandData }: IProps) => {
         <Image src={storeLike?.status ? onBookMark : bookmark} alt="좋아요" width={22} height={22} />
       </button>
 
-      <LikeToast
-        open={toastOpen}
-        setOpen={() => setToastOpen(false)}
-        message="관심 브랜드에 저장되었습니다."
-        link="/saved?tab=brand"
+      <MaterialToast
+        open={toastOpen?.open}
+        setOpen={() => setToastOpen({ open: false, message: '' })}
+        message={toastOpen?.message}
       />
     </article>
   );

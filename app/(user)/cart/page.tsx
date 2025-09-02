@@ -19,6 +19,7 @@ import OptionBottomSheet from '@/components/cart/OptionBottomSheet';
 import SelectOrderInfo from '@/components/cart/SelectOrderInfo';
 import EmptyText from '@/components/saved/EmptyText';
 import Toast from '@/components/common/Toast';
+import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
 
 const CartPage = () => {
   const { getCart, removeCart, removesCart, upsertCart } = cartService;
@@ -32,7 +33,10 @@ const CartPage = () => {
   const [multiDeleteOpen, setMultiDeleteOpen] = useState(false);
   const [selectedCart, setSelectedCart] = useState<ICart>(CART_INITIAL_VALUE);
   const [selectOptionId, setSelectOptionId] = useState<number>(0);
-  const [toastOpen, setToastOpen] = useState(false);
+  const [toastOpen, setToastOpen] = useState<IToastState>({
+    open: false,
+    message: '',
+  });
 
   const handleRemoveCart = () => {
     removeCart(selectedCart?.id)
@@ -88,7 +92,7 @@ const CartPage = () => {
   };
 
   const onClickMultiRemoveCart = () => {
-    if (selectCarts?.length === 0) return alert('상품을 선택해주세요!');
+    if (selectCarts?.length === 0) return setToastOpen({ open: true, message: '상품을 선택해 주세요!' });
 
     setMultiDeleteOpen(true);
   };
@@ -106,14 +110,10 @@ const CartPage = () => {
 
   const onClickPayment = (direct?: ICart | ICart[]) => {
     // direct가 배열이면 그대로, 객체면 1개 배열로, 없으면 현재 selectCarts
-    const targets = Array.isArray(direct)
-      ? direct
-      : direct
-        ? [direct]
-        : selectCarts;
+    const targets = Array.isArray(direct) ? direct : direct ? [direct] : selectCarts;
 
     if (!targets.length) {
-      setToastOpen(true);
+      setToastOpen({ open: true, message: '상품을 선택해 주세요!' });
       return;
     }
 
@@ -159,14 +159,6 @@ const CartPage = () => {
   useEffect(() => {
     initCart();
   }, [initCart]);
-
-  useEffect(() => {
-    if (toastOpen) {
-      setTimeout(() => {
-        setToastOpen(false);
-      }, 2000);
-    }
-  }, [toastOpen]);
 
   return (
     <article className={styles.cart_wrap}>
@@ -258,10 +250,12 @@ const CartPage = () => {
         handleOptionChange={handleOptionChange}
       />
 
-      {toastOpen && <Toast>상품을 선택해 주세요!</Toast>}
-
+      <MaterialToast
+        open={toastOpen?.open}
+        setOpen={() => setToastOpen({ open: false, message: '' })}
+        message={toastOpen?.message}
+      />
     </article>
-
   );
 };
 

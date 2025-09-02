@@ -10,6 +10,7 @@ import { IAddress } from '@/types/address';
 import { ADDRESS_INITIAL_VALUE } from '@/constraint/address';
 import { useUserStore } from '@/store/userStore';
 import { addAddressConversion, addressListMapper, updateAddressConversion } from '@/utils/address';
+import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
 
 const AddressPage = () => {
   const { getAddress, addAddress, updateAddress, deleteAddress } = myService;
@@ -19,6 +20,10 @@ const AddressPage = () => {
   const [defaultAddress, setDefaultAddress] = useState<IAddress>(ADDRESS_INITIAL_VALUE);
   const [addressInfo, setAddressInfo] = useState<IAddress>(ADDRESS_INITIAL_VALUE);
   const [modalType, setModalType] = useState<'default' | 'change' | 'add'>('add');
+  const [toastOpen, setToastOpen] = useState<IToastState>({
+    open: false,
+    message: '',
+  });
 
   const { user } = useUserStore();
 
@@ -48,7 +53,7 @@ const AddressPage = () => {
       addAddress(data)
         .then((res) => {
           if (res?.result?.id) {
-            alert('주소록 등록이 완료 되었어요.');
+            setToastOpen({ open: true, message: '주소록 등록이 완료 되었어요!' });
             initAddress();
           }
         })
@@ -87,7 +92,7 @@ const AddressPage = () => {
       .then((res) => {
         if (res) {
           initAddress();
-          alert('변경이 완료 되었어요!');
+          setToastOpen({ open: true, message: '변경이 완료 되었어요!' });
         }
       })
       .catch((error) => {
@@ -99,7 +104,7 @@ const AddressPage = () => {
     deleteAddress(id)
       .then((res) => {
         if (res?.result?.message) {
-          alert(res?.result?.message);
+          setToastOpen({ open: true, message: res?.result?.message });
         }
 
         initAddress();
@@ -197,6 +202,12 @@ const AddressPage = () => {
           onClickSave={onClickAddressSave}
         />
       )}
+
+      <MaterialToast
+        open={toastOpen?.open}
+        setOpen={() => setToastOpen({ open: false, message: '' })}
+        message={toastOpen?.message}
+      />
     </section>
   );
 };

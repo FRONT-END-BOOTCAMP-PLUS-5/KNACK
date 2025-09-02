@@ -16,6 +16,7 @@ import RequestModal from '@/components/address/RequestModal';
 import { Coupon, CheckoutRow, OrderItem, BestCoupon } from '@/types/order';
 import CouponSelectModal from '@/components/Payments/CouponSelectModal';
 import { IAddress } from '@/types/address';
+import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
 
@@ -36,6 +37,10 @@ export default function CheckoutPage() {
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isReqOpen, setReqOpen] = useState(false);
   const [isOpenCouponModal, setOpenCouponModal] = useState(false);
+  const [toastOpen, setToastOpen] = useState<IToastState>({
+    open: false,
+    message: '',
+  });
 
   // 선택된 쿠폰(표시/계산은 전체 coupons 기준)
   const effectiveCouponId =
@@ -63,8 +68,8 @@ export default function CheckoutPage() {
     // 3) 해당 상품군 합계(쿠폰 타깃 금액)
     const targetSum = isCouponApplicable
       ? orderItems
-        .filter((it) => it.productId === selectedCoupon!.productId)
-        .reduce((s, it) => s + it.price * it.quantity, 0)
+          .filter((it) => it.productId === selectedCoupon!.productId)
+          .reduce((s, it) => s + it.price * it.quantity, 0)
       : 0;
 
     // 4) 쿠폰 할인금액 (과할인 방지)
@@ -121,7 +126,7 @@ export default function CheckoutPage() {
   // ----- save request message -----
   const handleSaveRequestMessage = async () => {
     if (!selectedAddress?.id) {
-      alert('주소가 선택되지 않았습니다.');
+      setToastOpen({ open: true, message: '주소가 선택되지 않았어요!' });
       return;
     }
     try {
@@ -130,14 +135,14 @@ export default function CheckoutPage() {
       });
     } catch (e) {
       console.error('요청사항 저장 실패', e);
-      alert('요청사항 저장 중 오류가 발생했습니다.');
+      setToastOpen({ open: true, message: '저장 중에 오류가 발생했어요.' });
     }
   };
 
   // ----- payment -----
   const handlePayment = async () => {
-    if (!orderItems.length) return alert('상품을 선택해주세요.');
-    if (!selectedAddress) return alert('주소지를 선택해주세요.');
+    if (!orderItems.length) return setToastOpen({ open: true, message: '상품을 선택해주세요.' });
+    if (!selectedAddress) return setToastOpen({ open: true, message: '주소지를 선택해주세요.' });
 
     try {
       await handleSaveRequestMessage();
@@ -162,15 +167,16 @@ export default function CheckoutPage() {
       await toss.requestPayment('카드', {
         amount: totalPrice,
         orderId: `order_${Date.now()}`, // 권장: 서버에서 선발급한 orderNumber 사용
-        orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''
-          } 주문`,
+        orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${
+          orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''
+        } 주문`,
         customerName: selectedAddress.name || '홍길동',
         successUrl: `${window.location.origin}/payments/success`,
         failUrl: `${window.location.origin}/payments/failure`,
       });
     } catch (e) {
       console.error(e);
-      alert('결제 실패');
+      setToastOpen({ open: true, message: '결제에 실패 했어요.' });
     }
   };
 
@@ -181,7 +187,7 @@ export default function CheckoutPage() {
     if (!raw) return;
     try {
       const parsed: CheckoutRow[] = JSON.parse(raw);
-      const cartIds = parsed.map(p => p.cartId).filter(Boolean);
+      const cartIds = parsed.map((p) => p.cartId).filter(Boolean);
       sessionStorage.setItem('cartIds', JSON.stringify(cartIds));
       setCheckout(parsed);
     } catch (e) {
@@ -201,19 +207,19 @@ export default function CheckoutPage() {
         const items: OrderItem[] = results.flatMap((p, i) =>
           p
             ? [
-              {
-                productId: p.id,
-                price: p.price,
-                quantity: checkout[i].quantity,
-                thumbnail_image: p.thumbnailImage,
-                deliveryType: checkout[i].deliveryMethod,
-                kor_name: p.korName,
-                eng_name: p.engName,
-                optionValue: p?.productOptionMappings[0]?.optionType?.optionValue?.find(
-                  (item) => item?.id === checkout[i]?.optionValueId
-                ),
-              },
-            ]
+                {
+                  productId: p.id,
+                  price: p.price,
+                  quantity: checkout[i].quantity,
+                  thumbnail_image: p.thumbnailImage,
+                  deliveryType: checkout[i].deliveryMethod,
+                  kor_name: p.korName,
+                  eng_name: p.engName,
+                  optionValue: p?.productOptionMappings[0]?.optionType?.optionValue?.find(
+                    (item) => item?.id === checkout[i]?.optionValueId
+                  ),
+                },
+              ]
             : []
         );
 
@@ -236,7 +242,7 @@ export default function CheckoutPage() {
         const fetched = couponRes?.result ?? couponRes ?? [];
 
         // 구매한 상품 ID 목록
-        const purchasedProductIds = new Set(orderItems.map(item => item.productId));
+        const purchasedProductIds = new Set(orderItems.map((item) => item.productId));
 
         // 구매한 상품에 적용 가능한 쿠폰만 필터링
         const validCoupons = fetched.filter((coupon: Coupon) => purchasedProductIds.has(coupon.productId));
@@ -354,6 +360,7 @@ export default function CheckoutPage() {
       <PointSection
         availablePoints={availablePoints}
         maxUsablePoints={totalBeforePoints} // 🔥 추가
+        setToastOpen={setToastOpen}
         onChange={(p) => setPoints(Math.max(0, Math.min(p, totalBeforePoints)))} // 🔥 캡 적용
       />
 
@@ -374,14 +381,13 @@ export default function CheckoutPage() {
           selectedAddress={
             selectedAddress
               ? {
-                ...selectedAddress,
-                message: selectedAddress.message,
-              }
+                  ...selectedAddress,
+                  message: selectedAddress.message,
+                }
               : null
           }
           onChangeSelected={(a: IAddress) => {
-            const zip =
-              a.address.zipCode ?? '';
+            const zip = a.address.zipCode ?? '';
 
             if (!a?.id) return; // Early return if no valid address
 
@@ -413,6 +419,12 @@ export default function CheckoutPage() {
           setSelectedAddress(updated);
           sessionStorage.setItem('selectedAddress', JSON.stringify(updated));
         }}
+      />
+
+      <MaterialToast
+        open={toastOpen?.open}
+        setOpen={() => setToastOpen({ open: false, message: '' })}
+        message={toastOpen?.message}
       />
     </main>
   );

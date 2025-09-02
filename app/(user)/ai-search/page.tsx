@@ -13,6 +13,7 @@ import BottomSheet from '@/components/common/BottomSheet';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import Text from '@/components/common/Text';
 import Link from 'next/link';
+import MaterialToast from '@/components/common/MaterialToast';
 
 interface ImageDataPart {
   inlineData: {
@@ -37,10 +38,14 @@ const AiSearchPage = () => {
   const [product, setProduct] = useState<IProduct>();
   const [uploadImage, setUploadImage] = useState<string | ArrayBuffer | null>();
   const [thumbnailList, setThumbnailList] = useState<Base64ImageState[]>([]);
+  const [toastOpen, setToastOpen] = useState({
+    open: false,
+    message: '',
+  });
 
   const aiHandler = async () => {
     if (!uploadImage) {
-      return alert('찾으실 상품 이미지를 올려주세요!');
+      return;
     }
 
     setLoading(true);
@@ -68,7 +73,7 @@ const AiSearchPage = () => {
     try {
       getProduct(Number(response.text) ?? 0).then((res) => {
         if (!res.result) {
-          alert('이미지를 찾지 못했어요... 다시 시도해주세요!');
+          setToastOpen({ open: true, message: '이미지를 찾지 못했어요... 다시 시도해주세요!' });
           onClose();
           return;
         }
@@ -178,6 +183,12 @@ const AiSearchPage = () => {
           </Flex>
         </section>
       </BottomSheet>
+
+      <MaterialToast
+        open={toastOpen?.open}
+        setOpen={() => setToastOpen({ open: false, message: '' })}
+        message={toastOpen?.message}
+      />
     </section>
   );
 };
