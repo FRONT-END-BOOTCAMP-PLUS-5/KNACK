@@ -8,18 +8,16 @@ import Image from 'next/image';
 import { AddressAddModal } from '../AddressAddModal';
 import { AddressModalProps } from '@/types/order';
 import { IAddress } from '@/types/address';
-import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 export default function AddressModal({ onClose, selectedAddress, onChangeSelected }: AddressModalProps) {
-  const [saved, setSaved] = useState<IAddress[]>([]);
-  const selectedId = selectedAddress?.id ?? 0;
+  const { setOnToast } = useToastStore();
 
+  const [saved, setSaved] = useState<IAddress[]>([]);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [editing, setEditing] = useState<IAddress | null>(null);
-  const [toastOpen, setToastOpen] = useState<IToastState>({
-    open: false,
-    message: '',
-  });
+
+  const selectedId = selectedAddress?.id ?? 0;
 
   // 주소 목록 로드 함수 분리 (재사용)
   const loadAddresses = async () => {
@@ -98,7 +96,7 @@ export default function AddressModal({ onClose, selectedAddress, onChangeSelecte
         });
       }
     } catch {
-      setToastOpen({ open: true, message: '삭제에 실패했어요.' });
+      setOnToast(true, '삭제에 실패했어요.');
     }
   };
 
@@ -207,12 +205,6 @@ export default function AddressModal({ onClose, selectedAddress, onChangeSelecte
           }}
         />
       )}
-
-      <MaterialToast
-        open={toastOpen?.open}
-        setOpen={() => setToastOpen({ open: false, message: '' })}
-        message={toastOpen?.message}
-      />
     </div>
   );
 }

@@ -14,7 +14,7 @@ import { IBrandLikeList } from '@/types/like';
 import { useLikeStore } from '@/store/likeStore';
 import { useUserStore } from '@/store/userStore';
 import { useRouter } from 'next/navigation';
-import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 interface IProps {
   brandData?: IBrand;
@@ -23,9 +23,10 @@ interface IProps {
 const BrandInfo = ({ brandData }: IProps) => {
   const router = useRouter();
   const { user } = useUserStore();
+  const { setOnToast } = useToastStore();
+
   const { addBrandLike, getBrandLikes, deleteBrandLike } = likeService;
   const [likedCheck, setLikedCheck] = useState(false);
-  const [toastOpen, setToastOpen] = useState<IToastState>({ open: false, message: '' });
 
   const { productDetailBrandLike: storeLike, setProductDetailBrandLike: setStoreLike } = useLikeStore();
 
@@ -59,7 +60,7 @@ const BrandInfo = ({ brandData }: IProps) => {
       deleteBrandLike(id)
         .then((res) => {
           if (res.status === 200) {
-            setToastOpen({ open: true, message: '삭제가 완료 되었어요!' });
+            setOnToast(true, '삭제가 완료 되었어요!');
             setStoreLike(storeLike.count - 1, false);
             setLikedCheck(!likedCheck);
           }
@@ -68,7 +69,7 @@ const BrandInfo = ({ brandData }: IProps) => {
           console.log('error', error.message);
         });
     },
-    [deleteBrandLike, setStoreLike, storeLike.count, likedCheck]
+    [deleteBrandLike, setOnToast, setStoreLike, storeLike.count, likedCheck]
   );
 
   const handleAddBrandLike = useCallback(
@@ -81,7 +82,7 @@ const BrandInfo = ({ brandData }: IProps) => {
           .then((res) => {
             if (res.status === 200) {
               setStoreLike(storeLike.count + 1, true);
-              setToastOpen({ open: true, message: '관심 브랜드에 저장되었어요!', link: '/saved?tab=brand' });
+              setOnToast(true, '관심 브랜드에 저장되었어요!', '/saved?tab=brand');
               setLikedCheck(!likedCheck);
             }
           })
@@ -122,12 +123,6 @@ const BrandInfo = ({ brandData }: IProps) => {
       <button className={styles.brand_like_button} onClick={() => handleAddBrandLike(brandData?.id ?? 0)}>
         <Image src={storeLike?.status ? onBookMark : bookmark} alt="좋아요" width={22} height={22} />
       </button>
-
-      <MaterialToast
-        open={toastOpen?.open}
-        setOpen={() => setToastOpen({ open: false, message: '' })}
-        message={toastOpen?.message}
-      />
     </article>
   );
 };

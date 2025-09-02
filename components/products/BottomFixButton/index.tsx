@@ -18,7 +18,7 @@ import { useCartStore } from '@/store/cartStore';
 import { useLikeStore } from '@/store/likeStore';
 import { useUserStore } from '@/store/userStore';
 import { useToggleProductLike } from '@/hooks/search/useToggleProductLike';
-import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 interface IProps {
   productData?: IProduct;
@@ -35,14 +35,11 @@ const BottomFixButton = ({ productData }: IProps) => {
   const { storeCarts, setStoreCarts } = useCartStore();
   const { productDetailLike: storeLike, setProductDetailLike: setStoreLike } = useLikeStore();
   const { user } = useUserStore();
+  const { setOnToast } = useToastStore();
 
   const [selectOptionId, setSelectOptionId] = useState(0);
   const [deliveryOptionId, setDeliveryOption] = useState(0);
   const [likedCheck, setLikedCheck] = useState(false);
-  const [toastOpen, setToastOpen] = useState<IToastState>({
-    open: false,
-    message: '',
-  });
 
   const onClickNowBuy = () => {
     if (!user?.id) {
@@ -50,7 +47,7 @@ const BottomFixButton = ({ productData }: IProps) => {
     }
 
     if (!selectOptionId || selectOptionId === 0) {
-      return setToastOpen({ open: true, message: '옵션을 선택해주세요.' });
+      return setOnToast(true, '옵션을 선택해주세요.');
     }
 
     const checkoutData = [
@@ -68,7 +65,7 @@ const BottomFixButton = ({ productData }: IProps) => {
   };
 
   const onClickCart = () => {
-    if (selectOptionId === 0) return setToastOpen({ open: true, message: '옵션을 선택해주세요.' });
+    if (selectOptionId === 0) return setOnToast(true, '옵션을 선택해주세요.');
 
     const cartData = {
       count: 1,
@@ -81,7 +78,7 @@ const BottomFixButton = ({ productData }: IProps) => {
       (item) => item.optionValueId === selectOptionId && item.product?.id === productData?.id
     );
 
-    if (cartDuplicate) return setToastOpen({ open: true, message: '이미 장바구니에 담긴 상품이에요!' });
+    if (cartDuplicate) return setOnToast(true, '이미 장바구니에 담긴 상품이에요!');
 
     upsertCart(cartData)
       .then((res) => {
@@ -90,7 +87,7 @@ const BottomFixButton = ({ productData }: IProps) => {
         }
 
         if (res.status === 200) {
-          setToastOpen({ open: true, message: '장바구니에 담겼어요!', link: '/cart' });
+          setOnToast(true, '장바구니에 담겼어요!', '/cart');
 
           setStoreCarts(cartData);
           onClose();
@@ -128,7 +125,7 @@ const BottomFixButton = ({ productData }: IProps) => {
         toggleProductLike({ isLiked: false, id: productId });
 
         setStoreLike(storeLike.count + 1, true);
-        setToastOpen({ open: true, message: '관심 상품에 저장되었어요!', link: '/saved?tab=product' });
+        setOnToast(true, '관심 상품에 저장되었어요!', '/saved?tab=product');
         setLikedCheck(!likedCheck);
       }
     },
@@ -174,13 +171,6 @@ const BottomFixButton = ({ productData }: IProps) => {
         onClickCart={onClickCart}
         setSelectOptionId={setSelectOptionId}
         setDeliveryOption={setDeliveryOption}
-      />
-
-      <MaterialToast
-        open={toastOpen?.open}
-        setOpen={() => setToastOpen({ open: false, message: '' })}
-        message={toastOpen?.message}
-        link={toastOpen?.link}
       />
     </>
   );

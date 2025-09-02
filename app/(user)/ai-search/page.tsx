@@ -13,7 +13,7 @@ import BottomSheet from '@/components/common/BottomSheet';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import Text from '@/components/common/Text';
 import Link from 'next/link';
-import MaterialToast from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 interface ImageDataPart {
   inlineData: {
@@ -31,6 +31,7 @@ const AiSearchPage = () => {
   const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
 
   const { onOpen, onClose } = useBottomSheetStore();
+  const { setOnToast } = useToastStore();
   const { getProduct, getProductsThumbnail } = productsService;
 
   const [loading, setLoading] = useState(false);
@@ -38,10 +39,6 @@ const AiSearchPage = () => {
   const [product, setProduct] = useState<IProduct>();
   const [uploadImage, setUploadImage] = useState<string | ArrayBuffer | null>();
   const [thumbnailList, setThumbnailList] = useState<Base64ImageState[]>([]);
-  const [toastOpen, setToastOpen] = useState({
-    open: false,
-    message: '',
-  });
 
   const aiHandler = async () => {
     if (!uploadImage) {
@@ -73,7 +70,7 @@ const AiSearchPage = () => {
     try {
       getProduct(Number(response.text) ?? 0).then((res) => {
         if (!res.result) {
-          setToastOpen({ open: true, message: '이미지를 찾지 못했어요... 다시 시도해주세요!' });
+          setOnToast(true, '이미지를 찾지 못했어요... 다시 시도해주세요!');
           onClose();
           return;
         }
@@ -183,12 +180,6 @@ const AiSearchPage = () => {
           </Flex>
         </section>
       </BottomSheet>
-
-      <MaterialToast
-        open={toastOpen?.open}
-        setOpen={() => setToastOpen({ open: false, message: '' })}
-        message={toastOpen?.message}
-      />
     </section>
   );
 };

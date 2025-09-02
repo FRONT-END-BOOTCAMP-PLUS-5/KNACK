@@ -2,16 +2,17 @@
 
 import { useState } from 'react';
 import styles from './PointSection.module.scss';
-import { IToastState } from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 interface IProps {
   availablePoints: number;
   maxUsablePoints: number;
   onChange: (value: number) => void;
-  setToastOpen: (value: IToastState) => void;
 }
 
-export default function PointSection({ availablePoints, maxUsablePoints, onChange, setToastOpen }: IProps) {
+export default function PointSection({ availablePoints, maxUsablePoints, onChange }: IProps) {
+  const { setOnToast } = useToastStore();
+
   const [showModal, setShowModal] = useState(false);
   const [inputValue, setInputValue] = useState<string>('');
 
@@ -21,7 +22,7 @@ export default function PointSection({ availablePoints, maxUsablePoints, onChang
   const handleMaxUse = () => {
     const cap = Math.min(availablePoints, maxUsablePoints);
     if (cap < MIN_POINT_USAGE) {
-      setToastOpen({ open: true, message: `${MIN_POINT_USAGE.toLocaleString()}P 이상부터 사용할 수 있습니다.` });
+      setOnToast(true, `${MIN_POINT_USAGE.toLocaleString()}P 이상부터 사용할 수 있습니다.`);
       return;
     }
     setInputValue(String(cap));

@@ -5,25 +5,21 @@ import { useWithdraw } from '@/hooks/useWithdraw';
 import WithdrawalInfo from '@/components/withdrawal/WithdrawalInfo';
 import WithdrawalForm from '@/components/withdrawal/WithdrawalForm';
 import styles from './withdrawalPage.module.scss';
-import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
-import { useState } from 'react';
+import { useToastStore } from '@/store/toastStore';
 
 export default function WithdrawalPage() {
   const router = useRouter();
   const withdrawMutation = useWithdraw();
 
-  const [toastOpen, setToastOpen] = useState<IToastState>({
-    open: false,
-    message: '',
-  });
+  const { setOnToast } = useToastStore();
 
   const handleWithdraw = async (password: string) => {
     try {
       await withdrawMutation.mutateAsync(password);
-      setToastOpen({ open: true, message: '회원탈퇴가 완료 되었어요.' });
+      setOnToast(true, '회원탈퇴가 완료 되었어요.');
     } catch (error) {
       console.error('회원탈퇴 실패:', error);
-      setToastOpen({ open: true, message: error instanceof Error ? error.message : '회원탈퇴에 실패했어요.' });
+      setOnToast(true, error instanceof Error ? error.message : '회원탈퇴에 실패했어요.');
     }
   };
 
@@ -51,12 +47,6 @@ export default function WithdrawalPage() {
           </div>
         </div>
       </div>
-
-      <MaterialToast
-        open={toastOpen?.open}
-        setOpen={() => setToastOpen({ open: false, message: '' })}
-        message={toastOpen?.message}
-      />
     </main>
   );
 }

@@ -18,12 +18,12 @@ import { useRouter } from 'next/navigation';
 import OptionBottomSheet from '@/components/cart/OptionBottomSheet';
 import SelectOrderInfo from '@/components/cart/SelectOrderInfo';
 import EmptyText from '@/components/saved/EmptyText';
-import Toast from '@/components/common/Toast';
-import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 const CartPage = () => {
   const { getCart, removeCart, removesCart, upsertCart } = cartService;
   const { onOpen, onClose } = useBottomSheetStore();
+  const { setOnToast } = useToastStore();
   const router = useRouter();
 
   const [carts, setCarts] = useState<ICart[]>([]);
@@ -33,10 +33,6 @@ const CartPage = () => {
   const [multiDeleteOpen, setMultiDeleteOpen] = useState(false);
   const [selectedCart, setSelectedCart] = useState<ICart>(CART_INITIAL_VALUE);
   const [selectOptionId, setSelectOptionId] = useState<number>(0);
-  const [toastOpen, setToastOpen] = useState<IToastState>({
-    open: false,
-    message: '',
-  });
 
   const handleRemoveCart = () => {
     removeCart(selectedCart?.id)
@@ -92,7 +88,7 @@ const CartPage = () => {
   };
 
   const onClickMultiRemoveCart = () => {
-    if (selectCarts?.length === 0) return setToastOpen({ open: true, message: '상품을 선택해 주세요!' });
+    if (selectCarts?.length === 0) return setOnToast(true, '상품을 선택해 주세요!');
 
     setMultiDeleteOpen(true);
   };
@@ -113,7 +109,7 @@ const CartPage = () => {
     const targets = Array.isArray(direct) ? direct : direct ? [direct] : selectCarts;
 
     if (!targets.length) {
-      setToastOpen({ open: true, message: '상품을 선택해 주세요!' });
+      setOnToast(true, '상품을 선택해 주세요!');
       return;
     }
 
@@ -248,12 +244,6 @@ const CartPage = () => {
         selectedCart={selectedCart}
         setSelectOptionId={setSelectOptionId}
         handleOptionChange={handleOptionChange}
-      />
-
-      <MaterialToast
-        open={toastOpen?.open}
-        setOpen={() => setToastOpen({ open: false, message: '' })}
-        message={toastOpen?.message}
       />
     </article>
   );

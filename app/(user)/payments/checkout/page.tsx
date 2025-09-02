@@ -16,11 +16,13 @@ import RequestModal from '@/components/address/RequestModal';
 import { Coupon, CheckoutRow, OrderItem, BestCoupon } from '@/types/order';
 import CouponSelectModal from '@/components/Payments/CouponSelectModal';
 import { IAddress } from '@/types/address';
-import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
 
 export default function CheckoutPage() {
+  const { setOnToast } = useToastStore();
+
   // ----- Local UI States (Zustand 제거) -----
   const [checkout, setCheckout] = useState<CheckoutRow[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
@@ -37,10 +39,6 @@ export default function CheckoutPage() {
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isReqOpen, setReqOpen] = useState(false);
   const [isOpenCouponModal, setOpenCouponModal] = useState(false);
-  const [toastOpen, setToastOpen] = useState<IToastState>({
-    open: false,
-    message: '',
-  });
 
   // 선택된 쿠폰(표시/계산은 전체 coupons 기준)
   const effectiveCouponId =
@@ -126,7 +124,7 @@ export default function CheckoutPage() {
   // ----- save request message -----
   const handleSaveRequestMessage = async () => {
     if (!selectedAddress?.id) {
-      setToastOpen({ open: true, message: '주소가 선택되지 않았어요!' });
+      setOnToast(true, '주소가 선택되지 않았어요!');
       return;
     }
     try {
@@ -135,14 +133,14 @@ export default function CheckoutPage() {
       });
     } catch (e) {
       console.error('요청사항 저장 실패', e);
-      setToastOpen({ open: true, message: '저장 중에 오류가 발생했어요.' });
+      setOnToast(true, '저장 중에 오류가 발생했어요.');
     }
   };
 
   // ----- payment -----
   const handlePayment = async () => {
-    if (!orderItems.length) return setToastOpen({ open: true, message: '상품을 선택해주세요.' });
-    if (!selectedAddress) return setToastOpen({ open: true, message: '주소지를 선택해주세요.' });
+    if (!orderItems.length) return setOnToast(true, '상품을 선택해주세요.');
+    if (!selectedAddress) return setOnToast(true, '주소지를 선택해주세요.');
 
     try {
       await handleSaveRequestMessage();
@@ -176,7 +174,7 @@ export default function CheckoutPage() {
       });
     } catch (e) {
       console.error(e);
-      setToastOpen({ open: true, message: '결제에 실패 했어요.' });
+      setOnToast(true, '결제에 실패 했어요.');
     }
   };
 
@@ -360,7 +358,6 @@ export default function CheckoutPage() {
       <PointSection
         availablePoints={availablePoints}
         maxUsablePoints={totalBeforePoints} // 🔥 추가
-        setToastOpen={setToastOpen}
         onChange={(p) => setPoints(Math.max(0, Math.min(p, totalBeforePoints)))} // 🔥 캡 적용
       />
 
@@ -419,12 +416,6 @@ export default function CheckoutPage() {
           setSelectedAddress(updated);
           sessionStorage.setItem('selectedAddress', JSON.stringify(updated));
         }}
-      />
-
-      <MaterialToast
-        open={toastOpen?.open}
-        setOpen={() => setToastOpen({ open: false, message: '' })}
-        message={toastOpen?.message}
       />
     </main>
   );

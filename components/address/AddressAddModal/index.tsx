@@ -8,7 +8,7 @@ import { AddressAddModalProps } from '@/types/order';
 import DaumPostcodeEmbed, { Address } from 'react-daum-postcode';
 import CloseLarge from '@/public/icons/close_large.svg';
 import { IAddress } from '@/types/address';
-import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 const NAME_MIN = 2;
 const NAME_MAX = 50;
@@ -17,16 +17,14 @@ const phonePattern = /^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/;
 export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressAddModalProps) {
   const isEdit = !!editing;
 
+  const { setOnToast } = useToastStore();
+
   const [zipCode, setZipCode] = useState(editing?.address?.zipCode ?? initial?.zipCode ?? '');
   const [main, setMain] = useState(editing?.address?.main ?? initial?.main ?? '');
   const [detail, setDetail] = useState(editing?.detail ?? '');
   const [name, setName] = useState(editing?.name ?? '');
   const [phone, setPhone] = useState(editing?.phone ?? '');
   const [setAsDefault, setSetAsDefault] = useState(!!editing?.isDefault);
-  const [toastOpen, setToastOpen] = useState<IToastState>({
-    open: false,
-    message: '',
-  });
 
   // ⬇️ 새로 추가: 우편번호 검색 모달 열림 상태
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
@@ -103,7 +101,7 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
       onClose();
     } catch (e) {
       console.error(e);
-      setToastOpen({ open: true, message: '주소 저장에 실패했어요.' });
+      setOnToast(true, '주소 저장에 실패했어요.');
     }
   };
 
@@ -213,12 +211,6 @@ export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressA
           />
         </div>
       )}
-
-      <MaterialToast
-        open={toastOpen?.open}
-        setOpen={() => setToastOpen({ open: false, message: '' })}
-        message={toastOpen?.message}
-      />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { WithdrawalAgreements } from '@/types/withdrawal';
 import styles from './withdrawalForm.module.scss';
-import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 interface IProps {
   onSubmit: (password: string) => void;
@@ -11,15 +11,13 @@ interface IProps {
 }
 
 export default function WithdrawalForm({ onSubmit, isPending }: IProps) {
+  const { setOnToast } = useToastStore();
+
   const [password, setPassword] = useState('');
   const [agreements, setAgreements] = useState<WithdrawalAgreements>({
     delete: false,
     retention: false,
     withdraw: false,
-  });
-  const [toastOpen, setToastOpen] = useState<IToastState>({
-    open: false,
-    message: '',
   });
 
   const isAllAgreed = agreements.delete && agreements.retention && agreements.withdraw;
@@ -37,12 +35,12 @@ export default function WithdrawalForm({ onSubmit, isPending }: IProps) {
 
   const handleSubmit = () => {
     if (!password.trim()) {
-      setToastOpen({ open: true, message: '비밀번호를 입력해주세요.' });
+      setOnToast(true, '비밀번호를 입력해주세요.');
       return;
     }
 
     if (!isAllAgreed) {
-      setToastOpen({ open: true, message: '모든 동의 항목에 체크해주세요.' });
+      setOnToast(true, '모든 동의 항목에 체크해주세요.');
       return;
     }
 
@@ -116,12 +114,6 @@ export default function WithdrawalForm({ onSubmit, isPending }: IProps) {
           {isPending ? '탈퇴 처리 중...' : '탈퇴하기'}
         </button>
       </div>
-
-      <MaterialToast
-        open={toastOpen?.open}
-        setOpen={() => setToastOpen({ open: false, message: '' })}
-        message={toastOpen?.message}
-      />
     </div>
   );
 }

@@ -10,20 +10,18 @@ import { IAddress } from '@/types/address';
 import { ADDRESS_INITIAL_VALUE } from '@/constraint/address';
 import { useUserStore } from '@/store/userStore';
 import { addAddressConversion, addressListMapper, updateAddressConversion } from '@/utils/address';
-import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 const AddressPage = () => {
   const { getAddress, addAddress, updateAddress, deleteAddress } = myService;
+
+  const { setOnToast } = useToastStore();
 
   const [open, setOpen] = useState(false);
   const [addressList, setAddressList] = useState<IAddress[]>([]);
   const [defaultAddress, setDefaultAddress] = useState<IAddress>(ADDRESS_INITIAL_VALUE);
   const [addressInfo, setAddressInfo] = useState<IAddress>(ADDRESS_INITIAL_VALUE);
   const [modalType, setModalType] = useState<'default' | 'change' | 'add'>('add');
-  const [toastOpen, setToastOpen] = useState<IToastState>({
-    open: false,
-    message: '',
-  });
 
   const { user } = useUserStore();
 
@@ -53,7 +51,7 @@ const AddressPage = () => {
       addAddress(data)
         .then((res) => {
           if (res?.result?.id) {
-            setToastOpen({ open: true, message: '주소록 등록이 완료 되었어요!' });
+            setOnToast(true, '주소록 등록이 완료 되었어요!');
             initAddress();
           }
         })
@@ -92,7 +90,7 @@ const AddressPage = () => {
       .then((res) => {
         if (res) {
           initAddress();
-          setToastOpen({ open: true, message: '변경이 완료 되었어요!' });
+          setOnToast(true, '변경이 완료 되었어요!');
         }
       })
       .catch((error) => {
@@ -104,7 +102,7 @@ const AddressPage = () => {
     deleteAddress(id)
       .then((res) => {
         if (res?.result?.message) {
-          setToastOpen({ open: true, message: res?.result?.message });
+          setOnToast(true, res?.result?.message);
         }
 
         initAddress();
@@ -202,12 +200,6 @@ const AddressPage = () => {
           onClickSave={onClickAddressSave}
         />
       )}
-
-      <MaterialToast
-        open={toastOpen?.open}
-        setOpen={() => setToastOpen({ open: false, message: '' })}
-        message={toastOpen?.message}
-      />
     </section>
   );
 };

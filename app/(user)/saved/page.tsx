@@ -12,7 +12,7 @@ import RecentlySave from '@/components/saved/RecentlySave';
 import { TABS } from '@/constraint/saved';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useUserStore } from '@/store/userStore';
-import MaterialToast, { IToastState } from '@/components/common/MaterialToast';
+import { useToastStore } from '@/store/toastStore';
 
 interface SAVED_TABS {
   product: string;
@@ -32,10 +32,8 @@ const SavedPage = () => {
   const [likeList, setLikeList] = useState<ILikeList[]>([]);
   const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
   const [recentProducts, setRecentProducts] = useState<IRecentProduct[]>([]);
-  const [toastOpen, setToastOpen] = useState<IToastState>({
-    open: false,
-    message: '',
-  });
+
+  const { setOnToast } = useToastStore();
 
   const handleGetRecentlyProduct = useCallback(
     (ids: string[]) => {
@@ -84,19 +82,19 @@ const SavedPage = () => {
         .then((res) => {
           if (res.status === 200) {
             initLikeBrand();
-            setToastOpen({ open: true, message: '삭제 되었어요!' });
+            setOnToast(true, '삭제 되었어요!');
           }
         })
         .catch((error) => {
           console.log('error', error.message);
         });
     },
-    [deleteBrandLike, initLikeBrand]
+    [deleteBrandLike, initLikeBrand, setOnToast]
   );
 
-  const handleGetLikes = useCallback(() => {
+  const handleGetLikes = useCallback(async () => {
     if (!user?.id) return;
-    getLikes()
+    await getLikes()
       .then((res) => {
         if (res.status === 200) {
           setLikeList(res.result);
@@ -117,14 +115,14 @@ const SavedPage = () => {
         .then((res) => {
           if (res.status === 200) {
             initSave();
-            setToastOpen({ open: true, message: '삭제 되었어요!' });
+            setOnToast(true, '삭제 되었어요!');
           }
         })
         .catch((error) => {
           console.log('error', error.message);
         });
     },
-    [deleteLike, initSave]
+    [deleteLike, initSave, setOnToast]
   );
 
   const handleLikeAdd = useCallback(
@@ -139,7 +137,7 @@ const SavedPage = () => {
         addLike(productId)
           .then((res) => {
             if (res.status === 200) {
-              setToastOpen({ open: true, message: '잘 담겼어요!' });
+              setOnToast(true, '잘 담겼어요!');
               handleGetLikes();
             }
           })
@@ -188,11 +186,6 @@ const SavedPage = () => {
       {selectTab === 2 && (
         <RecentlySave recentProducts={recentProducts} likeList={likeList} onClickSaveAdd={handleLikeAdd} />
       )}
-      <MaterialToast
-        open={toastOpen?.open}
-        setOpen={() => setToastOpen({ open: false, message: '' })}
-        message={toastOpen?.message}
-      />
     </section>
   );
 };
