@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     const cartRepository = new PrCartRepository(body);
-    const cart = new CreateCartUseCase(cartRepository).create(body.id, session?.user?.id);
+    const cart = await new CreateCartUseCase(cartRepository).create(body.id, session?.user?.id);
 
     return NextResponse.json({ result: cart, status: 200 });
   } catch (err) {

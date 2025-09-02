@@ -10,9 +10,12 @@ import { IAddress } from '@/types/address';
 import { ADDRESS_INITIAL_VALUE } from '@/constraint/address';
 import { useUserStore } from '@/store/userStore';
 import { addAddressConversion, addressListMapper, updateAddressConversion } from '@/utils/address';
+import { useToastStore } from '@/store/toastStore';
 
 const AddressPage = () => {
   const { getAddress, addAddress, updateAddress, deleteAddress } = myService;
+
+  const { setOnToast } = useToastStore();
 
   const [open, setOpen] = useState(false);
   const [addressList, setAddressList] = useState<IAddress[]>([]);
@@ -48,7 +51,7 @@ const AddressPage = () => {
       addAddress(data)
         .then((res) => {
           if (res?.result?.id) {
-            alert('주소록 등록이 완료 되었어요.');
+            setOnToast(true, '주소록 등록이 완료 되었어요!');
             initAddress();
           }
         })
@@ -87,7 +90,7 @@ const AddressPage = () => {
       .then((res) => {
         if (res) {
           initAddress();
-          alert('변경이 완료 되었어요!');
+          setOnToast(true, '변경이 완료 되었어요!');
         }
       })
       .catch((error) => {
@@ -99,7 +102,7 @@ const AddressPage = () => {
     deleteAddress(id)
       .then((res) => {
         if (res?.result?.message) {
-          alert(res?.result?.message);
+          setOnToast(true, res?.result?.message);
         }
 
         initAddress();

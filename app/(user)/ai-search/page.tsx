@@ -13,6 +13,7 @@ import BottomSheet from '@/components/common/BottomSheet';
 import { useBottomSheetStore } from '@/store/bottomSheetStore';
 import Text from '@/components/common/Text';
 import Link from 'next/link';
+import { useToastStore } from '@/store/toastStore';
 
 interface ImageDataPart {
   inlineData: {
@@ -30,6 +31,7 @@ const AiSearchPage = () => {
   const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
 
   const { onOpen, onClose } = useBottomSheetStore();
+  const { setOnToast } = useToastStore();
   const { getProduct, getProductsThumbnail } = productsService;
 
   const [loading, setLoading] = useState(false);
@@ -40,7 +42,7 @@ const AiSearchPage = () => {
 
   const aiHandler = async () => {
     if (!uploadImage) {
-      return alert('찾으실 상품 이미지를 올려주세요!');
+      return;
     }
 
     setLoading(true);
@@ -68,7 +70,7 @@ const AiSearchPage = () => {
     try {
       getProduct(Number(response.text) ?? 0).then((res) => {
         if (!res.result) {
-          alert('이미지를 찾지 못했어요... 다시 시도해주세요!');
+          setOnToast(true, '이미지를 찾지 못했어요... 다시 시도해주세요!');
           onClose();
           return;
         }

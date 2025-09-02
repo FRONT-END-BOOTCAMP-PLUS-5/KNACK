@@ -12,6 +12,7 @@ import RecentlySave from '@/components/saved/RecentlySave';
 import { TABS } from '@/constraint/saved';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useUserStore } from '@/store/userStore';
+import { useToastStore } from '@/store/toastStore';
 
 interface SAVED_TABS {
   product: string;
@@ -22,13 +23,17 @@ interface SAVED_TABS {
 const SavedPage = () => {
   const { user } = useUserStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const { addLike, deleteLike, getLikes, deleteBrandLike, getBrandLikes } = likeService;
   const { getRecentlyProductList } = productsService;
+
   const [selectTab, setSelectTab] = useState(0);
   const [likeList, setLikeList] = useState<ILikeList[]>([]);
   const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
   const [recentProducts, setRecentProducts] = useState<IRecentProduct[]>([]);
-  const searchParams = useSearchParams();
+
+  const { setOnToast } = useToastStore();
 
   const handleGetRecentlyProduct = useCallback(
     (ids: string[]) => {
@@ -77,19 +82,19 @@ const SavedPage = () => {
         .then((res) => {
           if (res.status === 200) {
             initLikeBrand();
-            alert('삭제완료!');
+            setOnToast(true, '삭제 되었어요!');
           }
         })
         .catch((error) => {
           console.log('error', error.message);
         });
     },
-    [deleteBrandLike, initLikeBrand]
+    [deleteBrandLike, initLikeBrand, setOnToast]
   );
 
-  const handleGetLikes = useCallback(() => {
+  const handleGetLikes = useCallback(async () => {
     if (!user?.id) return;
-    getLikes()
+    await getLikes()
       .then((res) => {
         if (res.status === 200) {
           setLikeList(res.result);
@@ -110,14 +115,14 @@ const SavedPage = () => {
         .then((res) => {
           if (res.status === 200) {
             initSave();
-            alert('삭제완료!');
+            setOnToast(true, '삭제 되었어요!');
           }
         })
         .catch((error) => {
           console.log('error', error.message);
         });
     },
-    [deleteLike, initSave]
+    [deleteLike, initSave, setOnToast]
   );
 
   const handleLikeAdd = useCallback(
@@ -132,7 +137,7 @@ const SavedPage = () => {
         addLike(productId)
           .then((res) => {
             if (res.status === 200) {
-              alert('잘 담겼어요!');
+              setOnToast(true, '잘 담겼어요!');
               handleGetLikes();
             }
           })

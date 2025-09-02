@@ -4,9 +4,9 @@ import { IAddress } from './address';
 
 /* ---------- 장바구니/주문 ---------- */
 
-export const STEPS = ["구매 확정", "배송 대기", "배송 중", "배송 완료"] as const;
+export const STEPS = ['구매 확정', '배송 대기', '배송 중', '배송 완료'] as const;
 export type Tab = 'all' | 'progress' | 'done';
-export type Step = typeof STEPS[number];
+export type Step = (typeof STEPS)[number];
 
 export interface FilterItem {
   inProgress: BuyingItem[];
@@ -79,7 +79,7 @@ export type ComputeTotalsOrder = {
   shipFee?: number;
   couponPrice?: number;
   point?: number;
-}
+};
 
 export interface RepresentativeProduct {
   id: number;
@@ -137,7 +137,7 @@ export type RepoIndependentOrder = {
   product?: { korName?: string | null; engName?: string | null; thumbnailImage?: string | null } | null;
   optionValue?: { id: number; name: string; value?: string } | null;
   address?: RepoAddress | null;
-}
+};
 
 export type DtoStatus = 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
 
@@ -145,13 +145,13 @@ export type BuyingPageProps = { params: Promise<{ id: string }> };
 
 const addressSelect = {
   id: true,
-  name: true,      // or name
-  phone: true,         // or phoneNumber
-  zipCode: true,       // or postalCode
-  main: true,      // or line1 / address
-  detail: true,      // or line2 / detailAddress
-  message: true,       // 배송 요청사항
-} as const
+  name: true, // or name
+  phone: true, // or phoneNumber
+  zipCode: true, // or postalCode
+  main: true, // or line1 / address
+  detail: true, // or line2 / detailAddress
+  message: true, // 배송 요청사항
+} as const;
 
 // 기존 아이템 그래프 include (관계명은 스키마에 맞게)
 export const graphInclude = {
@@ -169,7 +169,7 @@ export const graphInclude = {
       tracking: true,
       createdAt: true,
       deliveryStatus: true,
-      count: true,          // or quantity
+      count: true, // or quantity
       paymentId: true,
       couponPrice: true,
       point: true,
@@ -191,7 +191,7 @@ export const graphInclude = {
       },
     },
   },
-} as const
+} as const;
 
 export type RepoOrder = {
   orderItems?: RepoOrderItem[];
@@ -214,7 +214,7 @@ export type RepoOrderItem = {
   payment: {
     paymentNumber: bigint;
     status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
-  }
+  };
   price: number | bigint;
   salePrice?: number | bigint;
   quantity?: number;
@@ -247,15 +247,15 @@ export type ProcessedPayment = {
 // (선택) 카드 저장이 필요하면 CardRepository 타입을 추가로 주입
 export interface CardRepository {
   save(dto: {
-    paymentId: number
-    issuerCode?: string | null
-    acquirerCode?: string | null
-    number?: string | null
-    installmentPlanMonths?: number | null
-    approveNo?: string | null
-    useCardPoint?: boolean | null
-    isInterestFree?: boolean | null
-  }): Promise<void>
+    paymentId: number;
+    issuerCode?: string | null;
+    acquirerCode?: string | null;
+    number?: string | null;
+    installmentPlanMonths?: number | null;
+    approveNo?: string | null;
+    useCardPoint?: boolean | null;
+    isInterestFree?: boolean | null;
+  }): Promise<void>;
 }
 
 /* ---------- 주소 ---------- */
@@ -289,13 +289,6 @@ export type AddressModalProps = {
   onClose: () => void;
   selectedAddress: IAddress | null;
   onChangeSelected: (addr: IAddress) => void;
-};
-
-/* ---------- 포인트/결제 요약 ---------- */
-export type PointSectionProps = {
-  availablePoints: number;
-  maxUsablePoints: number;
-  onChange: (value: number) => void;
 };
 
 export interface PaymentFooterProps {

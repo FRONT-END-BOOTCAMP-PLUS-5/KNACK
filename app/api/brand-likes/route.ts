@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     const brandLikesRepository = new PrBrandLikesRepository();
-    const brandLikes = new CreateBrandLikesUseCase(brandLikesRepository).insert(session.user.id, body.id);
+    const brandLikes = await new CreateBrandLikesUseCase(brandLikesRepository).insert(session.user.id, body.id);
 
     return NextResponse.json({ result: brandLikes, status: 200 });
   } catch (err) {
@@ -38,7 +38,7 @@ export async function DELETE(request: NextRequest) {
     const body = await request.json();
 
     const brandLikesRepository = new PrBrandLikesRepository();
-    const brandLikes = new DeleteBrandLikesUseCase(brandLikesRepository).delete(body.id, session?.user?.id);
+    const brandLikes = await new DeleteBrandLikesUseCase(brandLikesRepository).delete(body.id, session?.user?.id);
 
     return NextResponse.json({ result: brandLikes, status: 200 });
   } catch (error) {
