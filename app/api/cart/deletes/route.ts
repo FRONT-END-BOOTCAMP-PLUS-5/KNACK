@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     const cartRepository = new PrCartRepository(body);
-    const cart = new DeletesCartUseCase(cartRepository).delete(body.ids);
+    const cart = await new DeletesCartUseCase(cartRepository).delete(body.ids);
 
     return NextResponse.json({ result: cart, status: 200 });
   } catch (err) {
