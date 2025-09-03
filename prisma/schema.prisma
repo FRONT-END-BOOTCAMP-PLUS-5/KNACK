@@ -324,7 +324,7 @@ model Payment {
   userId         String    @map("user_id") @db.Uuid
   price          Int?      @default(0)
   createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  paymentNumber  BigInt    @map("payment_number")
+  paymentNumber  String    @map("payment_number") @db.VarChar
   addressId      Int       @map("address_id")
   approvedAt     DateTime? @map("approved_at") @db.Timestamptz(6)
   method         String    @db.VarChar
