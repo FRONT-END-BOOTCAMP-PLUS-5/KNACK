@@ -19,6 +19,7 @@ export class PrPaymentRepository implements PaymentRepository {
     tossPaymentKey: string;
   }): Promise<PaymentRecord> {
     // tossPaymentKey UNIQUE로 선점(upsert)
+
     const row = await prisma.payment.upsert({
       where: { tossPaymentKey },
       create: {
@@ -27,7 +28,7 @@ export class PrPaymentRepository implements PaymentRepository {
         price: amount,
         status: 'CONFIRMING',
         tossPaymentKey,
-        paymentNumber: await String(this.generateTodayPaymentNumber()),
+        paymentNumber: await this.generateTodayPaymentNumber(),
         method: 'CARD',
       },
       update: {}, // 존재 판단만
@@ -127,32 +128,17 @@ export class PrPaymentRepository implements PaymentRepository {
   }
 
   async generateTodayPaymentNumber(): Promise<string> {
-    const todayPrefix = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // 예: '20250806'
-    const base = String(parseInt(todayPrefix) * 1e8); // 예: 2025080600000000
-    const max = String(parseInt(todayPrefix) * 1e8 + 99999999);
-
     const latestPayment = await prisma.payment.findFirst({
-      where: {
-        paymentNumber: {
-          gte: base,
-          lt: max, // 오늘 날짜 범위 내
-        },
-      },
       orderBy: {
-        paymentNumber: 'desc',
+        createdAt: 'desc',
       },
       select: {
-        paymentNumber: true,
+        tossPaymentKey: true,
       },
     });
 
-    let nextSequence = 1;
-    if (latestPayment) {
-      const latestSeq = Number(latestPayment.paymentNumber) % 1e8;
-      nextSequence = latestSeq + 1;
-    }
+    const paymentNumber = latestPayment?.tossPaymentKey ? latestPayment?.tossPaymentKey?.substring(5, 19) : '0';
 
-    const paymentNumber = String(Number(base) + nextSequence);
     return paymentNumber;
   }
 
