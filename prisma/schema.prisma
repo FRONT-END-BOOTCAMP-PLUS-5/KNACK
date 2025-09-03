@@ -21,14 +21,14 @@ model User {
   isActive       Boolean         @default(true) @map("is_active")
   nickname       String          @db.VarChar
   addresses      Address[]
+  brandLike      BrandLike[]
   carts          Cart[]
   couponMappings CouponMapping[]
-  productLike    ProductLike[]
   orders         Order[]
   payments       Payment[]
+  productLike    ProductLike[]
   reviews        Review[]
   userAuths      UserAuth[]
-  brandLike      BrandLike[]
 
   @@map("users")
 }
@@ -83,58 +83,56 @@ model RelatedProduct {
 }
 
 model Product {
-  id              Int       @id @default(autoincrement())
-  descriptionText String?   @map("description_text") @db.VarChar
-  thumbnailImage  String    @map("thumbnail_image") @db.VarChar
-  subImages       String?   @map("sub_images") @db.VarChar
-  price           Int?      @default(0)
-  discountPercent Int?      @default(0) @map("discount_percent")
-  detailImages    String?   @map("detail_images") @db.VarChar
-  topImages       String?   @map("top_images") @db.VarChar
-  brandId         Int       @map("brand_id")
-  categoryId      Int       @map("category_id")
-  isRecommended   Boolean   @default(false) @map("is_recommended")
-  isPrivate       Boolean   @default(true) @map("is_private")
-  createdAt       DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  gender          String?   @default("all") @db.VarChar
-  hit             Int?      @default(0)
-  engName         String    @map("eng_name") @db.VarChar
-  korName         String    @map("kor_name") @db.VarChar
-  subCategoryId   Int       @map("sub_category_id")
-  modelNumber     String?   @map("model_number")
-  releaseDate     String?   @map("release_date") @db.VarChar
-  colorKorName    String    @map("color_kor_name") @db.VarChar
-  colorEngName    String    @map("color_eng_name") @db.VarChar
-  keywordColorId  Int      @map("keyword_color_id")
-
+  id                               Int                    @id @default(autoincrement())
+  descriptionText                  String?                @map("description_text") @db.VarChar
+  thumbnailImage                   String                 @map("thumbnail_image") @db.VarChar
+  subImages                        String?                @map("sub_images") @db.VarChar
+  price                            Int?                   @default(0)
+  discountPercent                  Int?                   @default(0) @map("discount_percent")
+  brandId                          Int                    @map("brand_id")
+  categoryId                       Int                    @map("category_id")
+  isRecommended                    Boolean                @default(false) @map("is_recommended")
+  isPrivate                        Boolean                @default(true) @map("is_private")
+  createdAt                        DateTime?              @default(now()) @map("created_at") @db.Timestamptz(6)
+  gender                           String?                @default("all") @db.VarChar
+  hit                              Int?                   @default(0)
+  engName                          String                 @map("eng_name") @db.VarChar
+  korName                          String                 @map("kor_name") @db.VarChar
+  subCategoryId                    Int                    @map("sub_category_id")
+  colorEngName                     String                 @map("color_eng_name") @db.VarChar
+  colorKorName                     String                 @map("color_kor_name") @db.VarChar
+  modelNumber                      String?                @map("model_number")
+  releaseDate                      String?                @map("release_date") @db.VarChar
+  detailImages                     String?                @map("detail_images") @db.VarChar
+  topImages                        String?                @map("top_images") @db.VarChar
+  keywordColorId                   Int                    @map("keyword_color_id")
+  carts                            Cart[]
   coupons                          Coupon[]
   inquires                         Inquiry[]
-  productLike                      ProductLike[]
   orders                           Order[]
+  productLike                      ProductLike[]
   productOptionMappings            ProductOptionMapping[]
+  productStockMapping              ProductStockMapping[]
   brand                            Brand                  @relation(fields: [brandId], references: [id])
   category                         Category               @relation(fields: [categoryId], references: [id])
+  optionValue                      OptionValue            @relation(fields: [keywordColorId], references: [id])
+  subCategory                      SubCategory            @relation(fields: [subCategoryId], references: [id])
   relatedProducts_ProductRelated   RelatedProduct[]       @relation("ProductRelated")
   relatedProducts_RelatedToProduct RelatedProduct[]       @relation("RelatedToProduct")
   reviews                          Review[]
-  carts                            Cart[]
-  subCategory                      SubCategory            @relation(fields: [subCategoryId], references: [id])
-  productStockMapping              ProductStockMapping[]
-  optionValue                      OptionValue            @relation(fields: [keywordColorId], references: [id])
 
   @@map("products")
 }
 
 model ProductStockMapping {
-  id            Int @id @default(autoincrement())
-  productId     Int @map("product_id")
-  stock         Int @default(0)
-  optionTypeId  Int @map("option_type_id")
-  optionValueId Int @map("option_value_id")
-
-  product     Product     @relation(fields: [productId], references: [id])
-  optionType  OptionType  @relation(fields: [optionTypeId], references: [id])
-  optionValue OptionValue @relation(fields: [optionValueId], references: [id])
+  id            Int         @id @default(autoincrement())
+  productId     Int         @map("product_id")
+  stock         Int         @default(0)
+  optionTypeId  Int         @map("option_type_id")
+  optionValueId Int         @map("option_value_id")
+  optionType    OptionType  @relation(fields: [optionTypeId], references: [id])
+  optionValue   OptionValue @relation(fields: [optionValueId], references: [id])
+  product       Product     @relation(fields: [productId], references: [id])
 
   @@map("product_stock_mappings")
 }
@@ -188,7 +186,6 @@ model Inquiry {
 }
 
 model Review {
-  id           Int       @id @default(autoincrement())
   userId       String    @map("user_id") @db.Uuid
   productId    Int       @map("product_id")
   contents     String    @db.VarChar
@@ -196,10 +193,10 @@ model Review {
   reviewImages String?   @map("review_images") @db.VarChar
   createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   orderId      Int       @map("order_id")
-
+  id           Int       @id @default(autoincrement())
+  order        Order     @relation(fields: [orderId], references: [id])
   product      Product   @relation(fields: [productId], references: [id])
   user         User      @relation(fields: [userId], references: [id])
-  order        Order     @relation(fields: [orderId], references: [id])
 
   @@map("reviews")
 }
@@ -208,8 +205,8 @@ model OptionType {
   id                    Int                    @id @default(autoincrement())
   name                  String                 @db.VarChar
   isPrivate             Boolean                @default(true) @map("is_private")
-  productOptionMappings ProductOptionMapping[]
   optionValue           OptionValue[]
+  productOptionMappings ProductOptionMapping[]
   productStockMapping   ProductStockMapping[]
 
   @@map("option_types")
@@ -220,36 +217,33 @@ model OptionValue {
   isPrivate           Boolean               @default(true) @map("is_private")
   name                String                @db.VarChar
   typeId              Int                   @map("type_id")
-
-  optionTypes         OptionType            @relation(fields: [typeId], references: [id])
   cart                Cart[]
+  optionTypes         OptionType            @relation(fields: [typeId], references: [id])
+  order               Order[]
   productStockMapping ProductStockMapping[]
   product             Product[]
-  order               Order[]
 
   @@map("option_values")
 }
 
 model ProductOptionMapping {
-  id           Int @id @default(autoincrement())
-  productId    Int @map("product_id")
-  optionTypeId Int @map("option_type_id")
-
-  optionType OptionType @relation(fields: [optionTypeId], references: [id])
-  product    Product    @relation(fields: [productId], references: [id])
+  id           Int        @id @default(autoincrement())
+  productId    Int        @map("product_id")
+  optionTypeId Int        @map("option_type_id")
+  optionType   OptionType @relation(fields: [optionTypeId], references: [id])
+  product      Product    @relation(fields: [productId], references: [id])
 
   @@map("product_option_mappings")
 }
 
 model Brand {
-  id        Int       @id @default(autoincrement())
-  korName   String    @map("kor_name") @db.VarChar
-  engName   String    @map("eng_name") @db.VarChar
-  logoImage String    @map("logo_image") @db.VarChar
-  isPrivate Boolean   @default(true) @map("is_private")
-
-  products  Product[]
+  id        Int         @id @default(autoincrement())
+  logoImage String      @map("logo_image") @db.VarChar
+  isPrivate Boolean     @default(true) @map("is_private")
+  engName   String      @map("eng_name") @db.VarChar
+  korName   String      @map("kor_name") @db.VarChar
   brandLike BrandLike[]
+  products  Product[]
 
   @@map("brands")
 }
@@ -268,65 +262,59 @@ model Category {
 
 model SubCategory {
   id         Int       @id @default(autoincrement())
-  engName    String    @map("eng_name") @db.VarChar
-  korName    String    @map("kor_name") @db.VarChar
   categoryId Int       @map("category_id")
   createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   isPrivate  Boolean   @default(true) @map("is_private")
-  image      String?   @db.VarChar 
-
-  category   Category  @relation(fields: [categoryId], references: [id])
+  engName    String    @map("eng_name") @db.VarChar
+  korName    String    @map("kor_name") @db.VarChar
+  image      String?   @db.VarChar
   products   Product[]
+  category   Category  @relation(fields: [categoryId], references: [id])
 
   @@map("sub_categories")
 }
 
 model ProductLike {
-  userId        String         @map("user_id") @db.Uuid
-  productId     Int            @map("product_id")
-  createdAt     DateTime?      @default(now()) @map("created_at") @db.Timestamptz(6)
-  product       Product        @relation(fields: [productId], references: [id])
-  user          User           @relation(fields: [userId], references: [id])
+  userId    String    @map("user_id") @db.Uuid
+  productId Int       @map("product_id")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  product   Product   @relation(fields: [productId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 
   @@id([userId, productId])
   @@map("product_likes")
 }
 
 model BrandLike {
-  userId        String         @map("user_id") @db.Uuid
-  brandId       Int            @map("brand_id")
-  createdAt     DateTime?      @default(now()) @map("created_at") @db.Timestamptz(6)
-
-  user          User           @relation(fields: [userId], references: [id])
-  brand         Brand          @relation(fields: [brandId], references: [id])
+  userId    String    @map("user_id") @db.Uuid
+  brandId   Int       @map("brand_id")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  brand     Brand     @relation(fields: [brandId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 
   @@id([userId, brandId])
   @@map("brand_likes")
-
 }
 
 model Order {
-  id             Int       @id @default(autoincrement())
-  userId         String    @map("user_id") @db.Uuid
-  productId      Int       @map("product_id")
-  price          Int?      @default(0)
-  salePrice      Int?      @default(0) @map("sale_price")
-  tracking       String?   @db.VarChar
-  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  deliveryStatus Int?      @map("delivery_status")
-  count          Int?      @default(0)
-  paymentId      Int?      @map("payment_id")
-  optionValueId  Int       @map("option_value_id")
-  point          Int       @default(0)
-  couponPrice    Int       @map("coupon_price") @default(0)
-  
-
+  id             Int         @id @default(autoincrement())
+  userId         String      @map("user_id") @db.Uuid
+  productId      Int         @map("product_id")
+  price          Int?        @default(0)
+  salePrice      Int?        @default(0) @map("sale_price")
+  tracking       String?     @db.VarChar
+  createdAt      DateTime?   @default(now()) @map("created_at") @db.Timestamptz(6)
+  deliveryStatus Int?        @map("delivery_status")
+  count          Int?        @default(0)
+  paymentId      Int?        @map("payment_id")
+  optionValueId  Int         @map("option_value_id")
+  couponPrice    Int         @default(0) @map("coupon_price")
+  point          Int         @default(0)
+  optionValue    OptionValue @relation(fields: [optionValueId], references: [id])
   payment        Payment?    @relation(fields: [paymentId], references: [id])
   product        Product     @relation(fields: [productId], references: [id])
   user           User        @relation(fields: [userId], references: [id])
-  optionValue    OptionValue @relation(fields: [optionValueId], references: [id])
-  review         Review[]      
-  
+  review         Review[]
 
   @@map("orders")
 }
@@ -372,9 +360,9 @@ model Cart {
   createdAt     DateTime?   @default(now()) @map("created_at") @db.Timestamptz(6)
   count         Int?        @default(1)
   optionValueId Int         @map("option_value_id")
-  user          User        @relation(fields: [userId], references: [id])
-  product       Product     @relation(fields: [productId], references: [id])
   optionValue   OptionValue @relation(fields: [optionValueId], references: [id])
+  product       Product     @relation(fields: [productId], references: [id])
+  user          User        @relation(fields: [userId], references: [id])
 
   @@map("carts")
 }
