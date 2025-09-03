@@ -20,9 +20,6 @@ export class PrBrandLikesRepository implements BrandLikesRepository {
   }
 
   async delete(brandId: number, userId: string): Promise<number> {
-    console.log('========================================');
-    console.log('PrBrandLikesRepository', brandId, '/', userId);
-    console.log('========================================');
     try {
       const result = await prisma.brandLike.delete({
         where: {

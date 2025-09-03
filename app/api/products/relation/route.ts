@@ -7,10 +7,6 @@ export async function GET(request: NextRequest) {
 
   const id = searchParams?.get('id');
 
-  console.log('========================');
-  console.log('params', id);
-  console.log('========================');
-
   try {
     const productRepository = new PrProductRepository();
     const products = await new GetRelationProductsUseCase(productRepository).execute(Number(id));
