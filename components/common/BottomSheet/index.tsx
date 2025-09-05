@@ -115,32 +115,33 @@ export default function BottomSheet({
             dragConstraints={{ top: 0 }}
             dragElastic={0.1}
             onDragEnd={handleDragEnd}
-            dragMomentum={false}
           >
-            {showHandle && (
-              <div className={styles.handle} onPointerDown={(e) => dragControls.start(e)}>
-                <div className={styles.handle_bar} />
-              </div>
-            )}
+            <section onPointerDown={(e) => dragControls.start(e)}>
+              {showHandle && (
+                <div className={styles.handle}>
+                  <div className={styles.handle_bar} />
+                </div>
+              )}
 
-            {title && (
-              <div className={styles.header}>
-                <Flex justify="center" paddingVertical={16}>
-                  <Text tag="h2" size={1.8} weight={600}>
-                    {title}
-                  </Text>
-                </Flex>
-                {isCloseButton && (
-                  <button className={styles.close_button} onClick={onClose} aria-label="닫기">
-                    <Image src={closeLarge} alt="닫기" width={24} height={24} />
-                  </button>
-                )}
-              </div>
-            )}
+              {title && (
+                <div className={styles.header}>
+                  <Flex justify="center" paddingVertical={16}>
+                    <Text tag="h2" size={1.8} weight={600}>
+                      {title}
+                    </Text>
+                  </Flex>
+                  {isCloseButton && (
+                    <button className={styles.close_button} onClick={onClose} aria-label="닫기">
+                      <Image src={closeLarge} alt="닫기" width={24} height={24} />
+                    </button>
+                  )}
+                </div>
+              )}
+            </section>
 
-            <div className={styles.content} style={style}>
+            <section className={styles.content} style={style}>
               {children}
-            </div>
+            </section>
           </motion.div>
         </div>
       )}
