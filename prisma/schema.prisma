@@ -320,19 +320,26 @@ model Order {
 }
 
 model Payment {
-  id             Int       @id @default(autoincrement())
-  userId         String    @map("user_id") @db.Uuid
-  price          Int?      @default(0)
-  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  paymentNumber  String    @map("payment_number") @db.VarChar
-  addressId      Int       @map("address_id")
-  approvedAt     DateTime? @map("approved_at") @db.Timestamptz(6)
-  method         String    @db.VarChar
-  status         String    @db.VarChar
-  tossPaymentKey String?   @unique @map("toss_payment_key") @db.VarChar
+  id               Int       @id @default(autoincrement())
+  userId           String    @map("user_id") @db.Uuid
+  price            Int?      @default(0)
+  createdAt        DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  paymentNumber    String    @map("payment_number") @db.VarChar
+  approvedAt       DateTime? @map("approved_at") @db.Timestamptz(6)
+  method           String    @db.VarChar
+  status           String    @db.VarChar
+  tossPaymentKey   String?   @unique @map("toss_payment_key") @db.VarChar
+  name             String    @db.VarChar
+  username         String    @db.VarChar
+  zipCode          String    @db.VarChar @map("zip_code")
+  detailAddress    String?   @db.VarChar @map("detail_address")
+  mainAddress      String    @db.VarChar @map("main_address")
+  deliveryMessage  String?   @db.VarChar @map("delivery_message")
+
   orders         Order[]
-  address        Address   @relation(fields: [addressId], references: [id])
   user           User      @relation(fields: [userId], references: [id])
+  PaymentProductSnapshots PaymentProductSnapshots[]
+
 
   @@map("payments")
 }
@@ -348,7 +355,6 @@ model Address {
   message   String?   @db.VarChar
   isDefault Boolean   @default(false) @map("is_default")
   user      User      @relation(fields: [userId], references: [id])
-  payments  Payment[]
 
   @@map("addresses")
 }
@@ -365,4 +371,26 @@ model Cart {
   user          User        @relation(fields: [userId], references: [id])
 
   @@map("carts")
+}
+
+model PaymentProductSnapshots {
+  id                Int      @id @default(autoincrement())
+  price             Int      @default(0)
+	discountPercent   Int?     @default(0) @map("discount_percent")
+	brandName         String   @db.VarChar @map("brand_name")
+	categoryName      String   @db.VarChar @map("category_name")
+	sub_categoryName  String   @db.VarChar @map("sub_category_name")
+	gender            String   @db.VarChar @default("all")
+	engName           String   @db.VarChar @map("eng_name")
+	korName           String   @db.VarChar @map("kor_name")
+	colorEngName      String   @db.VarChar @map("color_eng_name")
+	colorKorName      String   @db.VarChar @map("color_kor_name")
+	modelNumber       String?  @db.VarChar @map("model_number")
+	releaseDate       String?  @db.VarChar @map("release_date")
+	thumbnailImage    String   @db.VarChar @map("thumbnail_image")
+  paymentId         Int      @map("payment_id")
+
+  payment           Payment  @relation(fields: [paymentId], references: [id])
+
+  @@map("payment_product_snapshots")
 }
