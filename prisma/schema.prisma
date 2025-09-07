@@ -304,7 +304,6 @@ model Order {
   deliveryStatus    Int?        @map("delivery_status")
   count             Int?        @default(0)
   paymentId         Int?        @map("payment_id")
-  optionValueId     Int         @map("option_value_id")
   couponPrice       Int         @default(0) @map("coupon_price")
   point             Int         @default(0)
   discountPercent   Int?        @default(0) @map("discount_percent")
