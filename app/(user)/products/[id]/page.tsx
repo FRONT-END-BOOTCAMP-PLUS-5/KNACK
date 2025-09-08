@@ -14,6 +14,8 @@ import Recommends from '@/components/products/Recommends';
 import DetailLayout from '@/components/products/DetailLayout';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { createMetaData } from '@/utils/createMetaData';
+import { STORAGE_PATHS } from '@/constraint/auth';
 
 interface IProps {
   params: Promise<{
@@ -56,10 +58,12 @@ export async function generateMetadata({ params }: IProps): Promise<Metadata> {
       return res.result;
     });
 
-    return {
-      title: `${productData.korName} | KNACK`,
-      description: `${productData.engName} - ${productData.korName} | KNACK`,
-    };
+    return createMetaData({
+      title: productData?.korName && `${productData?.korName} | KNACK`,
+      description:
+        productData?.korName && productData?.engName && `${productData.engName} - ${productData.korName} | KNACK`,
+      ogImage: productData?.thumbnailImage && `${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${productData?.thumbnailImage}`,
+    });
   } catch (error) {
     console.error('상품 메타데이터 조회 실패:', error);
 
