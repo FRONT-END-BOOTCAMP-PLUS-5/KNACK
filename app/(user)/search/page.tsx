@@ -7,10 +7,16 @@ import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/auth';
+import { createMetaData } from '@/utils/createMetaData';
+import { Metadata } from 'next';
 
 interface IProps {
   searchParams: Promise<IQueryParams>;
 }
+
+export const metadata: Metadata = createMetaData({
+  title: 'SHOP | KNACK',
+});
 
 export default async function Search({ searchParams }: IProps) {
   const params = await searchParams;
