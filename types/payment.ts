@@ -31,10 +31,14 @@ export interface TossConfirmResult {
     useCardPoint?: boolean;
     isInterestFree?: boolean;
   };
+  totalAmount: number;
+  balanceAmount: number;
+  suppliedAmount: number;
+  vat: number;
 }
 
 export interface TossGateway {
-  confirmPayment(args: { tossPaymentKey: string; orderId: string; amount: number }): Promise<TossConfirmResult>;
+  confirmPayment(args: { tossPaymentKey: string; amount: number }): Promise<TossConfirmResult>;
 }
 
 export type Item = {
@@ -91,3 +95,26 @@ export type Payment = {
   createdAt?: string | Date | null;
   orders: OrderRow[];
 };
+
+export interface IPaymentSessionData {
+  pointAmount: number;
+  couponDiscountAmount: number;
+  shippingFee: number;
+  targetSumAfterCoupon: number;
+  name: string;
+  mainAddress: string;
+  detailAddress: string;
+  zipCode: string;
+}
+
+export interface IPaymentRef {
+  amount: number; // 실제 결제된 총 금액
+  salePrice: number;
+  detailAddress: string;
+  mainAddress: string;
+  name: string;
+  zipCode: string;
+  tossPaymentKey: string;
+  pointAmount: number;
+  orderId: string;
+}

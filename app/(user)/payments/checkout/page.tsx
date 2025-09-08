@@ -17,6 +17,7 @@ import { Coupon, CheckoutRow, OrderItem, BestCoupon } from '@/types/order';
 import CouponSelectModal from '@/components/Payments/CouponSelectModal';
 import { IAddress } from '@/types/address';
 import { useToastStore } from '@/store/toastStore';
+import { IPaymentSessionData } from '@/types/payment';
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
 
@@ -146,11 +147,15 @@ export default function CheckoutPage() {
       await handleSaveRequestMessage();
 
       // ✅ 성공 페이지에서 보여주려면 세션에 저장
-      const paymentData = {
+      const paymentData: IPaymentSessionData = {
         pointAmount: points,
         couponDiscountAmount: pricing.couponDiscount,
         shippingFee: pricing.shippingFee,
         targetSumAfterCoupon: pricing.targetSumAfterCoupon,
+        name: selectedAddress?.name,
+        mainAddress: selectedAddress?.address?.main,
+        detailAddress: selectedAddress?.detail,
+        zipCode: selectedAddress?.address?.zipCode,
       };
 
       // 문자열로 변환해서 저장
@@ -178,7 +183,6 @@ export default function CheckoutPage() {
     }
   };
 
-  // ----- load checkout from localStorage -----
   useEffect(() => {
     // localStorage는 클라에서만 접근 가능
     const raw = typeof window !== 'undefined' ? localStorage.getItem('checkout') : null;
@@ -193,7 +197,6 @@ export default function CheckoutPage() {
     }
   }, []);
 
-  // ----- fetch products in batch & build orderItems -----
   useEffect(() => {
     if (!checkout.length) return;
     (async () => {

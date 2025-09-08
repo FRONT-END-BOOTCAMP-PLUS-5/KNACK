@@ -14,6 +14,7 @@ import Text from '@/components/common/Text';
 import { useCartStore } from '@/store/cartStore';
 import { cartService } from '@/services/cart';
 import Flex from '@/components/common/Flex';
+import { IPaymentRef, IPaymentSessionData } from '@/types/payment';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
@@ -28,9 +29,9 @@ export default function PaymentSuccess() {
   const [shippingFee, setShippingFee] = useState(0);
   const [otherOrdersCount, setOtherOrdersCount] = useState(0);
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>();
-  const [pointsToUse, setPointsToUse] = useState(0);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [targetSumAfterCoupon, setTargetSumAfterCoupon] = useState(0);
+  const [paymentSessionData, setPaymentSessionData] = useState<IPaymentSessionData>();
 
   // ✅ URL 파라미터를 원시값으로 고정
   const tossPaymentKey = useMemo(() => params.get('paymentKey') ?? '', [params]);
@@ -84,7 +85,7 @@ export default function PaymentSuccess() {
       setDiscountAmount(paymentData.couponDiscountAmount);
       setShippingFee(paymentData.shippingFee);
       setTargetSumAfterCoupon(paymentData.targetSumAfterCoupon);
-      setPointsToUse(paymentData.pointAmount);
+      setPaymentSessionData(paymentData);
     }
     if (coupon) {
       const parsed = JSON.parse(coupon);
@@ -109,10 +110,7 @@ export default function PaymentSuccess() {
       console.log('SKIP: no user');
       return;
     }
-    if (!IAddress?.id) {
-      console.log('SKIP: no address');
-      return;
-    }
+
     if (orderItems.length === 0) {
       console.log('SKIP: no orderItems');
       return;
@@ -149,34 +147,34 @@ export default function PaymentSuccess() {
 
     (async () => {
       try {
-        console.log('➡️ 주문 저장 요청 /api/orders', { orderItems, targetSumAfterCoupon, discountAmount, pointsToUse });
-        const orderRes = await requester.post('/api/orders', {
+        const data: IPaymentRef = {
+          tossPaymentKey,
+          amount: paymentAmount,
+          salePrice: 0,
+          detailAddress: paymentSessionData?.detailAddress ?? '',
+          mainAddress: paymentSessionData?.mainAddress ?? '',
+          name: paymentSessionData?.name ?? '',
+          zipCode: paymentSessionData?.zipCode ?? '',
+          pointAmount: paymentSessionData?.pointAmount ?? 0,
+          orderId: tossOrderId ?? '',
+        };
+
+        // 주문 영수증 생성
+        const paymentRes = await requester.post('/api/payments', data);
+
+        // 상품마다의 주문 생성
+        await requester.post('/api/orders', {
           userId: user.id,
           items: orderItems.map((item) => ({
             productId: item.productId,
             price: item.price,
             salePrice: targetSumAfterCoupon,
             count: item.quantity,
-            addressId: IAddress.id,
             paymentId: null,
             optionValueId: item?.optionValue?.id,
             couponPrice: discountAmount,
-            point: pointsToUse,
+            point: paymentSessionData?.pointAmount,
           })),
-        });
-
-        const createdOrderIds: number[] = orderRes.data.orderIds || [];
-        console.log('✅ 주문 저장 완료:', createdOrderIds);
-
-        console.log('➡️ 결제 확인/저장 요청 /api/payments');
-        const paymentRes = await requester.post('/api/payments', {
-          tossPaymentKey,
-          orderId: tossOrderId,
-          amount: paymentAmount,
-          addressId: IAddress.id,
-          orderIds: createdOrderIds,
-          selectedCouponId: selectedCoupon?.id ?? null,
-          pointsToUse: pointsToUse,
         });
 
         // ✅ cartIds를 가진 장바구니만 로컬 스토어에서 제거
@@ -209,18 +207,20 @@ export default function PaymentSuccess() {
       }
     })();
   }, [
-    IAddress,
-    orderItems,
-    tossPaymentKey,
-    tossOrderId,
-    paymentAmount,
-    router,
-    pointsToUse,
-    selectedCoupon?.id,
-    targetSumAfterCoupon,
-    user,
     discountAmount,
+    orderItems,
+    paymentAmount,
+    paymentSessionData?.detailAddress,
+    paymentSessionData?.mainAddress,
+    paymentSessionData?.name,
+    paymentSessionData?.pointAmount,
+    paymentSessionData?.zipCode,
     readProcessed,
+    router,
+    targetSumAfterCoupon,
+    tossOrderId,
+    tossPaymentKey,
+    user,
     writeProcessed,
   ]);
 
@@ -310,7 +310,11 @@ export default function PaymentSuccess() {
 
         <div className={styles.row}>
           <div>포인트 사용</div>
-          <div>{pointsToUse > 0 ? `-${fmt(pointsToUse)}P` : '-'}</div>
+          <div>
+            {paymentSessionData?.pointAmount && paymentSessionData?.pointAmount > 0
+              ? `-${fmt(paymentSessionData?.pointAmount)}P`
+              : '-'}{' '}
+          </div>
         </div>
       </section>
     </div>
