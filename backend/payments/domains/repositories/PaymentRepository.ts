@@ -1,6 +1,5 @@
 // 📁 backend/domain/repositories/PaymentRepository.ts
 
-import { PaymentRecord } from '@/types/payment';
 import { CreatePaymentDto } from '../../applications/dtos/CreatePaymentDto';
 import { GetPaymentDto } from '../../applications/dtos/GetPaymentDto';
 import { RepoPayment } from '@/types/order';
@@ -25,19 +24,9 @@ export interface PaymentRepository {
   }): Promise<boolean>; // true면 내가 성공, false면 이미 누군가 처리함
 
   /**
-   *tossPaymentKey로 선점 (있으면 반환, 없으면 CONFIRMING으로 생성)
-   */
-  claimByTossKey(args: {
-    userId: string;
-    addressId: number;
-    amount: number;
-    tossPaymentKey: string;
-  }): Promise<PaymentRecord>;
-
-  /**
    * 결제 저장
    */
-  save(payment: CreatePaymentDto): Promise<number | null>;
+  save(payment: CreatePaymentDto): Promise<number>;
 
   /**
    * Toss 결제 승인 응답에서 받은 고유 TossPaymentKey로 결제 조회
