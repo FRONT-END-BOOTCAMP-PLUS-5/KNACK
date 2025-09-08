@@ -310,7 +310,7 @@ model Order {
   brandName         String      @db.VarChar @map("brand_name")
   thumbnailImage    String      @db.VarChar @map("thumbnail_image")
   categoryName      String      @db.VarChar @map("category_name")
-	sub_categoryName  String      @db.VarChar @map("sub_category_name")
+	subCategoryName  String      @db.VarChar @map("sub_category_name")
 	gender            String      @db.VarChar @default("all")
 	engName           String      @db.VarChar @map("eng_name")
 	korName           String      @db.VarChar @map("kor_name")
