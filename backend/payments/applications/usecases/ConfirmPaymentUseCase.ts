@@ -4,13 +4,11 @@ import { CouponRepository } from '@/backend/coupon/domains/repositories/CouponRe
 import { UserPointsRepository } from '@/backend/points/domains/repositories/UserPointsRepository';
 import { TossGateway } from '@/types/payment';
 import prisma from '@/backend/utils/prisma';
-import { OrderRepository } from '@/backend/orders/domains/repositories/OrderRepository';
 import { CardRepository } from '@/types/order';
 
 export class ConfirmPaymentUseCase {
   constructor(
     private readonly payments: PaymentRepository,
-    private readonly orders: OrderRepository,
     private readonly coupons: CouponRepository,
     private readonly points: UserPointsRepository,
     private readonly toss: TossGateway,
