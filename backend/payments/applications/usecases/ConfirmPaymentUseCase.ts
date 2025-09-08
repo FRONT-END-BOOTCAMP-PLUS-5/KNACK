@@ -61,12 +61,6 @@ export class ConfirmPaymentUseCase {
         return already!;
       }
 
-      // 주문 연결 (아직 미연결만)
-      const linked = await this.orders.linkOrdersToPayment({ orderIds: args.orderIds, paymentId: claimed.id, userId });
-      if (linked !== args.orderIds.length) {
-        throw new Error('some orders already linked or not owned');
-      }
-
       // ✅ 쿠폰 차감: 트랜잭션 클라이언트(tx) 전달
       if (selectedCouponId) {
         await this.coupons.consumeByDelete(userId, Number(selectedCouponId), tx);
