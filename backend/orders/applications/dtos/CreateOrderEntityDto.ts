@@ -1,15 +1,23 @@
-// backend/application/dto/CreateOrderEntityDto.ts
 export interface CreateOrderEntityDto {
   userId: string;
-  productId: number;
   count: number;
   price: number;
   salePrice: number;
   deliveryStatus: DeliveryStatus;
-  createdAt: Date;
-  optionValueId: number;
   couponPrice: number;
   point: number;
+  brandName: string;
+  categoryName: string;
+  colorEngName: string;
+  colorKorName: string;
+  engName: string;
+  korName: string;
+  gender: string;
+  optionName: string;
+  optionValue: string;
+  releaseDate?: string;
+  subCategoryName: string;
+  thumbnailImage: string;
 }
 
 export enum DeliveryStatus {
