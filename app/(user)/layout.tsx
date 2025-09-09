@@ -1,8 +1,9 @@
-import type { Metadata } from 'next';
 import '@/styles/global.scss';
 import LayoutWrapper from '@/app/(user)/LayoutWrapper';
 import SessionProvider from '@/components/providers/SessionProvider';
 import localFont from 'next/font/local';
+import { createMetaData } from '@/utils/createMetaData';
+import { Metadata } from 'next';
 
 const pretendard = localFont({
   src: '../../public/fonts/PretendardVariable.woff2',
@@ -10,10 +11,7 @@ const pretendard = localFont({
   variable: '--font-pretendard',
 });
 
-export const metadata: Metadata = {
-  title: 'KNACK',
-  description: 'KNACK에서 다양한 상품을 확인해보세요.',
-};
+export const metadata: Metadata = createMetaData();
 
 export default function RootLayout({
   children,
