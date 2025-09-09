@@ -8,7 +8,6 @@ import { GetPaymentsByUserIdUseCase } from '@/backend/payments/applications/usec
 import { TossConfirmResult } from '@/types/payment';
 import { serverPost } from '@/backend/utils/serverRequester';
 import axios from 'axios';
-import { serializeBigInt } from '@/utils/orders';
 import { CreatePaymentUseCase } from '@/backend/payments/applications/usecases/CreatePaymentUseCase';
 import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto';
 
@@ -81,19 +80,19 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  // try {
-  //   const session = await getServerSession(authOptions);
-  //   const userId = session?.user?.id;
-  //   if (!userId) {
-  //     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-  //   }
-  //   const usecase = new GetPaymentsByUserIdUseCase(new PrPaymentRepository());
-  //   const payments = await usecase.execute(userId);
-  //   // 응답 포맷 일관성: 객체로 래핑
-  //   return NextResponse.json(serializeBigInt({ payments }), { status: 200 });
-  // } catch (e) {
-  //   console.error('[GET /api/payments] failed:', e);
-  //   const msg = e instanceof Error ? e.message : 'internal_error';
-  //   return NextResponse.json({ error: msg }, { status: 500 });
-  // }
+  try {
+    const session = await getServerSession(authOptions);
+    const userId = session?.user?.id;
+    if (!userId) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    const usecase = new GetPaymentsByUserIdUseCase(new PrPaymentRepository());
+    const payments = await usecase.execute(userId);
+
+    return NextResponse.json({ payments }, { status: 200 });
+  } catch (e) {
+    console.error('[GET /api/payments] failed:', e);
+    const msg = e instanceof Error ? e.message : 'internal_error';
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }

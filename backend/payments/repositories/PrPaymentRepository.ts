@@ -3,6 +3,7 @@ import { PaymentRepository } from '@/backend/payments/domains/repositories/Payme
 import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto';
 import { GetPaymentDto } from '@/backend/payments/applications/dtos/GetPaymentDto';
 import { RepoPayment } from '@/types/order';
+import { IPaymentList } from '../domains/entities/Payment';
 
 export class PrPaymentRepository implements PaymentRepository {
   async markPaid({
@@ -112,5 +113,37 @@ export class PrPaymentRepository implements PaymentRepository {
       },
     });
     return data as unknown as RepoPayment | null;
+  }
+
+  async findWithOrderItemsByUserId(userId: string): Promise<IPaymentList[]> {
+    const data = await prisma.payment.findMany({
+      where: { userId: userId },
+      select: {
+        id: true,
+        approvedAt: true,
+        paymentNumber: true,
+        orders: {
+          select: {
+            id: true,
+            paymentId: true,
+            thumbnailImage: true,
+            korName: true,
+            engName: true,
+            optionName: true,
+            optionValue: true,
+            deliveryStatus: true,
+          },
+        },
+      },
+    });
+
+    const dataToMap = data?.map((item) => {
+      return {
+        ...item,
+        approvedAt: String(item?.approvedAt),
+      };
+    });
+
+    return dataToMap;
   }
 }
