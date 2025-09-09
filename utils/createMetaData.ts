@@ -15,6 +15,7 @@ export const createMetaData = (metaDataProps: IProps = {}) => {
   const OG_IMAGE = ogImage || META_DATA.ogImage;
 
   const metaData: Metadata = {
+    metadataBase: new URL(META_DATA.baseUrl),
     title: TITLE,
     description: DESCRIPTION,
     openGraph: {
