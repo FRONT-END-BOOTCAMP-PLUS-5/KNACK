@@ -20,7 +20,7 @@ export const createMetaData = (metaDataProps: IProps = {}) => {
     openGraph: {
       title: TITLE,
       description: DESCRIPTION,
-      images: { url: OG_IMAGE },
+      images: OG_IMAGE,
       siteName: META_DATA.siteName,
       type: 'website',
       url: META_DATA.url,
