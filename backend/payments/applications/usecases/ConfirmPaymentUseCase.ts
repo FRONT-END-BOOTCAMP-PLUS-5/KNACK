@@ -28,7 +28,7 @@ export class ConfirmPaymentUseCase {
     const paid = await prisma.$transaction(async (tx) => {
       // 상태 전이: CONFIRMING -> PAID (경합 시 false)
       const ok = await this.payments.markPaid({
-        id: claimed.id,
+        id: 0,
         method: confirm.method,
         approvedAt: new Date(confirm.approvedAt ?? Date.now()),
         requestedAt: confirm.requestedAt ? new Date(confirm.requestedAt) : undefined,

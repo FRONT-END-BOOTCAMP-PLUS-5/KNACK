@@ -1,7 +1,6 @@
 import { OrderRepository } from '@/backend/orders/domains/repositories/OrderRepository';
 import { CreateOrderEntityDto } from '@/backend/orders/applications/dtos/CreateOrderEntityDto';
 import prisma from '@/backend/utils/prisma';
-import { OrderDto } from '../applications/dtos/GetOrderDto';
 import { RepoIndependentOrder } from '@/types/order';
 
 export class PrOrderRepository implements OrderRepository {
@@ -31,6 +30,7 @@ export class PrOrderRepository implements OrderRepository {
             releaseDate: o.releaseDate,
             subCategoryName: o.subCategoryName,
             thumbnailImage: o.thumbnailImage,
+            productId: o.productId,
           },
         })
       )
@@ -70,12 +70,11 @@ export class PrOrderRepository implements OrderRepository {
   }
 
   // 하나의 주문만 찾기??
-  async findById(id: number, userId: string): Promise<OrderDto | null> {
+  async findById(id: number, userId: string): Promise<RepoIndependentOrder | null> {
     const order = await prisma.order.findFirst({
       where: { id, userId },
       select: {
         id: true,
-        paymentId: true,
         createdAt: true,
         korName: true,
         engName: true,

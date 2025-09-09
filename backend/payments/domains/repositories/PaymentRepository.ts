@@ -5,14 +5,7 @@ import { GetPaymentDto } from '../../applications/dtos/GetPaymentDto';
 import { RepoPayment } from '@/types/order';
 
 export interface PaymentRepository {
-  findWithOrderItemsByUserId(userId: string): Promise<RepoPayment[]>;
-
-  // Add these methods that return RepoPayment with orders
-  findWithOrdersByNumber(paymentNumber: string, userId: string): Promise<RepoPayment | null>;
   findWithOrdersById(paymentId: number, userId: string): Promise<RepoPayment | null>;
-
-  findWithOrderItemsByNumber(paymentNumber: string, userId: string): Promise<RepoPayment | null>;
-  findWithOrderItemsById(paymentId: number, userId: string): Promise<RepoPayment | null>;
 
   // 상태 전이: CONFIRMING -> PAID (동시성 방지: where에 status 포함)
   markPaid(args: {
@@ -44,6 +37,4 @@ export interface PaymentRepository {
   updateStatusByTossPaymentKey(tossPaymentKey: string, status: string): Promise<void>;
 
   generateTodayPaymentNumber(): Promise<string>;
-
-  createFailedPayment(params: { params: CreatePaymentDto }): Promise<void>;
 }

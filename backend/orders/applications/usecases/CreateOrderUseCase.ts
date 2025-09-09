@@ -27,6 +27,7 @@ export class CreateOrderUseCase {
       releaseDate: item.releaseDate,
       subCategoryName: item.subCategoryName,
       thumbnailImage: item.thumbnailImage,
+      productId: item.productId,
     }));
 
     return this.repo.saveMany(orders);

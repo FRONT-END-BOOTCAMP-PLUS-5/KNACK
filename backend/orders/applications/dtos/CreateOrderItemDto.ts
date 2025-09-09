@@ -18,6 +18,7 @@ export interface CreateOrderItemDto {
   releaseDate?: string;
   subCategoryName: string;
   thumbnailImage: string;
+  productId: number;
 }
 
 export enum DeliveryStatus {

@@ -119,8 +119,8 @@ export type RepoPayment = {
       id: number;
       productId: number;
       quantity: number;
-      price: number | bigint;
-      salePrice?: number | bigint;
+      price: number;
+      salePrice?: number;
       couponPrice?: number;
       point?: number;
       product?: { korName?: string | null; engName?: string | null; thumbnailImage?: string | null } | null;
@@ -131,19 +131,18 @@ export type RepoPayment = {
 
 export type RepoIndependentOrder = {
   id: number;
-  userId: string;
-  productId: number;
-  price: number | bigint;
-  salePrice?: number | bigint;
+  price: number | null;
+  salePrice?: number;
   tracking?: string | null;
   createdAt?: Date | null;
   deliveryStatus?: number;
   count?: number;
   paymentId?: number;
-  optionValueId?: number;
   quantity?: number;
-  product?: { korName?: string | null; engName?: string | null; thumbnailImage?: string | null } | null;
-  optionValue?: { id: number; name: string; value?: string } | null;
+  korName?: string | null;
+  engName?: string | null;
+  thumbnailImage?: string | null;
+  optionValue?: string;
   address?: RepoAddress | null;
 };
 

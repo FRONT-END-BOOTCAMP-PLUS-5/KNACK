@@ -8,9 +8,7 @@ export interface Order {
     engName: string;
     korName: string;
   };
-  optionValue?: {
-    name: string;
-  };
+  optionValue?: string;
   review?: {
     id: number;
   };
