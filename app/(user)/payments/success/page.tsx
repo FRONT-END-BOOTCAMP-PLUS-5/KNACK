@@ -6,10 +6,9 @@ import styles from './SuccessPage.module.scss';
 import requester from '@/utils/requester';
 import { useUserStore } from '@/store/userStore';
 import axios from 'axios';
-import { Coupon, OrderItem, RepresentativeProduct } from '@/types/order';
+import { Coupon, OrderItem } from '@/types/order';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
-import { IAddress } from '@/types/address';
 import Text from '@/components/common/Text';
 import { useCartStore } from '@/store/cartStore';
 import { cartService } from '@/services/cart';
@@ -22,10 +21,8 @@ export default function PaymentSuccess() {
   const user = useUserStore((s) => s.user);
 
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
-  const [IAddress, setIAddress] = useState<IAddress | null>(null);
   const [paymentNumber, setPaymentNumber] = useState('');
   const [paymentId, setPaymentId] = useState<number | null>(null);
-  const [repProd, setRepProd] = useState<RepresentativeProduct | null>(null);
   const [shippingFee, setShippingFee] = useState(0);
   const [otherOrdersCount, setOtherOrdersCount] = useState(0);
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>();
@@ -78,7 +75,6 @@ export default function PaymentSuccess() {
     const stored = sessionStorage.getItem('paymentData');
     const coupon = sessionStorage.getItem('selectedCoupon');
     const orderItems = sessionStorage.getItem('orderItems');
-    const address = sessionStorage.getItem('selectedAddress');
 
     if (stored) {
       const paymentData = JSON.parse(stored);
@@ -95,10 +91,6 @@ export default function PaymentSuccess() {
       const parsed = JSON.parse(orderItems);
 
       setOrderItems(parsed);
-    }
-    if (address) {
-      const parsed = JSON.parse(address);
-      setIAddress(parsed);
     }
   }, []);
 
@@ -171,9 +163,20 @@ export default function PaymentSuccess() {
             salePrice: targetSumAfterCoupon,
             count: item.quantity,
             paymentId: null,
-            optionValueId: item?.optionValue?.id,
+            optionValue: item?.optionValue,
             couponPrice: discountAmount,
             point: paymentSessionData?.pointAmount,
+            brandName: item?.brandName,
+            categoryName: item?.categoryName,
+            colorEngName: item?.colorEngName,
+            colorKorName: item?.colorKorName,
+            engName: item?.engName,
+            korName: item?.korName,
+            gender: item?.gender,
+            optionName: item?.optionName,
+            releaseDate: item?.releaseDate,
+            subCategoryName: item?.subCategoryName,
+            thumbnailImage: item?.thumbnailImage,
           })),
         });
 
@@ -186,7 +189,6 @@ export default function PaymentSuccess() {
         console.log(pid);
         setPaymentId(pid);
         setPaymentNumber(String(paymentRes.data.paymentNumber ?? ''));
-        console.log('✅ 결제 저장 완료:', { paymentNumber: paymentRes.data.paymentNumber, id: pid });
 
         // ✅ 여기서만 '처리됨' 기록
         writeProcessed({ tossPaymentKey, tossOrderId, at: Date.now() });
@@ -237,20 +239,9 @@ export default function PaymentSuccess() {
           orderIds = payRes.data.orders.map((o: { id: number }) => o.id).filter((v: number) => Number.isFinite(v));
         }
         setOtherOrdersCount(Math.max(0, (orderIds?.length ?? 0) - 1));
-
-        const firstOrderId = orderIds?.[0];
-        if (!Number.isFinite(firstOrderId)) {
-          setRepProd(null);
-          return;
-        }
-
-        // 2) 첫 주문 상세 → 대표상품 + 배송비
-        const ordRes = await requester.get(`/api/orders/${firstOrderId}`);
-        const order = ordRes.data;
-        setRepProd(order.product ?? null);
       } catch (e) {
         console.error('❌ 대표상품/주문 로드 실패', e);
-        setRepProd(null);
+
         setShippingFee(0);
       }
     })();
@@ -265,12 +256,12 @@ export default function PaymentSuccess() {
         <p className={styles.subtitle}>주문 즉시 출고를 준비하여 안전하게 배송 될 예정입니다.</p>
 
         <div className={styles.image_wrap}>
-          {repProd?.thumbnailImage && (
+          {orderItems?.[0]?.thumbnailImage && (
             <Image
-              src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${repProd.thumbnailImage}`}
-              alt={repProd.korName}
-              width={80}
-              height={80}
+              src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${orderItems?.[0]?.thumbnailImage}`}
+              alt={orderItems?.[0]?.korName ?? ''}
+              width={120}
+              height={120}
               className={styles.productImage}
             />
           )}

@@ -34,11 +34,19 @@ export type OrderItem = {
   productId: number;
   price: number;
   quantity: number;
-  thumbnail_image: string;
+  thumbnailImage: string;
   deliveryType: string;
-  kor_name?: string;
-  eng_name?: string;
-  optionValue?: IOptionValue;
+  korName?: string;
+  engName?: string;
+  brandName: string;
+  categoryName: string;
+  subCategoryName: string;
+  colorEngName: string;
+  colorKorName: string;
+  gender: string;
+  optionName: string;
+  optionValue: string;
+  releaseDate?: string;
 };
 
 export type OrderRow = {
