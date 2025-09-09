@@ -21,12 +21,12 @@ export class PrReviewRepository implements ReviewRepository {
           orderId: true,
           contents: true,
           rating: true,
-          createdAt: true
+          createdAt: true,
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
       });
 
-      return reviews.map(review => ({
+      return reviews.map((review) => ({
         id: 0, // 기본값
         userId: review.userId,
         productId: review.productId,
@@ -34,7 +34,7 @@ export class PrReviewRepository implements ReviewRepository {
         contents: review.contents,
         rating: review.rating || 0,
         reviewImages: undefined,
-        createdAt: review.createdAt || new Date()
+        createdAt: review.createdAt || new Date(),
       }));
     } catch (error) {
       throw new Error('리뷰를 조회할 수 없습니다.');
@@ -51,8 +51,8 @@ export class PrReviewRepository implements ReviewRepository {
           orderId: true,
           contents: true,
           rating: true,
-          createdAt: true
-        }
+          createdAt: true,
+        },
       });
 
       if (!review) return null;
@@ -65,7 +65,7 @@ export class PrReviewRepository implements ReviewRepository {
         contents: review.contents,
         rating: review.rating || 0,
         reviewImages: undefined,
-        createdAt: review.createdAt || new Date()
+        createdAt: review.createdAt || new Date(),
       };
     } catch (error) {
       throw new Error('리뷰를 조회할 수 없습니다.');
@@ -82,8 +82,8 @@ export class PrReviewRepository implements ReviewRepository {
           orderId: true,
           contents: true,
           rating: true,
-          createdAt: true
-        }
+          createdAt: true,
+        },
       });
 
       if (!review) return null;
@@ -96,7 +96,7 @@ export class PrReviewRepository implements ReviewRepository {
         contents: review.contents,
         rating: review.rating || 0,
         reviewImages: undefined,
-        createdAt: review.createdAt || new Date()
+        createdAt: review.createdAt || new Date(),
       };
     } catch (error) {
       throw new Error('리뷰를 조회할 수 없습니다.');
@@ -112,7 +112,7 @@ export class PrReviewRepository implements ReviewRepository {
           orderId: review.orderId,
           contents: review.contents,
           rating: review.rating,
-          reviewImages: review.reviewImages
+          reviewImages: review.reviewImages,
         },
         select: {
           userId: true,
@@ -120,8 +120,8 @@ export class PrReviewRepository implements ReviewRepository {
           orderId: true,
           contents: true,
           rating: true,
-          createdAt: true
-        }
+          createdAt: true,
+        },
       });
 
       return {
@@ -132,7 +132,7 @@ export class PrReviewRepository implements ReviewRepository {
         contents: createdReview.contents,
         rating: createdReview.rating || 0,
         reviewImages: undefined,
-        createdAt: createdReview.createdAt || new Date()
+        createdAt: createdReview.createdAt || new Date(),
       };
     } catch (error) {
       throw new Error('리뷰를 생성할 수 없습니다.');
@@ -153,12 +153,8 @@ export class PrReviewRepository implements ReviewRepository {
           order: {
             select: {
               id: true,
-              optionValue: {
-                select: {
-                  name: true
-                }
-              }
-            }
+              optionValue: true,
+            },
           },
           // Product relation
           product: {
@@ -166,33 +162,32 @@ export class PrReviewRepository implements ReviewRepository {
               id: true,
               korName: true,
               engName: true,
-              thumbnailImage: true
-            }
-          }
+              thumbnailImage: true,
+            },
+          },
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
       });
 
       // null 값들을 기본값으로 변환
-      return reviews.map(review => ({
+      return reviews.map((review) => ({
         id: review.id,
         contents: review.contents,
         rating: review.rating || 0,
         createdAt: review.createdAt || new Date(),
         order: {
           id: review.order.id,
-          optionValue: review.order.optionValue
+          optionValue: review.order.optionValue,
         },
         product: {
           id: review.product.id,
           korName: review.product.korName,
           engName: review.product.engName,
-          thumbnailImage: review.product.thumbnailImage
-        }
+          thumbnailImage: review.product.thumbnailImage,
+        },
       }));
     } catch (error) {
       throw new Error('리뷰를 조회할 수 없습니다.');
     }
   }
 }
-

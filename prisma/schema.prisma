@@ -119,6 +119,7 @@ model Product {
   relatedProducts_ProductRelated   RelatedProduct[]       @relation("ProductRelated")
   relatedProducts_RelatedToProduct RelatedProduct[]       @relation("RelatedToProduct")
   reviews                          Review[]
+  orders                           Order[]
 
   @@map("products")
 }
@@ -297,6 +298,7 @@ model BrandLike {
 model Order {
   id                Int         @id @default(autoincrement())
   userId            String      @map("user_id") @db.Uuid
+  productId         Int         @map("product_id")
   price             Int?        @default(0)
   salePrice         Int?        @default(0) @map("sale_price")
   tracking          String?     @db.VarChar
@@ -322,6 +324,7 @@ model Order {
   optionValue       String      @db.VarChar @map("option_value")
 
 
+  product        Product    @relation(fields: [productId], references: [id])
   payment        Payment?    @relation(fields: [paymentId], references: [id])
   user           User        @relation(fields: [userId], references: [id])
   review         Review[]
