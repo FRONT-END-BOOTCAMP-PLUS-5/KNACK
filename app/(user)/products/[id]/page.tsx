@@ -14,6 +14,9 @@ import Recommends from '@/components/products/Recommends';
 import DetailLayout from '@/components/products/DetailLayout';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { createMetaData } from '@/utils/createMetaData';
+import { STORAGE_PATHS } from '@/constraint/auth';
+import { cache } from 'react';
 
 interface IProps {
   params: Promise<{
@@ -47,37 +50,39 @@ const SSRContent = (productData?: IProduct) => {
   );
 };
 
-export async function generateMetadata({ params }: IProps): Promise<Metadata> {
-  const { id } = await params;
-
+const getProductData = cache(async (id: number): Promise<IProduct | null> => {
   try {
     const { getProduct } = productsService;
-    const productData: IProduct = await getProduct(Number(id)).then((res) => {
-      return res.result;
-    });
-
-    return {
-      title: `${productData.korName} | KNACK`,
-      description: `${productData.engName} - ${productData.korName} | KNACK`,
-    };
+    const response = await getProduct(id);
+    return response.result;
   } catch (error) {
-    console.error('상품 메타데이터 조회 실패:', error);
-
-    return {
-      title: 'Product | KNACK',
-      description: 'KNACK에서 다양한 상품을 확인해보세요.',
-    };
+    console.error('상품 데이터 조회 실패:', error);
+    return null;
   }
-}
+});
+
+export const generateMetadata = async ({ params }: IProps): Promise<Metadata> => {
+  const { id } = await params;
+  const productData = await getProductData(Number(id));
+
+  if (!productData) {
+    return createMetaData({
+      title: 'Product | KNACK',
+    });
+  }
+
+  return createMetaData({
+    title: productData?.korName && `${productData?.korName} | KNACK`,
+    description:
+      productData?.korName && productData?.engName && `${productData.engName} - ${productData.korName} | KNACK`,
+    ogImage: productData?.thumbnailImage && `${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${productData?.thumbnailImage}`,
+  });
+};
 
 const ProductDetail = async ({ params }: IProps) => {
   const { id } = await params;
 
-  const { getProduct } = productsService;
-
-  const productData: IProduct = await getProduct(Number(id)).then((res) => {
-    return res.result;
-  });
+  const productData = await getProductData(Number(id));
 
   if (!productData) {
     return notFound();
