@@ -17,8 +17,9 @@ export default function MyPage() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await requester.get('/api/payments');
-        const orders = data.payments.overallSummary || [];
+        const { data } = await requester.get('/api/orders');
+
+        const orders = data?.orders || [];
 
         setOrderStats({
           all: orders.total.length,

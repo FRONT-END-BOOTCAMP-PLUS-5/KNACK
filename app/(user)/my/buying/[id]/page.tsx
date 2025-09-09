@@ -1,6 +1,5 @@
 'use client';
 
-// app/order/[orderId]/page.tsx
 import Image from 'next/image';
 import styles from './buying.module.scss';
 import BuyingFooter from '@/components/my/BuyingFooter';

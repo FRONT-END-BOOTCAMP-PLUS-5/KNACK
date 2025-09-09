@@ -53,8 +53,11 @@ export type OrderRow = {
   id: number;
   deliveryStatus: number; // 4 == 완료
   tracking?: string | null;
-  product?: { korName: string; thumbnailImage: string };
-  optionValue?: { name?: string; value?: string };
+  thumbnailImage: string;
+  korName: string;
+  engName: string;
+  optionValue: string;
+  optionName: string;
 };
 
 export interface OrderResponse {

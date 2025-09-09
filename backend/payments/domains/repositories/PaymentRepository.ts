@@ -3,6 +3,7 @@
 import { CreatePaymentDto } from '../../applications/dtos/CreatePaymentDto';
 import { GetPaymentDto } from '../../applications/dtos/GetPaymentDto';
 import { RepoPayment } from '@/types/order';
+import { IPaymentList } from '../entities/Payment';
 
 export interface PaymentRepository {
   findWithOrdersById(paymentId: number, userId: string): Promise<RepoPayment | null>;
@@ -37,4 +38,5 @@ export interface PaymentRepository {
   updateStatusByTossPaymentKey(tossPaymentKey: string, status: string): Promise<void>;
 
   generateTodayPaymentNumber(): Promise<string>;
+  findWithOrderItemsByUserId(userId: string): Promise<IPaymentList[]>;
 }
