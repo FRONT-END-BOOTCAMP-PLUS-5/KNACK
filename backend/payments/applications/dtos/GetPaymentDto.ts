@@ -1,7 +1,6 @@
 export interface GetPaymentDto {
   id: number;
   createdAt: Date;
-  addressId: number;
   paymentNumber: string;
   tossPaymentKey: string | null; // Toss에서 발급한 고유 결제 키
   price: number; // 실제 결제된 총 금액

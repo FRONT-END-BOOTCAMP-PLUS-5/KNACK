@@ -34,11 +34,19 @@ export type OrderItem = {
   productId: number;
   price: number;
   quantity: number;
-  thumbnail_image: string;
+  thumbnailImage: string;
   deliveryType: string;
-  kor_name?: string;
-  eng_name?: string;
-  optionValue?: IOptionValue;
+  korName?: string;
+  engName?: string;
+  brandName: string;
+  categoryName: string;
+  subCategoryName: string;
+  colorEngName: string;
+  colorKorName: string;
+  gender: string;
+  optionName: string;
+  optionValue: string;
+  releaseDate?: string;
 };
 
 export type OrderRow = {
@@ -111,8 +119,8 @@ export type RepoPayment = {
       id: number;
       productId: number;
       quantity: number;
-      price: number | bigint;
-      salePrice?: number | bigint;
+      price: number;
+      salePrice?: number;
       couponPrice?: number;
       point?: number;
       product?: { korName?: string | null; engName?: string | null; thumbnailImage?: string | null } | null;
@@ -123,19 +131,18 @@ export type RepoPayment = {
 
 export type RepoIndependentOrder = {
   id: number;
-  userId: string;
-  productId: number;
-  price: number | bigint;
-  salePrice?: number | bigint;
+  price: number | null;
+  salePrice?: number;
   tracking?: string | null;
   createdAt?: Date | null;
   deliveryStatus?: number;
   count?: number;
   paymentId?: number;
-  optionValueId?: number;
   quantity?: number;
-  product?: { korName?: string | null; engName?: string | null; thumbnailImage?: string | null } | null;
-  optionValue?: { id: number; name: string; value?: string } | null;
+  korName?: string | null;
+  engName?: string | null;
+  thumbnailImage?: string | null;
+  optionValue?: string;
   address?: RepoAddress | null;
 };
 

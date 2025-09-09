@@ -109,7 +109,6 @@ model Product {
   carts                            Cart[]
   coupons                          Coupon[]
   inquires                         Inquiry[]
-  orders                           Order[]
   productLike                      ProductLike[]
   productOptionMappings            ProductOptionMapping[]
   productStockMapping              ProductStockMapping[]
@@ -120,6 +119,7 @@ model Product {
   relatedProducts_ProductRelated   RelatedProduct[]       @relation("ProductRelated")
   relatedProducts_RelatedToProduct RelatedProduct[]       @relation("RelatedToProduct")
   reviews                          Review[]
+  orders                           Order[]
 
   @@map("products")
 }
@@ -219,7 +219,6 @@ model OptionValue {
   typeId              Int                   @map("type_id")
   cart                Cart[]
   optionTypes         OptionType            @relation(fields: [typeId], references: [id])
-  order               Order[]
   productStockMapping ProductStockMapping[]
   product             Product[]
 
@@ -297,22 +296,36 @@ model BrandLike {
 }
 
 model Order {
-  id             Int         @id @default(autoincrement())
-  userId         String      @map("user_id") @db.Uuid
-  productId      Int         @map("product_id")
-  price          Int?        @default(0)
-  salePrice      Int?        @default(0) @map("sale_price")
-  tracking       String?     @db.VarChar
-  createdAt      DateTime?   @default(now()) @map("created_at") @db.Timestamptz(6)
-  deliveryStatus Int?        @map("delivery_status")
-  count          Int?        @default(0)
-  paymentId      Int?        @map("payment_id")
-  optionValueId  Int         @map("option_value_id")
-  couponPrice    Int         @default(0) @map("coupon_price")
-  point          Int         @default(0)
-  optionValue    OptionValue @relation(fields: [optionValueId], references: [id])
+  id                Int         @id @default(autoincrement())
+  userId            String      @map("user_id") @db.Uuid
+  productId         Int         @map("product_id")
+  price             Int?        @default(0)
+  salePrice         Int?        @default(0) @map("sale_price")
+  tracking          String?     @db.VarChar
+  createdAt         DateTime?   @default(now()) @map("created_at") @db.Timestamptz(6)
+  deliveryStatus    Int?        @map("delivery_status")
+  count             Int?        @default(0)
+  paymentId         Int?        @map("payment_id")
+  couponPrice       Int         @default(0) @map("coupon_price")
+  point             Int         @default(0)
+  discountPercent   Int?        @default(0) @map("discount_percent")
+  brandName         String      @db.VarChar @map("brand_name")
+  thumbnailImage    String      @db.VarChar @map("thumbnail_image")
+  categoryName      String      @db.VarChar @map("category_name")
+	subCategoryName  String      @db.VarChar @map("sub_category_name")
+	gender            String      @db.VarChar @default("all")
+	engName           String      @db.VarChar @map("eng_name")
+	korName           String      @db.VarChar @map("kor_name")
+	colorEngName      String      @db.VarChar @map("color_eng_name")
+	colorKorName      String      @db.VarChar @map("color_kor_name")
+	modelNumber       String?     @db.VarChar @map("model_number")
+	releaseDate       String?     @db.VarChar @map("release_date")
+  optionName        String      @db.VarChar @map("option_name")
+  optionValue       String      @db.VarChar @map("option_value")
+
+
+  product        Product    @relation(fields: [productId], references: [id])
   payment        Payment?    @relation(fields: [paymentId], references: [id])
-  product        Product     @relation(fields: [productId], references: [id])
   user           User        @relation(fields: [userId], references: [id])
   review         Review[]
 
@@ -320,19 +333,25 @@ model Order {
 }
 
 model Payment {
-  id             Int       @id @default(autoincrement())
-  userId         String    @map("user_id") @db.Uuid
-  price          Int?      @default(0)
-  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  paymentNumber  String    @map("payment_number") @db.VarChar
-  addressId      Int       @map("address_id")
-  approvedAt     DateTime? @map("approved_at") @db.Timestamptz(6)
-  method         String    @db.VarChar
-  status         String    @db.VarChar
-  tossPaymentKey String?   @unique @map("toss_payment_key") @db.VarChar
+  id               Int       @id @default(autoincrement())
+  userId           String    @map("user_id") @db.Uuid
+  price            Int?      @default(0)
+  createdAt        DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  paymentNumber    String    @map("payment_number") @db.VarChar
+  approvedAt       DateTime? @map("approved_at") @db.Timestamptz(6)
+  method           String    @db.VarChar
+  status           String    @db.VarChar
+  tossPaymentKey   String?   @unique @map("toss_payment_key") @db.VarChar
+  name             String    @db.VarChar
+  username         String    @db.VarChar
+  zipCode          String    @db.VarChar @map("zip_code")
+  detailAddress    String?   @db.VarChar @map("detail_address")
+  mainAddress      String    @db.VarChar @map("main_address")
+  deliveryMessage  String?   @db.VarChar @map("delivery_message")
+
   orders         Order[]
-  address        Address   @relation(fields: [addressId], references: [id])
   user           User      @relation(fields: [userId], references: [id])
+
 
   @@map("payments")
 }
@@ -348,7 +367,6 @@ model Address {
   message   String?   @db.VarChar
   isDefault Boolean   @default(false) @map("is_default")
   user      User      @relation(fields: [userId], references: [id])
-  payments  Payment[]
 
   @@map("addresses")
 }
@@ -366,3 +384,4 @@ model Cart {
 
   @@map("carts")
 }
+

@@ -2,18 +2,18 @@
 
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import styles from './SuccessPage.module.scss';
+import styles from './successPage.module.scss';
 import requester from '@/utils/requester';
 import { useUserStore } from '@/store/userStore';
 import axios from 'axios';
-import { Coupon, OrderItem, RepresentativeProduct } from '@/types/order';
+import { Coupon, OrderItem } from '@/types/order';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
-import { IAddress } from '@/types/address';
 import Text from '@/components/common/Text';
 import { useCartStore } from '@/store/cartStore';
 import { cartService } from '@/services/cart';
 import Flex from '@/components/common/Flex';
+import { IPaymentRef, IPaymentSessionData } from '@/types/payment';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
@@ -21,16 +21,14 @@ export default function PaymentSuccess() {
   const user = useUserStore((s) => s.user);
 
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
-  const [IAddress, setIAddress] = useState<IAddress | null>(null);
   const [paymentNumber, setPaymentNumber] = useState('');
   const [paymentId, setPaymentId] = useState<number | null>(null);
-  const [repProd, setRepProd] = useState<RepresentativeProduct | null>(null);
   const [shippingFee, setShippingFee] = useState(0);
   const [otherOrdersCount, setOtherOrdersCount] = useState(0);
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>();
-  const [pointsToUse, setPointsToUse] = useState(0);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [targetSumAfterCoupon, setTargetSumAfterCoupon] = useState(0);
+  const [paymentSessionData, setPaymentSessionData] = useState<IPaymentSessionData>();
 
   // ✅ URL 파라미터를 원시값으로 고정
   const tossPaymentKey = useMemo(() => params.get('paymentKey') ?? '', [params]);
@@ -77,14 +75,13 @@ export default function PaymentSuccess() {
     const stored = sessionStorage.getItem('paymentData');
     const coupon = sessionStorage.getItem('selectedCoupon');
     const orderItems = sessionStorage.getItem('orderItems');
-    const address = sessionStorage.getItem('selectedAddress');
 
     if (stored) {
       const paymentData = JSON.parse(stored);
       setDiscountAmount(paymentData.couponDiscountAmount);
       setShippingFee(paymentData.shippingFee);
       setTargetSumAfterCoupon(paymentData.targetSumAfterCoupon);
-      setPointsToUse(paymentData.pointAmount);
+      setPaymentSessionData(paymentData);
     }
     if (coupon) {
       const parsed = JSON.parse(coupon);
@@ -94,10 +91,6 @@ export default function PaymentSuccess() {
       const parsed = JSON.parse(orderItems);
 
       setOrderItems(parsed);
-    }
-    if (address) {
-      const parsed = JSON.parse(address);
-      setIAddress(parsed);
     }
   }, []);
 
@@ -109,10 +102,7 @@ export default function PaymentSuccess() {
       console.log('SKIP: no user');
       return;
     }
-    if (!IAddress?.id) {
-      console.log('SKIP: no address');
-      return;
-    }
+
     if (orderItems.length === 0) {
       console.log('SKIP: no orderItems');
       return;
@@ -149,34 +139,45 @@ export default function PaymentSuccess() {
 
     (async () => {
       try {
-        console.log('➡️ 주문 저장 요청 /api/orders', { orderItems, targetSumAfterCoupon, discountAmount, pointsToUse });
-        const orderRes = await requester.post('/api/orders', {
+        const data: IPaymentRef = {
+          tossPaymentKey,
+          amount: paymentAmount,
+          salePrice: 0,
+          detailAddress: paymentSessionData?.detailAddress ?? '',
+          mainAddress: paymentSessionData?.mainAddress ?? '',
+          name: paymentSessionData?.name ?? '',
+          zipCode: paymentSessionData?.zipCode ?? '',
+          pointAmount: paymentSessionData?.pointAmount ?? 0,
+          orderId: tossOrderId ?? '',
+        };
+
+        // 주문 영수증 생성
+        const paymentRes = await requester.post('/api/payments', data);
+
+        // 상품마다의 주문 생성
+        await requester.post('/api/orders', {
           userId: user.id,
           items: orderItems.map((item) => ({
             productId: item.productId,
             price: item.price,
             salePrice: targetSumAfterCoupon,
             count: item.quantity,
-            addressId: IAddress.id,
             paymentId: null,
-            optionValueId: item?.optionValue?.id,
+            optionValue: item?.optionValue,
             couponPrice: discountAmount,
-            point: pointsToUse,
+            point: paymentSessionData?.pointAmount,
+            brandName: item?.brandName,
+            categoryName: item?.categoryName,
+            colorEngName: item?.colorEngName,
+            colorKorName: item?.colorKorName,
+            engName: item?.engName,
+            korName: item?.korName,
+            gender: item?.gender,
+            optionName: item?.optionName,
+            releaseDate: item?.releaseDate,
+            subCategoryName: item?.subCategoryName,
+            thumbnailImage: item?.thumbnailImage,
           })),
-        });
-
-        const createdOrderIds: number[] = orderRes.data.orderIds || [];
-        console.log('✅ 주문 저장 완료:', createdOrderIds);
-
-        console.log('➡️ 결제 확인/저장 요청 /api/payments');
-        const paymentRes = await requester.post('/api/payments', {
-          tossPaymentKey,
-          orderId: tossOrderId,
-          amount: paymentAmount,
-          addressId: IAddress.id,
-          orderIds: createdOrderIds,
-          selectedCouponId: selectedCoupon?.id ?? null,
-          pointsToUse: pointsToUse,
         });
 
         // ✅ cartIds를 가진 장바구니만 로컬 스토어에서 제거
@@ -188,7 +189,6 @@ export default function PaymentSuccess() {
         console.log(pid);
         setPaymentId(pid);
         setPaymentNumber(String(paymentRes.data.paymentNumber ?? ''));
-        console.log('✅ 결제 저장 완료:', { paymentNumber: paymentRes.data.paymentNumber, id: pid });
 
         // ✅ 여기서만 '처리됨' 기록
         writeProcessed({ tossPaymentKey, tossOrderId, at: Date.now() });
@@ -209,18 +209,20 @@ export default function PaymentSuccess() {
       }
     })();
   }, [
-    IAddress,
-    orderItems,
-    tossPaymentKey,
-    tossOrderId,
-    paymentAmount,
-    router,
-    pointsToUse,
-    selectedCoupon?.id,
-    targetSumAfterCoupon,
-    user,
     discountAmount,
+    orderItems,
+    paymentAmount,
+    paymentSessionData?.detailAddress,
+    paymentSessionData?.mainAddress,
+    paymentSessionData?.name,
+    paymentSessionData?.pointAmount,
+    paymentSessionData?.zipCode,
     readProcessed,
+    router,
+    targetSumAfterCoupon,
+    tossOrderId,
+    tossPaymentKey,
+    user,
     writeProcessed,
   ]);
 
@@ -237,20 +239,9 @@ export default function PaymentSuccess() {
           orderIds = payRes.data.orders.map((o: { id: number }) => o.id).filter((v: number) => Number.isFinite(v));
         }
         setOtherOrdersCount(Math.max(0, (orderIds?.length ?? 0) - 1));
-
-        const firstOrderId = orderIds?.[0];
-        if (!Number.isFinite(firstOrderId)) {
-          setRepProd(null);
-          return;
-        }
-
-        // 2) 첫 주문 상세 → 대표상품 + 배송비
-        const ordRes = await requester.get(`/api/orders/${firstOrderId}`);
-        const order = ordRes.data;
-        setRepProd(order.product ?? null);
       } catch (e) {
         console.error('❌ 대표상품/주문 로드 실패', e);
-        setRepProd(null);
+
         setShippingFee(0);
       }
     })();
@@ -265,12 +256,12 @@ export default function PaymentSuccess() {
         <p className={styles.subtitle}>주문 즉시 출고를 준비하여 안전하게 배송 될 예정입니다.</p>
 
         <div className={styles.image_wrap}>
-          {repProd?.thumbnailImage && (
+          {orderItems?.[0]?.thumbnailImage && (
             <Image
-              src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${repProd.thumbnailImage}`}
-              alt={repProd.korName}
-              width={80}
-              height={80}
+              src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${orderItems?.[0]?.thumbnailImage}`}
+              alt={orderItems?.[0]?.korName ?? ''}
+              width={120}
+              height={120}
               className={styles.productImage}
             />
           )}
@@ -310,7 +301,11 @@ export default function PaymentSuccess() {
 
         <div className={styles.row}>
           <div>포인트 사용</div>
-          <div>{pointsToUse > 0 ? `-${fmt(pointsToUse)}P` : '-'}</div>
+          <div>
+            {paymentSessionData?.pointAmount && paymentSessionData?.pointAmount > 0
+              ? `-${fmt(paymentSessionData?.pointAmount)}P`
+              : '-'}{' '}
+          </div>
         </div>
       </section>
     </div>

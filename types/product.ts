@@ -20,6 +20,9 @@ export interface IProduct {
   brand: IBrand;
   category: ICategory;
   productOptionMappings: IProductOptionMapping[];
+  colorKorName: string;
+  colorEngName: string;
+  releaseDate?: string;
 }
 
 export interface IProductOptionMapping {

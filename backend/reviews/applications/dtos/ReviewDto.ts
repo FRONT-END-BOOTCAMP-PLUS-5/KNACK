@@ -30,9 +30,7 @@ export interface ReviewWithRelations {
   createdAt: Date;
   order: {
     id: number;
-    optionValue?: {
-      name: string;
-    };
+    optionValue?: string;
   };
   product: {
     id: number;

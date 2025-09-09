@@ -1,10 +1,29 @@
-// backend/application/dto/CreateOrderItemDto.ts
 export interface CreateOrderItemDto {
-  productId: number;
+  userId: string;
   count: number;
   price: number;
-  salePrice?: number;
-  optionValueId: number;
-  couponPrice?: number;
-  point?: number;
+  salePrice: number;
+  deliveryStatus: DeliveryStatus;
+  couponPrice: number;
+  point: number;
+  brandName: string;
+  categoryName: string;
+  colorEngName: string;
+  colorKorName: string;
+  engName: string;
+  korName: string;
+  gender: string;
+  optionName: string;
+  optionValue: string;
+  releaseDate?: string;
+  subCategoryName: string;
+  thumbnailImage: string;
+  productId: number;
+}
+
+export enum DeliveryStatus {
+  PAID = 1,
+  CONFIRMED = 2,
+  DELIVERING = 3,
+  COMPLETED = 4,
 }

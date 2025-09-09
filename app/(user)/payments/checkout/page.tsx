@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
-import styles from './CheckoutPage.module.scss';
+import styles from './checkoutPage.module.scss';
 import AddressBox from '@/components/address/AddressBox';
 import requester from '@/utils/requester';
 import PaymentFooter from '@/components/Payments/PaymentFooter';
@@ -17,6 +17,7 @@ import { Coupon, CheckoutRow, OrderItem, BestCoupon } from '@/types/order';
 import CouponSelectModal from '@/components/Payments/CouponSelectModal';
 import { IAddress } from '@/types/address';
 import { useToastStore } from '@/store/toastStore';
+import { IPaymentSessionData } from '@/types/payment';
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
 
@@ -146,11 +147,15 @@ export default function CheckoutPage() {
       await handleSaveRequestMessage();
 
       // ✅ 성공 페이지에서 보여주려면 세션에 저장
-      const paymentData = {
+      const paymentData: IPaymentSessionData = {
         pointAmount: points,
         couponDiscountAmount: pricing.couponDiscount,
         shippingFee: pricing.shippingFee,
         targetSumAfterCoupon: pricing.targetSumAfterCoupon,
+        name: selectedAddress?.name,
+        mainAddress: selectedAddress?.address?.main,
+        detailAddress: selectedAddress?.detail,
+        zipCode: selectedAddress?.address?.zipCode,
       };
 
       // 문자열로 변환해서 저장
@@ -165,7 +170,7 @@ export default function CheckoutPage() {
       await toss.requestPayment('카드', {
         amount: totalPrice,
         orderId: `order_${Date.now()}`, // 권장: 서버에서 선발급한 orderNumber 사용
-        orderName: `${orderItems[0]?.kor_name || orderItems[0]?.eng_name || '상품'} ${
+        orderName: `${orderItems[0]?.korName || orderItems[0]?.engName || '상품'} ${
           orderItems.length > 1 ? `외 ${orderItems.length - 1}개` : ''
         } 주문`,
         customerName: selectedAddress.name || '홍길동',
@@ -178,7 +183,6 @@ export default function CheckoutPage() {
     }
   };
 
-  // ----- load checkout from localStorage -----
   useEffect(() => {
     // localStorage는 클라에서만 접근 가능
     const raw = typeof window !== 'undefined' ? localStorage.getItem('checkout') : null;
@@ -193,7 +197,6 @@ export default function CheckoutPage() {
     }
   }, []);
 
-  // ----- fetch products in batch & build orderItems -----
   useEffect(() => {
     if (!checkout.length) return;
     (async () => {
@@ -209,20 +212,29 @@ export default function CheckoutPage() {
                   productId: p.id,
                   price: p.price,
                   quantity: checkout[i].quantity,
-                  thumbnail_image: p.thumbnailImage,
+                  thumbnailImage: p.thumbnailImage,
                   deliveryType: checkout[i].deliveryMethod,
-                  kor_name: p.korName,
-                  eng_name: p.engName,
-                  optionValue: p?.productOptionMappings[0]?.optionType?.optionValue?.find(
-                    (item) => item?.id === checkout[i]?.optionValueId
-                  ),
+                  korName: p.korName,
+                  engName: p.engName,
+                  optionValue:
+                    p?.productOptionMappings[0]?.optionType?.optionValue?.find(
+                      (item) => item?.id === checkout[i]?.optionValueId
+                    )?.name ?? '',
+                  optionName: p?.productOptionMappings[0]?.optionType?.name,
+                  brandName: p?.brand?.korName,
+                  categoryName: p?.category?.korName,
+                  subCategoryName: p?.category?.korName,
+                  colorEngName: p?.colorEngName,
+                  colorKorName: p?.colorKorName,
+                  gender: p?.gender,
+                  releaseDate: p?.releaseDate ?? '',
                 },
               ]
             : []
         );
 
         setOrderItems(items);
-        // 필요 시 성공 페이지용으로 보존
+
         sessionStorage.setItem('orderItems', JSON.stringify(items));
       } catch (e) {
         console.error('batch fetch failed:', e);

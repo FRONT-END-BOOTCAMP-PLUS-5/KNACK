@@ -61,16 +61,4 @@ export class GetOrderInPaymentsUseCase {
       })),
     };
   }
-
-  async byNumber(paymentNumber: string, userId: string) {
-    const payment = await this.repo.findWithOrderItemsByNumber(paymentNumber, userId);
-    if (!payment) return null;
-    return this.mapToDto(payment);
-  }
-
-  async byId(paymentId: number, userId: string) {
-    const payment = await this.repo.findWithOrderItemsById(paymentId, userId);
-    if (!payment) return null;
-    return this.mapToDto(payment);
-  }
 }

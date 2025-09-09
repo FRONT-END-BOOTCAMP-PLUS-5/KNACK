@@ -26,24 +26,24 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<Param
     const asBig = BigInt(raw);
     const usecase = new GetOrderInPaymentsUseCase(new PrPaymentRepository());
 
-    // ✅ INT32 범위면 paymentId로 처리
-    if (asBig <= INT32_MAX && asBig >= INT32_MIN) {
-      const paymentId = Number(asBig);
-      const dto = await usecase.byId(paymentId, userId);
-      if (!dto) return NextResponse.json({ error: 'not_found' }, { status: 404 });
-      return NextResponse.json(serializeBigInt(dto), { status: 200 });
-    }
+    // // ✅ INT32 범위면 paymentId로 처리
+    // if (asBig <= INT32_MAX && asBig >= INT32_MIN) {
+    //   const paymentId = Number(asBig);
+    //   const dto = await usecase.byId(paymentId, userId);
+    //   if (!dto) return NextResponse.json({ error: 'not_found' }, { status: 404 });
+    //   return NextResponse.json(serializeBigInt(dto), { status: 200 });
+    // }
 
-    // ✅ 그보다 크면 paymentNumber(BigInt)로 처리
-    //  └ Prisma 스키마에서 paymentNumber가 BigInt 컬럼이어야 함
-    const dto = await usecase.byNumber(String(asBig) /* bigint */, userId);
-    if (!dto) return NextResponse.json({ error: 'not_found' }, { status: 404 });
+    // // ✅ 그보다 크면 paymentNumber(BigInt)로 처리
+    // //  └ Prisma 스키마에서 paymentNumber가 BigInt 컬럼이어야 함
+    // const dto = await usecase.byNumber(String(asBig) /* bigint */, userId);
+    // if (!dto) return NextResponse.json({ error: 'not_found' }, { status: 404 });
 
-    // BigInt 직렬화
-    return new NextResponse(
-      JSON.stringify(dto, (_k, v) => (typeof v === 'bigint' ? v.toString() : v)),
-      { status: 200, headers: { 'content-type': 'application/json; charset=utf-8' } }
-    );
+    // // BigInt 직렬화
+    // return new NextResponse(
+    //   JSON.stringify(dto, (_k, v) => (typeof v === 'bigint' ? v.toString() : v)),
+    //   { status: 200, headers: { 'content-type': 'application/json; charset=utf-8' } }
+    // );
   } catch (e) {
     console.error('GET /api/payments/[id] failed:', e);
     return NextResponse.json({ error: 'internal_error' }, { status: 500 });
