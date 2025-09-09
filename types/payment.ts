@@ -118,3 +118,21 @@ export interface IPaymentRef {
   pointAmount: number;
   orderId: string;
 }
+
+export interface IPaymentList {
+  id: number;
+  approvedAt: string;
+  paymentNumber: string;
+  orders: IOrderItem[];
+}
+
+export interface IOrderItem {
+  id: number;
+  paymentId: number | null;
+  thumbnailImage: string;
+  korName: string;
+  engName: string;
+  optionName: string;
+  optionValue: string;
+  deliveryStatus: number | null;
+}
