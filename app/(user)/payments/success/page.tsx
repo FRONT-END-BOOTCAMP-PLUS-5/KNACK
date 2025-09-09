@@ -216,6 +216,7 @@ export default function PaymentSuccess() {
     paymentSessionData?.detailAddress,
     paymentSessionData?.mainAddress,
     paymentSessionData?.name,
+    paymentSessionData?.phone,
     paymentSessionData?.pointAmount,
     paymentSessionData?.zipCode,
     readProcessed,

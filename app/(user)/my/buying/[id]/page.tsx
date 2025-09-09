@@ -28,12 +28,6 @@ export default function BuyingPage({ params }: BuyingPageProps) {
   const [isReqOpen, setReqOpen] = useState(false);
   const [isPaymentCompleted, setIsPaymentCompleted] = useState(true);
   const [confirming, setConfirming] = useState(false);
-  const [meta, setMeta] = useState<{
-    paymentNumber?: string;
-    status?: string;
-    method?: string;
-    createdAt?: string;
-  }>({});
 
   // 하단 버튼 클릭시 완료 처리
   const handleFooterClick = async () => {
@@ -60,19 +54,6 @@ export default function BuyingPage({ params }: BuyingPageProps) {
   const total = productTotal + (paymentData?.shippingFee ?? 0) - (item?.couponPrice ?? 0) - (item?.point ?? 0);
 
   const step: Step = statusToStep(item?.deliveryStatus);
-
-  // 주소 안전 매핑
-  const name = (address?.name ?? '') || '-';
-  const phone = (address?.phone ?? '') || '-';
-  const zip = (address?.address?.zipCode ?? '') || '';
-  const main = (address?.address?.main ?? '') || '';
-  const detail = (address?.detail ?? '') || '';
-  const message = (address?.message ?? '') || '';
-
-  const thumb = item?.product?.thumbnailImage ?? '/placeholder.png';
-  const korname = item?.product?.korName ?? '';
-  const engname = item?.product?.engName ?? '';
-  const variant = item?.optionValue?.name ?? item?.optionValue?.value ?? '';
 
   useEffect(() => {
     params.then(({ id }) => {
@@ -101,12 +82,7 @@ export default function BuyingPage({ params }: BuyingPageProps) {
               }
             : null
         );
-        setMeta({
-          paymentNumber: String(data.paymentId ?? ''),
-          status: data.status,
-          method: data.method,
-          createdAt: data.createdAt,
-        });
+
         const paymentStatus = data.deliveryStatus as number | undefined;
 
         // status가 CONFIRMED이면 결제 완료 처리
@@ -144,14 +120,16 @@ export default function BuyingPage({ params }: BuyingPageProps) {
       <BuyingHeader /> {/* 타이틀 컴포넌트가 '구매 진행 중'을 보여주도록 되어있다면 OK */}
       {/* 주문번호 */}
       <section className={styles.section}>
-        <div className={styles.order_no}>주문번호 {meta.paymentNumber || '-'}</div>
+        <Text size={1.2} weight={600}>
+          주문번호 {item?.payment?.paymentNumber || '-'}
+        </Text>
       </section>
       {/* 상품 카드 */}
       <section key={item?.id} className={`${styles.section} ${styles.product_card}`}>
         <div className={styles.thumb_wrap}>
           <Image
-            src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${thumb}`}
-            alt={korname}
+            src={`${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${item?.thumbnailImage}`}
+            alt={item?.korName ?? ''}
             width={80}
             height={80}
             className={styles.thumb}
@@ -159,16 +137,18 @@ export default function BuyingPage({ params }: BuyingPageProps) {
         </div>
         <div className={styles.prod_info}>
           <Text size={1.4} weight={500} marginBottom={2}>
-            {korname}
+            {item?.engName}
           </Text>
           <Text size={1.3} color="gray2">
-            {engname}
+            {item?.korName}
           </Text>
-          {variant && <div className={styles.variant}>{variant}</div>}
+          <Text size={1.4} weight={600} marginTop={10}>
+            {item?.optionValue}
+          </Text>
         </div>
       </section>
       <section className={styles.section} style={{ borderTop: 'none' }}>
-        <button className={styles.detail_btn} onClick={() => router.push(`/products/${item?.product?.id}`)}>
+        <button className={styles.detail_btn} onClick={() => router.push(`/products/${item?.productId}`)}>
           상품 상세
         </button>
       </section>
@@ -219,17 +199,17 @@ export default function BuyingPage({ params }: BuyingPageProps) {
         <div className={styles.addr_card}>
           <div className={styles.addr_row}>
             <Text>받는 사람</Text>
-            <Text>{name}</Text>
+            <Text>{item?.payment?.name}</Text>
           </div>
           <div className={styles.addr_row}>
             <Text>휴대폰 번호</Text>
-            <Text>{formatPhoneNumber(phone)}</Text>
+            <Text>{formatPhoneNumber(item?.payment?.phone ?? '')}</Text>
           </div>
           <div className={styles.addr_row}>
             <Text>주소</Text>
             <Text>
-              {zip ? `(${zip}) ` : ''}
-              {main} {detail}
+              {item?.payment?.zipCode ? `(${item?.payment?.zipCode}) ` : ''}
+              {item?.payment?.mainAddress} {item?.payment?.detailAddress}
             </Text>
           </div>
         </div>
@@ -246,7 +226,7 @@ export default function BuyingPage({ params }: BuyingPageProps) {
         <div className={styles.addr_card}>
           <div className={styles.addr_row}>
             <Text>요청 사항</Text>
-            <Text>{message || '-'}</Text>
+            <Text>{item?.payment?.deliveryMessage || '-'}</Text>
           </div>
         </div>
       </section>
