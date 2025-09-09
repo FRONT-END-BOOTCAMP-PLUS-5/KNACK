@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
-import styles from './CheckoutPage.module.scss';
+import styles from './checkoutPage.module.scss';
 import AddressBox from '@/components/address/AddressBox';
 import requester from '@/utils/requester';
 import PaymentFooter from '@/components/Payments/PaymentFooter';

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import styles from './SuccessPage.module.scss';
+import styles from './successPage.module.scss';
 import requester from '@/utils/requester';
 import { useUserStore } from '@/store/userStore';
 import axios from 'axios';
