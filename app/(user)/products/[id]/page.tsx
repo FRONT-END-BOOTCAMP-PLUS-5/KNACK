@@ -16,6 +16,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createMetaData } from '@/utils/createMetaData';
 import { STORAGE_PATHS } from '@/constraint/auth';
+import { cache } from 'react';
 
 interface IProps {
   params: Promise<{
@@ -49,7 +50,7 @@ const SSRContent = (productData?: IProduct) => {
   );
 };
 
-async function getProductData(id: number): Promise<IProduct | null> {
+const getProductData = cache(async (id: number): Promise<IProduct | null> => {
   try {
     const { getProduct } = productsService;
     const response = await getProduct(id);
@@ -58,9 +59,9 @@ async function getProductData(id: number): Promise<IProduct | null> {
     console.error('상품 데이터 조회 실패:', error);
     return null;
   }
-}
+});
 
-export async function generateMetadata({ params }: IProps): Promise<Metadata> {
+export const generateMetadata = async ({ params }: IProps): Promise<Metadata> => {
   const { id } = await params;
   const productData = await getProductData(Number(id));
 
@@ -76,7 +77,7 @@ export async function generateMetadata({ params }: IProps): Promise<Metadata> {
       productData?.korName && productData?.engName && `${productData.engName} - ${productData.korName} | KNACK`,
     ogImage: productData?.thumbnailImage && `${STORAGE_PATHS.PRODUCT.THUMBNAIL}/${productData?.thumbnailImage}`,
   });
-}
+};
 
 const ProductDetail = async ({ params }: IProps) => {
   const { id } = await params;
