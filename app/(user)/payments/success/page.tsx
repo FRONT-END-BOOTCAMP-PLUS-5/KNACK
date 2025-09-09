@@ -162,7 +162,7 @@ export default function PaymentSuccess() {
             price: item.price,
             salePrice: targetSumAfterCoupon,
             count: item.quantity,
-            paymentId: null,
+            paymentId: paymentRes?.data?.result,
             optionValue: item?.optionValue,
             couponPrice: discountAmount,
             point: paymentSessionData?.pointAmount,

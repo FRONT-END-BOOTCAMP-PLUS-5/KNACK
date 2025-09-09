@@ -28,6 +28,7 @@ export class CreateOrderUseCase {
       subCategoryName: item.subCategoryName,
       thumbnailImage: item.thumbnailImage,
       productId: item.productId,
+      paymentId: item.paymentId,
     }));
 
     return this.repo.saveMany(orders);

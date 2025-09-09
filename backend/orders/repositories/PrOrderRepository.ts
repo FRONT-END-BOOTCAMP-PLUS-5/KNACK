@@ -15,7 +15,7 @@ export class PrOrderRepository implements OrderRepository {
             price: o.price,
             salePrice: o.salePrice,
             deliveryStatus: o.deliveryStatus,
-            paymentId: null,
+            paymentId: o.paymentId,
             couponPrice: o.couponPrice,
             point: o.point,
             brandName: o.brandName,
