@@ -12,4 +12,5 @@ export interface CreatePaymentDto {
   name?: string;
   username?: string;
   zipCode?: string;
+  phone: string;
 }

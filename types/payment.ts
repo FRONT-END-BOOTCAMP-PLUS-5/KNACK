@@ -105,6 +105,7 @@ export interface IPaymentSessionData {
   mainAddress: string;
   detailAddress: string;
   zipCode: string;
+  phone: string;
 }
 
 export interface IPaymentRef {
@@ -117,6 +118,7 @@ export interface IPaymentRef {
   tossPaymentKey: string;
   pointAmount: number;
   orderId: string;
+  phone: string;
 }
 
 export interface IPaymentList {

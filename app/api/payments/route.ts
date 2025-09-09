@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     const user = session.user;
 
     const body = await req.json();
-    const { tossPaymentKey, amount, pointAmount, orderId, detailAddress, mainAddress, name, zipCode } = body;
+    const { tossPaymentKey, amount, pointAmount, orderId, detailAddress, mainAddress, name, zipCode, phone } = body;
 
     // ✅ 1) 입력값 1차 검증 (개발서버에서 특히 중요)
     if (!tossPaymentKey || !Number.isFinite(Number(amount))) {
@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
         name: name,
         username: user?.name,
         zipCode: zipCode,
+        phone: phone,
       };
 
       const paymentRepository = new PrPaymentRepository();
