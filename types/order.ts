@@ -134,19 +134,29 @@ export type RepoPayment = {
 
 export type RepoIndependentOrder = {
   id: number;
-  price: number | null;
-  salePrice?: number;
-  tracking?: string | null;
   createdAt?: Date | null;
-  deliveryStatus?: number;
-  count?: number;
-  paymentId?: number;
-  quantity?: number;
   korName?: string | null;
   engName?: string | null;
   thumbnailImage?: string | null;
-  optionValue?: string;
-  address?: RepoAddress | null;
+  price: number | null;
+  deliveryStatus?: number | null;
+  salePrice?: number | null;
+  tracking?: string | null;
+  optionName: string;
+  optionValue: string;
+  productId: number;
+  paymentId?: number | null;
+  payment?: {
+    id: number;
+    deliveryMessage: string | null;
+    detailAddress: string | null;
+    mainAddress: string | null;
+    name: string | null;
+    zipCode: string | null;
+    method: string | null;
+    paymentNumber: string | null;
+    phone: string | null;
+  } | null;
 };
 
 export type DtoStatus = 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
@@ -221,10 +231,6 @@ export type RepoOrderItem = {
   id: number;
   productId: number;
   paymentId: number;
-  payment: {
-    paymentNumber: bigint;
-    status: 'PENDING' | 'PAID' | 'CANCELLED' | 'FAILED' | string;
-  };
   price: number | bigint;
   salePrice?: number | bigint;
   quantity?: number;
@@ -236,16 +242,18 @@ export type RepoOrderItem = {
   optionValueId?: number;
   couponPrice?: number;
   point?: number;
-  product?: {
-    id: number;
-    korName?: string;
-    engName?: string;
-    thumbnailImage?: string;
-  };
-  optionValue?: {
-    id: number;
+  korName?: string;
+  engName?: string;
+  thumbnailImage?: string;
+  optionValue: string;
+  payment: {
     name: string;
-    value?: string;
+    zipCode: string;
+    mainAddress: string;
+    detailAddress: string;
+    deliveryMessage: string;
+    paymentNumber: string;
+    phone: string;
   };
 };
 

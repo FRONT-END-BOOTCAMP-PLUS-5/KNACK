@@ -23,12 +23,6 @@ $page-max: 440px;
   padding: 19px 20px 31px;
 }
 
-.order_no {
-  color: #222;
-  font-size: 14px;
-  font-weight: 600;
-}
-
 /* 크기 살짝 다운: 오른쪽 카드 느낌 */
 .product_card {
   grid-template-columns: 72px 1fr; // ← 96px → 72px

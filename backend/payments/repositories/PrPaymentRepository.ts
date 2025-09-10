@@ -2,8 +2,7 @@ import prisma from '@/backend/utils/prisma';
 import { PaymentRepository } from '@/backend/payments/domains/repositories/PaymentRepository';
 import { CreatePaymentDto } from '@/backend/payments/applications/dtos/CreatePaymentDto';
 import { GetPaymentDto } from '@/backend/payments/applications/dtos/GetPaymentDto';
-import { RepoPayment } from '@/types/order';
-import { IPaymentList } from '../domains/entities/Payment';
+import { IPaymentDetail, IPaymentList } from '../domains/entities/Payment';
 
 export class PrPaymentRepository implements PaymentRepository {
   async markPaid({
@@ -46,6 +45,7 @@ export class PrPaymentRepository implements PaymentRepository {
         name: payment.name ?? '',
         username: payment.username ?? '',
         zipCode: payment.zipCode ?? '',
+        phone: payment.phone,
       },
     });
 
@@ -105,16 +105,38 @@ export class PrPaymentRepository implements PaymentRepository {
     return paymentNumber;
   }
 
-  async findWithOrdersById(paymentId: number, userId: string): Promise<RepoPayment | null> {
+  // 하나의 주문 가져오기
+  async findWithOrdersById(id: number, userId: string): Promise<IPaymentDetail | null> {
     const data = await prisma.payment.findFirst({
-      where: { id: paymentId, userId },
-      include: {
-        orders: true,
+      where: { id: id, userId },
+      select: {
+        id: true,
+        paymentNumber: true,
+        approvedAt: true,
+        method: true,
+        price: true,
+        orders: {
+          select: {
+            id: true,
+            engName: true,
+            optionName: true,
+            optionValue: true,
+            deliveryStatus: true,
+            price: true,
+            couponPrice: true,
+            point: true,
+            thumbnailImage: true,
+          },
+        },
       },
     });
-    return data as unknown as RepoPayment | null;
+
+    const conversionData = { ...data, approvedAt: String(data?.approvedAt) };
+
+    return conversionData;
   }
 
+  // 유저의 모든 주문 가져오기
   async findWithOrderItemsByUserId(userId: string): Promise<IPaymentList[]> {
     const data = await prisma.payment.findMany({
       where: { userId: userId },

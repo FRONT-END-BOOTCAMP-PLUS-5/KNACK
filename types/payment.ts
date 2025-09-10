@@ -65,26 +65,24 @@ export type Info = {
 };
 
 export type ReceiptItem = {
-  id: string;
-  orderNumber: string;
-  title: string;
-  optionText: string;
-  status?: string;
-  imageUrl: string;
+  id: number;
+  engName: string;
+  optionName: string;
+  optionValue: string;
+  deliveryStatus: number;
+  price: number;
+  couponPrice: number;
+  point: number;
+  thumbnailImage: string;
 };
 
 export type PaymentData = {
-  orders?: unknown[]; // 서버 스키마 다양성 고려
-  approvedAt?: string;
-  totals?: {
-    subtotal?: number;
-    shippingFee?: number;
-    couponUsed?: number;
-    pointsUsed?: number;
-    total?: number;
-  };
-  paymentNumber?: string | number;
-  cardMasked?: string;
+  id: number;
+  paymentNumber: string;
+  approvedAt: string;
+  method: string;
+  price: number;
+  orders: ReceiptItem[];
 };
 
 export type Payment = {
@@ -105,6 +103,7 @@ export interface IPaymentSessionData {
   mainAddress: string;
   detailAddress: string;
   zipCode: string;
+  phone: string;
 }
 
 export interface IPaymentRef {
@@ -117,6 +116,7 @@ export interface IPaymentRef {
   tossPaymentKey: string;
   pointAmount: number;
   orderId: string;
+  phone: string;
 }
 
 export interface IPaymentList {

@@ -22,10 +22,7 @@ export default function BuyingList({ items }: { items: Payment[] }) {
               <Divider />
               <article className={styles.payment_block}>
                 {/* 결제 헤더: 결제번호 + 구매확정(승인) 날짜 */}
-                <header
-                  className={styles.payment_header}
-                  onClick={() => router.push(`/my/order/${payment.paymentNumber}`)}
-                >
+                <header className={styles.payment_header} onClick={() => router.push(`/my/order/${payment.id}`)}>
                   <div className={styles.payment_left}>
                     <Text size={1.2} weight={600}>
                       결제번호 {payment.paymentNumber}

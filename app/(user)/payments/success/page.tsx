@@ -149,6 +149,7 @@ export default function PaymentSuccess() {
           zipCode: paymentSessionData?.zipCode ?? '',
           pointAmount: paymentSessionData?.pointAmount ?? 0,
           orderId: tossOrderId ?? '',
+          phone: paymentSessionData?.phone ?? '',
         };
 
         // 주문 영수증 생성
@@ -215,6 +216,7 @@ export default function PaymentSuccess() {
     paymentSessionData?.detailAddress,
     paymentSessionData?.mainAddress,
     paymentSessionData?.name,
+    paymentSessionData?.phone,
     paymentSessionData?.pointAmount,
     paymentSessionData?.zipCode,
     readProcessed,

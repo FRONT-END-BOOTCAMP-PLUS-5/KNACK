@@ -69,7 +69,7 @@ export class PrOrderRepository implements OrderRepository {
     return orders.map((order) => order.id);
   }
 
-  // 하나의 주문만 찾기??
+  // 주문 상세
   async findById(id: number, userId: string): Promise<RepoIndependentOrder | null> {
     const order = await prisma.order.findFirst({
       where: { id, userId },
@@ -80,9 +80,28 @@ export class PrOrderRepository implements OrderRepository {
         engName: true,
         thumbnailImage: true,
         price: true,
+        deliveryStatus: true,
+        salePrice: true,
+        tracking: true,
+        optionName: true,
+        optionValue: true,
+        productId: true,
+        paymentId: true,
+        payment: {
+          select: {
+            id: true,
+            deliveryMessage: true,
+            detailAddress: true,
+            mainAddress: true,
+            name: true,
+            zipCode: true,
+            method: true,
+            paymentNumber: true,
+            phone: true,
+          },
+        },
       },
     });
-    if (!order) return null;
 
     return order;
   }
@@ -98,15 +117,15 @@ export class PrOrderRepository implements OrderRepository {
         tracking: true,
         createdAt: true,
         deliveryStatus: true,
-        count: true,
         paymentId: true,
         korName: true,
         engName: true,
         thumbnailImage: true,
         optionName: true,
         optionValue: true,
+        productId: true,
       },
     });
-    return orders as RepoIndependentOrder[];
+    return orders;
   }
 }

@@ -17,11 +17,23 @@ export interface IPaymentList {
 
 interface IOrderItem {
   id: number;
-  paymentId: number | null;
+  paymentId?: number | null;
   thumbnailImage: string;
-  korName: string;
+  korName?: string;
   engName: string;
   optionName: string;
   optionValue: string;
   deliveryStatus: number | null;
+  point?: number;
+  couponPrice?: number;
+  price?: number | null;
+}
+
+export interface IPaymentDetail {
+  id?: number;
+  approvedAt: string;
+  paymentNumber?: string;
+  method?: string;
+  price?: number | null;
+  orders?: IOrderItem[];
 }
