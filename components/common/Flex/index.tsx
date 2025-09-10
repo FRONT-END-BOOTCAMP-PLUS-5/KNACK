@@ -8,7 +8,7 @@ interface IProps {
   className?: string;
   direction?: 'row' | 'column';
   align?: 'center' | 'start' | 'end';
-  justify?: 'between' | 'center' | 'start';
+  justify?: 'between' | 'center' | 'start' | 'end';
   width?: 'full' | 'self';
   gap?: number;
   paddingVertical?: number;
