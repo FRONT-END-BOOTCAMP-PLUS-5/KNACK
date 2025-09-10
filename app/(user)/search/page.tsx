@@ -46,7 +46,6 @@ export default async function Search({ searchParams }: IProps) {
       session?.user.id
     );
 
-    console.log('initialData', initialData);
     return (
       <main>
         <SearchCsrWrapper queryParams={queryParams} />
