@@ -86,6 +86,7 @@ export class PrOrderRepository implements OrderRepository {
         optionName: true,
         optionValue: true,
         productId: true,
+        paymentId: true,
         payment: {
           select: {
             id: true,

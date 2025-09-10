@@ -186,7 +186,7 @@ export default function BuyingPage({ params }: BuyingPageProps) {
           <div className={styles.value_strong}>{formatPrice(total)}</div>
         </div>
 
-        <button className={styles.subtle_btn} onClick={() => router.push(`/my/order/${item?.payment?.paymentNumber}`)}>
+        <button className={styles.subtle_btn} onClick={() => router.push(`/my/order/${item?.paymentId}`)}>
           결제 내역 상세보기
         </button>
       </section>
