@@ -1,8 +1,13 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './event.module.scss';
+import { Metadata } from 'next';
+import { createMetaData } from '@/utils/createMetaData';
+
+export const metadata: Metadata = createMetaData({
+  title: 'EVENT | KNACK',
+  description: 'KNACK의 다양한 이벤트, 할인 정보를 확인해보세요.',
+});
 
 export default function EventPage() {
   return (
