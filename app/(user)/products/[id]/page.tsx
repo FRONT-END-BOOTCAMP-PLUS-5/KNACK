@@ -68,6 +68,7 @@ export const generateMetadata = async ({ params }: IProps): Promise<Metadata> =>
   if (!productData) {
     return createMetaData({
       title: 'Product | KNACK',
+      description: '상품의 자세한 정보를 확인해보세요. | KNACK',
     });
   }
 
