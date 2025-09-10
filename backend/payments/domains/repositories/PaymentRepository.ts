@@ -2,11 +2,10 @@
 
 import { CreatePaymentDto } from '../../applications/dtos/CreatePaymentDto';
 import { GetPaymentDto } from '../../applications/dtos/GetPaymentDto';
-import { RepoPayment } from '@/types/order';
-import { IPaymentList } from '../entities/Payment';
+import { IPaymentDetail, IPaymentList } from '../entities/Payment';
 
 export interface PaymentRepository {
-  findWithOrdersById(paymentId: number, userId: string): Promise<RepoPayment | null>;
+  findWithOrdersById(id: number, userId: string): Promise<IPaymentDetail | null>;
 
   // 상태 전이: CONFIRMING -> PAID (동시성 방지: where에 status 포함)
   markPaid(args: {
