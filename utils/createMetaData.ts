@@ -18,6 +18,9 @@ export const createMetaData = (metaDataProps: IProps = {}) => {
     metadataBase: new URL(META_DATA.baseUrl),
     title: TITLE,
     description: DESCRIPTION,
+    verification: {
+      google: 'XsagSDQamTgB-R1oZSIUL3Ew3uIUdPm-0wgPi9gsRaU',
+    },
     openGraph: {
       title: TITLE,
       description: DESCRIPTION,

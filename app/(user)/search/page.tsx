@@ -16,6 +16,7 @@ interface IProps {
 
 export const metadata: Metadata = createMetaData({
   title: 'SHOP | KNACK',
+  description: '원하는 상품을 검색해보세요. | KNACK',
 });
 
 export default async function Search({ searchParams }: IProps) {
@@ -44,6 +45,7 @@ export default async function Search({ searchParams }: IProps) {
       queryString,
       session?.user.id
     );
+
     return (
       <main>
         <SearchCsrWrapper queryParams={queryParams} />
