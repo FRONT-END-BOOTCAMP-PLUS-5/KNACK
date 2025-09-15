@@ -14,6 +14,7 @@ import { useCartStore } from '@/store/cartStore';
 import { cartService } from '@/services/cart';
 import Flex from '@/components/common/Flex';
 import { IPaymentRef, IPaymentSessionData } from '@/types/payment';
+import { couponService } from '@/services/coupon';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
@@ -150,6 +151,7 @@ export default function PaymentSuccess() {
           pointAmount: paymentSessionData?.pointAmount ?? 0,
           orderId: tossOrderId ?? '',
           phone: paymentSessionData?.phone ?? '',
+          message: paymentSessionData?.message ?? '',
         };
 
         // 주문 영수증 생성
@@ -185,6 +187,8 @@ export default function PaymentSuccess() {
         cartService.removesCart(cartIds);
         useCartStore.getState().removeStoreCarts(cartIds);
 
+        await couponService.deleteCoupon(selectedCoupon?.id ?? 0);
+
         // ⚓ paymentId + paymentNumber 확보
         const pid: number | null = paymentRes.data?.id ?? null;
         console.log(pid);
@@ -215,12 +219,14 @@ export default function PaymentSuccess() {
     paymentAmount,
     paymentSessionData?.detailAddress,
     paymentSessionData?.mainAddress,
+    paymentSessionData?.message,
     paymentSessionData?.name,
     paymentSessionData?.phone,
     paymentSessionData?.pointAmount,
     paymentSessionData?.zipCode,
     readProcessed,
     router,
+    selectedCoupon?.id,
     targetSumAfterCoupon,
     tossOrderId,
     tossPaymentKey,
