@@ -349,6 +349,7 @@ model Payment {
   mainAddress      String    @db.VarChar @map("main_address")
   deliveryMessage  String?   @db.VarChar @map("delivery_message")
   phone            String?   @db.VarChar @map("phone")
+  provider         String?   @db.VarChar
 
   orders         Order[]
   user           User      @relation(fields: [userId], references: [id])
