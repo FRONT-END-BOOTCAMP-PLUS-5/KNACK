@@ -46,6 +46,8 @@ export class PrPaymentRepository implements PaymentRepository {
         username: payment.username ?? '',
         zipCode: payment.zipCode ?? '',
         phone: payment.phone,
+        deliveryMessage: payment.message ?? '',
+        provider: payment.provider,
       },
     });
 

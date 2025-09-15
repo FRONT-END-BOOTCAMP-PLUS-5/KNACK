@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
     const user = session.user;
 
     const body = await req.json();
-    const { tossPaymentKey, amount, pointAmount, orderId, detailAddress, mainAddress, name, zipCode, phone } = body;
-
+    const { tossPaymentKey, amount, pointAmount, orderId, detailAddress, mainAddress, name, zipCode, phone, message } =
+      body;
     // ✅ 1) 입력값 1차 검증 (개발서버에서 특히 중요)
     if (!tossPaymentKey || !Number.isFinite(Number(amount))) {
       return NextResponse.json({ message: 'bad params', body }, { status: 400 });
@@ -49,6 +49,8 @@ export async function POST(req: NextRequest) {
         username: user?.name,
         zipCode: zipCode,
         phone: phone,
+        message: message,
+        provider: tossResult?.easyPay?.provider,
       };
 
       const paymentRepository = new PrPaymentRepository();

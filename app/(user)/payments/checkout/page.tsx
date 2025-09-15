@@ -157,6 +157,7 @@ export default function CheckoutPage() {
         detailAddress: selectedAddress?.detail,
         zipCode: selectedAddress?.address?.zipCode,
         phone: selectedAddress?.phone,
+        message: selectedAddress?.message,
       };
 
       // 문자열로 변환해서 저장

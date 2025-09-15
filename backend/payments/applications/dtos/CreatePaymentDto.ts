@@ -13,4 +13,6 @@ export interface CreatePaymentDto {
   username?: string;
   zipCode?: string;
   phone: string;
+  message?: string;
+  provider: string;
 }
