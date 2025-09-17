@@ -26,7 +26,7 @@
   overflow: hidden;
   margin: 0 auto;
   z-index: 1000;
-  
+
   &.visible {
     display: block;
   }
@@ -97,12 +97,11 @@
   width: 100%;
   height: 60px;
   z-index: 100;
-
 }
 
 // 새로운 UI 스타일
 .box_ui {
-  padding: 0 2rem 0 2rem;;
+  padding: 0 2rem 0 2rem;
 }
 
 .notification_text {
@@ -128,7 +127,7 @@
   flex: 1;
   text-align: center;
   background: #fff;
-  border-radius: 1.2rem;
+  border-radius: 1rem;
   padding: 1.6rem;
   box-shadow: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.1);
 }
@@ -149,10 +148,10 @@
 
 .fishing_button {
   width: 100%;
-  background: #495057;
+  background: $black;
   color: #fff;
   padding: 1.6rem;
-  border-radius: 0.8rem;
+  border-radius: 1rem;
   font-size: 1.6rem;
   font-weight: 700;
   border: none;
@@ -160,10 +159,6 @@
   transition: background-color 0.2s;
   position: relative;
   margin-top: 1rem;
-  
-  &:hover {
-    background: #343a40;
-  }
 }
 
 .event_wrap .cont .bg2 {
@@ -225,7 +220,7 @@
 }
 
 .event_wrap .cont .bg2 .fishing_hook {
-  margin:0 auto;
+  margin: 0 auto;
   width: 43px;
   margin-top: -15%;
   padding-right: 1rem;
@@ -239,10 +234,18 @@
     top: 49%;
     transform: rotateZ(-5deg);
   }
-  20%, 30%, 60%, 70%, 80% {
+  20%,
+  30%,
+  60%,
+  70%,
+  80% {
     transform: rotateZ(8deg);
   }
-  25%, 35%, 65%, 75%, 85% {
+  25%,
+  35%,
+  65%,
+  75%,
+  85% {
     transform: rotateZ(-5deg);
   }
   100% {
@@ -257,11 +260,19 @@
     transform: rotateZ(-5deg);
     opacity: 0;
   }
-  20%, 30%, 60%, 70%, 80% {
+  20%,
+  30%,
+  60%,
+  70%,
+  80% {
     transform: rotateZ(8deg);
     opacity: 1;
   }
-  25%, 35%, 65%, 75%, 85% {
+  25%,
+  35%,
+  65%,
+  75%,
+  85% {
     transform: rotateZ(-5deg);
     opacity: 1;
   }
@@ -396,7 +407,7 @@
 }
 
 .event_wrap .cont .bg3 {
-  margin-top: -100vh;;
+  margin-top: -100vh;
   width: 100%;
 }
 
@@ -483,19 +494,24 @@
 }
 
 @keyframes tide {
-  0%, 25%, 75% {
+  0%,
+  25%,
+  75% {
     left: -16px;
   }
-  50%, 100% {
+  50%,
+  100% {
     left: 0;
   }
 }
 
 @keyframes crucian_carp {
-  0%, 50% {
+  0%,
+  50% {
     top: -2%;
   }
-  25%, 75% {
+  25%,
+  75% {
     top: -6%;
   }
   100% {
