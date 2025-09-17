@@ -14,11 +14,15 @@ import { useCartStore } from '@/store/cartStore';
 import { cartService } from '@/services/cart';
 import Flex from '@/components/common/Flex';
 import { IPaymentRef, IPaymentSessionData } from '@/types/payment';
+import { couponService } from '@/services/coupon';
+import { myService } from '@/services/my';
+import { IUpdateUserRef } from '@/types/user';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
   const router = useRouter();
   const user = useUserStore((s) => s.user);
+  const { fetchUserData } = useUserStore();
 
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [paymentNumber, setPaymentNumber] = useState('');
@@ -150,6 +154,7 @@ export default function PaymentSuccess() {
           pointAmount: paymentSessionData?.pointAmount ?? 0,
           orderId: tossOrderId ?? '',
           phone: paymentSessionData?.phone ?? '',
+          message: paymentSessionData?.message ?? '',
         };
 
         // 주문 영수증 생성
@@ -185,6 +190,22 @@ export default function PaymentSuccess() {
         cartService.removesCart(cartIds);
         useCartStore.getState().removeStoreCarts(cartIds);
 
+        if (selectedCoupon?.id) {
+          await couponService.deleteCoupon(selectedCoupon?.id ?? 0);
+        }
+
+        if (user?.point) {
+          const calculPoint = user?.point - (paymentSessionData?.pointAmount ?? 0);
+
+          const userUpdatePoint: IUpdateUserRef = {
+            point: calculPoint,
+          };
+
+          await myService.updateUser(userUpdatePoint);
+
+          fetchUserData();
+        }
+
         // ⚓ paymentId + paymentNumber 확보
         const pid: number | null = paymentRes.data?.id ?? null;
         console.log(pid);
@@ -211,16 +232,19 @@ export default function PaymentSuccess() {
     })();
   }, [
     discountAmount,
+    fetchUserData,
     orderItems,
     paymentAmount,
     paymentSessionData?.detailAddress,
     paymentSessionData?.mainAddress,
+    paymentSessionData?.message,
     paymentSessionData?.name,
     paymentSessionData?.phone,
     paymentSessionData?.pointAmount,
     paymentSessionData?.zipCode,
     readProcessed,
     router,
+    selectedCoupon?.id,
     targetSumAfterCoupon,
     tossOrderId,
     tossPaymentKey,

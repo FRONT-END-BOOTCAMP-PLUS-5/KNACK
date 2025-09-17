@@ -46,6 +46,8 @@ export class PrPaymentRepository implements PaymentRepository {
         username: payment.username ?? '',
         zipCode: payment.zipCode ?? '',
         phone: payment.phone,
+        deliveryMessage: payment.message ?? '',
+        provider: payment.provider,
       },
     });
 
@@ -115,6 +117,7 @@ export class PrPaymentRepository implements PaymentRepository {
         approvedAt: true,
         method: true,
         price: true,
+        provider: true,
         orders: {
           select: {
             id: true,
@@ -156,6 +159,9 @@ export class PrPaymentRepository implements PaymentRepository {
             deliveryStatus: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 

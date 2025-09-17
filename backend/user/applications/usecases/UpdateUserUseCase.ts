@@ -18,6 +18,7 @@ export class UpdateUserUseCase {
       profileImage: result.profileImage,
       marketing: result.marketing,
       sns: result.sns,
+      point: result.point,
     };
   }
 }

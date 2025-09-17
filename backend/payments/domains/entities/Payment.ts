@@ -36,4 +36,5 @@ export interface IPaymentDetail {
   method?: string;
   price?: number | null;
   orders?: IOrderItem[];
+  provider?: string | null;
 }

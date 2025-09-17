@@ -5,4 +5,5 @@ export interface UpdateUser {
   profileImage: string;
   sns: boolean;
   marketing: boolean;
+  point: number;
 }

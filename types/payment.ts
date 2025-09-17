@@ -35,6 +35,11 @@ export interface TossConfirmResult {
   balanceAmount: number;
   suppliedAmount: number;
   vat: number;
+  easyPay: {
+    provider: string;
+    amount: number;
+    discountAmount: number;
+  };
 }
 
 export interface TossGateway {
@@ -83,6 +88,7 @@ export type PaymentData = {
   method: string;
   price: number;
   orders: ReceiptItem[];
+  provider: string;
 };
 
 export type Payment = {
@@ -104,6 +110,7 @@ export interface IPaymentSessionData {
   detailAddress: string;
   zipCode: string;
   phone: string;
+  message: string;
 }
 
 export interface IPaymentRef {
@@ -117,6 +124,7 @@ export interface IPaymentRef {
   pointAmount: number;
   orderId: string;
   phone: string;
+  message: string;
 }
 
 export interface IPaymentList {
