@@ -4,4 +4,5 @@ export interface IUpdateUserRef {
   nickname?: string;
   marketing?: boolean;
   sns?: boolean;
+  point?: number;
 }

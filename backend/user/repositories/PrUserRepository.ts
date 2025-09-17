@@ -8,6 +8,7 @@ interface IProps {
   nickname: string;
   sns: boolean;
   marketing: boolean;
+  point: number;
 }
 
 export class PrUserRepository implements UserRepository {
@@ -26,6 +27,7 @@ export class PrUserRepository implements UserRepository {
         name: this.userData?.name,
         marketing: this.userData?.marketing,
         sns: this.userData?.sns,
+        point: this.userData?.point,
       },
       select: {
         id: true,
@@ -34,6 +36,7 @@ export class PrUserRepository implements UserRepository {
         profileImage: true,
         sns: true,
         marketing: true,
+        point: true,
       },
     });
 
@@ -44,6 +47,7 @@ export class PrUserRepository implements UserRepository {
       profileImage: user.profileImage ?? '',
       sns: true,
       marketing: true,
+      point: user?.point,
     };
   }
 }
