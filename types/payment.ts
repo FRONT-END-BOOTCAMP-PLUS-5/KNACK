@@ -88,6 +88,7 @@ export type PaymentData = {
   method: string;
   price: number;
   orders: ReceiptItem[];
+  provider: string;
 };
 
 export type Payment = {

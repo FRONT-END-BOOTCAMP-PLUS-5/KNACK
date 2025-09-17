@@ -117,6 +117,7 @@ export class PrPaymentRepository implements PaymentRepository {
         approvedAt: true,
         method: true,
         price: true,
+        provider: true,
         orders: {
           select: {
             id: true,
@@ -158,6 +159,9 @@ export class PrPaymentRepository implements PaymentRepository {
             deliveryStatus: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 

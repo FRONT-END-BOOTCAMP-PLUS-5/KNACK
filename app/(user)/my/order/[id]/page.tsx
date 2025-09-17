@@ -4,12 +4,13 @@ import requester from '@/utils/requester';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import styles from './orderPage.module.scss';
-import { computeTotalsFromOrders } from '@/utils/orders';
+import { computeTotalsFromOrders, statusToStep } from '@/utils/orders';
 import { PaymentData, ReceiptItem } from '@/types/payment';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import Text from '@/components/common/Text';
 import Flex from '@/components/common/Flex';
+import ChervronRight from '@/public/icons/chevron_right.svg';
 
 export default function OrderPage() {
   const { id } = useParams<{ id: string }>();
@@ -32,8 +33,6 @@ export default function OrderPage() {
       try {
         const { data } = await requester.get(`/api/payments/${id}`);
         const payment = data.payment.result;
-
-        console.log('data', data);
 
         // ✅ totals 재계산
         const totals = computeTotalsFromOrders(data.orders);
@@ -97,13 +96,14 @@ export default function OrderPage() {
                   <Text size={1.2} color="gray1">
                     주문번호 {item.id}
                   </Text>
-                  {item?.deliveryStatus && <span className={styles.badge}>{item?.deliveryStatus}</span>}
                 </div>
                 <div className={styles.title_line}>
                   <span className={styles.title}>{item?.engName}</span>
-                  <span className={styles.chevron} aria-hidden>
-                    &gt;
-                  </span>
+
+                  <Flex width="self">
+                    <Text size={1.3}>{statusToStep(item?.deliveryStatus)}</Text>
+                    <Image width={14} height={14} src={ChervronRight} alt="arrow" />
+                  </Flex>
                 </div>
                 <Text size={1.2} weight={600}>
                   {item?.optionValue}
@@ -166,7 +166,9 @@ export default function OrderPage() {
           <Text size={1.2} color="gray1">
             체결 후 결제 정보 변경은 불가하며, 할부 전환은 카드사 문의 바랍니다.
           </Text>
-          <Text>{paymentData?.method}</Text>
+          <Text>
+            {paymentData?.method} | {paymentData?.provider}
+          </Text>
         </Flex>
       </div>
     </div>
