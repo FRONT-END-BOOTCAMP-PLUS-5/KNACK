@@ -276,39 +276,6 @@ export interface CardRepository {
   }): Promise<void>;
 }
 
-/* ---------- 주소 ---------- */
-
-export interface AddressAddModalProps {
-  onClose: () => void;
-  onSaved?: (addr: IAddress) => void;
-  editing?: IAddress | null;
-  /** 신규 등록 시 카카오 검색에서 넘겨줄 초기값 (선택) */
-  initial?: Partial<Pick<IAddress['address'], 'zipCode' | 'main'>>;
-}
-
-/* AddressBox props */
-export type AddressBoxProps = {
-  selectedAddress: IAddress | null;
-  onOpenModal: () => void;
-  onOpenRequestModal?: () => void;
-  onChangeRequest: (request: string) => void;
-};
-
-/* RequestModal props */
-export type RequestModalProps = {
-  open: boolean;
-  value: string;
-  onClose: () => void;
-  onApply: (next: string) => void;
-};
-
-/* AddressModal props */
-export type AddressModalProps = {
-  onClose: () => void;
-  selectedAddress: IAddress | null;
-  onChangeSelected: (addr: IAddress) => void;
-};
-
 export interface PaymentFooterProps {
   totalPrice: number;
   onPay: () => void;

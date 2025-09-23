@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import styles from './addressAddModal.module.scss';
 import requester from '@/utils/requester';
 import Image from 'next/image';
-import { AddressAddModalProps } from '@/types/order';
 import DaumPostcodeEmbed, { Address } from 'react-daum-postcode';
 import CloseLarge from '@/public/icons/close_large.svg';
 import { IAddress } from '@/types/address';
@@ -14,7 +13,15 @@ const NAME_MIN = 2;
 const NAME_MAX = 50;
 const phonePattern = /^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/;
 
-export function AddressAddModal({ onClose, onSaved, editing, initial }: AddressAddModalProps) {
+interface IProps {
+  onClose: () => void;
+  onSaved?: (addr: IAddress) => void;
+  editing?: IAddress | null;
+  /** 신규 등록 시 카카오 검색에서 넘겨줄 초기값 (선택) */
+  initial?: Partial<Pick<IAddress['address'], 'zipCode' | 'main'>>;
+}
+
+export function AddressAddModal({ onClose, onSaved, editing, initial }: IProps) {
   const isEdit = !!editing;
 
   const { setOnToast } = useToastStore();
