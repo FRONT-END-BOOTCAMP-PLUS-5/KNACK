@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 import styles from './checkoutPage.module.scss';
 import AddressBox from '@/components/address/AddressBox';
@@ -9,7 +9,6 @@ import PaymentFooter from '@/components/Payments/PaymentFooter';
 import OrderSummaryCard from '@/components/Payments/Order/OrderSummaryCard';
 import PointSection from '@/components/Payments/Points';
 import FinalOrderSummary from '@/components/Payments/Order/FinalOrderSummary';
-import { AddressDto } from '@/backend/address/applications/dtos/AddressDto';
 import { IProduct } from '@/types/product';
 import AddressModal from '@/components/address/AddressModal';
 import RequestModal from '@/components/address/RequestModal';
@@ -18,11 +17,13 @@ import CouponSelectModal from '@/components/Payments/CouponSelectModal';
 import { IAddress } from '@/types/address';
 import { useToastStore } from '@/store/toastStore';
 import { IPaymentSessionData } from '@/types/payment';
+import { myService } from '@/services/my';
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
 
 export default function CheckoutPage() {
   const { setOnToast } = useToastStore();
+  const { getAddress } = myService;
 
   // ----- Local UI States (Zustand 제거) -----
   const [checkout, setCheckout] = useState<CheckoutRow[]>([]);
@@ -185,14 +186,48 @@ export default function CheckoutPage() {
     }
   };
 
+  const handleSelectdAddress = (value: IAddress) => {
+    const zip = value.address.zipCode ?? '';
+
+    if (!value?.id) return; // Early return if no valid address
+
+    const mapped = {
+      id: value.id,
+      name: value.name ?? '',
+      phone: value.phone ?? '',
+      address: {
+        zipCode: zip,
+        main: value.address.main,
+      },
+      detail: value.detail ?? '',
+      message: value.message ?? '',
+      isDefault: value.isDefault ?? false,
+    };
+    setSelectedAddress(mapped);
+  };
+
+  const handleGetAddress = useCallback(async () => {
+    try {
+      const { result } = await getAddress();
+
+      const defaultAddress: IAddress = result.find((item: IAddress) => item.isDefault);
+
+      if (defaultAddress) {
+        setSelectedAddress(defaultAddress);
+      }
+    } catch (err) {
+      console.error('주소 불러오기 실패', err);
+    }
+  }, [getAddress]);
+
   useEffect(() => {
     // localStorage는 클라에서만 접근 가능
     const raw = typeof window !== 'undefined' ? localStorage.getItem('checkout') : null;
+
     if (!raw) return;
     try {
       const parsed: CheckoutRow[] = JSON.parse(raw);
-      const cartIds = parsed.map((p) => p.cartId).filter(Boolean);
-      sessionStorage.setItem('cartIds', JSON.stringify(cartIds));
+
       setCheckout(parsed);
     } catch (e) {
       console.error('checkout 파싱 실패', e);
@@ -207,29 +242,29 @@ export default function CheckoutPage() {
         const { data } = await requester.post('/api/products', { ids });
         const results = data.results as (IProduct | null)[];
 
-        const items: OrderItem[] = results.flatMap((p, i) =>
-          p
+        const items: OrderItem[] = results.flatMap((item, i) =>
+          item
             ? [
                 {
-                  productId: p.id,
-                  price: p.price,
+                  productId: item.id,
+                  price: item.price,
                   quantity: checkout[i].quantity,
-                  thumbnailImage: p.thumbnailImage,
+                  thumbnailImage: item.thumbnailImage,
                   deliveryType: checkout[i].deliveryMethod,
-                  korName: p.korName,
-                  engName: p.engName,
+                  korName: item.korName,
+                  engName: item.engName,
                   optionValue:
-                    p?.productOptionMappings[0]?.optionType?.optionValue?.find(
-                      (item) => item?.id === checkout[i]?.optionValueId
+                    item?.productOptionMappings[0]?.optionType?.optionValue?.find(
+                      (value) => value?.id === checkout[i]?.optionValueId
                     )?.name ?? '',
-                  optionName: p?.productOptionMappings[0]?.optionType?.name,
-                  brandName: p?.brand?.korName,
-                  categoryName: p?.category?.korName,
-                  subCategoryName: p?.category?.korName,
-                  colorEngName: p?.colorEngName,
-                  colorKorName: p?.colorKorName,
-                  gender: p?.gender,
-                  releaseDate: p?.releaseDate ?? '',
+                  optionName: item?.productOptionMappings[0]?.optionType?.name,
+                  brandName: item?.brand?.korName,
+                  categoryName: item?.category?.korName,
+                  subCategoryName: item?.category?.korName,
+                  colorEngName: item?.colorEngName,
+                  colorKorName: item?.colorKorName,
+                  gender: item?.gender,
+                  releaseDate: item?.releaseDate ?? '',
                 },
               ]
             : []
@@ -294,34 +329,9 @@ export default function CheckoutPage() {
     if (points > cap) setPoints(cap);
   }, [totalBeforePoints, availablePoints, points]);
 
-  // ----- fetch default address -----
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await requester.get('/api/addresses');
-        const addresses: AddressDto[] = res.data;
-        const def = addresses.find((a) => a.isDefault);
-        if (def) {
-          const addr = {
-            id: def.id,
-            name: def.name,
-            phone: def.phone ?? '',
-            detail: def.detail ?? '',
-            message: def.message ?? '',
-            isDefault: def.isDefault ?? false,
-            address: {
-              zipCode: def.address.zipCode,
-              main: def.address.main,
-            },
-          };
-          setSelectedAddress(addr);
-          sessionStorage.setItem('selectedAddress', JSON.stringify(addr));
-        }
-      } catch (err) {
-        console.error('주소 불러오기 실패', err);
-      }
-    })();
-  }, []);
+    handleGetAddress();
+  }, [handleGetAddress]);
 
   return (
     <main className={styles.checkout_container}>
@@ -397,26 +407,7 @@ export default function CheckoutPage() {
                 }
               : null
           }
-          onChangeSelected={(a: IAddress) => {
-            const zip = a.address.zipCode ?? '';
-
-            if (!a?.id) return; // Early return if no valid address
-
-            const mapped = {
-              id: a.id,
-              name: a.name ?? '',
-              phone: a.phone ?? '',
-              address: {
-                zipCode: zip,
-                main: a.address.main,
-              },
-              detail: a.detail ?? '',
-              message: a.message ?? '',
-              isDefault: a.isDefault ?? false,
-            };
-            setSelectedAddress(mapped);
-            sessionStorage.setItem('selectedAddress', JSON.stringify(mapped));
-          }}
+          onChangeSelected={handleSelectdAddress}
         />
       )}
 
@@ -428,7 +419,6 @@ export default function CheckoutPage() {
           if (!selectedAddress) return;
           const updated = { ...selectedAddress, message: next }; // ← 여기!
           setSelectedAddress(updated);
-          sessionStorage.setItem('selectedAddress', JSON.stringify(updated));
         }}
       />
     </main>

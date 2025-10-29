@@ -6,7 +6,7 @@ import styles from './successPage.module.scss';
 import requester from '@/utils/requester';
 import { useUserStore } from '@/store/userStore';
 import axios from 'axios';
-import { Coupon, OrderItem } from '@/types/order';
+import { CheckoutRow, Coupon, OrderItem } from '@/types/order';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import Text from '@/components/common/Text';
@@ -138,8 +138,9 @@ export default function PaymentSuccess() {
     hasRun.current = true;
 
     // CheckoutPage에서 저장해둔 cartIds 꺼내기
-    const raw = sessionStorage.getItem('cartIds');
-    const cartIds: number[] = raw ? JSON.parse(raw) : [];
+    const raw = localStorage.getItem('cartIds');
+    const rawParse = raw ? JSON.parse(raw) : [];
+    const cartIds: number[] = rawParse?.map((item: CheckoutRow) => item?.cartId);
 
     (async () => {
       try {
@@ -216,7 +217,6 @@ export default function PaymentSuccess() {
         writeProcessed({ tossPaymentKey, tossOrderId, at: Date.now() });
 
         // 정리
-        sessionStorage.removeItem('cartIds');
         sessionStorage.removeItem('orderItems');
         sessionStorage.removeItem('selectedAddress');
       } catch (err) {

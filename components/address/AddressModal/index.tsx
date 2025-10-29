@@ -6,11 +6,16 @@ import requester from '@/utils/requester';
 import { formatPhoneNumber, phonePattern } from '@/utils/formatAddressUtils';
 import Image from 'next/image';
 import { AddressAddModal } from '../AddressAddModal';
-import { AddressModalProps } from '@/types/order';
 import { IAddress } from '@/types/address';
 import { useToastStore } from '@/store/toastStore';
 
-export default function AddressModal({ onClose, selectedAddress, onChangeSelected }: AddressModalProps) {
+interface IProps {
+  onClose: () => void;
+  selectedAddress: IAddress | null;
+  onChangeSelected: (addr: IAddress) => void;
+}
+
+export default function AddressModal({ onClose, selectedAddress, onChangeSelected }: IProps) {
   const { setOnToast } = useToastStore();
 
   const [saved, setSaved] = useState<IAddress[]>([]);

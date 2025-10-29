@@ -6,161 +6,161 @@ $divider: #f4f4f4;
 $primary: #222;
 
 .overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    background: rgba(0, 0, 0, .3);
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 
 .sheet {
-    width: 100%;
-    max-width: 440px;
-    height: 100%;
-    background: $bg;
-    border-radius: 16px 16px 0 0;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 -6px 24px rgba(0, 0, 0, .08);
-    padding: 0 16px;
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  background: $bg;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.08);
+  padding: 0 16px;
 }
 
 .header {
-    display: flex;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .back {
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: $text;
+    background: transparent;
+    border: 0;
+  }
 
-    .back {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        color: $text;
-        background: transparent;
-        border: 0;
+  .title {
+    font-size: 18px;
+    font-weight: 700;
+    color: $text;
+    text-align: center;
+    letter-spacing: -0.15px;
+    line-height: 22px;
+    min-height: 44px;
+
+    p {
+      padding: 11px 0;
     }
+  }
 
-    .title {
-        font-size: 18px;
-        font-weight: 700;
-        color: $text;
-        text-align: center;
-        letter-spacing: -.15px;
-        line-height: 22px;
-        min-height: 44px;
-
-        p {
-            padding: 11px 0;
-        }
-    }
-
-    .rightSpacer {
-        width: 40px;
-    }
+  .rightSpacer {
+    width: 40px;
+  }
 }
 
 .list {
-    flex: 1 1 auto;
-    overflow: auto;
-    background: $bg;
-    display: flex;
-    flex-direction: column;
+  flex: 1 1 auto;
+  overflow: auto;
+  background: $bg;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 각 아이템 기본 보더 */
-.list>button.item {
-    width: 100%;
-    text-align: left;
-    background: $bg;
-    border: 0;
-    cursor: pointer;
-    padding: 17px 0;
-    font-size: 14px;
-    color: $text;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid $line;
+.list > button.item {
+  width: 100%;
+  text-align: left;
+  background: $bg;
+  border: 0;
+  cursor: pointer;
+  padding: 17px 0;
+  font-size: 14px;
+  color: $text;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid $line;
 
-    &:first-of-type {
-        margin-top: 8px;
-    }
+  &:first-of-type {
+    margin-top: 8px;
+  }
 
-    &:active {
-        background: #fafafa;
-    }
+  &:active {
+    background: #fafafa;
+  }
 
-    &[aria-pressed="true"] .itemLabel {
-        font-weight: 700;
-    }
+  &[aria-pressed='true'] .itemLabel {
+    font-weight: 700;
+  }
 }
 
 /* ✅ 진짜 마지막 '버튼' 아이템만 보더 제거 (customBox가 뒤에 있어도 동작) */
-.list>button.item:last-of-type {
-    border-bottom: none;
+.list > button.item:last-of-type {
+  border-bottom: none;
 }
 
 /* (선택) :has 지원 브라우저에서 커스텀 입력 박스가 바로 뒤에 오면 보더 제거 */
-.list>button.item:has(+ .customBox) {
-    border-bottom: none;
+.list > button.item:has(+ .customBox) {
+  border-bottom: none;
 }
 
 .itemLabel {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 .check {
-    color: $text;
-    font-weight: 700;
+  color: $text;
+  font-weight: 700;
 }
 
 .customBox {
+  .input {
+    border: 1px solid #ebebeb;
+    border-radius: 10px;
+    font-size: 14px;
+    height: 64px;
+    width: 100%;
+    padding: 12px;
+    background: #fff;
 
-    .input {
-        border: 1px solid #ebebeb;
-        border-radius: 10px;
-        font-size: 14px;
-        height: 64px;
-        width: 100%;
-        background: #fff;
-
-        &:focus {
-            outline: none;
-            border-color: #007aff;
-        }
-
-        &::placeholder {
-            color: #e6e6e6;
-            padding-top: 0;
-        }
+    &:focus {
+      outline: none;
+      border-color: #222;
     }
+
+    &::placeholder {
+      color: #e6e6e6;
+      padding-top: 0;
+    }
+  }
 }
 
 .footer {
-    position: sticky;
-    bottom: 0;
-    background: $bg;
-    padding: 10px 16px max(env(safe-area-inset-bottom), 16px);
-    display: flex;
-    justify-content: center;
+  position: sticky;
+  bottom: 0;
+  background: $bg;
+  padding: 10px 16px max(env(safe-area-inset-bottom), 16px);
+  display: flex;
+  justify-content: center;
 
-    .applyBtn {
-        width: 100%;
-        height: 52px;
-        border: 0;
-        border-radius: 10px;
-        background: $primary;
-        color: #fff;
-        font-weight: 700;
-        font-size: 16px;
+  .applyBtn {
+    width: 100%;
+    height: 52px;
+    border: 0;
+    border-radius: 10px;
+    background: $primary;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
 
-        &:disabled {
-            background: #d3d3d3;
-            color: #fff;
-            cursor: not-allowed;
-        }
+    &:disabled {
+      background: #d3d3d3;
+      color: #fff;
+      cursor: not-allowed;
     }
+  }
 }
