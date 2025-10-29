@@ -225,11 +225,11 @@ export default function CheckoutPage() {
   useEffect(() => {
     // localStorage는 클라에서만 접근 가능
     const raw = typeof window !== 'undefined' ? localStorage.getItem('checkout') : null;
+
     if (!raw) return;
     try {
       const parsed: CheckoutRow[] = JSON.parse(raw);
-      const cartIds = parsed.map((p) => p.cartId).filter(Boolean);
-      sessionStorage.setItem('cartIds', JSON.stringify(cartIds));
+
       setCheckout(parsed);
     } catch (e) {
       console.error('checkout 파싱 실패', e);
