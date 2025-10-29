@@ -204,7 +204,6 @@ export default function CheckoutPage() {
       isDefault: value.isDefault ?? false,
     };
     setSelectedAddress(mapped);
-    sessionStorage.setItem('selectedAddress', JSON.stringify(mapped));
   };
 
   const handleGetAddress = useCallback(async () => {
@@ -215,7 +214,6 @@ export default function CheckoutPage() {
 
       if (defaultAddress) {
         setSelectedAddress(defaultAddress);
-        sessionStorage.setItem('selectedAddress', JSON.stringify(defaultAddress));
       }
     } catch (err) {
       console.error('주소 불러오기 실패', err);
@@ -421,7 +419,6 @@ export default function CheckoutPage() {
           if (!selectedAddress) return;
           const updated = { ...selectedAddress, message: next }; // ← 여기!
           setSelectedAddress(updated);
-          sessionStorage.setItem('selectedAddress', JSON.stringify(updated));
         }}
       />
     </main>

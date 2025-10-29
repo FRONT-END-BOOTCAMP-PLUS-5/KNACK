@@ -217,7 +217,6 @@ export default function PaymentSuccess() {
         writeProcessed({ tossPaymentKey, tossOrderId, at: Date.now() });
 
         // 정리
-        sessionStorage.removeItem('cartIds');
         sessionStorage.removeItem('orderItems');
         sessionStorage.removeItem('selectedAddress');
       } catch (err) {
