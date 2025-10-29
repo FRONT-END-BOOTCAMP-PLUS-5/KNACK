@@ -1,18 +1,16 @@
 'use client';
 
 import TabMenu from '@/components/common/TabMenu';
-import { likeService } from '@/services/like';
 import { MouseEvent, useCallback, useEffect, useState } from 'react';
-import { productsService } from '@/services/products';
-import { IRecentProduct } from '@/types/product';
-import { IBrandLikeList, ILikeList } from '@/types/like';
 import ProductSave from '@/components/saved/ProductSave';
 import BrandSave from '@/components/saved/BrandSave';
 import RecentlySave from '@/components/saved/RecentlySave';
 import { TABS } from '@/constraint/saved';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useUserStore } from '@/store/userStore';
-import { useToastStore } from '@/store/toastStore';
+import { useSavedBrand } from '@/hooks/saved/useSavedBrand';
+import { useSavedProduct } from '@/hooks/saved/useSavedProduct';
+import { useSavedRecent } from '@/hooks/saved/useSavedRecent';
 
 interface SAVED_TABS {
   product: string;
@@ -25,105 +23,11 @@ const SavedPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { addLike, deleteLike, getLikes, deleteBrandLike, getBrandLikes } = likeService;
-  const { getRecentlyProductList } = productsService;
+  const { brandLikeList, deleteBrandLike } = useSavedBrand();
+  const { likeList, likeAdd, deleteLike } = useSavedProduct();
+  const { recentProducts, getRecentlyProductList } = useSavedRecent();
 
   const [selectTab, setSelectTab] = useState(0);
-  const [likeList, setLikeList] = useState<ILikeList[]>([]);
-  const [brandLikeList, setBrandLikeList] = useState<IBrandLikeList[]>([]);
-  const [recentProducts, setRecentProducts] = useState<IRecentProduct[]>([]);
-
-  const { setOnToast } = useToastStore();
-
-  const handleGetRecentlyProduct = useCallback(
-    (ids: string[]) => {
-      const params = new URLSearchParams();
-
-      if (!ids) return;
-
-      ids.forEach((id) => params.append('id', id));
-
-      getRecentlyProductList(params.toString())
-        .then((res) => {
-          if (res.status === 200) {
-            const sortedProducts = ids
-              .map((id) => res.result.find((product: IRecentProduct) => product.id === Number(id)))
-              .filter((product) => product !== undefined);
-
-            setRecentProducts(sortedProducts);
-          }
-        })
-        .catch((error) => {
-          console.log('error', error.message);
-        });
-    },
-    [getRecentlyProductList]
-  );
-
-  const handleGetBrandLikes = useCallback(() => {
-    getBrandLikes()
-      .then((res) => {
-        if (res.status === 200) {
-          setBrandLikeList(res.result);
-        }
-      })
-      .catch((error) => {
-        console.log('error', error.message);
-      });
-  }, [getBrandLikes]);
-
-  const initLikeBrand = useCallback(() => {
-    handleGetBrandLikes();
-  }, [handleGetBrandLikes]);
-
-  const handleDeleteBrandLike = useCallback(
-    (id: number) => {
-      deleteBrandLike(id)
-        .then((res) => {
-          if (res.status === 200) {
-            initLikeBrand();
-            setOnToast(true, '삭제 되었어요!');
-          }
-        })
-        .catch((error) => {
-          console.log('error', error.message);
-        });
-    },
-    [deleteBrandLike, initLikeBrand, setOnToast]
-  );
-
-  const handleGetLikes = useCallback(async () => {
-    if (!user?.id) return;
-    await getLikes()
-      .then((res) => {
-        if (res.status === 200) {
-          setLikeList(res.result);
-        }
-      })
-      .catch((error) => {
-        console.log('error', error.message);
-      });
-  }, [getLikes, user]);
-
-  const initSave = useCallback(() => {
-    handleGetLikes();
-  }, [handleGetLikes]);
-
-  const handleDeleteLike = useCallback(
-    (id: number) => {
-      deleteLike(id)
-        .then((res) => {
-          if (res.status === 200) {
-            initSave();
-            setOnToast(true, '삭제 되었어요!');
-          }
-        })
-        .catch((error) => {
-          console.log('error', error.message);
-        });
-    },
-    [deleteLike, initSave, setOnToast]
-  );
 
   const handleLikeAdd = useCallback(
     (e: MouseEvent<HTMLButtonElement>, productId: number) => {
@@ -132,43 +36,31 @@ const SavedPage = () => {
       const likeCheck = likeList?.find((likeItem) => likeItem?.product?.id === productId);
 
       if (likeCheck) {
-        handleDeleteLike(productId);
+        deleteLike(productId);
       } else {
-        addLike(productId)
-          .then((res) => {
-            if (res.status === 200) {
-              setOnToast(true, '잘 담겼어요!');
-              handleGetLikes();
-            }
-          })
-          .catch((error) => {
-            console.log('error', error.message);
-          });
+        likeAdd(productId);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [addLike, handleDeleteLike, handleGetLikes, likeList, user]
+    [deleteLike, likeAdd, likeList, router, user?.id]
   );
 
   const onClickSave = (e: MouseEvent<HTMLButtonElement>, id: number) => {
     e.preventDefault();
 
-    handleDeleteLike(id);
+    deleteLike(id);
   };
-
-  useEffect(() => {
-    handleGetLikes();
-  }, [handleGetLikes]);
-
-  useEffect(() => {
-    handleGetBrandLikes();
-  }, [handleGetBrandLikes]);
 
   useEffect(() => {
     const storage = localStorage.getItem('recent') && JSON.parse(localStorage.getItem('recent') ?? '');
 
-    handleGetRecentlyProduct(storage);
-  }, [handleGetRecentlyProduct]);
+    const params = new URLSearchParams();
+
+    if (!storage) return;
+
+    storage.forEach((id: string) => params.append('id', id));
+
+    getRecentlyProductList(storage);
+  }, [getRecentlyProductList]);
 
   useEffect(() => {
     const tabs = { product: 0, brand: 1, recent: 2 };
@@ -182,7 +74,7 @@ const SavedPage = () => {
     <section>
       <TabMenu tabs={TABS} selectedTab={selectTab} onTabSelect={setSelectTab} />
       {selectTab === 0 && <ProductSave likeList={likeList} onClickSave={onClickSave} />}
-      {selectTab === 1 && <BrandSave brandLikeData={brandLikeList} onClickBookMark={handleDeleteBrandLike} />}
+      {selectTab === 1 && <BrandSave brandLikeData={brandLikeList} onClickBookMark={deleteBrandLike} />}
       {selectTab === 2 && (
         <RecentlySave recentProducts={recentProducts} likeList={likeList} onClickSaveAdd={handleLikeAdd} />
       )}
