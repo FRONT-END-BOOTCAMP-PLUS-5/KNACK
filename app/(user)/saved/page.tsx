@@ -25,7 +25,7 @@ const SavedPage = () => {
 
   const { brandLikeList, deleteBrandLike } = useSavedBrand();
   const { likeList, likeAdd, deleteLike } = useSavedProduct();
-  const { recentProducts, getRecentlyProductList } = useSavedRecent();
+  const { recentProducts } = useSavedRecent();
 
   const [selectTab, setSelectTab] = useState(0);
 
@@ -49,18 +49,6 @@ const SavedPage = () => {
 
     deleteLike(id);
   };
-
-  useEffect(() => {
-    const storage = localStorage.getItem('recent') && JSON.parse(localStorage.getItem('recent') ?? '');
-
-    const params = new URLSearchParams();
-
-    if (!storage) return;
-
-    storage.forEach((id: string) => params.append('id', id));
-
-    getRecentlyProductList(storage);
-  }, [getRecentlyProductList]);
 
   useEffect(() => {
     const tabs = { product: 0, brand: 1, recent: 2 };
