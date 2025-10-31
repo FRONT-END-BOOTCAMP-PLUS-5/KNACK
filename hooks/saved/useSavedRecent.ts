@@ -1,31 +1,50 @@
 import { IRecentProduct } from '@/types/product';
 import requester from '@/utils/requester';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export const useSavedRecent = () => {
   const [recentProducts, setRecentProducts] = useState<IRecentProduct[]>([]);
+  const [mainRecentProducts, setMainRecentProducts] = useState<IRecentProduct[][]>([]);
 
-  const getRecentlyProductList = async (ids: string[]) => {
+  const conversionArray = (value: IRecentProduct[], size: number) => {
+    return value.reduce<IRecentProduct[][]>((acc, _, i) => {
+      if (i % size === 0) {
+        acc.push(value.slice(i, i + size));
+      }
+      return acc;
+    }, []);
+  };
+
+  const getRecentlyProductList = useCallback(async (ids: string) => {
     if (!ids) return;
 
     await requester
-      .get(`api/products/recent?${ids}`)
+      .get(`api/products/recent?${ids.toString()}`)
       .then((res) => {
         if (res.status === 200) {
-          const sortedProducts = ids
-            .map((id) => res.data.find((product: IRecentProduct) => product.id === Number(id)))
-            .filter((product) => product !== undefined);
-
-          setRecentProducts(sortedProducts);
+          setRecentProducts(res.data.result);
+          setMainRecentProducts(conversionArray(res.data.result, 2));
         }
       })
       .catch((error) => {
         console.log('error', error.message);
       });
-  };
+  }, []);
+
+  useEffect(() => {
+    const storage = localStorage.getItem('recent') && JSON.parse(localStorage.getItem('recent') ?? '');
+
+    const params = new URLSearchParams();
+
+    if (!storage) return;
+
+    storage.forEach((id: string) => params.append('id', id));
+
+    getRecentlyProductList(params.toString());
+  }, [getRecentlyProductList]);
 
   return {
     recentProducts,
-    getRecentlyProductList,
+    mainRecentProducts,
   };
 };

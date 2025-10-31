@@ -1,7 +1,7 @@
 import { useToastStore } from '@/store/toastStore';
 import { ILikeList } from '@/types/like';
 import requester from '@/utils/requester';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useSavedProduct = () => {
   const { setOnToast } = useToastStore();
@@ -12,7 +12,7 @@ export const useSavedProduct = () => {
     await requester
       .get(`api/likes`)
       .then((res) => {
-        setLikeList(res.data);
+        setLikeList(res.data.result);
       })
       .catch((error) => {
         console.log('getLikes-error', error.message);

@@ -12,7 +12,7 @@ export const useSavedBrand = () => {
     await requester
       .get(`api/brand-likes`)
       .then((res) => {
-        setBrandLikeList(res.data);
+        setBrandLikeList(res.data.result);
       })
       .catch((error) => {
         console.log('getBrandLikes-error', error.message);
