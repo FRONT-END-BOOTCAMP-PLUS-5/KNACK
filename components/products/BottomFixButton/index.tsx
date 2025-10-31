@@ -11,7 +11,6 @@ import OptionBottomSheet from '../OptionBottomSheet';
 import { IProduct } from '@/types/productDetail';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { cartService } from '@/services/cart';
 import { likeService } from '@/services/like';
 import { ILikeList } from '@/types/like';
 import { useCartStore } from '@/store/cartStore';
@@ -19,6 +18,8 @@ import { useLikeStore } from '@/store/likeStore';
 import { useUserStore } from '@/store/userStore';
 import { useToggleProductLike } from '@/hooks/search/useToggleProductLike';
 import { useToastStore } from '@/store/toastStore';
+import { useCart } from '@/hooks/cart/useCart';
+import { CartRef } from '@/types/cart';
 
 interface IProps {
   productData?: IProduct;
@@ -27,12 +28,12 @@ interface IProps {
 const BottomFixButton = ({ productData }: IProps) => {
   const router = useRouter();
 
-  const { upsertCart } = cartService;
+  const { upsertCart, message } = useCart();
   const { getLikes } = likeService;
   const { mutate: toggleProductLike, isPending } = useToggleProductLike();
 
   const { onOpen, onClose } = useBottomSheetStore();
-  const { storeCarts, setStoreCarts } = useCartStore();
+  const { storeCarts } = useCartStore();
   const { productDetailLike: storeLike, setProductDetailLike: setStoreLike } = useLikeStore();
   const { user } = useUserStore();
   const { setOnToast } = useToastStore();
@@ -64,13 +65,13 @@ const BottomFixButton = ({ productData }: IProps) => {
     router.push('/payments/checkout');
   };
 
-  const onClickCart = () => {
+  const onClickCart = async () => {
     if (selectOptionId === 0) return setOnToast(true, '옵션을 선택해주세요.');
 
-    const cartData = {
+    const cartData: CartRef = {
       count: 1,
       optionValueId: selectOptionId,
-      productId: productData?.id,
+      productId: productData?.id ?? 0,
       id: 0, // upsert 이므로 없는 아이디를 넣어서 insert
     };
 
@@ -80,22 +81,12 @@ const BottomFixButton = ({ productData }: IProps) => {
 
     if (cartDuplicate) return setOnToast(true, '이미 장바구니에 담긴 상품이에요!');
 
-    upsertCart(cartData)
-      .then((res) => {
-        if (res.message === '로그인이 필요합니다.') {
-          return router.push('/login');
-        }
+    await upsertCart(cartData);
 
-        if (res.status === 200) {
-          setOnToast(true, '장바구니에 담겼어요!', '/cart');
-
-          setStoreCarts(cartData);
-          onClose();
-        }
-      })
-      .catch((error) => {
-        console.log('error', error.message);
-      });
+    if (message === '로그인이 필요합니다.') {
+      return router.push('/login');
+    }
+    onClose();
   };
 
   const handleGetLikes = useCallback(() => {

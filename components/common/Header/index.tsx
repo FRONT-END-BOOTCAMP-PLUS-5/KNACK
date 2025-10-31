@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './header.module.scss';
 import { HEADER_TABS, HeaderTab } from '@/constraint/header';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -10,14 +10,13 @@ import Image from 'next/image';
 import HamburgerIcon from '@/public/icons/hamburger.svg';
 import CartIcon from '@/public/icons/cart.svg';
 import HomeIcon from '@/public/icons/home.svg';
-import { cartService } from '@/services/cart';
-import { ICart } from '@/types/cart';
 import { useCartStore } from '@/store/cartStore';
 import HeaderCategory from './HeaderCategory';
 import HeaderInput from '../HeaderInput';
 import SearchModal from '../SearchModal';
 import CategoryBrandModal from '../CategoryBrandModal';
 import Logo from '@/public/images/logo_white.png';
+import { useCart } from '@/hooks/cart/useCart';
 
 export default function Header({
   hideHeaderElements = false,
@@ -31,11 +30,10 @@ export default function Header({
   // 현재 활성화된 탭 상태 관리
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [carts, setCarts] = useState<ICart[]>([]);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isCategoryBrandModalOpen, setIsCategoryBrandModalOpen] = useState(false);
 
-  const { getCart } = cartService;
+  const { carts } = useCart();
 
   const { storeCarts, setStoreCarts, clearStoreCarts } = useCartStore();
 
@@ -61,22 +59,6 @@ export default function Header({
   const handleBackClick = () => {
     router.back();
   };
-
-  const handleGetCart = useCallback(() => {
-    getCart()
-      .then((res) => {
-        if (res.status === 200) {
-          setCarts(res.result);
-        }
-      })
-      .catch((error) => {
-        console.log('handleGetCart-error', error.message);
-      });
-  }, [getCart]);
-
-  useEffect(() => {
-    handleGetCart();
-  }, [handleGetCart]);
 
   useEffect(() => {
     if (carts?.length === 0) return;

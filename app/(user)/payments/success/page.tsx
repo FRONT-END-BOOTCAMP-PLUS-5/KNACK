@@ -11,18 +11,19 @@ import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import Text from '@/components/common/Text';
 import { useCartStore } from '@/store/cartStore';
-import { cartService } from '@/services/cart';
 import Flex from '@/components/common/Flex';
 import { IPaymentRef, IPaymentSessionData } from '@/types/payment';
 import { couponService } from '@/services/coupon';
 import { myService } from '@/services/my';
 import { IUpdateUserRef } from '@/types/user';
+import { useCart } from '@/hooks/cart/useCart';
 
 export default function PaymentSuccess() {
   const params = useSearchParams();
   const router = useRouter();
   const user = useUserStore((s) => s.user);
   const { fetchUserData } = useUserStore();
+  const { removesCart } = useCart();
 
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [paymentNumber, setPaymentNumber] = useState('');
@@ -188,7 +189,7 @@ export default function PaymentSuccess() {
         });
 
         // ✅ cartIds를 가진 장바구니만 로컬 스토어에서 제거
-        cartService.removesCart(cartIds);
+        await removesCart(cartIds);
         useCartStore.getState().removeStoreCarts(cartIds);
 
         if (selectedCoupon?.id) {
@@ -243,6 +244,7 @@ export default function PaymentSuccess() {
     paymentSessionData?.pointAmount,
     paymentSessionData?.zipCode,
     readProcessed,
+    removesCart,
     router,
     selectedCoupon?.id,
     targetSumAfterCoupon,

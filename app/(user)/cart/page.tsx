@@ -8,8 +8,7 @@ import Flex from '@/components/common/Flex';
 import Text from '@/components/common/Text';
 import CartProduct from '@/components/cart/CartProduct';
 import PaymentButton from '@/components/cart/PaymentButton';
-import { cartService } from '@/services/cart';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ICart } from '@/types/cart';
 import { CART_INITIAL_VALUE, DELIVERY_DESCRIPTION_TEXT } from '@/constraint/cart';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -19,14 +18,14 @@ import OptionBottomSheet from '@/components/cart/OptionBottomSheet';
 import SelectOrderInfo from '@/components/cart/SelectOrderInfo';
 import EmptyText from '@/components/saved/EmptyText';
 import { useToastStore } from '@/store/toastStore';
+import { useCart } from '@/hooks/cart/useCart';
 
 const CartPage = () => {
-  const { getCart, removeCart, removesCart, upsertCart } = cartService;
+  const { carts, removeCart, upsertCart, removesCart, message } = useCart();
   const { onOpen, onClose } = useBottomSheetStore();
   const { setOnToast } = useToastStore();
   const router = useRouter();
 
-  const [carts, setCarts] = useState<ICart[]>([]);
   const [selectCarts, setSelectCarts] = useState<ICart[]>([]);
   const [allChecked, setAllChecked] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -34,32 +33,20 @@ const CartPage = () => {
   const [selectedCart, setSelectedCart] = useState<ICart>(CART_INITIAL_VALUE);
   const [selectOptionId, setSelectOptionId] = useState<number>(0);
 
-  const handleRemoveCart = () => {
-    removeCart(selectedCart?.id)
-      .then((res) => {
-        if (res.result) {
-          setSelectedCart(CART_INITIAL_VALUE);
-          setDeleteOpen(false);
-          initCart();
-        }
-      })
-      .catch((error) => {
-        console.log('error', error.message);
-      });
+  const handleRemoveCart = async () => {
+    await removeCart(selectedCart?.id);
+
+    setSelectedCart(CART_INITIAL_VALUE);
+    setDeleteOpen(false);
   };
 
-  const handleMultiRemoveCart = () => {
+  const handleMultiRemoveCart = async () => {
     const ids = selectCarts?.map((item) => item.id);
 
-    removesCart(ids)
-      .then((res) => {
-        setMultiDeleteOpen(false);
-        setSelectCarts([]);
-        initCart();
-      })
-      .catch((error) => {
-        console.log('error', error.message);
-      });
+    await removesCart(ids);
+
+    setMultiDeleteOpen(false);
+    setSelectCarts([]);
   };
 
   const handleOptionChange = async () => {
@@ -69,22 +56,18 @@ const CartPage = () => {
       id: selectedCart?.id,
       count: selectedCart?.count,
       optionValueId: selectOptionId,
+      productId: selectedCart?.product?.id ?? 0,
     };
 
-    await upsertCart(updateData)
-      .then((res) => {
-        if (res.result) {
-          // spinner 적용 필요
-          setTimeout(() => {
-            initCart();
-            onClose();
-          }, 300);
-        }
-      })
-      .catch((error) => {
-        onClose();
-        console.log('error', error.message);
-      });
+    await upsertCart(updateData);
+
+    if (message === '로그인이 필요합니다.') {
+      return router.push('/login');
+    }
+
+    setTimeout(() => {
+      onClose();
+    }, 300);
   };
 
   const onClickMultiRemoveCart = () => {
@@ -140,21 +123,11 @@ const CartPage = () => {
     else setSelectCarts([]);
   };
 
-  const initCart = useCallback(async () => {
-    await getCart().then((res) => {
-      setCarts(res.result);
-    });
-  }, [getCart]);
-
   useEffect(() => {
     if (carts?.length > 0) {
       setAllChecked(selectCarts.length === carts.length);
     }
   }, [selectCarts, carts]);
-
-  useEffect(() => {
-    initCart();
-  }, [initCart]);
 
   return (
     <article className={styles.cart_wrap}>
