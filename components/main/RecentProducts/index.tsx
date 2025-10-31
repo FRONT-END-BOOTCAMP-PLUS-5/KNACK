@@ -3,64 +3,18 @@
 import Flex from '@/components/common/Flex';
 import styles from './recentProducts.module.scss';
 import Text from '@/components/common/Text';
-import { useCallback, useEffect, useState } from 'react';
-import { productsService } from '@/services/products';
-import { IRecentProduct } from '@/types/product';
 import Image from 'next/image';
 import { STORAGE_PATHS } from '@/constraint/auth';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode } from 'swiper/modules';
 import Link from 'next/link';
 import 'swiper/css/free-mode';
+import { useSavedRecent } from '@/hooks/saved/useSavedRecent';
 
 const RecentProducts = () => {
-  const { getRecentlyProductList } = productsService;
+  const { mainRecentProducts } = useSavedRecent();
 
-  const [recentProducts, setRecentProducts] = useState<IRecentProduct[][]>([]);
-
-  const conversionArray = (value: IRecentProduct[], size: number) => {
-    return value.reduce<IRecentProduct[][]>((acc, _, i) => {
-      if (i % size === 0) {
-        acc.push(value.slice(i, i + size));
-      }
-      return acc;
-    }, []);
-  };
-
-  const handleGetRecentlyProduct = useCallback(
-    (ids: string[]) => {
-      const params = new URLSearchParams();
-
-      if (!ids) return;
-
-      ids.forEach((id) => params.append('id', id));
-
-      getRecentlyProductList(params.toString())
-        .then((res) => {
-          if (res.status === 200) {
-            const sortedProducts = ids
-              .map((id) => res.result.find((product: IRecentProduct) => product.id === Number(id)))
-              .filter((product) => product !== undefined);
-
-            const result = conversionArray(sortedProducts, 2);
-
-            setRecentProducts(result);
-          }
-        })
-        .catch((error) => {
-          console.log('error', error.message);
-        });
-    },
-    [getRecentlyProductList]
-  );
-
-  useEffect(() => {
-    const storage = localStorage.getItem('recent') && JSON.parse(localStorage.getItem('recent') ?? '');
-
-    handleGetRecentlyProduct(storage);
-  }, [handleGetRecentlyProduct]);
-
-  if (recentProducts?.length === 0) return;
+  if (mainRecentProducts?.length === 0) return;
 
   return (
     <div className={styles.recent_container}>
@@ -90,7 +44,7 @@ const RecentProducts = () => {
           },
         }}
       >
-        {recentProducts?.map((item, index) => (
+        {mainRecentProducts?.map((item, index) => (
           <SwiperSlide key={'recent_swiper_' + index} className={styles.swiper_slide}>
             {item?.map((value) => (
               <Link key={'recent_product_' + value?.id} href={`/products/${value?.id}`}>
