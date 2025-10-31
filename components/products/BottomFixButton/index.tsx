@@ -33,7 +33,7 @@ const BottomFixButton = ({ productData }: IProps) => {
   const { mutate: toggleProductLike, isPending } = useToggleProductLike();
 
   const { onOpen, onClose } = useBottomSheetStore();
-  const { storeCarts } = useCartStore();
+  const { setStoreCarts, storeCarts } = useCartStore();
   const { productDetailLike: storeLike, setProductDetailLike: setStoreLike } = useLikeStore();
   const { user } = useUserStore();
   const { setOnToast } = useToastStore();
@@ -86,6 +86,10 @@ const BottomFixButton = ({ productData }: IProps) => {
     if (message === '로그인이 필요합니다.') {
       return router.push('/login');
     }
+
+    setOnToast(true, '장바구니에 담겼어요!', '/cart');
+    setStoreCarts(cartData);
+
     onClose();
   };
 

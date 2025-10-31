@@ -1,12 +1,8 @@
-import { useCartStore } from '@/store/cartStore';
-import { useToastStore } from '@/store/toastStore';
 import { CartRef, ICart } from '@/types/cart';
 import requester from '@/utils/requester';
 import { useCallback, useEffect, useState } from 'react';
 
 export const useCart = () => {
-  const { setStoreCarts } = useCartStore();
-  const { setOnToast } = useToastStore();
   const [carts, setCarts] = useState<ICart[]>([]);
   const [message, setMessage] = useState('');
 
@@ -60,9 +56,6 @@ export const useCart = () => {
           }
 
           if (res.data.result) {
-            setOnToast(true, '장바구니에 담겼어요!', '/cart');
-            setStoreCarts(updateData);
-
             getCart();
           }
         })
@@ -70,7 +63,7 @@ export const useCart = () => {
           console.log('upsertCart-error', error.message);
         });
     },
-    [getCart, setOnToast, setStoreCarts]
+    [getCart]
   );
 
   useEffect(() => {
